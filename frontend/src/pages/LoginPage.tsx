@@ -1,5 +1,6 @@
 import React, { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, User, TenantChoice } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import AppMeta from '../components/AppMeta';
@@ -59,26 +60,27 @@ interface SelectionScreenProps {
 }
 
 function ClinicSelectionScreen({ tenants, selecting, error, onSelect, onBack }: SelectionScreenProps) {
+  const { t } = useTranslation('auth');
   return (
     <>
-      <h2 className="text-white font-semibold text-lg mb-1 text-center">Which clinic?</h2>
+      <h2 className="text-white font-semibold text-lg mb-1 text-center">{t('clinicSelect.title')}</h2>
       <p className="text-gray-400 text-sm text-center mb-6">
-        Select the clinic you'd like to sign in to.
+        {t('clinicSelect.subtitle')}
       </p>
 
       {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
 
       <div className="space-y-3">
-        {tenants.map(t => (
+        {tenants.map(tenant => (
           <button
-            key={t.tenantId}
-            onClick={() => onSelect(t.tenantId)}
+            key={tenant.tenantId}
+            onClick={() => onSelect(tenant.tenantId)}
             disabled={selecting}
             className="w-full text-left bg-navy-800 hover:bg-navy-700 border border-navy-600 hover:border-gold rounded-xl px-5 py-4 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <span className="block text-white font-semibold">{t.tenantName}</span>
+            <span className="block text-white font-semibold">{tenant.tenantName}</span>
             <span className="block text-gray-400 text-xs mt-0.5 capitalize">
-              {t.role.replace(/_/g, ' ')}
+              {tenant.role.replace(/_/g, ' ')}
             </span>
           </button>
         ))}
@@ -88,7 +90,7 @@ function ClinicSelectionScreen({ tenants, selecting, error, onSelect, onBack }: 
         onClick={onBack}
         className="mt-6 w-full text-center text-sm text-gray-500 hover:text-gray-300 transition-colors"
       >
-        ← Back to sign in
+        {t('clinicSelect.back')}
       </button>
     </>
   );
@@ -97,6 +99,7 @@ function ClinicSelectionScreen({ tenants, selecting, error, onSelect, onBack }: 
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function LoginPage() {
+  const { t } = useTranslation('auth');
   const { login, selectTenant } = useAuth();
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -130,7 +133,7 @@ export default function LoginPage() {
       const message =
         err instanceof Error
           ? err.message
-          : 'Invalid email or password';
+          : t('login.error');
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -149,9 +152,9 @@ export default function LoginPage() {
       if (status === 401) {
         // Selection token expired (5 min window) — send back to login
         setSelectionData(null);
-        setError('Session expired. Please sign in again.');
+        setError(t('login.sessionExpired'));
       } else {
-        setError('Could not sign in to that clinic. Please try again.');
+        setError(t('login.selectClinicError'));
       }
     } finally {
       setSelecting(false);
@@ -188,7 +191,7 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-1">
-            Email
+            {t('login.email')}
           </label>
           <input
             type="email"
@@ -202,7 +205,7 @@ export default function LoginPage() {
 
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-1">
-            Password
+            {t('login.password')}
           </label>
           <input
             type="password"
@@ -223,12 +226,12 @@ export default function LoginPage() {
           disabled={isSubmitting}
           className="w-full bg-gold hover:bg-gold-light text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? 'Signing in…' : 'Sign in'}
+          {isSubmitting ? t('login.submitting') : t('login.submit')}
         </button>
 
         <p className="text-center text-sm mt-1">
           <Link to="/forgot-password" className="text-gray-400 hover:text-gold transition-colors">
-            Forgot password?
+            {t('login.forgotPassword')}
           </Link>
         </p>
       </form>

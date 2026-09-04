@@ -137,8 +137,8 @@ export default function AboutPage() {
   return (
     <div style={{ background: '#ffffff', minHeight: '100vh' }}>
       <SEOMeta
-        title="About CareNova — WhatsApp AI Built for Dental Clinics"
-        description="Why we built a WhatsApp-native AI for dental practices, how it works, and the team behind it. UK-based, ICO-registered and GDPR compliant. Made in London."
+        title="About CareNova — WhatsApp AI Built for Health Tourism Clinics"
+        description="Why we built a WhatsApp-native AI patient-trust platform for Turkish health tourism clinics, how it works, and the team behind it."
         path="/about"
       />
       <NavBar />

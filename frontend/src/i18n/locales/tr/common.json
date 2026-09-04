@@ -1,0 +1,18 @@
+{
+  "appName": "CareNova",
+  "loading": "Yükleniyor…",
+  "save": "Kaydet",
+  "cancel": "Vazgeç",
+  "delete": "Sil",
+  "edit": "Düzenle",
+  "close": "Kapat",
+  "search": "Ara",
+  "back": "Geri",
+  "next": "İleri",
+  "yes": "Evet",
+  "no": "Hayır",
+  "confirm": "Onayla",
+  "error": "Bir hata oluştu",
+  "retry": "Tekrar dene",
+  "language": "Dil"
+}

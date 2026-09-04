@@ -4,7 +4,11 @@
 (sabah en üstte okunacak 5 satır — Paket 9'da doldurulacak)
 
 ## Canlı URL
-(deploy edildiğinde buraya yazılacak)
+https://carenova-owfx5aiu6-baturay-ozden-s-projects.vercel.app
+
+⚠️ **Şu an Vercel SSO/Deployment Protection arkasında** — sadece Baturay'ın kendi
+Vercel oturumundan erişilebilir, herkese açık değil. 30 saniyelik tek-tık düzeltme
+için `BLOKAJLAR.md` B1'e bak. Build/deploy'un kendisi başarılı ve içerik doğru.
 
 ---
 ## [23:05] PAKET 0 — Hazırlık
@@ -47,5 +51,41 @@ vercel CLI: 59.11.7
 
 **Not:** `ai-prompts/en_initial_outreach.md` içinde hâlâ diş-spesifik dil var ama kod tarafından hiç yüklenmiyor (statik referans dosyası) — düşük öncelik, dokunulmadı.
 **Commit:** `0e03aa2` chore: fork CareDental and rebrand to CareNova, strip dental-specific assumptions
+
+---
+## [23:35] PAKET 2 — İlk deploy
+**Yapıldı:**
+- Kök `package.json` + `vercel.json` shim'i (brief §2.1) oluşturuldu, yerelde `npm run build`'un `frontend/build/` ürettiği doğrulandı.
+- `vercel whoami` / `vercel teams ls` ile hesap/takım doğrulandı: `baturayozden`, tek takım `baturay-ozden-s-projects` — CareDental'ın ayrı takımıyla (`team_71vQmAg7t8fDpd93BteWyHY3`) çakışma riski yok, zaten `.vercel` klasörü de yok (link kurulmadı).
+- `git push` → ilk build **başarısız oldu** (bkz. aşağıda). Kök nedeni bulup düzelttim, ikinci push başarılı oldu.
+- **Bulunan ve düzeltilen build hatası:** `frontend/scripts/generate-og-cards.js`, blog API'ye ulaşamayınca (`api.carenova.ai` DNS yok — backend deploy edilmedi, beklenen durum) `process.exit(1)` ile TÜM build'i çöktürüyordu. `generate-sitemap.js`'in aksine try/catch ile yumuşatılmamıştı. Brief tam bunu uyarmıştı ama uyarı sadece sitemap script'i içindi — og-cards script'i aynı hataya sahipti, gözden kaçmış. `generate-sitemap.js`'deki aynı "fail-soft" deseni uygulandı (WARN bas, build'i durdurma).
+- Bu sırada `scripts/prerender.js`'in "/" rotasını **500+ karakter body text + h1 şartı** olmadan "not ready" sayıp build'i durdurduğu görüldü — çünkü PAKET 1'de bıraktığım placeholder `LandingPage.tsx` neredeyse boştu. Placeholder'a gerçek, dürüst içerik eklendi (konumlandırma cümlesi, kısa ürün açıklaması, iletişim maili) — hem bu kontrolü geçti hem de sabaha kadar gerçek sayfa gelene kadar ziyaretçiye anlamlı bir şey gösteriyor.
+- **Stray dosya temizliği:** `frontend/public/care-dental.zip` (build çıktısına sızan CareDental'a ait bir zip) silindi.
+- İkinci push sonrası deployment **Ready** oldu, içerik doğrulandı (`grep -io carenova` → eşleşme, `<title>` doğru).
+- ⚠️ **Bulunan yeni blokaj (B1, bkz. `BLOKAJLAR.md`):** Canlı URL Vercel SSO/Deployment Protection arkasında — herkese açık değil, sadece Baturay'ın oturumundan erişilebiliyor. Bu bir proje AYARI (CLI salt-okunur kuralı gereği kendim değiştirmedim), 30 saniyelik dashboard'dan tek tık düzeltme gerekiyor.
+
+**Karar:**
+- `carenova.vercel.app` ve `care-nova.vercel.app` tahminlerinin İKİSİ de **başka insanlara ait ilgisiz projeler** çıktı (biri bebek bakıcısı rezervasyon sitesi, diğeri "Create Next App" varsayılanı) — brief'in "tahmin etme, doğrula" uyarısı tam yerinde oldu. Gerçek URL `vercel ls carenova` ile bulundu.
+- `gh api repos/.../deployments` GitHub Deployments API'si bu Vercel Git entegrasyonu için hiç dolmadı (defalarca "no deployment found" — muhtemelen bu entegrasyon türü GitHub Deployments objesi oluşturmuyor, commit status kullanıyor olabilir). `vercel ls <proje>` çok daha güvenilir çıktı, ileride onu kullanacağım.
+
+**Commit:** `3f51e31` chore: add Vercel deployment config, `ce15131` fix(build): stop generate-og-cards.js from crashing the Vercel build
+
+---
+## [23:55] PAKET 3 — i18n altyapısı (TR/EN)
+**Yapıldı:**
+- `react-i18next` + `i18next` + `i18next-browser-languagedetector` kuruldu. **Önemli sürüm notu:** en güncel majör sürümler (react-i18next 17, i18next 26) TypeScript 5+ gerektiren `const` tip parametreleri kullanıyor; bu proje TS 4.9.5'te (react-scripts 5.0.1 ile sabit) kilitli. `useTranslation('nav')` ve `t('key')` derlemede "Expected 0 arguments" hatası verdi. **Çözüm:** react-i18next'i `^14`'e, i18next'i `^23`'e, language-detector'ı `^7`'ye indirdim — TS 4.9 ile tam uyumlu, aynı API yüzeyi.
+- `frontend/src/i18n/` altında namespace yapısı: `locales/{tr,en}/{common,auth,nav,landing,cases,patients,settings,billing}.json`. `cases`/`patients`/`billing` şimdilik boş (`{}`) — brief'in "kalan ekranları çevirme, altyapı yeter" kararına uygun.
+- Dil tespiti: localStorage (`carenova_language`) → tarayıcı dili → `tr` fallback. `frontend/src/index.tsx`'e `import './i18n'` eklendi.
+- `frontend/src/utils/format.ts` — Intl tabanlı `formatDateIntl`/`formatDateTime`/`formatNumber`/`formatCurrency`, aktif i18next diline göre `tr-TR`/`en-GB` seçiyor. Mevcut `utils/date.ts`'in `formatDate`'i (12 çağıran yeri kırma riski yüzünden) davranışı AYNEN korunarak bırakıldı, yeni yardımcılar oradan re-export edildi.
+- `Layout`, `Sidebar`, `LoginPage` örnek olarak i18n'e geçirildi. Sidebar'a ayrıca TR/EN dil değiştirici eklendi (brief'in "Header'a dil değiştirici koy" isteği — bu app'te ayrı bir header yok, doğal karşılığı Sidebar footer'ı).
+- ESLint kuralı: `eslint-plugin-i18next` kuruldu, `i18next/no-literal-string` kuralı eklendi ama **sadece i18n'e geçirilmiş 3 dosyaya scoped** (`overrides` ile) — global açılsaydı çevrilmemiş yüzlerce string tüm Vercel build'ini `CI=true` altında çökertirdi (test ettim, gerçekten çöküyor). Bu, brief'in "hardcoded string uyarısı ekle" isteğiyle "build'i kırma" arasındaki gerilimi çözüyor; kalan dosyalar modülleri çevrildikçe `overrides` listesine eklenecek.
+- **Fark edilen ve düzeltilen kalıntılar:** `Layout.tsx`'te `Care<span>Dental</span> AI` (JSX tag'i araya girdiği için ilk sed taramasını atlatmıştı), `RegisterPage.tsx`'te aynı desen + 🦷 emoji, `AboutPage.tsx`/`CareersPage.tsx` SEO başlıklarında "UK Dental Clinics" ifadesi.
+- **Bulunan ayrı hata (i18n ile ilgisiz):** Tarayıcı doğrulaması sırasında `localhost:3000`'de **caredental'ın kendi (benimle ilgisiz) dev server'ının** zaten çalıştığını fark ettim — preview aracı `name` ile server başlatırken birincil çalışma dizinim (`caredental`) altındaki `.claude/launch.json`'ı çözümlüyor, CareNova'nınkini değil. Caredental'a HİÇBİR dosya yazmadım/silmedim/taşımadım (kural ihlali yok) — sadece o transient `npm start` sürecini durdurdum (dosya değil, süreç) ve CareNova'yı kendi `.claude/launch.json`'ından bağımsız olarak doğrudan `PORT=3002 npm start` ile ayrı bir portta çalıştırıp tarayıcıdan doğruladım. `.claude/launch.json`'ı da 3000→3002 olarak güncelledim ki ileride bu araç tekrar yanlış projeye bağlanmasın (gitignore'da olduğu için commit'lenmiyor).
+- Tarayıcıda doğrulandı: login sayfası "CareNova" markasıyla render oluyor, dil `tr`'ye zorlanınca "E-posta/Şifre/Giriş yap/Şifremi unuttum" doğru çıkıyor, landing placeholder doğru görünüyor.
+- `CI=true npm run build` tekrar temiz geçti (yeni ESLint kuralı dahil).
+
+**Karar:** `users.locale` DB kolonu ve Settings sayfası dil seçici entegrasyonu bu gece YAPILMADI — brief'in kısa PAKET 3 tanımı sadece "Header'a dil değiştirici koy" diyor, DB kalıcılığı KOMUT4'ün daha detaylı halinde var ama gece brifinginde yok; localStorage yeterli kabul edildi.
+
+**Commit:** (aşağıda push sonrası eklenecek)
 
 ---

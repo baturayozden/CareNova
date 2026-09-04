@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, TenantChoice } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../lib/api';
@@ -11,7 +12,7 @@ import {
 } from 'lucide-react';
 
 type NavItem = {
-  label: string;
+  labelKey: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   path: string;
 };
@@ -32,29 +33,30 @@ interface SidebarProps {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Dashboard',     icon: LayoutGrid,     path: '/dashboard'      },
-  { label: 'Leads',         icon: Users,          path: '/leads'          },
-  { label: 'Patients',      icon: UserSquare2,    path: '/patients'       },
-  { label: 'AI Activity',   icon: Bot,            path: '/ai-activity'    },
-  { label: 'Appointments',  icon: CalendarDays,   path: '/appointments'   },
-  { label: 'Payments',      icon: CreditCard,     path: '/payments'       },
-  { label: 'Invoices',      icon: FileText,       path: '/invoices'       },
-  { label: 'Clinics',       icon: Building2,      path: '/clinics'        },
-  { label: 'Settings',      icon: SettingsIcon,   path: '/settings'       },
+  { labelKey: 'dashboard',  icon: LayoutGrid,     path: '/dashboard'      },
+  { labelKey: 'leads',      icon: Users,          path: '/leads'          },
+  { labelKey: 'patients',   icon: UserSquare2,    path: '/patients'       },
+  { labelKey: 'aiActivity', icon: Bot,            path: '/ai-activity'    },
+  { labelKey: 'appointments', icon: CalendarDays, path: '/appointments'   },
+  { labelKey: 'payments',   icon: CreditCard,     path: '/payments'       },
+  { labelKey: 'invoices',   icon: FileText,       path: '/invoices'       },
+  { labelKey: 'clinics',    icon: Building2,      path: '/clinics'        },
+  { labelKey: 'settings',   icon: SettingsIcon,   path: '/settings'       },
 ];
 
 const superAdminItems: NavItem[] = [
-  { label: 'Commission',    icon: Wallet,         path: '/commission'     },
-  { label: 'Demo Requests', icon: ClipboardList,  path: '/demo-requests'  },
+  { labelKey: 'commission',    icon: Wallet,        path: '/commission'     },
+  { labelKey: 'demoRequests',  icon: ClipboardList, path: '/demo-requests'  },
 ];
 
 const COMMISSION_ROLES = ['director', 'clinic_admin'];
 
 const commissionItems: NavItem[] = [
-  { label: 'Commission', icon: Wallet, path: '/commission' },
+  { labelKey: 'commission', icon: Wallet, path: '/commission' },
 ];
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const { t, i18n } = useTranslation('nav');
   const { user, logout, switchTenant } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const logoSrc = theme === 'light' ? carenovaLogoLight : carenovaLogoDark;
@@ -175,11 +177,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   function timeAgo(iso: string) {
     const diff = Date.now() - new Date(iso).getTime();
     const m = Math.floor(diff / 60000);
-    if (m < 1)  return 'just now';
-    if (m < 60) return `${m}m ago`;
+    if (m < 1)  return t('justNow');
+    if (m < 60) return t('minutesAgo', { count: m });
     const h = Math.floor(m / 60);
-    if (h < 24) return `${h}h ago`;
-    return `${Math.floor(h / 24)}d ago`;
+    if (h < 24) return t('hoursAgo', { count: h });
+    return t('daysAgo', { count: Math.floor(h / 24) });
   }
 
   const initials = user
@@ -240,30 +242,32 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
 
             {/* Close button — mobile drawer only */}
+            {/* eslint-disable i18next/no-literal-string -- ✕ is a symbol, not translatable text */}
             <button
               onClick={onClose}
               className="md:hidden ml-2 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-navy-700 transition-colors text-base"
-              aria-label="Close menu"
+              aria-label={t('closeMenu')}
             >
               ✕
             </button>
+            {/* eslint-enable i18next/no-literal-string */}
           </div>
 
           {/* Dropdown — anchored to header-div, fits inside sidebar */}
           {bellOpen && (
             <div className="absolute left-3 right-3 top-full bg-navy-800 border border-navy-600 rounded-xl shadow-2xl z-50 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-navy-700">
-                <p className="text-white text-sm font-semibold">Notifications</p>
+                <p className="text-white text-sm font-semibold">{t('notifications')}</p>
                 {unreadCount > 0 && (
                   <button onClick={markAllRead}
                     className="text-xs text-gold hover:text-gold-light transition-colors">
-                    Mark all read
+                    {t('markAllRead')}
                   </button>
                 )}
               </div>
               <div className="max-h-80 overflow-y-auto divide-y divide-navy-700">
                 {notifications.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center py-8">No notifications</p>
+                  <p className="text-gray-500 text-sm text-center py-8">{t('noNotifications')}</p>
                 ) : notifications.map(n => (
                   <div
                     key={n.id}
@@ -301,7 +305,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               }
             >
               {(() => { const Icon = item.icon; return <Icon size={18} className="shrink-0" />; })()}
-              <span className="flex-1">{item.label}</span>
+              <span className="flex-1">{t(item.labelKey)}</span>
               {item.path === '/ai-activity' && escalationCount > 0 && (
                 <span className="ml-auto bg-yellow-500 text-navy-950 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {escalationCount > 99 ? '99+' : escalationCount}
@@ -313,7 +317,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {user?.role && COMMISSION_ROLES.includes(user.role) && (
             <>
               <div className="pt-4 pb-1 px-3">
-                <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">Management</p>
+                <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">{t('management')}</p>
               </div>
               {commissionItems.map((item) => (
                 <NavLink
@@ -329,7 +333,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   }
                 >
                   {(() => { const Icon = item.icon; return <Icon size={18} className="shrink-0" />; })()}
-                  {item.label}
+                  {t(item.labelKey)}
                 </NavLink>
               ))}
             </>
@@ -338,7 +342,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {user?.role === 'super_admin' && (
             <>
               <div className="pt-4 pb-1 px-3">
-                <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">Super Admin</p>
+                <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">{t('superAdmin')}</p>
               </div>
               {superAdminItems.map((item) => (
                 <NavLink
@@ -354,7 +358,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   }
                 >
                   {(() => { const Icon = item.icon; return <Icon size={18} className="shrink-0" />; })()}
-                  {item.label}
+                  {t(item.labelKey)}
                 </NavLink>
               ))}
             </>
@@ -383,7 +387,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               >
                 <Building2 size={16} className="shrink-0" />
                 <span className="flex-1 text-left truncate">
-                  {myTenants.find(t => t.tenantId === user?.tenantId)?.tenantName ?? 'Switch clinic'}
+                  {myTenants.find(tn => tn.tenantId === user?.tenantId)?.tenantName ?? t('switchClinic')}
                 </span>
                 <ChevronDown
                   size={14}
@@ -393,12 +397,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
               {switcherOpen && (
                 <div className="absolute bottom-full left-0 right-0 mb-1 bg-navy-800 border border-navy-600 rounded-xl shadow-xl overflow-hidden z-50">
-                  {myTenants.map(t => {
-                    const isActive = t.tenantId === user?.tenantId;
+                  {myTenants.map(tenant => {
+                    const isActive = tenant.tenantId === user?.tenantId;
                     return (
                       <button
-                        key={t.tenantId}
-                        onClick={() => handleSwitchTenant(t.tenantId)}
+                        key={tenant.tenantId}
+                        onClick={() => handleSwitchTenant(tenant.tenantId)}
                         disabled={isActive || switching}
                         className={[
                           'w-full text-left px-4 py-3 text-sm transition-colors',
@@ -408,13 +412,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         ].join(' ')}
                       >
                         <span className={`block font-medium ${isActive ? 'text-white' : 'text-gray-200'}`}>
-                          {t.tenantName}
+                          {tenant.tenantName}
                         </span>
                         <span className="block text-xs text-gray-500 mt-0.5 capitalize">
-                          {t.role.replace(/_/g, ' ')}
+                          {tenant.role.replace(/_/g, ' ')}
                         </span>
                         {isActive && (
-                          <span className="block text-xs text-gold mt-0.5">Active</span>
+                          <span className="block text-xs text-gold mt-0.5">{t('active')}</span>
                         )}
                       </button>
                     );
@@ -424,13 +428,30 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
           )}
 
+          <div className="flex items-center gap-1 px-1">
+            {(['tr', 'en'] as const).map(lng => (
+              <button
+                key={lng}
+                onClick={() => i18n.changeLanguage(lng)}
+                aria-current={i18n.language?.startsWith(lng)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide transition-colors ${
+                  i18n.language?.startsWith(lng)
+                    ? 'bg-navy-700 text-gold'
+                    : 'text-gray-500 hover:text-white hover:bg-navy-700'
+                }`}
+              >
+                {lng}
+              </button>
+            ))}
+          </div>
+
           <button
             onClick={toggleTheme}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-navy-700 transition-colors"
-            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={theme === 'dark' ? t('switchToLight') : t('switchToDark')}
           >
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            {theme === 'dark' ? t('lightMode') : t('darkMode')}
           </button>
 
           <button
@@ -438,7 +459,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:text-red-300 hover:bg-navy-700 transition-colors"
           >
             <LogOut size={16} />
-            Sign out
+            {t('signOut')}
           </button>
         </div>
       </aside>

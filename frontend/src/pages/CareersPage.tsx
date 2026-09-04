@@ -22,7 +22,7 @@ export default function CareersPage() {
   return (
     <div style={{ background: '#ffffff', minHeight: '100vh' }}>
       <SEOMeta
-        title="Careers at CareNova — Build AI for UK Dental Clinics"
+        title="Careers at CareNova — Build AI for Health Tourism Clinics"
         description="Help us give every dental clinic a treatment coordinator that never sleeps. Open roles at CareNova, a UK-based WhatsApp AI company based in London."
         path="/careers"
       />
@@ -41,7 +41,7 @@ export default function CareersPage() {
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease, delay: 0.25 }}
             className="max-w-xl mx-auto mt-6" style={{ color: BODY, fontSize: 19, lineHeight: 1.6 }}>
-            We're a small, ambitious team building AI that helps dental clinics never miss a patient again.
+            We're a small, ambitious team building AI that helps health tourism clinics never miss a patient again.
           </motion.p>
         </div>
       </section>

@@ -64,10 +64,9 @@ export default function RegisterPage() {
       <div className="bg-navy-900 rounded-2xl p-10 w-full max-w-md shadow-2xl border border-navy-600">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-3xl">🦷</span>
             <span className="text-2xl font-serif">
               <span className="text-gold">Care</span>
-              <span className="text-white">Dental</span>
+              <span className="text-white">Nova</span>
             </span>
           </div>
           <p className="text-gray-400 text-sm">AI-powered lead recovery</p>
