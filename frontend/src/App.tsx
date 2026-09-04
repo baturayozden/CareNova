@@ -37,6 +37,7 @@ import PrivacyPage from './pages/legal/PrivacyPage';
 import TermsPage from './pages/legal/TermsPage';
 import CookiePage from './pages/legal/CookiePage';
 import GdprPage from './pages/legal/GdprPage';
+import ComingSoonPage from './pages/ComingSoonPage';
 
 // Determine at runtime whether we're on an app/admin subdomain.
 // Uses build-time env vars; if not set (local dev) falls back to false → LandingPage shown.
@@ -91,6 +92,12 @@ export default function App() {
               <Route path="/payments/:id"          element={<CaseDetailPage />} />
               <Route path="/invoices"              element={<InvoicesPage />} />
               <Route path="/demo-requests"         element={<DemoRequestsPage />} />
+              <Route path="/cases"          element={<ComingSoonPage title="Vakalar" />} />
+              <Route path="/doctor-queue"   element={<ComingSoonPage title="Doktor Onayı" />} />
+              <Route path="/quotes"         element={<ComingSoonPage title="Teklifler" />} />
+              <Route path="/travel"         element={<ComingSoonPage title="Seyahat" />} />
+              <Route path="/aftercare"      element={<ComingSoonPage title="Bakım Hattı" />} />
+              <Route path="/reports"        element={<ComingSoonPage title="Raporlar" />} />
             </Route>
           </Route>
         </Routes>

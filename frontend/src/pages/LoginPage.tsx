@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, User, TenantChoice } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import AppMeta from '../components/AppMeta';
+import { DEMO_MODE } from '../lib/api';
 import carenovaLogoDark  from '../assets/carenova-logo-transparent-dark.svg';
 import carenovaLogoLight from '../assets/carenova-logo-transparent-light.svg';
 
@@ -37,12 +38,21 @@ function redirectAfterLogin(user: User, navigate: ReturnType<typeof useNavigate>
 // ── Shared card wrapper ───────────────────────────────────────────────────────
 
 function LoginCard({ logoSrc, children }: { logoSrc: string; children: React.ReactNode }) {
+  const { t } = useTranslation('auth');
   return (
     <div className="flex h-screen items-center justify-center bg-navy-950 px-4">
       <div className="bg-navy-900 rounded-2xl p-10 w-full max-w-md shadow-2xl border border-navy-600">
         <div className="text-center mb-8">
           <img src={logoSrc} alt="CareNova AI" className="w-full max-w-[240px] h-auto mx-auto block mb-1" />
+          {DEMO_MODE && (
+            <span className="inline-flex items-center gap-1.5 mt-3 bg-gold/10 border border-gold/25 text-gold text-xs font-medium px-3 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-gold" /> {t('login.demoMode')}
+            </span>
+          )}
         </div>
+        {DEMO_MODE && (
+          <p className="text-center text-gray-500 text-xs mb-6 -mt-4">{t('login.demoModeHint')}</p>
+        )}
         {children}
       </div>
     </div>

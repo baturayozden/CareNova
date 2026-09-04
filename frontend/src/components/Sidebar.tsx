@@ -7,8 +7,9 @@ import api from '../lib/api';
 import carenovaLogoDark  from '../assets/carenova-logo-transparent-dark.svg';
 import carenovaLogoLight from '../assets/carenova-logo-transparent-light.svg';
 import {
-  LayoutGrid, Users, Bot, Building2, Settings as SettingsIcon,
-  Wallet, ClipboardList, Bell, Sun, Moon, LogOut, CalendarDays, CreditCard, ChevronDown, FileText, UserSquare2,
+  LayoutGrid, Building2, Settings as SettingsIcon,
+  Wallet, ClipboardList, Bell, Sun, Moon, LogOut, ChevronDown, UserSquare2,
+  FolderKanban, MessageCircle, Stethoscope, FileSignature, Plane, HeartPulse, BarChart3,
 } from 'lucide-react';
 
 type NavItem = {
@@ -33,15 +34,16 @@ interface SidebarProps {
 }
 
 const navItems: NavItem[] = [
-  { labelKey: 'dashboard',  icon: LayoutGrid,     path: '/dashboard'      },
-  { labelKey: 'leads',      icon: Users,          path: '/leads'          },
-  { labelKey: 'patients',   icon: UserSquare2,    path: '/patients'       },
-  { labelKey: 'aiActivity', icon: Bot,            path: '/ai-activity'    },
-  { labelKey: 'appointments', icon: CalendarDays, path: '/appointments'   },
-  { labelKey: 'payments',   icon: CreditCard,     path: '/payments'       },
-  { labelKey: 'invoices',   icon: FileText,       path: '/invoices'       },
-  { labelKey: 'clinics',    icon: Building2,      path: '/clinics'        },
-  { labelKey: 'settings',   icon: SettingsIcon,   path: '/settings'       },
+  { labelKey: 'dashboard',    icon: LayoutGrid,      path: '/dashboard'     },
+  { labelKey: 'cases',        icon: FolderKanban,    path: '/cases'         },
+  { labelKey: 'conversations', icon: MessageCircle,  path: '/ai-activity'   },
+  { labelKey: 'doctorQueue',  icon: Stethoscope,     path: '/doctor-queue'  },
+  { labelKey: 'quotes',       icon: FileSignature,   path: '/quotes'        },
+  { labelKey: 'travel',       icon: Plane,           path: '/travel'        },
+  { labelKey: 'aftercare',    icon: HeartPulse,      path: '/aftercare'     },
+  { labelKey: 'patients',     icon: UserSquare2,     path: '/patients'      },
+  { labelKey: 'reports',      icon: BarChart3,       path: '/reports'       },
+  { labelKey: 'settings',     icon: SettingsIcon,    path: '/settings'      },
 ];
 
 const superAdminItems: NavItem[] = [

@@ -4,7 +4,7 @@
 (sabah en üstte okunacak 5 satır — Paket 9'da doldurulacak)
 
 ## Canlı URL
-https://carenova-jkq82j5jr-baturay-ozden-s-projects.vercel.app
+https://carenova-bkea1ul9x-baturay-ozden-s-projects.vercel.app
 (her push'ta değişir — en güncel URL için `vercel ls carenova`)
 
 ⚠️ **Şu an Vercel SSO/Deployment Protection arkasında** — sadece Baturay'ın kendi
@@ -101,6 +101,23 @@ vercel CLI: 59.11.7
 **Karar:** Landing içeriğini flat i18next JSON yerine TS veri dosyası olarak tuttum — FAQ (8 soru × 2 dil), pricing (3 tier × ~7 özellik × 2 dil) gibi tekrarlayan yapılı içerik i18next'in `t()` API'siyle çok daha kırılgan/uzun olurdu. Karar `i18n.language` sinyaline bağlı kalarak "TR/EN üzerinden" ilkesini koruyor.
 
 **Not:** `#hero` bölümündeki ikincil CTA "Nasıl Çalışır?" `#platform`'a scroll ediyor — ayrı bir "how it works" bölümü brief'in 10 bölüm listesinde yoktu, Platform'un içine gömülü kabul edildi.
+
+**Commit:** `1395bb2` feat: build CareNova landing page (TR/EN)
+
+---
+## [01:20] PAKET 5 — Demo modu + gezilebilir panel
+**Yapıldı:**
+- `frontend/src/data/demoData.ts`: 4 gerçekçi vaka (Alman saç ekimi hastası Lukas Weber — Norwood 4, 3 fotoğraf yüklü, doktor onayı bekliyor; Iraklı diş hastası Ahmed Al-Rashid — panoramik bekleniyor; İngiliz estetik hastası Charlotte Bennett — kilitli teklif verildi, depozito bekleniyor; Rus göz hastası Irina Sokolova — D+30 bakım hattında). Her biri kendi dilinde gerçekçi WhatsApp geçmişiyle (DE/AR/EN/RU). 3 doktor kartı, 2 hasta danışmanı, dashboard metrikleri de eklendi.
+- **Önemli mimari not:** Bu veri mevcut `ApiLead`/`Message` tipine göre modellendi, brief'in tarif ettiği tam "Vaka" (Case File) modeline göre DEĞİL — çünkü Case File modeli (PAKET 6) henüz kurulmadı. `CaseDetailPage.tsx` diye bir sayfa zaten vardı ama o CareDental'ın "TreatmentCase" kavramı (ödeme/imza toplama iş akışı), sağlık turizmi "vaka"sıyla (hasta+refakatçi+teklif+seyahat+bakım) alakasız — karıştırılmadı.
+- `frontend/src/lib/demoAdapter.ts`: Axios'un custom `adapter` seçeneğiyle TÜM HTTP çağrılarını devre dışı bırakan bir mock katman — 200-400ms rastgele gecikme ile. Kapsanan uçlar: `/auth/login` (herhangi bir e-posta/şifre kabul edilir), `/auth/me`, `/auth/my-tenants`, `/api/leads` (liste+detay+mesajlar), `/api/leads/stats`, `/api/patients`, `/api/activity` (+summary+weekly-report), `/api/whatsapp/activity`, `/api/insights/global`, `/api/clinics` (+sales-users), `/api/notifications`. Kapsanmayan her GET boş ama güvenli bir obje döner (sayfa çökmesin diye), her POST/PUT `{success:true}` döner.
+- `frontend/src/lib/api.ts`: `REACT_APP_DEMO_MODE=true` olduğunda axios instance'ı bu adapter'ı kullanacak şekilde güncellendi.
+- `LoginPage.tsx`: Demo modunda görünür "Demo Modu" rozeti + "herhangi bir e-posta/şifre ile giriş yapabilirsiniz" ipucu eklendi.
+- `Sidebar.tsx` navigasyonu brief'in istediği CareNova listesine güncellendi: Panel · Vakalar · Sohbetler · Doktor Onayı · Teklifler · Seyahat · Bakım Hattı · Hastalar · Raporlar · Ayarlar. Henüz gerçek sayfası olmayan 5 öğe (Vakalar, Doktor Onayı, Teklifler, Seyahat, Bakım Hattı) yeni `ComingSoonPage.tsx` placeholder'ına yönlendirildi (404 YOK). Sohbetler → mevcut AI Activity sayfası, Raporlar → yeni `/reports` placeholder'ı (mevcut insights sayfası yok).
+- **Tarayıcıda uçtan uca doğrulandı** (dev server, port 3002): Login → Demo Modu rozeti + herhangi bilgiyle giriş → onboarding modalını kapat → Dashboard (4 lead, 2 booked, 5 AI mesajı, gerçek isimler ve dillerle) → Vakalar (Yakında ekranı, çökme yok) → Sohbetler/AI Activity (tam dolu: bugünkü mesajlar, reply/conversion rate, haftalık rapor, "2 leads need human follow-up" uyarısı) → Hastalar (4 hasta, atanan doktor, € tutarları, journey noktaları) → Ayarlar (profil sekmesi, demo kullanıcı bilgisi). Yol boyunca **bir gerçek çökme buldum ve düzelttim**: `/patients` endpoint'i adapter'da yoktu, `PatientsListPage.tsx` `res.data.patients.length`'te "Cannot read properties of undefined" ile çöküyordu — endpoint eklendi, doğrulandı.
+- **Ayrıca bir kozmetik hata buldum ve düzelttim:** `recoveryRate`/`replyRate`/`conversionRate` alanlarını demo veride 0-1 arası kesir (0.68) olarak yazmıştım ama `StatsCards.tsx`/`AIActivityPage.tsx` bunları zaten yüzde olarak (`${value}%`) render ediyor — "0.68%" gibi yanlış görünüyordu. Tamsayıya çevrildi (68).
+
+**Karar:** Brief'in tarif ettiği "Vakalar" sekmesi bu gece gerçek veriyle doldurulamadı çünkü altındaki veri modeli (Case File, PAKET 6) henüz yok — sahte bir "Vaka" ekranı gerçek olmayan bir yapıyı simüle etmek yerine dürüst bir "Yakında" ekranı gösteriyor. Bu, brief'in kendi paket sıralamasındaki bir gerilim: PAKET 5, PAKET 6'nın konseptlerini varsayıyor ama PAKET 6 sonra geliyor ve opsiyonel. Mevcut `Lead`/`Patient` modeliyle çalışan her şey (Panel, Sohbetler, Hastalar, demo login) tam dolu ve gerçek.
+**Not:** Demo adapter'ın "kapsanmayan her GET boş obje döner" ilkesi, `LeadsPage.tsx`'in kullandığı `/api/commissions/deals`, `/api/invoices?leadId=`, `/api/clinics/${id}/sales-users` gibi bazı İKİNCİL (lead detay modalı içindeki alt sekmeler) uçları test etmedim — büyük ihtimalle boş liste gösterirler ama çökme garantisi vermiyorum. Ana akışlar (Dashboard, Leads listesi, Patients, AI Activity, Settings) tek tek gezilip doğrulandı.
 
 **Commit:** (push sonrası eklenecek)
 

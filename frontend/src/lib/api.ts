@@ -1,4 +1,7 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
+import demoAdapter from './demoAdapter';
+
+export const DEMO_MODE = process.env.REACT_APP_DEMO_MODE === 'true';
 
 // ── Token helpers ─────────────────────────────────────────────────────────────
 
@@ -23,6 +26,9 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3001',
   // withCredentials kept so same-origin cookie fallback still works during dev
   withCredentials: true,
+  // Demo mode never touches the network — no backend is deployed tonight.
+  // See src/lib/demoAdapter.ts and src/data/demoData.ts.
+  ...(DEMO_MODE ? { adapter: demoAdapter } : {}),
 });
 
 // ── Request interceptor — attach Bearer token ─────────────────────────────────
