@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+
+  "redirects": [
+    { "source": "/landing.html", "destination": "/", "permanent": true },
+    { "source": "/_hosts/prerendered/:path*", "destination": "/:path*", "permanent": false }
+  ],
+
+  "rewrites": [
+    {
+      "source": "/robots.txt",
+      "has": [{ "type": "host", "value": "carenova.ai" }],
+      "destination": "/_hosts/apex-robots.txt"
+    },
+    { "source": "/robots.txt", "destination": "/_hosts/app-robots.txt" },
+
+    {
+      "source": "/sitemap.xml",
+      "has": [{ "type": "host", "value": "carenova.ai" }],
+      "destination": "/_hosts/sitemap.xml"
+    },
+
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "carenova.ai" }],
+      "destination": "/_hosts/prerendered/index.html"
+    },
+    {
+      "source": "/:page(about|blog|contact|careers|privacy|terms|gdpr|cookies)",
+      "has": [{ "type": "host", "value": "carenova.ai" }],
+      "destination": "/_hosts/prerendered/:page/index.html"
+    },
+    {
+      "source": "/blog/:slug",
+      "has": [{ "type": "host", "value": "carenova.ai" }],
+      "destination": "/_hosts/prerendered/blog/:slug/index.html"
+    },
+
+    { "source": "/(.*)", "destination": "/_hosts/app-shell.html" }
+  ],
+
+  "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [{ "key": "Content-Type", "value": "application/xml" }]
+    },
+    {
+      "source": "/static/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" }
+      ]
+    }
+  ]
+}

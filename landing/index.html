@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareNova — AI-Powered Dental Lead Recovery</title>
+  <meta name="description" content="Stop losing leads. CareNova's AI responds to every missed enquiry via WhatsApp in seconds — in English, Turkish or Arabic — and books the appointment for you." />
+  <link rel="canonical" href="https://carenova.ai/" />
+  <meta property="og:url" content="https://carenova.ai/" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              950: '#040810',
+              900: '#070d1a',
+              800: '#0d1626',
+              700: '#152035',
+              600: '#1e2d4d',
+              500: '#264066',
+            },
+            gold: {
+              DEFAULT: '#d4a853',
+              light:   '#e8c070',
+              dark:    '#b8892e',
+            },
+          },
+          fontFamily: {
+            sans:  ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['Georgia', 'Cambria', 'serif'],
+          },
+          animation: {
+            'fade-up':    'fadeUp 0.6s ease-out forwards',
+            'fade-in':    'fadeIn 0.5s ease-out forwards',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4,0,0.6,1) infinite',
+            'float':      'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeUp:  { from: { opacity: '0', transform: 'translateY(24px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+            fadeIn:  { from: { opacity: '0' }, to: { opacity: '1' } },
+            float:   { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-12px)' } },
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    * { scroll-behavior: smooth; }
+    body { background-color: #070d1a; }
+
+    /* Gold gradient text */
+    .text-gold-gradient {
+      background: linear-gradient(135deg, #d4a853 0%, #f0d080 50%, #d4a853 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Subtle grid background */
+    .bg-grid {
+      background-image:
+        linear-gradient(rgba(212,168,83,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212,168,83,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Radial glow */
+    .hero-glow {
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,168,83,0.12) 0%, transparent 70%);
+    }
+
+    /* Card hover */
+    .feature-card:hover { transform: translateY(-4px); border-color: rgba(212,168,83,0.4); }
+    .feature-card { transition: transform 0.3s ease, border-color 0.3s ease; }
+
+    /* Glowing button */
+    .btn-primary {
+      background: linear-gradient(135deg, #d4a853, #e8c070);
+      box-shadow: 0 0 32px rgba(212,168,83,0.3);
+      transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+    .btn-primary:hover { box-shadow: 0 0 48px rgba(212,168,83,0.5); transform: translateY(-1px); }
+
+    /* Pricing card highlight */
+    .pricing-featured {
+      background: linear-gradient(135deg, rgba(212,168,83,0.08), rgba(212,168,83,0.03));
+      border-color: rgba(212,168,83,0.5);
+      box-shadow: 0 0 48px rgba(212,168,83,0.1);
+    }
+
+    /* Scroll-reveal */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Nav blur */
+    nav { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+
+    /* Ticker */
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .ticker-inner { animation: ticker 28s linear infinite; }
+    .ticker-inner:hover { animation-play-state: paused; }
+
+    /* Mockup screen */
+    .screen-glow { box-shadow: 0 0 80px rgba(212,168,83,0.15), 0 0 160px rgba(212,168,83,0.06); }
+
+    /* WhatsApp bubble */
+    .bubble-out { background: #d4a853; border-radius: 18px 18px 4px 18px; }
+    .bubble-in  { background: #152035; border: 1px solid #1e2d4d; border-radius: 18px 18px 18px 4px; }
+  </style>
+</head>
+
+<body class="font-sans text-white antialiased">
+
+<!-- ═══════════════════════════════════════════════════════════ NAV ══ -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-navy-900/80 border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center text-navy-950 font-bold text-sm">C</div>
+      <span class="font-semibold text-white text-lg">Care<span class="text-gold">Dental</span></span>
+    </a>
+
+    <!-- Links -->
+    <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+      <a href="#features"   class="hover:text-white transition-colors">Features</a>
+      <a href="#how"        class="hover:text-white transition-colors">How It Works</a>
+      <a href="#pricing"    class="hover:text-white transition-colors">Pricing</a>
+      <a href="#contact"    class="hover:text-white transition-colors">Contact</a>
+    </div>
+
+    <!-- CTA -->
+    <div class="flex items-center gap-3">
+      <a href="#" class="hidden md:block text-sm text-gray-400 hover:text-white transition-colors px-4 py-2">Log in</a>
+      <a href="#pricing" class="btn-primary text-navy-950 font-semibold text-sm px-5 py-2.5 rounded-xl">
+        Start Free Trial
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════ HERO ══ -->
+<section class="relative min-h-screen flex flex-col items-center justify-center pt-16 overflow-hidden bg-grid hero-glow">
+
+  <!-- Background blobs -->
+  <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gold/5 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="relative max-w-7xl mx-auto px-6 py-20 text-center">
+
+    <!-- Eyebrow -->
+    <div class="inline-flex items-center gap-2 bg-gold/10 border border-gold/20 text-gold text-xs font-medium px-4 py-2 rounded-full mb-8">
+      <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse-slow"></span>
+      AI-Powered WhatsApp Automation for Dental Clinics
+    </div>
+
+    <!-- Headline -->
+    <h1 class="font-serif text-5xl md:text-7xl font-normal text-white leading-tight mb-6 max-w-4xl mx-auto">
+      Stop Losing Leads.<br />
+      <span class="text-gold-gradient">Start Booking Patients.</span>
+    </h1>
+
+    <!-- Sub -->
+    <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10">
+      CareNova's AI replies to every missed dental enquiry via WhatsApp within seconds —
+      in <strong class="text-white">English, Turkish or Arabic</strong> — and converts them into confirmed appointments while you sleep.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+      <a href="#pricing" class="btn-primary text-navy-950 font-semibold px-8 py-4 rounded-xl text-base inline-flex items-center gap-2">
+        Start 14-Day Free Trial
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </a>
+      <a href="#how" class="text-white border border-white/10 hover:border-white/25 bg-white/5 hover:bg-white/10 font-medium px-8 py-4 rounded-xl text-base transition-all inline-flex items-center gap-2">
+        <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        See How It Works
+      </a>
+    </div>
+
+    <!-- Social proof mini -->
+    <p class="text-gray-600 text-sm mb-16">
+      Trusted by <span class="text-gray-400 font-medium">dental clinics across the UK</span> · No credit card required
+    </p>
+
+    <!-- Hero Mockup -->
+    <div class="relative max-w-5xl mx-auto animate-float">
+      <!-- Browser chrome -->
+      <div class="bg-navy-800 border border-white/10 rounded-2xl overflow-hidden screen-glow">
+        <!-- Browser bar -->
+        <div class="bg-navy-900 border-b border-white/5 px-4 py-3 flex items-center gap-3">
+          <div class="flex gap-1.5">
+            <div class="w-3 h-3 rounded-full bg-red-500/60"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500/60"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500/60"></div>
+          </div>
+          <div class="flex-1 bg-navy-800 rounded-md px-3 py-1 text-xs text-gray-500 text-left max-w-xs mx-auto">
+            app.carenova.ai/activity
+          </div>
+        </div>
+
+        <!-- Dashboard mockup -->
+        <div class="p-5 bg-navy-900">
+
+          <!-- Stats row -->
+          <div class="grid grid-cols-5 gap-3 mb-4">
+            <div class="bg-navy-800 border border-white/5 rounded-xl p-4 col-span-1">
+              <p class="text-gray-500 text-xs uppercase tracking-wider mb-2">Today's AI Msgs</p>
+              <p class="text-white text-2xl font-semibold">47</p>
+            </div>
+            <div class="bg-navy-800 border border-white/5 rounded-xl p-4 col-span-1">
+              <p class="text-gray-500 text-xs uppercase tracking-wider mb-2">Leads Contacted</p>
+              <p class="text-white text-2xl font-semibold">23</p>
+            </div>
+            <div class="bg-navy-800 border border-white/5 rounded-xl p-4 col-span-1">
+              <p class="text-gray-500 text-xs uppercase tracking-wider mb-2">Reply Rate</p>
+              <p class="text-gold text-2xl font-semibold">68%</p>
+            </div>
+            <div class="bg-navy-800 border border-white/5 rounded-xl p-4 col-span-1">
+              <p class="text-gray-500 text-xs uppercase tracking-wider mb-2">Conversion</p>
+              <p class="text-gold text-2xl font-semibold">34%</p>
+            </div>
+            <div class="bg-navy-800 border border-white/5 rounded-xl p-4 col-span-1">
+              <p class="text-gray-500 text-xs uppercase tracking-wider mb-2">Pending Actions</p>
+              <p class="text-yellow-400 text-2xl font-semibold">3</p>
+            </div>
+          </div>
+
+          <!-- Conversations -->
+          <div class="grid grid-cols-3 gap-3">
+            <!-- Conversation card 1 -->
+            <div class="bg-navy-800 border border-white/5 rounded-xl p-4">
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-full bg-blue-900/60 border border-blue-700/50 flex items-center justify-center text-xs font-semibold text-blue-300">E</div>
+                  <div>
+                    <p class="text-white text-xs font-medium">Emma Thompson</p>
+                    <p class="text-gray-500 text-[10px]">🇬🇧 +44 770 090 0001</p>
+                  </div>
+                </div>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-green-900/60 text-green-400 border border-green-800/50">Booked ✓</span>
+              </div>
+              <!-- Mini chat -->
+              <div class="space-y-1.5">
+                <div class="bubble-in px-3 py-1.5 text-[10px] text-gray-300 max-w-[85%]">How much is teeth whitening?</div>
+                <div class="bubble-out px-3 py-1.5 text-[10px] text-navy-950 font-medium ml-auto max-w-[90%]">Hi Emma! From £380, takes 60–90 mins. Free consult this week? 😊</div>
+                <div class="bubble-in px-3 py-1.5 text-[10px] text-gray-300 max-w-[85%]">Thursday 10am works!</div>
+              </div>
+              <div class="mt-2 flex items-center gap-1">
+                <div class="w-1.5 h-1.5 rounded-full bg-gold"></div>
+                <div class="w-4 h-px bg-gold"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-gold"></div>
+                <div class="w-4 h-px bg-gold"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-gold"></div>
+                <div class="w-4 h-px bg-gold"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-gold"></div>
+                <span class="text-[9px] text-gray-500 ml-1">replied</span>
+              </div>
+            </div>
+
+            <!-- Conversation card 2 -->
+            <div class="bg-navy-800 border border-white/5 rounded-xl p-4">
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-full bg-purple-900/60 border border-purple-700/50 flex items-center justify-center text-xs font-semibold text-purple-300">F</div>
+                  <div>
+                    <p class="text-white text-xs font-medium">Fatma Yılmaz</p>
+                    <p class="text-gray-500 text-[10px]">🇹🇷 +44 770 090 0002</p>
+                  </div>
+                </div>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-900/60 text-blue-400 border border-blue-800/50">Talking</span>
+              </div>
+              <div class="space-y-1.5">
+                <div class="bubble-in px-3 py-1.5 text-[10px] text-gray-300 max-w-[85%]">Veneer fiyatı nedir? Taksit var mı?</div>
+                <div class="bubble-out px-3 py-1.5 text-[10px] text-navy-950 font-medium ml-auto max-w-[90%]">Merhaba Fatma! 12 ay 0% taksit seçeneğimiz var 😊</div>
+              </div>
+              <div class="mt-2.5 flex items-center gap-1.5">
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-yellow-400 border border-yellow-800/50">💳 Finance</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-900/60 text-blue-400 border border-blue-800/50">Finance Objection</span>
+              </div>
+            </div>
+
+            <!-- Conversation card 3 -->
+            <div class="bg-navy-800 border border-white/5 rounded-xl p-4">
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-full bg-green-900/60 border border-green-700/50 flex items-center justify-center text-xs font-semibold text-green-300">A</div>
+                  <div>
+                    <p class="text-white text-xs font-medium">Ahmed Hassan</p>
+                    <p class="text-gray-500 text-[10px]">🇸🇦 +44 770 090 0003</p>
+                  </div>
+                </div>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-green-900/60 text-green-400 border border-green-800/50">Booked ✓</span>
+              </div>
+              <div class="space-y-1.5">
+                <div class="bubble-in px-3 py-1.5 text-[10px] text-gray-300 max-w-[85%]">أريد زراعة أسنان — كم السعر؟</div>
+                <div class="bubble-out px-3 py-1.5 text-[10px] text-navy-950 font-medium ml-auto max-w-[90%]">أهلاً أحمد! تبدأ من £1,200 مع استشارة مجانية 🦷</div>
+              </div>
+              <div class="mt-2.5">
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-900/60 text-orange-400 border border-orange-800/50">🤔 Trust</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating WhatsApp badge -->
+      <div class="absolute -right-6 top-1/3 bg-navy-800 border border-white/10 rounded-2xl p-3 shadow-2xl hidden lg:flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+          <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </div>
+        <div>
+          <p class="text-white text-xs font-medium">AI replied</p>
+          <p class="text-gray-400 text-[10px]">in 1.2 seconds</p>
+        </div>
+      </div>
+
+      <!-- Floating booking badge -->
+      <div class="absolute -left-6 bottom-1/4 bg-navy-800 border border-green-800/40 rounded-2xl p-3 shadow-2xl hidden lg:flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-lg">🎉</div>
+        <div>
+          <p class="text-white text-xs font-medium">New booking!</p>
+          <p class="text-gray-400 text-[10px]">Implants · £3,500</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ TICKER ══ -->
+<div class="py-5 bg-navy-900/50 border-y border-white/5 overflow-hidden">
+  <div class="ticker-inner flex gap-12 whitespace-nowrap text-gray-500 text-sm font-medium">
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> 68% Reply Rate</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> AI responds in &lt;2 seconds</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> English · Turkish · Arabic</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> GDPR Compliant</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> WhatsApp Business API</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> Multi-Clinic Dashboard</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> Real-Time Analytics</span>
+    <!-- repeat -->
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> 68% Reply Rate</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> AI responds in &lt;2 seconds</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> English · Turkish · Arabic</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> GDPR Compliant</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> WhatsApp Business API</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> Multi-Clinic Dashboard</span>
+    <span class="flex items-center gap-2"><span class="text-gold">✦</span> Real-Time Analytics</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ FEATURES ══ -->
+<section id="features" class="py-28 max-w-7xl mx-auto px-6">
+
+  <div class="text-center mb-16 reveal">
+    <p class="text-gold text-sm font-medium uppercase tracking-widest mb-4">Everything You Need</p>
+    <h2 class="font-serif text-4xl md:text-5xl text-white mb-5">
+      Built for modern dental clinics
+    </h2>
+    <p class="text-gray-400 text-lg max-w-xl mx-auto">
+      One platform to capture, engage, and book every dental enquiry —
+      automatically, 24/7.
+    </p>
+  </div>
+
+  <!-- Main 3 feature cards -->
+  <div class="grid md:grid-cols-3 gap-6 mb-6">
+
+    <!-- Card 1 — WhatsApp AI -->
+    <div class="feature-card bg-navy-800 border border-white/8 rounded-2xl p-7 reveal">
+      <div class="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-5 text-2xl">
+        💬
+      </div>
+      <h3 class="text-white font-semibold text-xl mb-3">WhatsApp AI Follow-Up</h3>
+      <p class="text-gray-400 text-sm leading-relaxed mb-5">
+        Every missed call, form submission, or cold lead gets an instant, personalised WhatsApp reply — powered by Claude AI. Handles objections, answers pricing questions, and books appointments automatically.
+      </p>
+      <ul class="space-y-2 text-sm">
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> Responds in under 2 seconds</li>
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> Detects 8 objection types</li>
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> 4 conversation scenarios</li>
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> Human take-over with one click</li>
+      </ul>
+    </div>
+
+    <!-- Card 2 — Dashboard -->
+    <div class="feature-card bg-navy-800 border border-white/8 rounded-2xl p-7 reveal" style="transition-delay:0.1s">
+      <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-5 text-2xl">
+        🏥
+      </div>
+      <h3 class="text-white font-semibold text-xl mb-3">Multi-Clinic Dashboard</h3>
+      <p class="text-gray-400 text-sm leading-relaxed mb-5">
+        Manage all your clinics from a single command centre. Super admins get cross-clinic analytics; clinic staff see only their patients. Role-based access with 5 permission levels.
+      </p>
+      <ul class="space-y-2 text-sm">
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> Director · Admin · Coordinator</li>
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> Receptionist · Dentist roles</li>
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> Per-clinic AI usage quotas</li>
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> Staff invite via email</li>
+      </ul>
+    </div>
+
+    <!-- Card 3 — Analytics -->
+    <div class="feature-card bg-navy-800 border border-white/8 rounded-2xl p-7 reveal" style="transition-delay:0.2s">
+      <div class="w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center mb-5 text-2xl">
+        📊
+      </div>
+      <h3 class="text-white font-semibold text-xl mb-3">Real-Time Analytics</h3>
+      <p class="text-gray-400 text-sm leading-relaxed mb-5">
+        Track reply rates, booking conversions, response times, and revenue pipeline in real time. The Insights tab reveals which objections kill deals — so you can fix them.
+      </p>
+      <ul class="space-y-2 text-sm">
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> Reply rate & conversion trends</li>
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> Lead recovery rate by week</li>
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> Objection type breakdown</li>
+        <li class="flex items-center gap-2 text-gray-300"><span class="text-gold">✓</span> CSV export in one click</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Secondary feature row -->
+  <div class="grid md:grid-cols-4 gap-4">
+    <div class="feature-card bg-navy-800/60 border border-white/5 rounded-xl p-5 reveal">
+      <div class="text-2xl mb-3">🌍</div>
+      <h4 class="text-white font-medium mb-1.5">Multilingual</h4>
+      <p class="text-gray-500 text-sm">Auto-detects patient language and replies in English, Turkish, or Arabic.</p>
+    </div>
+    <div class="feature-card bg-navy-800/60 border border-white/5 rounded-xl p-5 reveal" style="transition-delay:0.05s">
+      <div class="text-2xl mb-3">⚡</div>
+      <h4 class="text-white font-medium mb-1.5">Instant Setup</h4>
+      <p class="text-gray-500 text-sm">Connect your WhatsApp Business number and go live in under 15 minutes.</p>
+    </div>
+    <div class="feature-card bg-navy-800/60 border border-white/5 rounded-xl p-5 reveal" style="transition-delay:0.1s">
+      <div class="text-2xl mb-3">🔒</div>
+      <h4 class="text-white font-medium mb-1.5">GDPR Ready</h4>
+      <p class="text-gray-500 text-sm">Consent tracking, opt-out handling, and data hosted in the EU by default.</p>
+    </div>
+    <div class="feature-card bg-navy-800/60 border border-white/5 rounded-xl p-5 reveal" style="transition-delay:0.15s">
+      <div class="text-2xl mb-3">🔗</div>
+      <h4 class="text-white font-medium mb-1.5">Integrations</h4>
+      <p class="text-gray-500 text-sm">Webhooks, CSV exports, and PMS integrations (Dentally, SOE — coming soon).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ HOW IT WORKS ══ -->
+<section id="how" class="py-28 bg-navy-900/40 border-y border-white/5">
+  <div class="max-w-5xl mx-auto px-6">
+
+    <div class="text-center mb-16 reveal">
+      <p class="text-gold text-sm font-medium uppercase tracking-widest mb-4">Simple by Design</p>
+      <h2 class="font-serif text-4xl md:text-5xl text-white mb-5">How CareNova works</h2>
+      <p class="text-gray-400 text-lg">From missed enquiry to booked appointment in three steps.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+
+      <!-- Step 1 -->
+      <div class="text-center reveal">
+        <div class="relative inline-flex mb-6">
+          <div class="w-20 h-20 rounded-full bg-navy-800 border-2 border-gold/30 flex items-center justify-center text-3xl">📱</div>
+          <div class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gold text-navy-950 text-sm font-bold flex items-center justify-center">1</div>
+        </div>
+        <h3 class="text-white font-semibold text-lg mb-2">Enquiry arrives</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          A patient sends a WhatsApp message, fills a web form, or calls and misses. CareNova captures it instantly.
+        </p>
+      </div>
+
+      <!-- Arrow -->
+      <div class="hidden md:flex items-center justify-center text-white/10 text-4xl pt-8">→</div>
+
+      <!-- Step 2 (desktop: col-span override via order) -->
+      <div class="text-center reveal md:order-3" style="transition-delay:0.1s">
+        <div class="relative inline-flex mb-6">
+          <div class="w-20 h-20 rounded-full bg-navy-800 border-2 border-gold/30 flex items-center justify-center text-3xl">🤖</div>
+          <div class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gold text-navy-950 text-sm font-bold flex items-center justify-center">2</div>
+        </div>
+        <h3 class="text-white font-semibold text-lg mb-2">AI engages instantly</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          Claude AI detects the language, classifies the scenario, and sends a warm, professional reply in under 2 seconds — 24/7.
+        </p>
+      </div>
+
+      <!-- Step 3 (desktop: middle column becomes arrow area) -->
+      <div class="md:hidden text-center reveal" style="transition-delay:0.2s">
+        <div class="relative inline-flex mb-6">
+          <div class="w-20 h-20 rounded-full bg-navy-800 border-2 border-gold/30 flex items-center justify-center text-3xl">✅</div>
+          <div class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gold text-navy-950 text-sm font-bold flex items-center justify-center">3</div>
+        </div>
+        <h3 class="text-white font-semibold text-lg mb-2">Patient books</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          The AI handles objections, answers questions, and guides the patient to book a consultation — all without human intervention.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Step 3 desktop -->
+    <div class="hidden md:grid grid-cols-3 gap-8 mt-8">
+      <div class="col-start-2 text-center reveal" style="transition-delay:0.2s">
+        <div class="relative inline-flex mb-6">
+          <div class="w-20 h-20 rounded-full bg-navy-800 border-2 border-gold/30 flex items-center justify-center text-3xl">✅</div>
+          <div class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gold text-navy-950 text-sm font-bold flex items-center justify-center">3</div>
+        </div>
+        <h3 class="text-white font-semibold text-lg mb-2">Patient books</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          The AI handles objections, answers pricing questions, and guides the patient to confirm a consultation — all on autopilot.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ STATS ══ -->
+<section class="py-20 max-w-5xl mx-auto px-6">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+    <div class="reveal">
+      <p class="text-5xl font-serif text-gold-gradient font-normal mb-2">&lt;2s</p>
+      <p class="text-gray-400 text-sm">Average AI response time</p>
+    </div>
+    <div class="reveal" style="transition-delay:0.1s">
+      <p class="text-5xl font-serif text-gold-gradient font-normal mb-2">68%</p>
+      <p class="text-gray-400 text-sm">Average patient reply rate</p>
+    </div>
+    <div class="reveal" style="transition-delay:0.2s">
+      <p class="text-5xl font-serif text-gold-gradient font-normal mb-2">3×</p>
+      <p class="text-gray-400 text-sm">More bookings from cold leads</p>
+    </div>
+    <div class="reveal" style="transition-delay:0.3s">
+      <p class="text-5xl font-serif text-gold-gradient font-normal mb-2">24/7</p>
+      <p class="text-gray-400 text-sm">Always on — never misses an enquiry</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ PRICING ══ -->
+<section id="pricing" class="py-28 bg-navy-900/40 border-y border-white/5">
+  <div class="max-w-6xl mx-auto px-6">
+
+    <div class="text-center mb-16 reveal">
+      <p class="text-gold text-sm font-medium uppercase tracking-widest mb-4">Simple Pricing</p>
+      <h2 class="font-serif text-4xl md:text-5xl text-white mb-5">Start free, scale as you grow</h2>
+      <p class="text-gray-400 text-lg">All plans include a 14-day free trial. No credit card required.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6 items-start">
+
+      <!-- Starter -->
+      <div class="bg-navy-800 border border-white/8 rounded-2xl p-8 reveal">
+        <div class="mb-6">
+          <p class="text-gray-400 text-sm uppercase tracking-widest mb-2">Starter</p>
+          <div class="flex items-end gap-1 mb-1">
+            <span class="text-white text-5xl font-serif font-light">£79</span>
+            <span class="text-gray-500 text-sm mb-2">/month</span>
+          </div>
+          <p class="text-gray-500 text-sm">For single-site clinics just getting started with AI.</p>
+        </div>
+
+        <ul class="space-y-3 mb-8 text-sm">
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> 1 clinic · 1 WhatsApp number</li>
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> 150 AI messages / month</li>
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> English &amp; Turkish</li>
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> AI conversation dashboard</li>
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> 3 staff accounts</li>
+          <li class="flex items-start gap-2 text-gray-500"><span class="mt-0.5">—</span> Advanced analytics</li>
+          <li class="flex items-start gap-2 text-gray-500"><span class="mt-0.5">—</span> Multi-clinic management</li>
+        </ul>
+
+        <a href="#contact" class="block text-center border border-white/15 hover:border-white/30 text-white font-medium py-3 rounded-xl transition-all hover:bg-white/5 text-sm">
+          Start Free Trial
+        </a>
+      </div>
+
+      <!-- Growth — featured -->
+      <div class="pricing-featured border rounded-2xl p-8 reveal relative" style="transition-delay:0.1s">
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+          <span class="bg-gold text-navy-950 text-xs font-bold px-4 py-1.5 rounded-full">Most Popular</span>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-gold text-sm uppercase tracking-widest mb-2">Growth</p>
+          <div class="flex items-end gap-1 mb-1">
+            <span class="text-white text-5xl font-serif font-light">£199</span>
+            <span class="text-gray-400 text-sm mb-2">/month</span>
+          </div>
+          <p class="text-gray-400 text-sm">For growing practices that want to dominate their local market.</p>
+        </div>
+
+        <ul class="space-y-3 mb-8 text-sm">
+          <li class="flex items-start gap-2 text-gray-200"><span class="text-gold mt-0.5">✓</span> Up to 3 clinics</li>
+          <li class="flex items-start gap-2 text-gray-200"><span class="text-gold mt-0.5">✓</span> 500 AI messages / month</li>
+          <li class="flex items-start gap-2 text-gray-200"><span class="text-gold mt-0.5">✓</span> English, Turkish &amp; Arabic</li>
+          <li class="flex items-start gap-2 text-gray-200"><span class="text-gold mt-0.5">✓</span> Full analytics + Insights tab</li>
+          <li class="flex items-start gap-2 text-gray-200"><span class="text-gold mt-0.5">✓</span> 10 staff accounts + all roles</li>
+          <li class="flex items-start gap-2 text-gray-200"><span class="text-gold mt-0.5">✓</span> CSV export + webhooks</li>
+          <li class="flex items-start gap-2 text-gray-400"><span class="mt-0.5">—</span> Dedicated account manager</li>
+        </ul>
+
+        <a href="#contact" class="btn-primary block text-center text-navy-950 font-semibold py-3 rounded-xl text-sm">
+          Start Free Trial
+        </a>
+      </div>
+
+      <!-- Pro -->
+      <div class="bg-navy-800 border border-white/8 rounded-2xl p-8 reveal" style="transition-delay:0.2s">
+        <div class="mb-6">
+          <p class="text-gray-400 text-sm uppercase tracking-widest mb-2">Pro</p>
+          <div class="flex items-end gap-1 mb-1">
+            <span class="text-white text-5xl font-serif font-light">£499</span>
+            <span class="text-gray-500 text-sm mb-2">/month</span>
+          </div>
+          <p class="text-gray-500 text-sm">For DSOs and enterprise groups with multiple locations.</p>
+        </div>
+
+        <ul class="space-y-3 mb-8 text-sm">
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> Unlimited clinics</li>
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> 2,000 AI messages / month</li>
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> All 3 languages + custom persona</li>
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> Super admin + full Insights</li>
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> Unlimited staff accounts</li>
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> PMS integrations (beta)</li>
+          <li class="flex items-start gap-2 text-gray-300"><span class="text-gold mt-0.5">✓</span> Dedicated account manager</li>
+        </ul>
+
+        <a href="#contact" class="block text-center border border-white/15 hover:border-white/30 text-white font-medium py-3 rounded-xl transition-all hover:bg-white/5 text-sm">
+          Contact Sales
+        </a>
+      </div>
+    </div>
+
+    <!-- FAQ note -->
+    <p class="text-center text-gray-500 text-sm mt-8 reveal">
+      All prices excl. VAT · Annual billing saves 20% · Overage at £0.01 per additional message
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ TESTIMONIALS ══ -->
+<section class="py-28 max-w-6xl mx-auto px-6">
+
+  <div class="text-center mb-14 reveal">
+    <p class="text-gold text-sm font-medium uppercase tracking-widest mb-4">From the Clinics</p>
+    <h2 class="font-serif text-4xl text-white">What our customers say</h2>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <div class="bg-navy-800 border border-white/8 rounded-2xl p-7 reveal">
+      <div class="flex gap-1 text-gold text-sm mb-4">★★★★★</div>
+      <p class="text-gray-300 text-sm leading-relaxed mb-5">
+        "We were losing £30k+ a month in missed implant enquiries. CareNova changed that overnight. Our Turkish-speaking patients especially love how natural the AI feels."
+      </p>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold font-semibold">N</div>
+        <div>
+          <p class="text-white text-sm font-medium">Dr. Natasha Reed</p>
+          <p class="text-gray-500 text-xs">Director · Smile Studio London</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-navy-800 border border-white/8 rounded-2xl p-7 reveal" style="transition-delay:0.1s">
+      <div class="flex gap-1 text-gold text-sm mb-4">★★★★★</div>
+      <p class="text-gray-300 text-sm leading-relaxed mb-5">
+        "The multi-clinic dashboard is exactly what we needed. I can see all three of our practices in one view, and the AI handles 90% of enquiries without my team lifting a finger."
+      </p>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold font-semibold">V</div>
+        <div>
+          <p class="text-white text-sm font-medium">Dr. Victoria Stone</p>
+          <p class="text-xs text-gray-500">Director · Pearl Dental Canary Wharf</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-navy-800 border border-white/8 rounded-2xl p-7 reveal" style="transition-delay:0.2s">
+      <div class="flex gap-1 text-gold text-sm mb-4">★★★★★</div>
+      <p class="text-gray-300 text-sm leading-relaxed mb-5">
+        "Setup took 20 minutes. Within the first week, the AI booked 7 new consultations from leads I would have completely missed. The ROI is insane."
+      </p>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold font-semibold">R</div>
+        <div>
+          <p class="text-white text-sm font-medium">Rachel Hunt</p>
+          <p class="text-xs text-gray-500">Clinic Admin · Elite Dental Manchester</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ CTA ══ -->
+<section id="contact" class="py-28 relative overflow-hidden">
+  <!-- Glow -->
+  <div class="absolute inset-0 hero-glow pointer-events-none"></div>
+
+  <div class="relative max-w-3xl mx-auto px-6 text-center reveal">
+    <div class="inline-flex items-center gap-2 bg-gold/10 border border-gold/20 text-gold text-xs font-medium px-4 py-2 rounded-full mb-8">
+      <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse-slow"></span>
+      14-Day Free Trial — No Credit Card Needed
+    </div>
+
+    <h2 class="font-serif text-4xl md:text-6xl text-white mb-6">
+      Ready to stop losing leads?
+    </h2>
+    <p class="text-gray-400 text-lg mb-10 max-w-xl mx-auto">
+      Join dental clinics already using CareNova to recover lost revenue from missed enquiries. Set up in 15 minutes.
+    </p>
+
+    <!-- Email capture -->
+    <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-6" onsubmit="handleSubmit(event)">
+      <input
+        type="email"
+        id="cta-email"
+        placeholder="Your work email"
+        required
+        class="flex-1 bg-navy-800 border border-white/10 focus:border-gold/50 rounded-xl px-4 py-3.5 text-white text-sm placeholder-gray-500 outline-none transition-colors"
+      />
+      <button type="submit" class="btn-primary text-navy-950 font-semibold px-6 py-3.5 rounded-xl text-sm whitespace-nowrap">
+        Start Free Trial →
+      </button>
+    </form>
+    <div id="cta-success" class="hidden text-green-400 text-sm font-medium py-2">
+      🎉 Thanks! We'll be in touch within 24 hours.
+    </div>
+
+    <p class="text-gray-600 text-xs">
+      Free trial · No card required · Cancel any time
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ FOOTER ══ -->
+<footer class="border-t border-white/5 bg-navy-950">
+  <div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="grid md:grid-cols-4 gap-10 mb-10">
+
+      <!-- Brand -->
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-2.5 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center text-navy-950 font-bold text-sm">C</div>
+          <span class="font-semibold text-white text-lg">Care<span class="text-gold">Dental</span></span>
+        </div>
+        <p class="text-gray-500 text-sm leading-relaxed max-w-xs">
+          AI-powered WhatsApp automation for dental clinics. Never miss a lead again.
+        </p>
+        <div class="flex gap-3 mt-5">
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-white/8 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:border-white/20 transition-all text-sm">𝕏</a>
+          <a href="#" class="w-9 h-9 bg-navy-800 border border-white/8 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:border-white/20 transition-all text-sm">in</a>
+        </div>
+      </div>
+
+      <!-- Product -->
+      <div>
+        <p class="text-white text-sm font-medium mb-4">Product</p>
+        <ul class="space-y-2.5 text-sm text-gray-500">
+          <li><a href="#features"  class="hover:text-white transition-colors">Features</a></li>
+          <li><a href="#pricing"   class="hover:text-white transition-colors">Pricing</a></li>
+          <li><a href="#how"       class="hover:text-white transition-colors">How It Works</a></li>
+          <li><a href="#"          class="hover:text-white transition-colors">Changelog</a></li>
+        </ul>
+      </div>
+
+      <!-- Company -->
+      <div>
+        <p class="text-white text-sm font-medium mb-4">Company</p>
+        <ul class="space-y-2.5 text-sm text-gray-500">
+          <li><a href="#" class="hover:text-white transition-colors">About</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+          <li><a href="#contact" class="hover:text-white transition-colors">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-gray-600 text-xs">© 2026 CareNova Ltd. All rights reserved.</p>
+      <p class="text-gray-700 text-xs flex items-center gap-1.5">
+        Powered by
+        <span class="text-gray-500 font-medium">Claude AI</span>
+        &amp;
+        <span class="text-gray-500 font-medium">WhatsApp Business API</span>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════ SCRIPTS ══ -->
+<script>
+  // ── Scroll reveal ────────────────────────────────────────────────────────
+  const observer = new IntersectionObserver(
+    (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── CTA form ─────────────────────────────────────────────────────────────
+  function handleSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById('cta-email').value;
+    if (!email) return;
+    e.target.classList.add('hidden');
+    document.getElementById('cta-success').classList.remove('hidden');
+    console.log('Lead captured:', email);
+    // TODO: POST to /api/waitlist or your CRM
+  }
+
+  // ── Active nav link highlight ─────────────────────────────────────────────
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks  = document.querySelectorAll('nav a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+    navLinks.forEach(a => {
+      a.classList.toggle('text-white', a.getAttribute('href') === `#${current}`);
+      a.classList.toggle('text-gray-400', a.getAttribute('href') !== `#${current}`);
+    });
+  }, { passive: true });
+</script>
+
+</body>
+</html>

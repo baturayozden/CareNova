@@ -1,0 +1,263 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Theme CSS Variables
+   RGB channel format — compatible with Tailwind's <alpha-value> / opacity
+   modifiers (bg-navy-900/40, border-navy-600/50, etc.)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Dark theme (default) — current dashboard palette preserved exactly */
+  --navy-950: 10 15 30;    /* #0a0f1e – page background                       */
+  --navy-900: 13 20 38;    /* #0d1426 – card / panel / sidebar / modal        */
+  --navy-800: 17 24 39;    /* #111827 – input field, table row                */
+  --navy-700: 22 32 53;    /* #162035 – hover state, selected row             */
+  --navy-600: 30 45 69;    /* #1e2d45 – border, divider                       */
+
+  /* CareNova brand surface/ink (Bölüm 4) — landing page + new UI only */
+  --surface:        10 26 28;    /* #0A1A1C – dark surface (brand default)   */
+  --surface-raised:  14 36 38;   /* slightly lifted panel on dark surface    */
+  --ink:            242 239 233; /* #F2EFE9 – ink on dark theme              */
+  --ink-muted:      168 181 180; /* muted ink on dark theme                  */
+}
+
+[data-theme="light"] {
+  --navy-950: 248 250 252;  /* #f8fafc – lightest page background             */
+  --navy-900: 255 255 255;  /* #ffffff – card / panel / sidebar               */
+  --navy-800: 241 245 249;  /* #f1f5f9 – input field, secondary bg            */
+  --navy-700: 226 232 240;  /* #e2e8f0 – hover state, subtle row              */
+  --navy-600: 203 213 225;  /* #cbd5e1 – border, divider                      */
+
+  /* CareNova brand surface/ink — light theme */
+  --surface:        247 244 239; /* #F7F4EF – bone white                     */
+  --surface-raised:  255 255 255;
+  --ink:            18 33 31;    /* #12211F – ink on light theme             */
+  --ink-muted:      92 108 106;
+}
+
+/* ─── Content text — light theme overrides ──────────────────────────────── */
+/* Specificity [0,2,0] beats Tailwind's plain class [0,1,0] — no !important  */
+
+[data-theme="light"] .text-white    { color: #0f172a; }  /* slate-900        */
+[data-theme="light"] .text-gray-200 { color: #1e293b; }  /* slate-800        */
+[data-theme="light"] .text-gray-300 { color: #334155; }  /* slate-700        */
+[data-theme="light"] .text-gray-400 { color: #475569; }  /* slate-600        */
+[data-theme="light"] .text-gray-500 { color: #64748b; }  /* slate-500        */
+[data-theme="light"] .text-gray-600 { color: #94a3b8; }  /* slate-400        */
+
+/* ─── Preserve white text on accent / semantic colour backgrounds ────────── */
+/* [0,3,0] > [0,2,0] — specific rule wins                                    */
+[data-theme="light"] .bg-gold.text-white       { color: #ffffff; }
+[data-theme="light"] .bg-red-500.text-white   { color: #ffffff; }
+[data-theme="light"] .bg-red-400.text-white   { color: #ffffff; }
+/* Solid coloured action buttons — text stays white in both themes */
+[data-theme="light"] .bg-blue-600.text-white   { color: #ffffff; }
+[data-theme="light"] .bg-green-600.text-white  { color: #ffffff; }
+[data-theme="light"] .bg-red-600.text-white    { color: #ffffff; }
+[data-theme="light"] .bg-red-700.text-white    { color: #ffffff; }
+[data-theme="light"] .bg-amber-500.text-white  { color: #ffffff; }
+[data-theme="light"] .bg-amber-600.text-white  { color: #ffffff; }
+[data-theme="light"] .bg-slate-500.text-white  { color: #ffffff; }
+[data-theme="light"] .bg-slate-600.text-white  { color: #ffffff; }
+
+/* ─── text-navy-* used as "dark contrast text" on accent backgrounds ──────  */
+/* bg-yellow-500 text-navy-950: without override, --navy-950 flips to white.  */
+[data-theme="light"] .text-navy-950 { color: #0f172a; }
+[data-theme="light"] .text-navy-800 { color: #1e293b; }
+[data-theme="light"] .text-navy-700 { color: #334155; }
+
+/* ─── Score / status badge overrides for light theme ────────────────────── */
+/* Dark theme uses /50 opacity on dark base (e.g. bg-red-900/50).            */
+/* Light theme: soft pastel background + saturated text — readable on white. */
+/* Tailwind escapes / → \/ in class names; use that in CSS selectors.        */
+
+[data-theme="light"] .bg-red-900\/50    { background-color: #FEE2E2; }  /* red-100   */
+[data-theme="light"] .border-red-700\/60 { border-color: #FECACA; }     /* red-200   */
+[data-theme="light"] .text-red-300      { color: #B91C1C; }             /* red-700   */
+
+[data-theme="light"] .bg-yellow-900\/50   { background-color: #FEF3C7; } /* amber-100 */
+[data-theme="light"] .border-yellow-700\/60 { border-color: #FDE68A; }   /* amber-200 */
+[data-theme="light"] .text-yellow-300     { color: #B45309; }            /* amber-700 */
+
+[data-theme="light"] .bg-blue-900\/50   { background-color: #DBEAFE; }  /* blue-100  */
+[data-theme="light"] .border-blue-700\/60 { border-color: #BFDBFE; }    /* blue-200  */
+[data-theme="light"] .text-blue-300     { color: #1D4ED8; }             /* blue-700  */
+
+[data-theme="light"] .bg-green-900\/60  { background-color: #DCFCE7; }  /* green-100 */
+[data-theme="light"] .border-green-700\/40 { border-color: #BBF7D0; }   /* green-200 */
+[data-theme="light"] .text-green-300    { color: #15803D; }             /* green-700 */
+
+/* Ghost Risk badge — bg-gray-800 */
+[data-theme="light"] .bg-gray-800       { background-color: #F1F5F9; }  /* slate-100 */
+[data-theme="light"] .border-gray-600   { border-color: #CBD5E1; }      /* slate-300 */
+
+/* ─── Status badges — solid bg (no opacity modifier) ────────────────────── */
+/* Lead status: new / contacted / responded / qualified / booked             */
+/* Also covers AI Activity objection/scenario/conv-state badges              */
+
+[data-theme="light"] .bg-blue-900       { background-color: #DBEAFE; }  /* blue-100   */
+[data-theme="light"] .border-blue-700   { border-color: #BFDBFE; }      /* blue-200   */
+
+[data-theme="light"] .bg-yellow-900     { background-color: #FEF3C7; }  /* amber-100  */
+[data-theme="light"] .border-yellow-700 { border-color: #FDE68A; }      /* amber-200  */
+
+[data-theme="light"] .bg-purple-900     { background-color: #EDE9FE; }  /* violet-100 */
+[data-theme="light"] .border-purple-700 { border-color: #DDD6FE; }      /* violet-200 */
+[data-theme="light"] .text-purple-300   { color: #6D28D9; }             /* violet-700 */
+
+[data-theme="light"] .bg-cyan-900       { background-color: #CFFAFE; }  /* cyan-100   */
+[data-theme="light"] .border-cyan-700   { border-color: #A5F3FC; }      /* cyan-200   */
+[data-theme="light"] .text-cyan-300     { color: #0E7490; }             /* cyan-700   */
+
+[data-theme="light"] .bg-green-900      { background-color: #DCFCE7; }  /* green-100  */
+[data-theme="light"] .border-green-700  { border-color: #BBF7D0; }      /* green-200  */
+
+[data-theme="light"] .bg-red-900        { background-color: #FEE2E2; }  /* red-100    */
+[data-theme="light"] .border-red-700    { border-color: #FECACA; }      /* red-200    */
+
+[data-theme="light"] .bg-emerald-900    { background-color: #D1FAE5; }  /* emerald-100 */
+[data-theme="light"] .border-emerald-700 { border-color: #A7F3D0; }     /* emerald-200 */
+[data-theme="light"] .text-emerald-300  { color: #047857; }             /* emerald-700 */
+
+/* ─── /40 + /50 opacity badge variants ──────────────────────────────────── */
+/* Source badges (WhatsApp/Website/Bulk) + AI follow-up Active badge         */
+
+[data-theme="light"] .bg-green-900\/40     { background-color: #DCFCE7; }  /* green-100  */
+[data-theme="light"] .border-green-700\/50 { border-color:   #BBF7D0; }    /* green-200  */
+[data-theme="light"] .text-green-400       { color: #15803D; }             /* green-700  */
+
+[data-theme="light"] .bg-blue-900\/40      { background-color: #DBEAFE; }  /* blue-100   */
+[data-theme="light"] .border-blue-700\/50  { border-color:   #BFDBFE; }    /* blue-200   */
+[data-theme="light"] .text-blue-400        { color: #1D4ED8; }             /* blue-700   */
+
+[data-theme="light"] .bg-purple-900\/40    { background-color: #EDE9FE; }  /* violet-100 */
+[data-theme="light"] .border-purple-700\/50 { border-color:  #DDD6FE; }    /* violet-200 */
+[data-theme="light"] .text-purple-400      { color: #6D28D9; }             /* violet-700 */
+
+/* ─── /20 + /30 opacity info-box variants ───────────────────────────────── */
+/* SchemeEditor + MyCommissionCard info note                                  */
+
+[data-theme="light"] .bg-blue-900\/20      { background-color: #EFF6FF; }  /* blue-50    */
+[data-theme="light"] .border-blue-700\/30  { border-color:   #BFDBFE; }    /* blue-200   */
+[data-theme="light"] .text-blue-200        { color: #1E40AF; }             /* blue-800   */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHT THEME — pseudo-class + dark-tone overrides
+   ───────────────────────────────────────────────────────────────────────────
+   Covers the 5 gaps the static override layer missed:
+     A/E  hover:text-white  → invisible (white-on-white) in light mode
+     B    Human handling badge (bg-orange-950 / text-orange-400)
+     C    Delete Clinic / Danger Zone (bg-red-950)
+     D    Filter <select> / inputs (bg-navy-700 already flips, but ensure
+          text + focus contrast)
+   Tailwind escapes the ":" in hover: as "hover\:" inside class names, so the
+   CSS selector must use the same escaping: .hover\:text-white:hover
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── A & E: pseudo-class text colour overrides ─────────────────────────── */
+/* The static layer overrides .text-white but NOT hover:text-white etc.      */
+/* Match Tailwind's escaped class name + the :hover / :focus pseudo-class.    */
+
+[data-theme="light"] .hover\:text-white:hover { color: #0f172a; }  /* slate-900 */
+[data-theme="light"] .focus\:text-white:focus { color: #0f172a; }
+[data-theme="light"] .hover\:text-gray-200:hover { color: #1e293b; }
+[data-theme="light"] .hover\:text-gray-300:hover { color: #334155; }
+
+/* Preserve white hover text when the hover background is an accent/solid     */
+/* colour (e.g. a button that goes bg-gold on hover). [0,3,0] wins.           */
+[data-theme="light"] .hover\:bg-gold:hover.hover\:text-white:hover { color: #ffffff; }
+
+/* ─── Tab hover background (pasif tab → hover) ──────────────────────────── */
+/* Pasif tab'lar hover'da hafif zemin alır; light'ta bunun açık olması lazım. */
+[data-theme="light"] .hover\:bg-navy-700\/50:hover { background-color: rgb(226 232 240 / 0.5); }
+[data-theme="light"] .hover\:border-navy-500:hover { border-color: #94a3b8; } /* slate-400 */
+
+/* ─── B: "Human handling" badge — bg-orange-950 family ──────────────────── */
+/* Dark: very dark orange bg + light orange text. Light: pastel + saturated. */
+[data-theme="light"] .bg-orange-950   { background-color: #FFEDD5; }  /* orange-100 */
+[data-theme="light"] .border-orange-800 { border-color: #FED7AA; }    /* orange-200 */
+[data-theme="light"] .text-orange-400 { color: #C2410C; }             /* orange-700 */
+[data-theme="light"] .bg-orange-900   { background-color: #FFEDD5; }  /* orange-100 */
+[data-theme="light"] .border-orange-700 { border-color: #FED7AA; }    /* orange-200 */
+[data-theme="light"] .text-orange-300 { color: #C2410C; }             /* orange-700 */
+
+/* ─── C: Delete Clinic / Danger Zone — bg-red-950 family ────────────────── */
+/* Dark: near-black red. Light: soft red surface, saturated text/border.     */
+[data-theme="light"] .bg-red-950         { background-color: #FEE2E2; } /* red-100 */
+[data-theme="light"] .hover\:bg-red-900:hover { background-color: #FECACA; } /* red-200 */
+[data-theme="light"] .border-red-800     { border-color: #FCA5A5; }    /* red-300 */
+[data-theme="light"] .text-red-400       { color: #B91C1C; }           /* red-700 */
+[data-theme="light"] .text-red-500       { color: #DC2626; }           /* red-600 */
+
+/* Danger Zone container often uses red-950/40 + border-red-900/50           */
+[data-theme="light"] .bg-red-950\/40     { background-color: #FEF2F2; } /* red-50  */
+[data-theme="light"] .border-red-900\/50 { border-color: #FECACA; }     /* red-200 */
+
+/* ─── D: form controls — <select>, <input> contrast in light ────────────── */
+/* bg-navy-700 / navy-800 already flip via CSS vars, but ensure the TEXT      */
+/* inside controls is dark enough and focus ring is visible.                 */
+[data-theme="light"] select,
+[data-theme="light"] input,
+[data-theme="light"] textarea {
+  color: #1e293b;  /* slate-800 — readable on light field bg */
+}
+[data-theme="light"] select option {
+  color: #1e293b;
+  background-color: #ffffff;
+}
+/* Placeholder a touch lighter */
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: #94a3b8;  /* slate-400 */
+}
+
+/* ─── Misc dark-tone solids that may appear elsewhere (defensive) ───────── */
+/* Cover the -950 tones for the semantic colours we use, so any future badge */
+/* built on a -950 base stays readable in light mode.                        */
+[data-theme="light"] .bg-blue-950   { background-color: #DBEAFE; }  /* blue-100  */
+[data-theme="light"] .bg-green-950  { background-color: #DCFCE7; }  /* green-100 */
+[data-theme="light"] .bg-yellow-950 { background-color: #FEF3C7; }  /* amber-100 */
+[data-theme="light"] .bg-yellow-950\/30     { background-color: #FEF3C7; }  /* amber-100 */
+[data-theme="light"] .bg-yellow-800         { background-color: #FEF3C7; }  /* amber-100 */
+[data-theme="light"] .border-yellow-800     { border-color: #FDE68A; }      /* amber-200 */
+[data-theme="light"] .border-yellow-800\/40 { border-color: #FDE68A; }
+[data-theme="light"] .border-yellow-800\/50 { border-color: #FDE68A; }
+[data-theme="light"] .border-yellow-800\/60 { border-color: #FDE68A; }
+[data-theme="light"] .text-yellow-400       { color: #D97706; }             /* amber-600 */
+[data-theme="light"] .text-yellow-500       { color: #B45309; }             /* amber-700 */
+[data-theme="light"] .text-yellow-600       { color: #92400E; }             /* amber-800 */
+[data-theme="light"] .bg-purple-950 { background-color: #EDE9FE; }  /* violet-100 */
+
+/* ─── Body background ───────────────────────────────────────────────────── */
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: rgb(var(--navy-950));
+}
+
+/* ─── AnimatedButton shimmer sweep ──────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(200%)  skewX(-15deg); }
+}
+
+/* ─── Testimonials infinite marquee ─────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 38s linear infinite;
+  will-change: transform;
+}
+
+/* ─── Native <select> popup: options readable on all platforms (macOS Chrome) */
+/* Placed last + !important so this beats [data-theme="light"] select option   */
+/* (higher specificity) and any Tailwind base resets that precede it.          */
+/* Native popup background is OS-controlled; we force dark text on white bg    */
+/* so options are legible regardless of OS theme or inherited dark background. */
+select option {
+  color: #111827 !important;           /* gray-900 */
+  background-color: #ffffff !important;
+}

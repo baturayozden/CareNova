@@ -1,0 +1,26 @@
+Invoice Token,Invoice Date,Time Zone,Invoice ID,Customer Name,Customer Email,Customer Phone,Invoice Title,Status,Requested Amount,Due Date,Last Payment Date,Amount Paid,Recurring Series ID,Invoice Delivery Method,Number of Instalments,Tip Amount,Automatic Payment Source,Service date
+inv:0-ChAd0nqrOXRF4jyvlqhFmF04EPoN,2026-07-06,Edinburgh,#000025,"SAMUEL JOSEPH BURNS,",,+447512085698,"",Draft,"£3,500.00",,,£0.00,,Text Message,1,£0.00,None,2026-05-01
+inv:0-ChD5X68nvVuAugdoYsd7a05NEPoN,2026-07-06,Edinburgh,#000024,"SAMUEL JOSEPH BURNS,",,+447512085698,"",Draft,"£3,500.00",,,£0.00,,Text Message,1,£0.00,None,2026-05-01
+inv:0-ChAfDIRm_GI0ZhO7lt59klE4EPoN,2026-06-24,Edinburgh,#000023,Antony Hart,itronuk@gmail.com,+447585491641,Check up,Paid,£100.00,2026-06-24,2026-06-24,£100.00,,Email,1,£0.00,None,
+inv:0-ChA74YwGnkJI2fuWMmO1TrZ8EPoN,2026-06-17,Edinburgh,#000022,DANIEL LUMSDEN,,+447565270276,"",Paid,"£2,044.98",2026-06-17,2026-06-17,"£2,044.98",,Text Message,1,£0.00,None,2026-04-29
+inv:0-ChBGOy-OdWy26UH269htW3QGEPoN,2026-06-17,Edinburgh,#000021,MOTAZ ABOU MOGHDEB,motaz.abomoghdeba@gmail.com,,"",Paid,"£2,065.00",2026-06-17,2026-06-17,"£2,065.00",,Email,1,£0.00,None,2026-04-29
+inv:0-ChBSasBQrhmAGc_J5F-62z-3EPoN,2026-06-17,Edinburgh,#000020,ADRIAN MARTIN OCONNOR,adeo961@gmail.com,,"",Paid,"£1,350.00",2026-06-17,2026-06-17,"£1,350.00",,Email,1,£0.00,None,2026-04-29
+inv:0-ChBsC20oMyAQqCtNuQlSihL5EPoN,2026-06-17,Edinburgh,#000019,THOMAS ANTHONY SMART,00smartt@gmail.com,,"",Paid,"£1,500.00",2026-06-17,2026-06-17,"£1,500.00",,Email,1,£0.00,None,2026-04-28
+inv:0-ChBd7H7CDh42qQCPavrsNzmaEPoN,2026-06-17,Edinburgh,#000018,",LAUREN LOUISE MCCARTHY",lauren039555@gmail.com,,"",Paid,"£2,040.00",2026-06-17,2026-06-17,"£2,040.00",,Email,1,£0.00,None,2026-04-27
+inv:0-ChAcPUM12E3yKIVtmULG834AEPoN,2026-06-17,Edinburgh,#000017,JUSTINE LEE JUSTINE LEE DEMPSEY,,+447707659389,"",Paid,"£7,900.00",2026-06-17,2026-06-17,"£7,900.00",,Text Message,1,£0.00,None,2026-04-27
+inv:0-ChBGb1wbrhdH5FCoV0fGha7XEPoN,2026-06-17,Edinburgh,#000016,", GILLIAN VICTORIA SHADFORTH",gilbill616@gmail.com,,"",Paid,"£2,350.08",2026-06-17,2026-06-17,"£2,350.08",,Email,1,£0.00,None,2026-04-27
+inv:0-ChA8eHd7pLpDj94Ubtat-Q2HEPoN,2026-06-17,Edinburgh,#000015,MELANIE SMITH,,+447900744405,"",Paid,£400.00,2026-06-17,2026-06-17,£400.00,,Text Message,1,£0.00,None,2026-04-25
+inv:0-ChDmcxlkynyblKnXkWSKtrhvEPoN,2026-06-17,Edinburgh,#000014,PAUL LEECE,,+447497519596,"",Paid,"£1,340.00",2026-06-17,2026-06-17,"£1,340.00",,Text Message,1,£0.00,None,2026-04-24
+inv:0-ChDp25HcJfzn5tLdEZO6F31EEPoN,2026-06-17,Edinburgh,#000013,STEVEN KANE,stevenkane94@outlook.com,,"",Paid,£300.00,2026-06-17,2026-06-17,£300.00,,Email,1,£0.00,None,2026-04-22
+inv:0-ChCEgDIaLHDTFyAUZnSSz2ROEPoN,2026-06-17,Edinburgh,#000012,IAN SWIFT,,+447446667401,"",Paid,"£4,240.00",2026-06-17,2026-06-17,"£4,240.00",,Text Message,1,£0.00,None,
+inv:0-ChBqcurRay8KX_uoBrVCeaJhEPoN,2026-06-17,Edinburgh,#000011,RILEY RICHARDS,,+447492491024,"",Paid,"£3,910.00",2026-06-17,2026-06-17,"£3,910.00",,Text Message,1,£0.00,None,2026-04-21
+inv:0-ChA5_A4LFRw8Xpo6T2072qk0EPoN,2026-06-17,Edinburgh,#000010,GARETH FORTUNE,gfortune82@icloud.com,,"",Paid,"£3,000.00",2026-06-17,2026-06-17,"£3,000.00",,Email,1,£0.00,None,2026-04-20
+inv:0-ChBQQTjDTqIQnrUVNZg7ef6-EPoN,2026-06-17,Edinburgh,#000009,KUNAL MANHARBHAI PATEL,kunalpatel85@aol.com,,"",Paid,"£6,750.00",2026-06-17,2026-06-17,"£6,750.00",,Email,1,£0.00,None,2026-04-17
+inv:0-ChCkDXsBO7XpeeTDviGmjuDFEPoN,2026-06-17,Edinburgh,#000008,MICHAEL MCNEILL,,+447949867114,"",Paid,"£2,506.00",2026-06-17,2026-06-17,"£2,506.00",,Text Message,1,£0.00,None,2026-04-14
+inv:0-ChAS6nozIwwM4XZmH_GJ4czcEPoN,2026-06-17,Edinburgh,#000007,JOHN MARK MALAQUE,johnmarkmalaque3@gmail.com,,"",Paid,"£4,100.00",2026-06-17,2026-06-17,"£4,100.00",,Email,1,£0.00,None,
+inv:0-ChBJnIBd3Z9plXttP9ZXuJ_SEPoN,2026-06-17,Edinburgh,#000006,SALEEM IQBAL BUTT,,+447944635777,"",Paid,"£6,500.04",2026-06-17,2026-06-17,"£6,500.04",,Text Message,1,£0.00,None,2026-04-13
+inv:0-ChDuC7jDw_CrP-vJKQyIGe-HEPoN,2026-06-17,Edinburgh,#000005,DANIELLE REBECCA MILNER,daniellem343@icloud.com,,"",Paid,£400.00,2026-06-17,2026-06-17,£400.00,,Email,1,£0.00,None,2026-04-13
+inv:0-ChAIo27oigC4ZHke3-KbgsEMEPoN,2026-06-17,Edinburgh,#000004,ALICIA MICHELLE BROWN,,+447846197171,"",Paid,"£2,800.00",2026-06-17,2026-06-17,"£2,800.00",,Text Message,1,£0.00,None,2026-04-11
+inv:0-ChBM7hg12Dwi4F0OTE8djRoIEPoN,2026-06-17,Edinburgh,#000003,AUDREY MCNEILL,audreymcneill1976@gmail.com,,"",Paid,"£3,144.00",2026-06-17,2026-06-17,"£3,144.00",,Email,1,£0.00,None,2025-04-11
+inv:0-ChAPGdArO_iSyIs54fsIyL-SEPoN,2026-05-22,Edinburgh,#000002,MARTİN KRALİK,mkralik@gmx.co.uk,+447704409996,"",Paid,"£1,800.00",2026-05-22,2026-05-22,"£1,800.00",,Email,1,£0.00,None,2026-04-19
+inv:0-ChBQLJgN8Yc6cyB0l4raxlBTEPoN,2026-05-20,Edinburgh,#000001,MARTİN KRALİK,mkralik@gmx.co.uk,+447704409996,"",Paid,"£1,800.00",2026-05-20,2026-05-20,"£1,800.00",,Email,1,£0.00,None,2026-04-19

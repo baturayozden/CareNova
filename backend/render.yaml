@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: caredental-api
+    runtime: node
+    region: frankfurt  # Closest to UK dental clinics; change to oregon/ohio for US
+    plan: starter       # $7/mo; upgrade to standard for zero-downtime deploys
+    buildCommand: npm install
+    startCommand: node src/index.js
+    healthCheckPath: /health
+    autoDeploy: true
+
+    envVars:
+      # ── Node ──────────────────────────────────────────────────────────────
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+
+      # ── Database (Supabase) ────────────────────────────────────────────────
+      # Paste the full connection string from Supabase → Settings → Database
+      - key: DATABASE_URL
+        sync: false   # Set in Render dashboard (never commit the real value)
+
+      # ── Auth ──────────────────────────────────────────────────────────────
+      # Generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+      - key: JWT_SECRET
+        generateValue: true   # Render auto-generates; copy it to your records
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+
+      # ── CORS ──────────────────────────────────────────────────────────────
+      # Your Vercel frontend URL, e.g. https://app.caredental.ai
+      - key: FRONTEND_URL
+        sync: false
+
+      # ── WhatsApp Business API ─────────────────────────────────────────────
+      - key: WHATSAPP_ACCESS_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_WEBHOOK_VERIFY_TOKEN
+        sync: false
+      - key: WHATSAPP_API_VERSION
+        value: v19.0
+
+      # ── Email (Resend) ────────────────────────────────────────────────────
+      # Resend dashboard → API Keys → Create key → paste here
+      # Leave blank to fall back to console logging (dev only).
+      - key: RESEND_API_KEY
+        sync: false

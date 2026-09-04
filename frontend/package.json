@@ -1,0 +1,68 @@
+{
+  "name": "carenova-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.126",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "axios": "^1.16.1",
+    "framer-motion": "^12.39.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "lucide-react": "^1.17.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.15.1",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "ALLOW_PLACEHOLDERS=1 node scripts/check-placeholders.js && node scripts/generate-sitemap.js && react-scripts build && node scripts/generate-og-cards.js && node scripts/prerender.js",
+    "generate-sitemap": "node scripts/generate-sitemap.js",
+    "generate-og-cards": "node scripts/generate-og-cards.js",
+    "check:placeholders": "node scripts/check-placeholders.js",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "prerender": "node scripts/prerender.js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@fontsource/dm-sans": "^5.3.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "@sparticuz/chromium": "^149.0.0",
+    "@types/react-router-dom": "^5.3.3",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.14",
+    "puppeteer": "^25.10.0",
+    "puppeteer-core": "^25.10.0",
+    "satori": "^0.33.4",
+    "sharp": "^0.35.4",
+    "tailwindcss": "^3.4.19"
+  }
+}
