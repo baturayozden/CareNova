@@ -33,3 +33,26 @@ giriş yapılmamış tarayıcı) şu an ÇALIŞMIYOR.
 
 **Güncel URL:** `https://carenova-owfx5aiu6-baturay-ozden-s-projects.vercel.app`
 (her yeni push sonrası değişebilir — `GECE-LOG.md`'nin en üstünde güncel tutulacak)
+
+## B2 — Yeni migration'lar (056-058) gerçek bir veritabanına karşı hiç çalıştırılmadı (aciliyet: orta)
+
+**Ne oldu:** PAKET 6'da `cases`/`case_*`/`branch_templates` tabloları için 3 yeni
+migration yazıldı (`backend/src/migrations/056-058`). Bu makinede `psql` veya
+`docker` kurulu değil, backend'in bağlanacağı bir Postgres de yok — dolayısıyla
+migration'lar sadece elle satır satır gözden geçirilerek doğrulandı, gerçek bir
+veritabanına karşı **hiç çalıştırılmadı**.
+
+**Ne denedim:** SQL'i elle okudum, bir gerçek sözdizimi hatası buldum ve
+düzelttim (058'de yanlış apostrof escape'i). Ama elle okuma, migration'ı
+gerçekten çalıştırmanın yerini tutmaz — FK sırası, tip uyumsuzluğu gibi
+hatalar sadece gerçek `node migrate.js` çalıştırıldığında ortaya çıkar.
+
+**Ne gerekiyor:** Bir Postgres'e (yerel/Supabase) bağlandığında ilk iş olarak
+`cd backend && node migrate.js` çalıştır ve çıktıyı kontrol et. 056-058 en son
+eklenenler, hata verirlerse önce onlara bak.
+
+**Etkisi:** Şu an backend zaten deploy edilmedi, bu yüzden gece boyu hiçbir
+şeyi bloklamıyor — ama migration'lar ilk gerçek DB bağlantısında sürpriz
+çıkarabilir.
+
+**Aciliyet:** Orta — backend deploy edilene kadar acil değil.

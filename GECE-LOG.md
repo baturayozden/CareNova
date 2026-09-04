@@ -4,7 +4,7 @@
 (sabah en üstte okunacak 5 satır — Paket 9'da doldurulacak)
 
 ## Canlı URL
-https://carenova-bkea1ul9x-baturay-ozden-s-projects.vercel.app
+https://carenova-2yblm28jw-baturay-ozden-s-projects.vercel.app
 (her push'ta değişir — en güncel URL için `vercel ls carenova`)
 
 ⚠️ **Şu an Vercel SSO/Deployment Protection arkasında** — sadece Baturay'ın kendi
@@ -118,6 +118,19 @@ vercel CLI: 59.11.7
 
 **Karar:** Brief'in tarif ettiği "Vakalar" sekmesi bu gece gerçek veriyle doldurulamadı çünkü altındaki veri modeli (Case File, PAKET 6) henüz yok — sahte bir "Vaka" ekranı gerçek olmayan bir yapıyı simüle etmek yerine dürüst bir "Yakında" ekranı gösteriyor. Bu, brief'in kendi paket sıralamasındaki bir gerilim: PAKET 5, PAKET 6'nın konseptlerini varsayıyor ama PAKET 6 sonra geliyor ve opsiyonel. Mevcut `Lead`/`Patient` modeliyle çalışan her şey (Panel, Sohbetler, Hastalar, demo login) tam dolu ve gerçek.
 **Not:** Demo adapter'ın "kapsanmayan her GET boş obje döner" ilkesi, `LeadsPage.tsx`'in kullandığı `/api/commissions/deals`, `/api/invoices?leadId=`, `/api/clinics/${id}/sales-users` gibi bazı İKİNCİL (lead detay modalı içindeki alt sekmeler) uçları test etmedim — büyük ihtimalle boş liste gösterirler ama çökme garantisi vermiyorum. Ana akışlar (Dashboard, Leads listesi, Patients, AI Activity, Settings) tek tek gezilip doğrulandı.
+
+**Commit:** `9de1ad8` feat: add demo mode with seeded Turkish health tourism data
+
+---
+## [01:45] PAKET 6 — Vaka Dosyası modeli + branş şablon motoru (KISMİ — sadece migration)
+**Yapıldı:**
+- `backend/src/migrations/056_leads_language_expand.sql`: `leads.language` CHECK constraint'i az/fa/ro/uk/kk/sq/bg ekleyerek genişletildi (Bölüm 2.3).
+- `backend/src/migrations/057_case_file_model.sql`: `cases`, `case_companions`, `case_media`, `case_assessments`, `case_timeline`, `case_events` tabloları — tam olarak brief'teki KOMUT 5 şemasına göre (append-only audit trail `case_events` dahil). `leads.case_id` nullable FK eklendi. Rollback yolu dosyanın sonunda yorum olarak var.
+- `backend/src/migrations/058_branch_templates.sql`: `branch_templates` tablosu + `tenants.active_branch_keys`. 3 sistem şablonu TAM içerikle seed edildi (`hair_transplant`→`range_from_photo`, `dental`→`range_after_imaging`, `aesthetic_surgery`→`qualification_only`) — ön-değerlendirme soruları, gerekli görsel talimatları, kırmızı bayraklar, branş itirazları, bakım hattı takvimi dahil. Diğer 7 branş (eye_lasik, bariatric, ivf, orthopedics, cardiology, oncology, checkup) doğru `ai_pricing_authority` ile iskelet olarak seed edildi. IVF şablonuna donör gamet yasağı kuralı `knowledge_seed` alanına yazıldı.
+- **Doğrulama:** Veritabanı yok (brief'in öngördüğü durum), `psql`/`docker` da bu makinede kurulu değil — migration'lar ÇALIŞTIRILAMADI. Bunun yerine dosyaları elle satır satır gözden geçirdim ve **gerçek bir sözdizimi hatası buldum ve düzelttim**: 058'deki IVF `knowledge_seed` metninde "patient's" kelimesindeki apostrofu SQL string içinde 3 tek tırnakla (`'''s`) escape etmeye çalışmıştım — doğrusu 2'dir (`''`) ya da hiç kullanmamak. Cümleyi apostrof kullanmayacak şekilde yeniden yazarak sorunu kökten çözdüm. Diğer tüm string literalleri apostrof içermiyor, `grep` ile teyit ettim.
+
+**Karar:** Brief'in "migration dosyalarını yaz, çalıştıramıyorsan devam et" talimatına uyuldu. Backend route/service katmanı (branş şablon CRUD API'si, `/settings/branches` admin ekranı, case list/detail sayfaları) bu gece YAZILMADI — sadece şema. Bunun nedeni zaman bütçesi: PAKET 6 brief'te 🟡 (opsiyonel, "~2 saat") olarak işaretli ve gece disiplini kuralı ("Paket 6→8 kalan zamanda") gereği PAKET 9'a (zorunlu kapanış) yeterli zaman bırakmak öncelikli. Migration'lar yine de gelecek bir oturum için hazır ve dokümante halde duruyor.
+**Not:** Backend `npm test` bu migration'ların gerçek DB'ye karşı doğrulanmadığını unutmayın — Baturay bir Postgres'e bağlanıp `node migrate.js` çalıştırdığında ilk gerçek doğrulama o zaman olacak.
 
 **Commit:** (push sonrası eklenecek)
 
