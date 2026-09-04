@@ -51,7 +51,17 @@ function assertNoDuplicateImages(posts) {
 }
 
 async function run() {
-  const posts = await fetchBlogPosts('og-cards');
+  let posts;
+  try {
+    posts = await fetchBlogPosts('og-cards');
+  } catch (err) {
+    // No backend/blog API deployed yet (or it's temporarily unreachable) — OG
+    // cards are a nice-to-have for blog social previews, not build-critical.
+    // Mirror generate-sitemap.js's fail-soft behavior instead of crashing the
+    // whole Vercel build (see GECE-CALISMA-BRIEFI.md PAKET 2.1 warning).
+    console.warn(`[og-cards] WARN: ${err.message} — skipping OG card generation; build continues.`);
+    return;
+  }
   assertNoDuplicateImages(posts);
   console.log(`[og-cards] ${posts.length} post(s), zero duplicate source images. Generating cards...`);
 
