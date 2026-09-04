@@ -1,15 +1,60 @@
-# CareNova Gece Çalışma Logu — 2026-09-04/05
+# SABAH RAPORU
 
-## Özet
-(sabah en üstte okunacak 5 satır — Paket 9'da doldurulacak)
+## 🔗 Canlı URL
+https://carenova-31f341be3-baturay-ozden-s-projects.vercel.app
 
-## Canlı URL
-https://carenova-2yblm28jw-baturay-ozden-s-projects.vercel.app
-(her push'ta değişir — en güncel URL için `vercel ls carenova`)
+⚠️ **Şu an Vercel SSO/Deployment Protection arkasında** — link sadece senin kendi
+Vercel oturumundan (tarayıcında zaten giriş yapmışken) açılıyor, başka biriyle
+paylaşırsan `vercel.com/sso-api`'ye düşer. **30 saniyelik tek-tık düzeltme:**
+`BLOKAJLAR.md` B1'e bak (Settings → Deployment Protection → Disabled). Build ve
+deploy'un kendisi tamamen sağlıklı, içerik doğru — sadece bu ayar engelliyor.
+URL her push'ta değişir; en güncelini görmek için `vercel ls carenova`.
 
-⚠️ **Şu an Vercel SSO/Deployment Protection arkasında** — sadece Baturay'ın kendi
-Vercel oturumundan erişilebilir, herkese açık değil. 30 saniyelik tek-tık düzeltme
-için `BLOKAJLAR.md` B1'e bak. Build/deploy'un kendisi başarılı ve içerik doğru.
+## ✅ Tamamlanan paketler
+- **Paket 0** — Hazırlık: strateji belgeleri okundu, log dosyaları kuruldu, ortam doğrulandı.
+- **Paket 1** — Fork + rebrand + diş-spesifik temizlik (`docs/dental-cleanup-inventory.md`'de tam liste).
+- **Paket 2** — İlk deploy. Kök Vercel shim'i, bir gerçek build-kırıcı hata bulundu ve düzeltildi (`generate-og-cards.js`).
+- **Paket 3** — TR/EN i18n altyapısı (react-i18next, localStorage→tarayıcı→tr fallback), Layout/Sidebar/LoginPage örnek olarak çevrildi.
+- **Paket 4** — Tam landing sayfası (10 bölüm: Nav, Hero — 5 dilde döngülü WhatsApp animasyonu, Problem, Trust, Platform, Compliance, Pricing, FAQ, CTA, Footer). TR/EN'de çalışıyor, mobilde test edildi.
+- **Paket 5** — Demo modu: herhangi bilgiyle giriş, 4 gerçekçi vaka (DE/AR/EN/RU), Sidebar CareNova navigasyonuna güncellendi, uçtan uca tarayıcıda doğrulandı (bir gerçek çökme bulundu ve düzeltildi: `/api/patients`).
+- **Paket 6 (kısmi)** — Case File + branch template migration'ları yazıldı (056-058), 3 sistem şablonu tam içerikle seed edildi. **Çalıştırılmadı** (DB yok) — bkz. `BLOKAJLAR.md` B2.
+- **Paket 9** — Kapanış: bu rapor, build/test doğrulaması, temiz commit geçmişi.
+
+## ⏸️ Yarım kalanlar
+- **Paket 6'nın geri kalanı** (backend route/service katmanı, `/settings/branches` admin ekranı, case list/detail sayfaları) — sadece şema yazıldı, uygulama katmanı yok.
+- **Paket 7** (AI prompt derleyici + yetki matrisi) — hiç başlanmadı. `backend/src/services/ai.js`'deki `buildSystemPrompt` hâlâ eski tek-katmanlı hali; branş şablonundan derlenen katmanlı versiyon KOMUT 7'de tarif edildiği gibi henüz yok.
+- **Paket 8** (kullanıcıları PostgreSQL'e taşıma) — brief'in kendi kuralı gereği ("sadece Paket 7 bittiyse başla") hiç başlanmadı.
+- Backend hâlâ deploy edilmedi (brief'in planına uygun — bu gece sadece frontend, demo modunda).
+- `frontend/src/lib/businessDetails.ts` — CareNova'nın gerçek TR tüzel kişiliği yok, tüm alanlar bilerek boş.
+
+## 🚧 Blokajlar (BLOKAJLAR.md'de detay)
+- **B1** (yüksek, 30 sn): Canlı URL Vercel SSO duvarının arkasında — Deployment Protection kapatılmalı.
+- **B2** (orta): Migration 056-058 gerçek bir Postgres'e karşı hiç çalıştırılmadı, sadece elle gözden geçirildi.
+
+## 🤔 Verdiğim önemli kararlar
+- **`navy`/`gold` renk skalasını KALDIRMADIM**, yeni `brand`/`accent`/`surface`/`ink` token'larını yanına EKLEDİM — mevcut dashboard'un ~30 sayfası eskisini kullanıyor, tam re-tema riskli ve bu gecenin önceliği değildi.
+- **Landing içeriğini flat i18next JSON yerine TS veri dosyası olarak tuttum** (`landingContent.tsx`) — FAQ/pricing gibi tekrarlayan yapılı içerik için çok daha bakımı kolay, yine de `i18n.language`'a bağlı.
+- **`£` → `€` mekanik sed ile değiştirdim** ama tam per-tenant `currency` altyapısını kurmadım — brief'in "yapılandırılabilir" isteğinin derinliği ayrı bir iş paketi.
+- **Vakalar/Doktor Onayı/Teklifler/Seyahat/Bakım Hattı nav öğelerini "Yakında" placeholder'ına yönlendirdim** — altlarındaki Case File modeli (Paket 6) henüz yok, sahte veriyle doldurmak yerine dürüst boş ekran tercih ettim.
+- **Migration'ları yazdım ama çalıştırmadım** — DB yok, brief'in kendi protokolüne uygun ("çalıştıramıyorsan devam et").
+- **PAKET 7-8'e hiç başlamadım** — zaman bütçesi (gece disiplini: "Paket 6→8 kalan zamanda", "Paket 9'u asla atlama") PAKET 9'a yeterli pay ayırmayı önceliklendirdi.
+
+## ▶️ Sıradaki 3 adım
+1. `BLOKAJLAR.md` B1'i çöz (Vercel Deployment Protection kapat) — link herkese açık olsun.
+2. Bir Postgres'e bağlan, `cd backend && node migrate.js` çalıştır, migration 056-058'i doğrula (B2).
+3. PAKET 7'ye başla: `backend/src/services/ai.js`'deki `buildSystemPrompt`'u branş şablonundan (artık DB'de var) derlenen katmanlı yapıya çevir, AI fiyat yetki matrisini zorlayıcı kural olarak enjekte et.
+
+## ⏱️ Süre
+Başlangıç: 23:05 · Bitiş: ~02:10 (yaklaşık, gerçek saatler yukarıdaki paket başlıklarında)
+
+---
+
+## Canlı URL geçmişi (referans)
+- Paket 2: `carenova-owfx5aiu6...`
+- Paket 3: `carenova-jkq82j5jr...`
+- Paket 4: `carenova-bkea1ul9x...`
+- Paket 5: `carenova-2yblm28jw...`
+- Paket 6 (backend-only, frontend değişmedi): `carenova-31f341be3...` ← **güncel**
 
 ---
 ## [23:05] PAKET 0 — Hazırlık
@@ -132,6 +177,20 @@ vercel CLI: 59.11.7
 **Karar:** Brief'in "migration dosyalarını yaz, çalıştıramıyorsan devam et" talimatına uyuldu. Backend route/service katmanı (branş şablon CRUD API'si, `/settings/branches` admin ekranı, case list/detail sayfaları) bu gece YAZILMADI — sadece şema. Bunun nedeni zaman bütçesi: PAKET 6 brief'te 🟡 (opsiyonel, "~2 saat") olarak işaretli ve gece disiplini kuralı ("Paket 6→8 kalan zamanda") gereği PAKET 9'a (zorunlu kapanış) yeterli zaman bırakmak öncelikli. Migration'lar yine de gelecek bir oturum için hazır ve dokümante halde duruyor.
 **Not:** Backend `npm test` bu migration'ların gerçek DB'ye karşı doğrulanmadığını unutmayın — Baturay bir Postgres'e bağlanıp `node migrate.js` çalıştırdığında ilk gerçek doğrulama o zaman olacak.
 
-**Commit:** (push sonrası eklenecek)
+**Commit:** `6e4ebdd` feat: add case file model and branch template engine migrations
+
+---
+## [02:10] PAKET 9 — Kapanış
+**Yapıldı:**
+1. `cd frontend && npm run build` (CI=true) → temiz, exit 0. Doğrulandı.
+2. `cd backend && npm test` → **104/104 test geçti** (2 gerçek suite). 3. suite (`invoiceNumber.test.js`) canlı Postgres gerektiriyor, DB yoksa `ECONNREFUSED` ile bekleniyor şekilde başarısız — bu benim bu gece bozduğum bir şey değil, DB olmadan zaten böyle davranıyor.
+3. Son deploy `curl -I` ile doğrulandı: HTTP 302 → `vercel.com/sso-api` (B1'de açıklanan Deployment Protection nedeniyle — beklenen davranış, build/deploy'un kendisi sağlıklı).
+4. Eksik `frontend/.env.example` bulundu (CareDental'da da hiç yokmuş) ve oluşturuldu.
+5. Tüm değişiklikler commit'lendi, `git status` temiz, GitHub'a push edildi (`gh` yerine doğrudan `git push` kullanıldı, brief'in izin verdiği şekilde — `gh auth status` zaten en başta doğrulanmıştı).
+6. Bu dosyanın en üstüne SABAH RAPORU yazıldı.
+
+**Karar:** PAKET 7-8'e hiç başlanmadı — brief'in "Paket 9 için 40 dakika ayır ve bunu asla atlama" kuralına uyuldu, kapanış görevlerine yeterli zaman/dikkat ayırmak PAKET 7'yi yarım bırakmaktan daha değerliydi.
+
+**Commit:** `310ceee` docs: add missing frontend/.env.example (ve bu commit)
 
 ---
