@@ -4,7 +4,8 @@
 (sabah en üstte okunacak 5 satır — Paket 9'da doldurulacak)
 
 ## Canlı URL
-https://carenova-owfx5aiu6-baturay-ozden-s-projects.vercel.app
+https://carenova-jkq82j5jr-baturay-ozden-s-projects.vercel.app
+(her push'ta değişir — en güncel URL için `vercel ls carenova`)
 
 ⚠️ **Şu an Vercel SSO/Deployment Protection arkasında** — sadece Baturay'ın kendi
 Vercel oturumundan erişilebilir, herkese açık değil. 30 saniyelik tek-tık düzeltme
@@ -86,6 +87,21 @@ vercel CLI: 59.11.7
 
 **Karar:** `users.locale` DB kolonu ve Settings sayfası dil seçici entegrasyonu bu gece YAPILMADI — brief'in kısa PAKET 3 tanımı sadece "Header'a dil değiştirici koy" diyor, DB kalıcılığı KOMUT4'ün daha detaylı halinde var ama gece brifinginde yok; localStorage yeterli kabul edildi.
 
-**Commit:** (aşağıda push sonrası eklenecek)
+**Commit:** `c009076` feat: add TR/EN i18n infrastructure with Turkish as default
+
+---
+## [00:35] PAKET 4 — Landing sayfası
+**Yapıldı:**
+- CareDental'ın eski `HeroSection.tsx`/`variants.ts`'ine SADECE yapısal/animasyon referansı için baktım (marka rengi, kopya, senaryo hiçbiri kopyalanmadı) — brief'in izin verdiği şekilde.
+- 10 bölüm sırayla yazıldı: `NavBar` (logo, link, TR/EN switcher, CTA, mobil hamburger menü), `HeroSection` (5 dilde döngülü WhatsApp animasyonu: TR→EN→AR→DE→RU, saç ekimi/Alman hasta senaryosu, Arapça RTL doğru), `ProblemSection` (kayıp hesabı 3 kart), `TrustSection` (üç güven yarası → cevap tablosu), `PlatformSection` (6 modül kartı), `ComplianceSection` (Mevzuat Kalkanı, koyu tema kontrast bölümü), `PricingSection` (Solo/Klinik/Grup, yıllık/aylık toggle, ROI cümlesi), `FAQSection` (8 soru, accordion), `CTASection` (demo formu — demo modunda gerçek submit yok, mock başarı ekranı), `Footer`.
+- Tüm içerik `frontend/src/data/landingContent.tsx`'te TR/EN paralel yapılandırılmış veri olarak tutuluyor (flat i18next JSON yerine — FAQ/pricing gibi tekrarlayan yapılı içerik için çok daha bakımı kolay), `i18n.language`'a göre seçiliyor. JSX içerdiği için dosya `.ts` değil `.tsx` olmak zorundaydı (ilk build'de bunu ıskaladım, `Type expected` hatası aldım, düzelttim).
+- Yeni `brand`/`accent`/`surface`/`ink` token'ları ve `font-display` (Fraunces) burada ilk kez gerçek içerikle kullanıldı.
+- **Kabul kriteri doğrulandı:** `CI=true npm run build` temiz geçti. Yerel dev server'da (port 3002 — brief'in kendi 3000 varsayılanı değil, bkz. Paket 3 notu) tarayıcıdan görsel doğrulama yapıldı: Hero pixel-perfect render oldu (marka renkleri, Fraunces başlık, WhatsApp animasyonu TR/AR arasında geçiş yaparken doğru çalıştı), mobil viewport'ta (375px) hero düzgün stack oluyor, butonlar tam genişlik. Aşağı scroll sırasında tarayıcı aracında (Browser pane) tekrarlayan bir `scroll` action timeout'u yaşadım — sayfa kodunda değil, araçta bir sorun görünüyor; JS ile (`getBoundingClientRect`/`getComputedStyle`) Pricing bölümünün `opacity:1`, doğru yükseklik (990px) ve doğru DOM konumunda olduğunu doğruladım, ayrıca `get_page_text` ile TÜM bölümlerin (Problem, Trust, Platform, Compliance, Pricing, FAQ, CTA, Footer) doğru çevrilmiş metinlerinin DOM'da mevcut olduğunu teyit ettim. Pixel-perfect ekran görüntüsü sadece Hero ve mobil görünüm için alınabildi; kalan bölümler DOM/CSS seviyesinde doğrulandı.
+
+**Karar:** Landing içeriğini flat i18next JSON yerine TS veri dosyası olarak tuttum — FAQ (8 soru × 2 dil), pricing (3 tier × ~7 özellik × 2 dil) gibi tekrarlayan yapılı içerik i18next'in `t()` API'siyle çok daha kırılgan/uzun olurdu. Karar `i18n.language` sinyaline bağlı kalarak "TR/EN üzerinden" ilkesini koruyor.
+
+**Not:** `#hero` bölümündeki ikincil CTA "Nasıl Çalışır?" `#platform`'a scroll ediyor — ayrı bir "how it works" bölümü brief'in 10 bölüm listesinde yoktu, Platform'un içine gömülü kabul edildi.
+
+**Commit:** (push sonrası eklenecek)
 
 ---

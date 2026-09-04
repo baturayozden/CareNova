@@ -1,45 +1,47 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import SEOMeta from '../components/SEOMeta';
+import ScrollToTopButton from '../components/ScrollToTopButton';
+import NavBar from '../components/landing/NavBar';
+import HeroSection from '../components/landing/HeroSection';
+import ProblemSection from '../components/landing/ProblemSection';
+import TrustSection from '../components/landing/TrustSection';
+import PlatformSection from '../components/landing/PlatformSection';
+import ComplianceSection from '../components/landing/ComplianceSection';
+import PricingSection from '../components/landing/PricingSection';
+import FAQSection from '../components/landing/FAQSection';
+import CTASection from '../components/landing/CTASection';
+import Footer from '../components/landing/Footer';
 
-// Placeholder — the real CareNova landing page (Nav, Hero, Problem, Trust,
-// Platform, Regulatory Shield, Pricing, FAQ, CTA, Footer) is built in PAKET 4.
-// See CARENOVA-STRATEJI.md Bölüm 6.2/7/10 and GECE-CALISMA-BRIEFI.md PAKET 4.
-//
-// This placeholder carries real, honest content rather than a near-empty
-// "coming soon" screen — partly because it's what visitors should see before
-// the full page ships, and partly because scripts/prerender.js refuses to
-// write a route to disk as static HTML unless its body text exceeds 500
-// characters and has an <h1> (a guard against publishing broken/empty pages).
+// CareNova landing page — TR default, EN via the nav language switcher.
+// See CARENOVA-STRATEJI.md Bölüm 6.2/7/10 and GECE-CALISMA-BRIEFI.md PAKET 4
+// for the content/section brief this implements.
 export default function LandingPage() {
+  const { i18n } = useTranslation();
+  const isTr = i18n.language?.startsWith('tr');
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface text-ink antialiased px-6">
+    <div className="min-h-screen bg-surface text-ink antialiased">
       <SEOMeta
-        title="CareNova — Türkiye Sağlık Turizmi için AI Hasta Güven Platformu"
-        description="CareNova, Türkiye'ye hasta getiren klinikler için WhatsApp üzerinden çok dilli AI hasta dönüşüm ve güven platformu."
+        title={isTr
+          ? 'CareNova — Türkiye Sağlık Turizmi için AI Hasta Güven Platformu'
+          : 'CareNova — AI Patient-Trust Platform for Turkish Health Tourism'}
+        description={isTr
+          ? "Gelen her WhatsApp mesajını 5 saniyede hastanın kendi dilinde karşılayan, fiyatı kilitleyen ve dönüş sonrası bir yıl takip eden AI platformu."
+          : 'The AI platform that replies to every WhatsApp message in 5 seconds, in the patient\'s own language, locks the price, and follows up for a year after they go home.'}
         path="/"
       />
-      <div className="max-w-xl text-center">
-        <h1 className="font-display text-4xl sm:text-5xl text-brand-500">CareNova</h1>
-        <p className="mt-2 text-sm uppercase tracking-widest text-accent-500">Çok yakında</p>
-        <p className="mt-6 text-lg leading-relaxed text-ink-muted">
-          Türkiye'ye hasta getiren klinikler ve doktorlar için: gelen her WhatsApp
-          mesajını 5 saniyede hastanın kendi dilinde karşılayan, fiyatı kilitleyen,
-          ameliyatı yapacak doktoru isimle taahhüt eden ve hasta eve döndükten
-          sonra bir yıl boyunca peşini bırakmayan AI hasta güven platformu.
-        </p>
-        <p className="mt-4 text-base leading-relaxed text-ink-muted">
-          CareNova bir CRM değil — reklam bütçenizle rezerve edilmiş bir hasta
-          arasındaki güven altyapısı. Çok dilli AI ajanı (TR, EN, AR, DE, RU),
-          doktor onaylı kilitli teklif, seyahat konsiyerjliği ve dönüş sonrası
-          bakım hattı tek bir WhatsApp hattında birleşiyor.
-        </p>
-        <p className="mt-8 text-sm text-ink-muted">
-          Demo talep etmek veya erken erişim için{' '}
-          <a href="mailto:hello@carenova.ai" className="text-accent-500 underline">
-            hello@carenova.ai
-          </a>
-        </p>
-      </div>
+      <NavBar />
+      <HeroSection />
+      <ProblemSection />
+      <TrustSection />
+      <PlatformSection />
+      <ComplianceSection />
+      <PricingSection />
+      <FAQSection />
+      <CTASection />
+      <Footer />
+      <ScrollToTopButton />
     </div>
   );
 }
