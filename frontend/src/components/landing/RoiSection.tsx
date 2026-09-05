@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { BarChart3 } from 'lucide-react';
 import { roiHeading, roiPanelLabel, roiSub, roiColumns, roiRows, roiFootnote } from '../../data/landingContent';
-import { fadeUp, stagger, sectionHeading, sectionSubheading } from './variants';
+import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
 export default function RoiSection() {
   const { i18n } = useTranslation();
@@ -13,7 +13,7 @@ export default function RoiSection() {
   return (
     <section id="roi" aria-labelledby="roi-heading" className="relative py-24 bg-surface">
       <div className="mx-auto max-w-6xl px-6">
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={stagger()} className="max-w-2xl mb-6">
+        <motion.div {...reveal()} variants={stagger()} className="max-w-2xl mb-6">
           <div className="flex items-center gap-2 mb-3">
             <BarChart3 size={20} strokeWidth={1.5} className="text-accent" aria-hidden="true" />
             <span className="text-xs font-semibold uppercase tracking-widest text-accent">ROI</span>
@@ -23,13 +23,13 @@ export default function RoiSection() {
         </motion.div>
 
         <motion.span
-          initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
+          {...reveal()} variants={fadeUp}
           className="inline-block mb-6 text-xs font-medium text-warning bg-warning-soft px-3 py-1.5 rounded-full"
         >
           {roiPanelLabel(i18n.language)}
         </motion.span>
 
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="rounded-2xl border border-line bg-surface shadow-sm overflow-x-auto">
+        <motion.div {...reveal()} variants={fadeUp} className="rounded-2xl border border-line bg-surface shadow-sm overflow-x-auto">
           <table className="w-full text-sm min-w-[600px]">
             <thead>
               <tr className="bg-surface-page">
@@ -54,7 +54,7 @@ export default function RoiSection() {
           </table>
         </motion.div>
 
-        <motion.p initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="text-ink-subtle text-xs mt-4">
+        <motion.p {...reveal()} variants={fadeUp} className="text-ink-subtle text-xs mt-4">
           {roiFootnote(i18n.language)}
         </motion.p>
       </div>

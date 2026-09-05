@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Check, X, Minus } from 'lucide-react';
 import { comparisonHeading, comparisonSub, comparisonColumns, comparisonRows, comparisonNote } from '../../data/landingContent';
-import { fadeUp, stagger, sectionHeading, sectionSubheading } from './variants';
+import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
 function Cell({ value }: { value: string }) {
   if (value === 'yes') return <Check size={18} strokeWidth={2} className="text-success mx-auto" aria-label="yes" />;
@@ -21,12 +21,12 @@ export default function ComparisonSection() {
   return (
     <section id="karsilastirma" aria-labelledby="comparison-heading" className="relative py-24 bg-surface-page">
       <div className="mx-auto max-w-6xl px-6">
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={stagger()} className="max-w-2xl mb-12">
+        <motion.div {...reveal()} variants={stagger()} className="max-w-2xl mb-12">
           <motion.h2 id="comparison-heading" variants={fadeUp} className={sectionHeading}>{comparisonHeading(i18n.language)}</motion.h2>
           <motion.p variants={fadeUp} className={`${sectionSubheading} mt-4`}>{comparisonSub(i18n.language)}</motion.p>
         </motion.div>
 
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} variants={fadeUp} className="rounded-2xl border border-line bg-surface shadow-sm overflow-x-auto">
+        <motion.div {...reveal()} variants={fadeUp} className="rounded-2xl border border-line bg-surface shadow-sm overflow-x-auto">
           <table className="w-full text-sm min-w-[720px]">
             <thead>
               <tr>
@@ -57,7 +57,7 @@ export default function ComparisonSection() {
           </table>
         </motion.div>
 
-        <motion.p initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="text-ink-muted text-sm max-w-2xl mx-auto mt-8 text-center">
+        <motion.p {...reveal()} variants={fadeUp} className="text-ink-muted text-sm max-w-2xl mx-auto mt-8 text-center">
           {comparisonNote(i18n.language)}
         </motion.p>
       </div>

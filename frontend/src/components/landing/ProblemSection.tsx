@@ -6,7 +6,7 @@ import {
   problemHeading, problemSub, problemCards,
   problemFunnelHeading, problemFunnel,
 } from '../../data/landingContent';
-import { fadeUp, stagger, sectionHeading, sectionSubheading } from './variants';
+import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
 const ICONS = [TrendingDown, Users, GraduationCap];
 
@@ -18,12 +18,12 @@ export default function ProblemSection() {
   return (
     <section id="problem" aria-labelledby="problem-heading" className="relative py-24 bg-surface-page">
       <div className="mx-auto max-w-6xl px-6">
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={stagger()} className="max-w-2xl mb-14">
+        <motion.div {...reveal()} variants={stagger()} className="max-w-2xl mb-14">
           <motion.h2 id="problem-heading" variants={fadeUp} className={sectionHeading}>{problemHeading(i18n.language)}</motion.h2>
           <motion.p variants={fadeUp} className={`${sectionSubheading} mt-4`}>{problemSub(i18n.language)}</motion.p>
         </motion.div>
 
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={stagger(0.12)} className="grid md:grid-cols-3 gap-6 mb-16">
+        <motion.div {...reveal()} variants={stagger(0.12)} className="grid md:grid-cols-3 gap-6 mb-16">
           {cards.map((c, i) => {
             const Icon = ICONS[i];
             return (
@@ -42,7 +42,7 @@ export default function ProblemSection() {
 
         {/* ── Visual funnel: same budget, two outcomes ─────────────────── */}
         <motion.div
-          initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={stagger(0.1)}
+          {...reveal()} variants={stagger(0.1)}
           className="rounded-2xl bg-surface border border-line shadow-sm p-8 md:p-10"
         >
           <motion.h3 variants={fadeUp} className="text-center font-semibold text-ink text-lg mb-1">{problemFunnelHeading(i18n.language)}</motion.h3>

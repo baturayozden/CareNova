@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ArrowRight, BadgeCheck, FileSignature, Clock3, ShieldCheck } from 'lucide-react';
 import { trustHeading, trustSub, trustRows } from '../../data/landingContent';
-import { fadeUp, stagger, sectionHeading, sectionSubheading } from './variants';
+import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
 // Small, honest product mock-ups — no photos, no invented names beyond the
 // same demo persona used elsewhere in the app (Dr. Emre Yıldız, seen in
@@ -58,7 +58,7 @@ export default function TrustSection() {
   return (
     <section id="trust" aria-labelledby="trust-heading" className="relative py-24 bg-surface">
       <div className="mx-auto max-w-6xl px-6">
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={stagger()} className="max-w-2xl mb-14 mx-auto text-center">
+        <motion.div {...reveal()} variants={stagger()} className="max-w-2xl mb-14 mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
             <ShieldCheck size={20} strokeWidth={1.5} className="text-accent" aria-hidden="true" />
             <span className="text-xs font-semibold uppercase tracking-widest text-accent">Trust</span>
@@ -67,7 +67,7 @@ export default function TrustSection() {
           <motion.p variants={fadeUp} className={`${sectionSubheading} mt-4 mx-auto`}>{trustSub(i18n.language)}</motion.p>
         </motion.div>
 
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={stagger(0.14)} className="space-y-6">
+        <motion.div {...reveal()} variants={stagger(0.14)} className="space-y-6">
           {rows.map(r => (
             <motion.div
               key={r.wound}

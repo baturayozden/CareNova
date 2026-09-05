@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ShieldCheck, FileWarning, FileSignature, ClipboardCheck } from 'lucide-react';
 import { complianceHeading, complianceSub, complianceItems, trustBasisHeading, trustBasisItems } from '../../data/landingContent';
-import { fadeUp, stagger } from './variants';
+import { fadeUp, stagger, reveal } from './variants';
 
 const ICONS = [ShieldCheck, FileWarning, FileSignature, ClipboardCheck];
 
@@ -19,7 +19,7 @@ export default function ComplianceSection() {
           backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(27,111,234,0.15), transparent 50%)',
         }} />
         <div className="relative mx-auto max-w-6xl px-6">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={stagger()} className="max-w-2xl mb-14">
+          <motion.div {...reveal()} variants={stagger()} className="max-w-2xl mb-14">
             <motion.div variants={fadeUp} className="flex items-center gap-2 mb-4">
               <ShieldCheck size={20} strokeWidth={1.5} className="text-accent-hover" aria-hidden="true" />
               <span className="text-accent-hover text-xs font-semibold tracking-widest uppercase">{complianceHeading(i18n.language)}</span>
@@ -29,7 +29,7 @@ export default function ComplianceSection() {
             </motion.h2>
           </motion.div>
 
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={stagger(0.1)} className="grid sm:grid-cols-2 gap-6">
+          <motion.div {...reveal()} variants={stagger(0.1)} className="grid sm:grid-cols-2 gap-6">
             {items.map((item, i) => {
               const Icon = ICONS[i];
               return (

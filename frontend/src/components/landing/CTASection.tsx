@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import { ctaHeading, ctaSub, ctaFormLabels, ctaBranchOptions } from '../../data/landingContent';
-import { fadeUp, stagger, ease } from './variants';
+import { fadeUp, stagger, ease, reveal } from './variants';
 
 export default function CTASection() {
   const { i18n } = useTranslation();
@@ -24,7 +24,7 @@ export default function CTASection() {
     <section id="cta" aria-labelledby="cta-heading" className="relative py-24 bg-surface">
       <div className="mx-auto max-w-2xl px-6">
         <motion.div
-          initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={stagger()}
+          {...reveal()} variants={stagger()}
           className="rounded-3xl bg-slate-900 text-white p-10 md:p-14 text-center overflow-hidden relative"
         >
           <div className="absolute inset-0 pointer-events-none opacity-50" style={{

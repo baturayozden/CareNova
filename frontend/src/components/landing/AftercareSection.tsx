@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeartPulse } from 'lucide-react';
 import { aftercareHeading, aftercareSub, aftercareDays, aftercareExample } from '../../data/landingContent';
-import { fadeUp, stagger, sectionHeading, sectionSubheading } from './variants';
+import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
 export default function AftercareSection() {
   const { i18n } = useTranslation();
@@ -14,7 +14,7 @@ export default function AftercareSection() {
   return (
     <section id="bakim-hatti" aria-labelledby="aftercare-heading" className="relative py-24 bg-surface-page">
       <div className="mx-auto max-w-6xl px-6">
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={stagger()} className="max-w-2xl mb-12">
+        <motion.div {...reveal()} variants={stagger()} className="max-w-2xl mb-12">
           <div className="flex items-center gap-2 mb-3">
             <HeartPulse size={20} strokeWidth={1.5} className="text-accent" aria-hidden="true" />
             <span className="text-xs font-semibold uppercase tracking-widest text-accent">Aftercare</span>
@@ -23,7 +23,7 @@ export default function AftercareSection() {
           <motion.p variants={fadeUp} className={`${sectionSubheading} mt-4`}>{aftercareSub(i18n.language)}</motion.p>
         </motion.div>
 
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} className="rounded-2xl bg-surface border border-line shadow-sm p-6 md:p-10">
+        <motion.div {...reveal()} variants={fadeUp} className="rounded-2xl bg-surface border border-line shadow-sm p-6 md:p-10">
           {/* Timeline */}
           <div className="overflow-x-auto pb-2">
             <div className="relative flex items-center justify-between gap-2 min-w-[640px] px-2">

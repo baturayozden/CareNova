@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Check, Lightbulb, Star } from 'lucide-react';
 import { pricingHeading, pricingNote, pricingToggle, pricingTiers, pricingRoiHook, pricingCta, pricingRecommendedBadge } from '../../data/landingContent';
-import { fadeUp, stagger, sectionHeading } from './variants';
+import { fadeUp, stagger, sectionHeading, reveal } from './variants';
 
 export default function PricingSection() {
   const { i18n } = useTranslation();
@@ -14,7 +14,7 @@ export default function PricingSection() {
   return (
     <section id="pricing" aria-labelledby="pricing-heading" className="relative py-24 bg-surface">
       <div className="mx-auto max-w-6xl px-6">
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger()} className="text-center max-w-xl mx-auto mb-6">
+        <motion.div {...reveal()} variants={stagger()} className="text-center max-w-xl mx-auto mb-6">
           <motion.h2 id="pricing-heading" variants={fadeUp} className={sectionHeading}>{pricingHeading(i18n.language)}</motion.h2>
           <motion.p variants={fadeUp} className="text-ink-muted text-sm mt-3">{pricingNote(i18n.language)}</motion.p>
         </motion.div>
@@ -36,7 +36,7 @@ export default function PricingSection() {
           </div>
         </div>
 
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={stagger(0.1)} className="grid md:grid-cols-3 gap-6 items-start">
+        <motion.div {...reveal()} variants={stagger(0.1)} className="grid md:grid-cols-3 gap-6 items-start">
           {tiers.map(tier => (
             <motion.div
               key={tier.name}
@@ -72,7 +72,7 @@ export default function PricingSection() {
         </motion.div>
 
         <motion.p
-          initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
+          {...reveal()} variants={fadeUp}
           className="flex items-start justify-center gap-2 text-center text-ink-muted text-sm max-w-lg mx-auto mt-12"
         >
           <Lightbulb size={16} strokeWidth={1.5} className="text-accent shrink-0 mt-0.5" aria-hidden="true" />

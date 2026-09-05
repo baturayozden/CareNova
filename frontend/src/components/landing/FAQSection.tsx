@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { faqHeading, faqItems } from '../../data/landingContent';
-import { fadeUp, stagger, sectionHeading } from './variants';
+import { fadeUp, stagger, sectionHeading, reveal } from './variants';
 
 export default function FAQSection() {
   const { i18n } = useTranslation();
@@ -24,11 +24,11 @@ export default function FAQSection() {
     <section id="faq" aria-labelledby="faq-heading" className="relative py-24 bg-surface-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="mx-auto max-w-3xl px-6">
-        <motion.h2 id="faq-heading" initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className={`${sectionHeading} text-center mb-12`}>
+        <motion.h2 id="faq-heading" {...reveal()} variants={fadeUp} className={`${sectionHeading} text-center mb-12`}>
           {faqHeading(i18n.language)}
         </motion.h2>
 
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} variants={stagger(0.06)} className="space-y-3">
+        <motion.div {...reveal()} variants={stagger(0.06)} className="space-y-3">
           {items.map((item, i) => {
             const isOpen = openIdx === i;
             const panelId = `faq-panel-${i}`;

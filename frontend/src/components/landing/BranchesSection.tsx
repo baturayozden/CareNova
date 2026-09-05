@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Settings2 } from 'lucide-react';
 import { branchesHeading, branchesSub, branchesTable } from '../../data/landingContent';
-import { fadeUp, stagger, sectionHeading, sectionSubheading } from './variants';
+import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
 export default function BranchesSection() {
   const { i18n } = useTranslation();
@@ -13,13 +13,13 @@ export default function BranchesSection() {
   return (
     <section id="branslar" aria-labelledby="branches-heading" className="relative py-24 bg-surface">
       <div className="mx-auto max-w-6xl px-6">
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={stagger()} className="max-w-2xl mb-12">
+        <motion.div {...reveal()} variants={stagger()} className="max-w-2xl mb-12">
           <motion.h2 id="branches-heading" variants={fadeUp} className={sectionHeading}>{branchesHeading(i18n.language)}</motion.h2>
           <motion.p variants={fadeUp} className={`${sectionSubheading} mt-4`}>{branchesSub(i18n.language)}</motion.p>
         </motion.div>
 
         <motion.div
-          initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.1 }} variants={fadeUp}
+          {...reveal()} variants={fadeUp}
           className="rounded-2xl border border-line shadow-sm overflow-x-auto"
         >
           <table className="w-full text-sm min-w-[640px]">

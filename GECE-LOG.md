@@ -431,3 +431,96 @@ dahil, build tekrar temiz.
 **Commit:** `106b996` feat(landing): comprehensive overhaul — new sections, sourced data, a11y, lucide icons
 
 ---
+### ACİL — Landing sayfası "boş görünüyor" hatası (Framer Motion reveal donması)
+
+**Bildirilen sorun:** Canlı sitede tüm scroll-reveal içerik (`whileInView`/`animate`
+ile açılan bölümler) opacity:0 + `translateY(28px)`'te donuyor; içerik DOM'da var
+ama görünmüyor; pencere yeniden boyutlandırılınca anında düzeliyor.
+
+**Araştırma (önemli, çünkü ilk teşhisim YANLIŞ çıktı):**
+- İlk hipotez ("IntersectionObserver eski layout'ta 'görünür değil' kararını
+  kilitliyor") **yanlıştı** — doğrudan test ettim: gerçek bir `resize_window`
+  (CDP üzerinden gerçek geometri değişikliği) donmuş elemanı DÜZELTMEDİ.
+- İkinci hipotez ("prerender snapshot + `createRoot` kapsayıcıyı temizlemiyor,
+  içerik ikileniyor") de **yanlış** çıktı — `#root`'un DOM'unu inceledim,
+  gerçek tekilleme yoktu; büyük `scrollHeight` ölçümü (32.000px), Hero'daki
+  WhatsApp mock bileşeninin AnimatePresence exit animasyonlarının hiç
+  tamamlanmaması yüzünden eski mesaj balonlarının DOM'dan hiç silinmeyip
+  birikmesinden kaynaklanıyordu (ayrı, küçük bir bulgu — aşağıda not edildi).
+- **Gerçek kök neden:** Test ortamımdaki (hem Browser pane hem gerçek Chrome
+  eklentisi) sekmeler `document.hidden` değerini SÜREKLİ `true` döndürüyor —
+  yani bu araçlar OS seviyesinde gerçek pencere odağı veremiyor. Chrome,
+  arka plandaki (hidden) sekmelerde `requestAnimationFrame`'i büyük ölçüde
+  kısıtlıyor/durduruyor — Framer Motion'ın `animate`/`whileInView` mekanizması
+  TAMAMEN rAF'a dayanıyor. rAF hiç tick atmazsa, JS tarafından hesaplanan
+  opacity/transform değeri "hidden" başlangıç noktasında SONSUZA KADAR donuk
+  kalıyor — sekme daha sonra görünür olsa bile, durmuş bir animasyon kendi
+  kendine devam etmiyor. `setInterval`/`setTimeout` de aynı ortamda ölçülen
+  gerçek veriyle ÇOK agresif kısıtlanıyor (250ms'lik bir interval bazen
+  ardışık tikler arası 18 saniyeye kadar gecikebiliyor).
+- **Dürüst belirsizlik:** Gerçek insan ziyaretçilerin sekmesi normalde
+  odaklı/görünürdür (rAF kısıtlanmaz), bu yüzden orijinal hata muhtemelen
+  büyük ölçüde OTOMATİK test/izleme araçlarının (SEO crawler, önizleme botu,
+  Lighthouse, headless QA) aynı `document.hidden=true` karakteristiğine sahip
+  olmasından kaynaklanıyor olabilir — kullanıcının orijinal raporu da böyle bir
+  araçla ölçülmüş olabilir. Bunu kesin olarak KANITLAYAMADIM (kendi
+  araçlarımla gerçekten odaklı bir sekme üretemedim), bu yüzden "gerçek
+  kullanıcılar hiç etkilenmiyor" diye İDDİA ETMİYORUM — sadece bu ihtimali
+  gördüğümü ve buna göre neden savunmacı bir çözüm seçtiğimi not ediyorum.
+
+**Yapılan düzeltmeler (4 katman, kod: `src/index.tsx`, `src/App.tsx`,
+`src/components/landing/variants.ts` + 13 landing bölümü):**
+1. `index.tsx`: `createRoot` öncesi `container.innerHTML = ''` — prerender
+   snapshot'ının statik markup'ıyla canlı ağacın asla yan yana kalmamasını
+   garantiliyor (gerçek bir tekilleme BULMADIM ama bu gerçek bir gizli risk,
+   ucuz ve zararsız bir savunma).
+2. `variants.ts`: yeni `reveal(amount=0.05)` yardımcı fonksiyonu —
+   `prefers-reduced-motion: reduce` ise `{}` döndürüp animasyonu tamamen
+   atlıyor (içerik baştan görünür render olur, hiçbir gözlemciye bağımlı
+   değil); değilse `viewport.amount`'ı brief'in istediği gibi 0.05'e
+   düşürüyor. 13 dosyada 30 adet `initial="hidden" whileInView="show"
+   viewport={{...}}` tekrarı `{...reveal()}` ile değiştirildi.
+3. `App.tsx`: iki katmanlı "watchdog" — (a) 250ms'lik bir periyodik tarama,
+   ekranda GERÇEKTEN görünür olup hâlâ opacity:0'da duran elemanları, ilk
+   görülüşlerinden 700ms sonra zorla `opacity:1` yapıyor (ekrana hiç
+   girmemiş — henüz scroll edilmemiş — içerik dokunulmadan bırakılıyor,
+   yani kasıtlı scroll-reveal efekti bozulmuyor); (b) bir `visibilitychange`
+   dinleyicisi, sekme görünür hale geldiği ANDA aynı taramayı zorla çalıştırır
+   — bu, zamanlayıcı kısıtlamasına TABİ DEĞİL, yani "arka planda açıldı, sonra
+   bakıldı" senaryosunu ANINDA (<100ms) düzeltiyor. Bunu simüle ederek
+   doğruladım (`document.hidden`'ı geçici olarak override edip
+   `visibilitychange` tetikledim) — 14 donmuş eleman 100ms içinde düzeldi.
+   Basit bir `window.dispatchEvent(new Event('resize'))` denedim, İŞE
+   YARAMADI (donmuş inline style'ı değiştirmiyor) — bu yüzden brief'in
+   önerdiği "resize nudge" fikrini bu daha isabetli mekanizmayla değiştirdim.
+
+**Doğrulama:**
+- ✅ `CI=true npm run build` temiz.
+- ✅ Mantık doğrudan doğrulandı: manuel olarak "sweep" fonksiyonunu simüle
+  ettim, ekranda görünür + opacity:0 elemanları güvenilir şekilde düzeltiyor.
+- ✅ `visibilitychange` anlık düzeltme yolu simülasyonla doğrulandı (<100ms).
+- ✅ Periyodik yoklama, en kötü senaryoda (sekme SÜREKLİ hidden — kendi test
+  ortamımın aşamayacağım bir kısıtı) birkaç saniye içinde kendi kendini
+  onarıyor; gerçek/görünür bir sekmede bu saniyenin çok altında olmalı
+  (kısıtlanmamış 250ms interval + 700ms eşik).
+- ⚠️ **Yapamadığım:** Gerçekten `document.hidden=false` olan bir sekmede uçtan
+  uca doğrulama — hem Browser pane hem gerçek Chrome eklentisi bu ortamda
+  sürekli `hidden:true` raporluyor (araç kısıtı). Kullanıcının kendi normal
+  tarayıcısında (gerçek odaklı sekme) canlı deploy sonrası bir kez daha göz
+  ile kontrol etmesi öneriliyor — bu tek doğrulanamayan adım.
+- **Ayrı, küçük bulgu (düzeltilmedi, gelecek iş):** `HeroSection.tsx`'teki
+  `WhatsAppMock`, sekme sürekli "hidden" kalırsa (rAF donarsa) eski mesaj
+  balonlarını DOM'dan hiç temizlemiyor (AnimatePresence exit animasyonu
+  tamamlanmadığı için), zamanla sayfa boyu şişiyor. Sadece bu patolojik/uzun
+  süreli-arka-plan senaryosunda görülür, gerçek kullanıcıyı etkilemesi
+  beklenmiyor; bu yüzden şimdilik dokunulmadı.
+
+**Kabul kriteri:** ✅ Build temiz. ✅ Mekanizma hem "eleman ekrana asla
+girmedi" (dokunulmuyor, doğru) hem "ekranda ama donuk" (düzeltiliyor) hem
+"arkaplanda yüklendi sonra görüldü" (anında düzeliyor) senaryolarında
+doğrulandı. ⚠️ Gerçek görünür sekmede elle doğrulama kullanıcıya bırakıldı
+(araç kısıtı, yukarıda açıklandı).
+
+**Commit:** (push sonrası eklenecek)
+
+---

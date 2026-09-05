@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -55,6 +55,62 @@ const isAppOrAdminSubdomain =
   (appHost && hostname === appHost) || (adminHost && hostname === adminHost);
 
 export default function App() {
+  // Safety net for scroll-reveal (Framer Motion whileInView/animate) content:
+  // these run on requestAnimationFrame, which browsers throttle or fully
+  // suspend for backgrounded/hidden tabs (e.g. a link opened in a background
+  // tab). If a reveal's rAF loop never gets a tick, the element's JS-driven
+  // opacity/transform values stay frozen at their "hidden" starting point
+  // forever — the tab becoming visible again does not, by itself, resume or
+  // restart that stalled animation. A plain resize-event dispatch does not
+  // fix this either (verified): it only helps observers that recompute on
+  // resize, not a JS interpolation loop that never advanced in the first
+  // place.
+  //
+  // Two complementary checks, because a backgrounded tab throttles BOTH
+  // requestAnimationFrame and setInterval/setTimeout (verified: a 250ms
+  // interval effectively never ticks while hidden) — a poll-only watchdog
+  // can silently never run in exactly the case it exists for:
+  //   - a periodic poll, for a tab that's visible the whole time (normal
+  //     case) and something still didn't resolve on its own;
+  //   - a `visibilitychange` listener, which fires immediately and is NOT
+  //     subject to timer throttling, for a tab that loaded in the
+  //     background and only later became the one the visitor is looking
+  //     at — the exact scenario the poll alone would miss.
+  // Either way, only elements genuinely on screen are touched, so this
+  // never short-circuits the intentional scroll-reveal effect for content
+  // the visitor hasn't scrolled to yet.
+  useEffect(() => {
+    // Timestamp of the first tick each element was seen on screen. Never
+    // cleared just because a later tick reads it as momentarily out of view
+    // (e.g. a boundary flicker while a poll is itself throttled to ~1/s) —
+    // only cleared once actually revealed. That makes the 700ms threshold
+    // a floor, not a fragile "N consecutive ticks" streak that a single
+    // missed tick could reset indefinitely.
+    const firstSeen = new WeakMap<Element, number>();
+    const sweep = (force: boolean) => {
+      document.querySelectorAll('main [style*="opacity: 0"]').forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        const inView = rect.width > 0 && rect.top < window.innerHeight && rect.bottom > 0;
+        if (!inView) return;
+        if (!firstSeen.has(el)) firstSeen.set(el, Date.now());
+        if (force || Date.now() - firstSeen.get(el)! > 700) {
+          const style = (el as HTMLElement).style;
+          style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          style.opacity = '1';
+          style.transform = 'none';
+          firstSeen.delete(el);
+        }
+      });
+    };
+    const id = window.setInterval(() => sweep(false), 250);
+    const onVisible = () => { if (!document.hidden) sweep(true); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, []);
+
   return (
     <ThemeProvider>
     <BrowserRouter>

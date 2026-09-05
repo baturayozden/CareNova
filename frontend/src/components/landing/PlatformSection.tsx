@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Globe2, FolderOpen, LayoutTemplate, Stethoscope, PlaneTakeoff, BarChart3 } from 'lucide-react';
 import { platformHeading, platformModules } from '../../data/landingContent';
-import { fadeUp, stagger, sectionHeading } from './variants';
+import { fadeUp, stagger, sectionHeading, reveal } from './variants';
 
 const ICONS = [Globe2, FolderOpen, LayoutTemplate, Stethoscope, PlaneTakeoff, BarChart3];
 
@@ -14,11 +14,11 @@ export default function PlatformSection() {
   return (
     <section id="platform" aria-labelledby="platform-heading" className="relative py-24 bg-surface-page">
       <div className="mx-auto max-w-6xl px-6">
-        <motion.h2 id="platform-heading" initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className={`${sectionHeading} mb-14 max-w-xl`}>
+        <motion.h2 id="platform-heading" {...reveal()} variants={fadeUp} className={`${sectionHeading} mb-14 max-w-xl`}>
           {platformHeading(i18n.language)}
         </motion.h2>
 
-        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={stagger(0.1)} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div {...reveal()} variants={stagger(0.1)} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {modules.map((m, i) => {
             const Icon = ICONS[i];
             return (
