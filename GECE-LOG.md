@@ -1,7 +1,7 @@
 # SABAH RAPORU
 
 ## 🔗 Canlı URL — herkese açık, doğrulandı (HTTP 200)
-https://carenova-pqt8mjjsu-baturay-ozden-s-projects.vercel.app (Bölüm C sonrası son deploy)
+https://carenova-3ozfxp9b1-baturay-ozden-s-projects.vercel.app (reveal-hatası düzeltmesi sonrası son deploy)
 (veya kalıcı: https://carenova-baturay-ozden-s-projects.vercel.app)
 
 ✅ Bu rapor ilk yazıldığında link SSO duvarının arkasındaydı ve ayrıca gerçek bir
