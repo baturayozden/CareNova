@@ -360,13 +360,13 @@ export function DealModal({ deal, tenantId, onClose, onSaved, fixedLeadId, fixed
     }
   }
 
-  const inputCls = 'w-full bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold/50';
+  const inputCls = 'w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-accent/50 focus:border-accent/50';
   const labelCls = 'block text-xs text-gray-400 mb-1 font-medium';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-navy-900 border border-navy-700 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-navy-700">
+      <div className="bg-surface border border-surface-sunken rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-surface-sunken">
           <h2 className="text-white font-semibold text-base">{isEdit ? 'Edit Deal' : 'New Deal'}</h2>
           <button type="button" onClick={onClose} className="text-gray-400 hover:text-white text-xl leading-none">×</button>
         </div>
@@ -393,14 +393,14 @@ export function DealModal({ deal, tenantId, onClose, onSaved, fixedLeadId, fixed
               )}
             </div>
             {leadDropdown && (
-              <div className="absolute z-10 mt-1 w-full bg-navy-800 border border-navy-600 rounded-lg shadow-xl max-h-44 overflow-y-auto">
+              <div className="absolute z-10 mt-1 w-full bg-surface-sunken border border-line rounded-lg shadow-xl max-h-44 overflow-y-auto">
                 {leadLoading ? (
                   <p className="px-3 py-2 text-sm text-gray-400">Loading…</p>
                 ) : filteredLeads.length === 0 ? (
                   <p className="px-3 py-2 text-sm text-gray-500">No leads found</p>
                 ) : filteredLeads.map(l => (
                   <button key={l.id} type="button"
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-navy-700 text-white"
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-surface-sunken text-white"
                     onClick={() => selectLead(l)}>
                     <span className="font-medium">{l.firstName} {l.lastName}</span>
                     {l.phone && <span className="ml-2 text-gray-400 text-xs">{l.phone}</span>}
@@ -414,7 +414,7 @@ export function DealModal({ deal, tenantId, onClose, onSaved, fixedLeadId, fixed
           {isSelfAssignRole && currentUserName && (
             <div>
               <label className={labelCls}>Assigned To</label>
-              <p className="text-white text-sm px-3 py-2 bg-navy-800 border border-navy-600 rounded-lg">{currentUserName}</p>
+              <p className="text-white text-sm px-3 py-2 bg-surface-sunken border border-line rounded-lg">{currentUserName}</p>
             </div>
           )}
           {isAdminRole && (
@@ -542,7 +542,7 @@ export function DealModal({ deal, tenantId, onClose, onSaved, fixedLeadId, fixed
                 return (
                   <div>
                     <label className={labelCls}>Balance Remaining</label>
-                    <div className="flex items-center h-[38px] px-3 bg-navy-800 border border-navy-600 rounded-lg text-sm text-gray-300">
+                    <div className="flex items-center h-[38px] px-3 bg-surface-sunken border border-line rounded-lg text-sm text-gray-300">
                       {formatGBP(agreed - deposit)}
                     </div>
                   </div>
@@ -584,13 +584,13 @@ export function DealModal({ deal, tenantId, onClose, onSaved, fixedLeadId, fixed
 
           {/* G1b — Create Payment Case (new deal only) */}
           {!isEdit && (
-            <div className="border-t border-navy-700 pt-4 space-y-4">
+            <div className="border-t border-surface-sunken pt-4 space-y-4">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={createCase}
                   onChange={e => setCreateCase(e.target.checked)}
-                  className="w-4 h-4 accent-gold"
+                  className="w-4 h-4 accent-accent"
                 />
                 <span className="text-sm text-white font-medium">Create Payment Case</span>
               </label>
@@ -624,7 +624,7 @@ export function DealModal({ deal, tenantId, onClose, onSaved, fixedLeadId, fixed
                   </div>
 
                   {payerType === 'third_party' && (
-                    <div className="bg-navy-800 rounded-lg p-3 space-y-3">
+                    <div className="bg-surface-sunken rounded-lg p-3 space-y-3">
                       <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Third Party Details</p>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
@@ -670,7 +670,7 @@ export function DealModal({ deal, tenantId, onClose, onSaved, fixedLeadId, fixed
               Cancel
             </button>
             <button type="submit" disabled={submitting}
-              className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 disabled:opacity-50 transition-colors">
+              className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 transition-colors">
               {submitting ? 'Saving…' : isEdit ? 'Save Changes' : (!isEdit && createCase ? 'Create Deal + Case' : 'Create Deal')}
             </button>
           </div>
@@ -824,7 +824,7 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
             <select
               value={tcFilter}
               onChange={e => setTcFilter(e.target.value)}
-              className="bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-gold/50"
+              className="bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent/50"
             >
               <option value="">All TCs</option>
               {tcOptions.map(tc => (
@@ -837,7 +837,7 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
               type="checkbox"
               checked={unverifiedOnly}
               onChange={e => setUnverifiedOnly(e.target.checked)}
-              className="w-3.5 h-3.5 accent-gold"
+              className="w-3.5 h-3.5 accent-accent"
             />
             Unverified only
           </label>
@@ -845,7 +845,7 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
 
         <button
           onClick={() => setModalDeal(null)}
-          className="flex items-center gap-2 px-4 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 transition-colors"
         >
           <span className="text-base leading-none">+</span>
           New Deal
@@ -861,8 +861,8 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
               onClick={() => setTcFilter(tcFilter === tc.id ? '' : tc.id)}
               className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                 tcFilter === tc.id
-                  ? 'bg-gold/20 border-gold/50 text-gold'
-                  : 'bg-navy-800 border-navy-600 text-gray-300 hover:border-gold/40 hover:text-white'
+                  ? 'bg-accent/20 border-accent/50 text-accent'
+                  : 'bg-surface-sunken border-line text-gray-300 hover:border-accent/40 hover:text-white'
               }`}
             >
               <span>{tc.name}</span>
@@ -876,7 +876,7 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
       )}
 
       {/* Table */}
-      <div className="bg-navy-800 border border-navy-700 rounded-xl overflow-hidden">
+      <div className="bg-surface-sunken border border-surface-sunken rounded-xl overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-16 text-gray-400 text-sm">
             Loading deals…
@@ -891,7 +891,7 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
             </p>
             {!tcFilter && (
               <button onClick={() => setModalDeal(null)}
-                className="mt-4 px-4 py-1.5 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 transition-colors">
+                className="mt-4 px-4 py-1.5 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 transition-colors">
                 + New Deal
               </button>
             )}
@@ -900,7 +900,7 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-navy-700">
+                <tr className="border-b border-surface-sunken">
                   <th className="text-left py-3 pl-5 pr-4 text-xs text-gray-400 font-medium whitespace-nowrap">Deal Date</th>
                   <th className="text-left py-3 pr-4 text-xs text-gray-400 font-medium">Patient</th>
                   {showAdmin && (
@@ -915,7 +915,7 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
               </thead>
               <tbody>
                 {visibleDeals.map(deal => (
-                  <tr key={deal.id} className="border-b border-navy-700/50 last:border-0 hover:bg-navy-800/60 transition-colors">
+                  <tr key={deal.id} className="border-b border-surface-sunken/50 last:border-0 hover:bg-surface-sunken/60 transition-colors">
                     <td className="py-3 pl-5 pr-4 text-gray-300 whitespace-nowrap text-sm">
                       {fmtDate(deal.deal_date)}
                     </td>
@@ -973,19 +973,19 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
                                 setOpenMenu(deal.id);
                               }
                             }}
-                            className="p-1 rounded text-gray-400 hover:text-white hover:bg-navy-700 transition-colors"
+                            className="p-1 rounded text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors"
                           >
                             <MoreHorizontal size={16} />
                           </button>
                           {openMenu === deal.id && menuPos && createPortal(
                             <div
                               style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 9999 }}
-                              className="bg-navy-800 border border-navy-600 rounded-lg shadow-xl py-1 w-36"
+                              className="bg-surface-sunken border border-line rounded-lg shadow-xl py-1 w-36"
                               onMouseDown={e => e.stopPropagation()}
                               onClick={e => e.stopPropagation()}
                             >
                               <button
-                                className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-navy-700 transition-colors"
+                                className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-surface-sunken transition-colors"
                                 onClick={() => { setModalDeal(deal); setOpenMenu(null); setMenuPos(null); }}
                               >
                                 Edit
@@ -993,7 +993,7 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
                               {isAdminRole && deal.verification_status !== 'manually_approved' && (
                                 <button
                                   disabled={verifying === deal.id}
-                                  className="w-full text-left px-4 py-2 text-sm text-green-400 hover:bg-navy-700 transition-colors disabled:opacity-50"
+                                  className="w-full text-left px-4 py-2 text-sm text-green-400 hover:bg-surface-sunken transition-colors disabled:opacity-50"
                                   onClick={() => handleVerify(deal.id, 'approve')}
                                 >
                                   {verifying === deal.id ? 'Verifying…' : 'Verify'}
@@ -1002,14 +1002,14 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
                               {isAdminRole && deal.verification_status !== 'rejected' && (
                                 <button
                                   disabled={verifying === deal.id}
-                                  className="w-full text-left px-4 py-2 text-sm text-yellow-400 hover:bg-navy-700 transition-colors disabled:opacity-50"
+                                  className="w-full text-left px-4 py-2 text-sm text-yellow-400 hover:bg-surface-sunken transition-colors disabled:opacity-50"
                                   onClick={() => handleVerify(deal.id, 'reject')}
                                 >
                                   Reject
                                 </button>
                               )}
                               <button
-                                className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-navy-700 transition-colors"
+                                className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-surface-sunken transition-colors"
                                 onClick={() => { setDeleteId(deal.id); setOpenMenu(null); setMenuPos(null); }}
                               >
                                 Delete
@@ -1044,7 +1044,7 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
       {/* Delete confirm */}
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+          <div className="bg-surface border border-surface-sunken rounded-2xl p-6 w-full max-w-sm shadow-2xl">
             <h3 className="text-white font-semibold mb-2">Delete Deal</h3>
             <p className="text-gray-400 text-sm mb-5">
               This deal will be permanently deleted. This cannot be undone.

@@ -19,10 +19,10 @@ const LANGUAGE_OPTIONS = [
   { value: 'es', label: '🇪🇸 Spanish' },
 ];
 
-const INPUT    = 'w-full bg-navy-700 border border-navy-500 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gold transition-colors';
-const SELECT   = 'w-full bg-navy-700 border border-navy-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold transition-colors';
+const INPUT    = 'w-full bg-surface-sunken border border-line-strong rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-accent transition-colors';
+const SELECT   = 'w-full bg-surface-sunken border border-line-strong rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors';
 const LABEL    = 'block text-xs font-medium text-gray-400 mb-1.5';
-const TEXTAREA = 'w-full bg-navy-700 border border-navy-500 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gold transition-colors resize-none';
+const TEXTAREA = 'w-full bg-surface-sunken border border-line-strong rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-accent transition-colors resize-none';
 
 const EMPTY_FORM = {
   firstName:         '',
@@ -179,10 +179,10 @@ export default function AddLeadModal({ isOpen, onClose, onCreated, editLead, onU
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
 
-      <div className="relative bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-surface-sunken border border-line rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
 
         {/* Header */}
-        <div className="px-6 py-5 border-b border-navy-600 flex items-center justify-between">
+        <div className="px-6 py-5 border-b border-line flex items-center justify-between">
           <div>
             <h2 className="text-white font-semibold text-lg">
               {isEditMode ? 'Edit Lead' : 'Add New Lead'}
@@ -275,13 +275,13 @@ export default function AddLeadModal({ isOpen, onClose, onCreated, editLead, onU
           </div>
 
           {/* AI follow-up toggle */}
-          <div className="bg-navy-700 border border-navy-500 rounded-xl p-4 space-y-3">
+          <div className="bg-surface-sunken border border-line-strong rounded-xl p-4 space-y-3">
             <label className="flex items-start gap-3 cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.aiFollowUpEnabled}
                 onChange={setCheck('aiFollowUpEnabled')}
-                className="mt-0.5 accent-gold w-4 h-4 shrink-0"
+                className="mt-0.5 accent-accent w-4 h-4 shrink-0"
               />
               <div>
                 <p className="text-sm text-white font-medium">Enable AI follow-up</p>
@@ -296,7 +296,7 @@ export default function AddLeadModal({ isOpen, onClose, onCreated, editLead, onU
                   type="checkbox"
                   checked={form.gdprConsentGiven}
                   onChange={setCheck('gdprConsentGiven')}
-                  className="mt-0.5 accent-gold w-4 h-4 shrink-0"
+                  className="mt-0.5 accent-accent w-4 h-4 shrink-0"
                 />
                 <div>
                   <p className="text-sm text-white font-medium">
@@ -320,17 +320,17 @@ export default function AddLeadModal({ isOpen, onClose, onCreated, editLead, onU
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2.5 rounded-xl border border-navy-500 text-gray-300 text-sm font-medium hover:bg-navy-700 transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-line-strong text-gray-300 text-sm font-medium hover:bg-surface-sunken transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-light text-white text-sm font-medium transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white text-sm font-medium transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {isLoading && (
-                <span className="w-4 h-4 border-2 border-navy-950 border-t-transparent rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-surface-page border-t-transparent rounded-full animate-spin" />
               )}
               {isLoading
                 ? (isEditMode ? 'Saving…' : 'Adding…')

@@ -18,7 +18,7 @@ const PLAN_OPTIONS = [
   { value: 'pro',        label: 'Pro',        desc: 'Unlimited leads'         },
 ];
 
-const INPUT = 'w-full bg-navy-700 border border-navy-500 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gold transition-colors';
+const INPUT = 'w-full bg-surface-sunken border border-line-strong rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-accent transition-colors';
 const LABEL = 'block text-xs font-medium text-gray-400 mb-1.5';
 
 export default function AddClinicModal({ onClose, onCreated }: Props) {
@@ -53,7 +53,7 @@ export default function AddClinicModal({ onClose, onCreated }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={credentials ? onClose : undefined} />
 
-      <div className="relative bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-surface-sunken border border-line rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
 
         {credentials ? (
           /* ── Success screen ──────────────────────────────────────────── */
@@ -68,7 +68,7 @@ export default function AddClinicModal({ onClose, onCreated }: Props) {
               </p>
             </div>
 
-            <div className="bg-navy-700 border border-navy-500 rounded-xl p-5 text-left space-y-3">
+            <div className="bg-surface-sunken border border-line-strong rounded-xl p-5 text-left space-y-3">
               <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Login credentials</p>
               <Credential label="Email"    value={credentials.admin.email} />
               <Credential label="Password" value={credentials.admin.password} monospace />
@@ -79,7 +79,7 @@ export default function AddClinicModal({ onClose, onCreated }: Props) {
 
             <button
               onClick={onClose}
-              className="w-full bg-gold hover:bg-gold-light text-white font-medium py-3 rounded-xl text-sm transition-colors"
+              className="w-full bg-accent hover:bg-accent-hover text-white font-medium py-3 rounded-xl text-sm transition-colors"
             >
               Done
             </button>
@@ -87,7 +87,7 @@ export default function AddClinicModal({ onClose, onCreated }: Props) {
         ) : (
           /* ── Form ────────────────────────────────────────────────────── */
           <>
-            <div className="px-6 py-5 border-b border-navy-600 flex items-center justify-between">
+            <div className="px-6 py-5 border-b border-line flex items-center justify-between">
               <div>
                 <h2 className="text-white font-semibold text-lg">Add New Clinic</h2>
                 <p className="text-gray-500 text-xs mt-0.5">Creates a clinic + clinic admin account</p>
@@ -138,8 +138,8 @@ export default function AddClinicModal({ onClose, onCreated }: Props) {
                       onClick={() => setForm(f => ({ ...f, planTier: p.value }))}
                       className={`rounded-xl border p-3 text-left transition-colors ${
                         form.planTier === p.value
-                          ? 'border-gold bg-gold/10 text-white'
-                          : 'border-navy-500 bg-navy-700 text-gray-400 hover:border-navy-400'
+                          ? 'border-accent bg-accent/10 text-white'
+                          : 'border-line-strong bg-surface-sunken text-gray-400 hover:border-line-strong'
                       }`}
                     >
                       <p className="text-sm font-medium">{p.label}</p>
@@ -159,16 +159,16 @@ export default function AddClinicModal({ onClose, onCreated }: Props) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-navy-500 text-gray-300 text-sm font-medium hover:bg-navy-700 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-line-strong text-gray-300 text-sm font-medium hover:bg-surface-sunken transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-light text-white text-sm font-medium transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white text-sm font-medium transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
                 >
-                  {isLoading && <span className="w-4 h-4 border-2 border-navy-950 border-t-transparent rounded-full animate-spin" />}
+                  {isLoading && <span className="w-4 h-4 border-2 border-surface-page border-t-transparent rounded-full animate-spin" />}
                   Create Clinic
                 </button>
               </div>
@@ -191,7 +191,7 @@ function Credential({ label, value, monospace }: { label: string; value: string;
       <span className={`text-white text-sm flex-1 min-w-0 truncate ${monospace ? 'font-mono' : ''}`}>{value}</span>
       <button
         onClick={copy}
-        className="text-xs text-gold hover:text-gold-light shrink-0 transition-colors"
+        className="text-xs text-accent hover:text-accent-hover shrink-0 transition-colors"
       >
         {copied ? '✓' : 'Copy'}
       </button>

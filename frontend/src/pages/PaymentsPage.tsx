@@ -55,7 +55,7 @@ const DATE_RANGE_OPTIONS = [
 
 // Unified control class — all filter inputs and selects share this
 const ctrl = [
-  'h-10 bg-navy-800 border border-navy-600 text-white rounded-lg px-3 text-sm',
+  'h-10 bg-surface-sunken border border-line text-white rounded-lg px-3 text-sm',
   'focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors',
 ].join(' ');
 
@@ -319,7 +319,7 @@ export default function PaymentsPage() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 transition-colors"
         >
           <CreditCard size={15} />
           + New Payment Case
@@ -349,13 +349,13 @@ export default function PaymentsPage() {
 
       {/* Platform admin — no clinic selected */}
       {isPlatformAdmin && !selectedClinicId ? (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-12 flex flex-col items-center text-center">
+        <div className="bg-surface-sunken border border-line rounded-xl p-12 flex flex-col items-center text-center">
           <Building2 size={48} className="mx-auto mb-4 text-gray-400" />
           <p className="text-white font-semibold text-base mb-1">Select a clinic to view payment cases</p>
           <p className="text-gray-400 text-sm">Choose a clinic from the dropdown above to get started.</p>
         </div>
       ) : loading ? (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-8 text-center text-gray-400 text-sm">
+        <div className="bg-surface-sunken border border-line rounded-xl p-8 text-center text-gray-400 text-sm">
           Loading cases…
         </div>
       ) : error ? (
@@ -365,7 +365,7 @@ export default function PaymentsPage() {
       ) : (
         <>
           {/* ── Filter bar ─────────────────────────────────────────────────── */}
-          <div className="bg-navy-800 border border-navy-600 rounded-xl px-4 py-3 space-y-3">
+          <div className="bg-surface-sunken border border-line rounded-xl px-4 py-3 space-y-3">
             <div className="flex flex-wrap gap-3 items-end">
 
               {/* Search */}
@@ -377,7 +377,7 @@ export default function PaymentsPage() {
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     placeholder="Search by patient name…"
-                    className="bg-navy-800 border border-navy-600 rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gold h-10 min-w-[260px]"
+                    className="bg-surface-sunken border border-line rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-accent h-10 min-w-[260px]"
                   />
                 </div>
               </div>
@@ -472,7 +472,7 @@ export default function PaymentsPage() {
                   <div className="h-5" aria-hidden="true" />
                   <button
                     onClick={clearFilters}
-                    className="h-10 flex items-center gap-1.5 px-3 text-sm text-gray-400 hover:text-white border border-navy-600 hover:border-gray-500 rounded-lg transition-colors"
+                    className="h-10 flex items-center gap-1.5 px-3 text-sm text-gray-400 hover:text-white border border-line hover:border-gray-500 rounded-lg transition-colors"
                   >
                     <X size={14} />
                     Clear
@@ -487,14 +487,14 @@ export default function PaymentsPage() {
                   <button
                     onClick={() => setShowExportMenu(v => !v)}
                     disabled={filteredCases.length === 0}
-                    className="h-10 flex items-center gap-2 px-4 text-sm font-medium bg-navy-700 border border-navy-600 text-gray-300 hover:text-white hover:bg-navy-600 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="h-10 flex items-center gap-2 px-4 text-sm font-medium bg-surface-sunken border border-line text-gray-300 hover:text-white hover:bg-line rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Download size={14} />
                     Export
                     <span className="text-gray-500 text-xs">▾</span>
                   </button>
                   {showExportMenu && (
-                    <div className="absolute top-full left-0 mt-1 bg-navy-800 border border-navy-600 rounded-lg shadow-xl overflow-hidden z-20 min-w-[160px]">
+                    <div className="absolute top-full left-0 mt-1 bg-surface-sunken border border-line rounded-lg shadow-xl overflow-hidden z-20 min-w-[160px]">
                       {([
                         { label: 'CSV (.csv)',    fn: () => doCSV(filteredCases) },
                         { label: 'Excel (.xlsx)', fn: () => doExcel(filteredCases) },
@@ -503,7 +503,7 @@ export default function PaymentsPage() {
                         <button
                           key={label}
                           onClick={() => { fn(); setShowExportMenu(false); }}
-                          className="w-full px-4 py-2.5 text-sm text-left text-gray-300 hover:text-white hover:bg-navy-700 transition-colors"
+                          className="w-full px-4 py-2.5 text-sm text-left text-gray-300 hover:text-white hover:bg-surface-sunken transition-colors"
                         >
                           {label}
                         </button>
@@ -528,7 +528,7 @@ export default function PaymentsPage() {
 
           {/* ── Table ──────────────────────────────────────────────────────── */}
           {filteredCases.length === 0 ? (
-            <div className="bg-navy-800 border border-navy-600 rounded-xl p-12 flex flex-col items-center text-center">
+            <div className="bg-surface-sunken border border-line rounded-xl p-12 flex flex-col items-center text-center">
               <CreditCard size={40} className="mx-auto mb-4 text-gray-500" />
               {cases.length === 0 ? (
                 <>
@@ -536,7 +536,7 @@ export default function PaymentsPage() {
                   <p className="text-gray-400 text-sm mb-5">Create your first payment case to get started.</p>
                   <button
                     onClick={() => setShowModal(true)}
-                    className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 transition-colors"
+                    className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 transition-colors"
                   >
                     + New Payment Case
                   </button>
@@ -547,7 +547,7 @@ export default function PaymentsPage() {
                   <p className="text-gray-400 text-sm mb-4">Try adjusting or clearing the filters above.</p>
                   <button
                     onClick={clearFilters}
-                    className="flex items-center gap-1.5 px-4 py-2 text-sm text-gray-300 hover:text-white border border-navy-600 hover:border-gray-500 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 px-4 py-2 text-sm text-gray-300 hover:text-white border border-line hover:border-gray-500 rounded-lg transition-colors"
                   >
                     <X size={14} />
                     Clear filters
@@ -556,11 +556,11 @@ export default function PaymentsPage() {
               )}
             </div>
           ) : (
-            <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
+            <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-navy-700 bg-navy-900/40">
+                    <tr className="border-b border-surface-sunken bg-surface/40">
                       <th className="text-left px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Patient</th>
                       <th className="text-left px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Treatment</th>
                       <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Amount</th>
@@ -570,12 +570,12 @@ export default function PaymentsPage() {
                       <th className="text-left px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Created</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-navy-700">
+                  <tbody className="divide-y divide-surface-sunken">
                     {filteredCases.map(c => (
                       <tr
                         key={c.id}
                         onClick={() => navigate(`/payments/${c.id}`)}
-                        className="hover:bg-navy-700/50 cursor-pointer transition-colors"
+                        className="hover:bg-surface-sunken/50 cursor-pointer transition-colors"
                       >
                         <td className="px-4 py-3 text-white font-medium">
                           {c.patient_name || <span className="text-gray-500 italic">Unknown</span>}
@@ -583,7 +583,7 @@ export default function PaymentsPage() {
                         <td className="px-4 py-3 text-gray-300 max-w-[200px] truncate">
                           {c.treatment_description || <span className="text-gray-600">—</span>}
                         </td>
-                        <td className="px-4 py-3 text-right text-gold font-semibold">
+                        <td className="px-4 py-3 text-right text-accent font-semibold">
                           {formatAmount(c.amount_due ?? c.total_cost)}
                         </td>
                         <td className="px-4 py-3 text-gray-300">

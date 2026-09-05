@@ -119,7 +119,7 @@ function ScoreBadge({ lead }: { lead: Lead & { id: string } }) {
       {lead.scoreTags.length > 0 && (
         <div className="flex gap-1 flex-wrap">
           {lead.scoreTags.slice(0, 2).map(tag => (
-            <span key={tag} className="text-[10px] bg-navy-700 text-gray-400 border border-navy-600 px-1.5 py-0.5 rounded-full">
+            <span key={tag} className="text-[10px] bg-surface-sunken text-gray-400 border border-line px-1.5 py-0.5 rounded-full">
               {tag.replace(/_/g, ' ')}
             </span>
           ))}
@@ -127,7 +127,7 @@ function ScoreBadge({ lead }: { lead: Lead & { id: string } }) {
       )}
       {/* Tooltip */}
       {lead.scoreReasoning && (
-        <div className="absolute bottom-full left-0 mb-2 w-52 bg-navy-700 border border-navy-500 rounded-lg px-3 py-2 text-xs text-gray-300 leading-relaxed opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-xl">
+        <div className="absolute bottom-full left-0 mb-2 w-52 bg-surface-sunken border border-line-strong rounded-lg px-3 py-2 text-xs text-gray-300 leading-relaxed opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-xl">
           {lead.scoreReasoning}
         </div>
       )}
@@ -415,13 +415,13 @@ export default function LeadsPage() {
               <>
                 <button
                   onClick={() => setShowBulkUpload(true)}
-                  className="text-xs font-medium text-gray-300 hover:text-white px-3 py-1.5 rounded-lg border border-navy-600 hover:border-navy-500 transition-colors"
+                  className="text-xs font-medium text-gray-300 hover:text-white px-3 py-1.5 rounded-lg border border-line hover:border-line-strong transition-colors"
                 >
                   ↑ Bulk Upload
                 </button>
                 <button
                   onClick={() => setShowAddLead(true)}
-                  className="text-xs font-medium bg-gold hover:bg-gold-light text-white px-3 py-1.5 rounded-lg transition-colors"
+                  className="text-xs font-medium bg-accent hover:bg-accent-hover text-white px-3 py-1.5 rounded-lg transition-colors"
                 >
                   + Add Lead
                 </button>
@@ -429,7 +429,7 @@ export default function LeadsPage() {
             )}
             <button
               onClick={() => fetchLeads(page)}
-              className="text-xs text-gold hover:text-gold-light transition-colors px-3 py-1 border border-navy-600 rounded-lg"
+              className="text-xs text-accent hover:text-accent-hover transition-colors px-3 py-1 border border-line rounded-lg"
             >
               ↻ Refresh
             </button>
@@ -446,7 +446,7 @@ export default function LeadsPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by name or phone…"
-              className="w-full bg-navy-800 border border-navy-600 rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gold"
+              className="w-full bg-surface-sunken border border-line rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-accent"
             />
           </div>
 
@@ -454,7 +454,7 @@ export default function LeadsPage() {
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value as StatusFilter)}
-            className="bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-gold"
+            className="bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-accent"
           >
             {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -463,7 +463,7 @@ export default function LeadsPage() {
           <select
             value={clinicFilter}
             onChange={e => setClinicFilter(e.target.value)}
-            className="bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-gold"
+            className="bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-accent"
           >
             <option value="all">All Clinics</option>
             {clinicOptions.map(c => (
@@ -475,7 +475,7 @@ export default function LeadsPage() {
           <select
             value={langFilter}
             onChange={e => setLangFilter(e.target.value)}
-            className="bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-gold"
+            className="bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-accent"
           >
             {LANGUAGE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -484,7 +484,7 @@ export default function LeadsPage() {
           <select
             value={treatFilter}
             onChange={e => setTreatFilter(e.target.value)}
-            className="bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-gold"
+            className="bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-accent"
           >
             <option value="all">All Treatments</option>
             {treatOptions.filter(t => t !== 'all').map(t => (
@@ -496,7 +496,7 @@ export default function LeadsPage() {
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value as SortField)}
-            className="bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-gold"
+            className="bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-accent"
           >
             <option value="lastContact">Sort: Recent</option>
             <option value="score">Sort: AI Score ↓</option>
@@ -512,11 +512,11 @@ export default function LeadsPage() {
         )}
 
         {/* Table */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
+        <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
           {isLoading ? (
             <div className="flex items-center justify-center py-24">
               <div className="text-center space-y-3">
-                <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
+                <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
                 <p className="text-gray-500 text-sm">Loading leads…</p>
               </div>
             </div>
@@ -524,7 +524,7 @@ export default function LeadsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-xs text-gray-500 uppercase tracking-wider border-b border-navy-600">
+                  <tr className="text-xs text-gray-500 uppercase tracking-wider border-b border-line">
                     <th className="text-left px-6 py-3 font-medium">Name</th>
                     <th className="text-left px-4 py-3 font-medium">Clinic</th>
                     <th className="text-left px-4 py-3 font-medium">Status</th>
@@ -541,10 +541,10 @@ export default function LeadsPage() {
                     <tr
                       key={lead.id}
                       onClick={() => setSelectedLead(selectedLead?.id === lead.id ? null : lead)}
-                      className={`border-t border-navy-600 transition-colors cursor-pointer ${
+                      className={`border-t border-line transition-colors cursor-pointer ${
                         selectedLead?.id === lead.id
-                          ? 'bg-navy-700 border-l-2 border-l-gold'
-                          : 'bg-navy-800 hover:bg-navy-700'
+                          ? 'bg-surface-sunken border-l-2 border-l-accent'
+                          : 'bg-surface-sunken hover:bg-surface-sunken'
                       }`}
                     >
                       <td className="px-6 py-3">
@@ -561,7 +561,7 @@ export default function LeadsPage() {
                         <ScoreBadge lead={lead} />
                       </td>
                       <td className="px-4 py-3 text-gray-300 text-xs">{lead.treatment || '—'}</td>
-                      <td className="px-4 py-3 text-gold text-xs font-medium">
+                      <td className="px-4 py-3 text-accent text-xs font-medium">
                         {lead.treatmentValue ? `€${lead.treatmentValue.toLocaleString()}` : '—'}
                       </td>
                       <td className="px-4 py-3 text-gray-300 text-xs">
@@ -569,7 +569,7 @@ export default function LeadsPage() {
                       </td>
                       <td className="px-4 py-3 text-gray-400 text-xs">{formatRelativeTime(lead.lastContact)}</td>
                       <td className="px-4 py-3">
-                        <span className="text-gold font-semibold">{lead.aiMessages}</span>
+                        <span className="text-accent font-semibold">{lead.aiMessages}</span>
                       </td>
                     </tr>
                   ))}
@@ -596,7 +596,7 @@ export default function LeadsPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-xs font-medium rounded-lg border border-navy-600 text-gray-300 hover:text-white hover:border-navy-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg border border-line text-gray-300 hover:text-white hover:border-line-strong disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 ← Previous
               </button>
@@ -619,8 +619,8 @@ export default function LeadsPage() {
                         onClick={() => setPage(n as number)}
                         className={`w-7 h-7 text-xs font-medium rounded-lg transition-colors ${
                           page === n
-                            ? 'bg-gold text-white'
-                            : 'border border-navy-600 text-gray-400 hover:text-white hover:border-navy-500'
+                            ? 'bg-accent text-white'
+                            : 'border border-line text-gray-400 hover:text-white hover:border-line-strong'
                         }`}
                       >
                         {n}
@@ -633,7 +633,7 @@ export default function LeadsPage() {
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-3 py-1.5 text-xs font-medium rounded-lg border border-navy-600 text-gray-300 hover:text-white hover:border-navy-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg border border-line text-gray-300 hover:text-white hover:border-line-strong disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 Next →
               </button>
@@ -644,10 +644,10 @@ export default function LeadsPage() {
 
       {/* ── Side panel ────────────────────────────────────────────────────── */}
       {selectedLead && (
-        <div className="fixed inset-0 z-50 w-full h-[100dvh] bg-navy-900 flex flex-col overflow-hidden md:relative md:inset-auto md:z-auto md:w-96 md:h-screen md:shrink-0 md:border-l md:border-navy-600 md:sticky md:top-0">
+        <div className="fixed inset-0 z-50 w-full h-[100dvh] bg-surface flex flex-col overflow-hidden md:relative md:inset-auto md:z-auto md:w-96 md:h-screen md:shrink-0 md:border-l md:border-line md:sticky md:top-0">
 
           {/* Panel header */}
-          <div className="px-6 py-5 border-b border-navy-600 flex items-start justify-between">
+          <div className="px-6 py-5 border-b border-line flex items-start justify-between">
             <div>
               <h2 className="text-white font-semibold text-lg">{selectedLead.name}</h2>
               <p className="text-gray-500 text-xs mt-0.5">{selectedLead.phone}</p>
@@ -655,14 +655,14 @@ export default function LeadsPage() {
             <div className="flex items-center gap-2 mt-0.5">
               <button
                 onClick={() => navigate(`/patients/${selectedLead.id}`)}
-                className="text-xs text-gray-400 hover:text-white border border-navy-600 hover:border-navy-500 px-2.5 py-1 rounded-lg transition-colors"
+                className="text-xs text-gray-400 hover:text-white border border-line hover:border-line-strong px-2.5 py-1 rounded-lg transition-colors"
               >
                 Full profile
               </button>
               {canAddLead && (
                 <button
                   onClick={() => setEditLead(selectedLead)}
-                  className="text-xs text-gold hover:text-gold-light border border-navy-600 hover:border-gold/50 px-2.5 py-1 rounded-lg transition-colors"
+                  className="text-xs text-accent hover:text-accent-hover border border-line hover:border-accent/50 px-2.5 py-1 rounded-lg transition-colors"
                 >
                   Edit
                 </button>
@@ -677,7 +677,7 @@ export default function LeadsPage() {
           </div>
 
           {/* Lead details */}
-          <div className="px-6 py-4 border-b border-navy-600 space-y-3">
+          <div className="px-6 py-4 border-b border-line space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-gray-500 text-xs">Status</span>
               <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[selectedLead.status]}`}>
@@ -705,7 +705,7 @@ export default function LeadsPage() {
                   ? 'bg-blue-900/40 text-blue-400 border border-blue-700/50'
                   : selectedLead.source === 'bulk_csv'
                   ? 'bg-purple-900/40 text-purple-400 border border-purple-700/50'
-                  : 'bg-navy-700 text-gray-400 border border-navy-600'
+                  : 'bg-surface-sunken text-gray-400 border border-line'
               }`}>
                 {selectedLead.source === 'whatsapp'  ? <><MessageCircle size={12} /> WhatsApp</>
                   : selectedLead.source === 'website'   ? <><Globe size={12} /> Website</>
@@ -732,24 +732,24 @@ export default function LeadsPage() {
             {selectedLead.treatmentValue != null && (
               <div className="flex items-center justify-between">
                 <span className="text-gray-500 text-xs">Est. Value</span>
-                <span className="text-gold text-sm font-semibold">€{selectedLead.treatmentValue.toLocaleString()}</span>
+                <span className="text-accent text-sm font-semibold">€{selectedLead.treatmentValue.toLocaleString()}</span>
               </div>
             )}
             <div className="flex items-center justify-between">
               <span className="text-gray-500 text-xs">AI Messages</span>
-              <span className="text-gold font-semibold text-sm">{selectedLead.aiMessages}</span>
+              <span className="text-accent font-semibold text-sm">{selectedLead.aiMessages}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-500 text-xs">AI follow-up</span>
               {selectedLead.aiFollowUpEnabled
                 ? <span className="inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-900/40 border border-green-700/50 px-2 py-0.5 rounded-full">● Active</span>
-                : <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 bg-navy-700 border border-navy-600 px-2 py-0.5 rounded-full">● Off</span>
+                : <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 bg-surface-sunken border border-line px-2 py-0.5 rounded-full">● Off</span>
               }
             </div>
             {selectedLead.notes && (
               <div className="flex flex-col gap-1">
                 <span className="text-gray-500 text-xs">Notes</span>
-                <p className="text-gray-300 text-xs leading-relaxed bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 whitespace-pre-wrap">
+                <p className="text-gray-300 text-xs leading-relaxed bg-surface-sunken border border-line rounded-lg px-3 py-2 whitespace-pre-wrap">
                   {selectedLead.notes}
                 </p>
               </div>
@@ -760,7 +760,7 @@ export default function LeadsPage() {
                 {selectedLead.scoreTags.length > 2 && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {selectedLead.scoreTags.slice(2).map(tag => (
-                      <span key={tag} className="text-[10px] bg-navy-700 text-gray-400 border border-navy-600 px-1.5 py-0.5 rounded-full">
+                      <span key={tag} className="text-[10px] bg-surface-sunken text-gray-400 border border-line px-1.5 py-0.5 rounded-full">
                         {tag.replace(/_/g, ' ')}
                       </span>
                     ))}
@@ -775,7 +775,7 @@ export default function LeadsPage() {
                   value={selectedLead.assignedTo || ''}
                   disabled={assignLoading}
                   onChange={e => handleAssign(selectedLead.id, e.target.value || null)}
-                  className="bg-navy-700 border border-navy-600 rounded-lg px-2 py-0.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-gold/40 disabled:opacity-50 max-w-[160px]"
+                  className="bg-surface-sunken border border-line rounded-lg px-2 py-0.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-accent/40 disabled:opacity-50 max-w-[160px]"
                 >
                   <option value="">— Unassigned —</option>
                   {salesUsers.map(u => (
@@ -794,10 +794,10 @@ export default function LeadsPage() {
             const totalDeposit = leadDeals.reduce((s, d) => s + (parseFloat(d.deposit_amount ?? '0') || 0), 0);
             const totalCaseDue = leadCases.reduce((s, c) => s + (parseFloat(c.amount_due     ?? '0') || 0), 0);
             return (
-              <div className="px-6 py-3 border-b border-navy-600 bg-navy-800/40">
+              <div className="px-6 py-3 border-b border-line bg-surface-sunken/40">
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div>
-                    <div className="text-gold font-semibold text-sm">{fmtGBP(totalAgreed)}</div>
+                    <div className="text-accent font-semibold text-sm">{fmtGBP(totalAgreed)}</div>
                     <div className="text-gray-600 text-[10px] mt-0.5">Total Agreed</div>
                   </div>
                   <div>
@@ -814,13 +814,13 @@ export default function LeadsPage() {
           })()}
 
           {/* Payments / Treatment Cases */}
-          <div className="px-6 py-4 border-b border-navy-600">
+          <div className="px-6 py-4 border-b border-line">
             <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
               <CreditCard size={12} /> Payments
             </p>
             {casesLoading ? (
               <div className="flex items-center justify-center py-4">
-                <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
               </div>
             ) : leadCases.length === 0 ? (
               <p className="text-gray-600 text-xs">No payments yet.</p>
@@ -830,7 +830,7 @@ export default function LeadsPage() {
                   <button
                     key={c.id}
                     onClick={() => navigate(`/payments/${c.id}`)}
-                    className="w-full text-left bg-navy-700 hover:bg-navy-600 border border-navy-600 rounded-lg px-3 py-2.5 transition-colors group"
+                    className="w-full text-left bg-surface-sunken hover:bg-line border border-line rounded-lg px-3 py-2.5 transition-colors group"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-white text-xs font-medium truncate max-w-[160px]">
@@ -842,14 +842,14 @@ export default function LeadsPage() {
                         c.status === 'awaiting_signature'  ? 'bg-yellow-900/60 text-yellow-400 border border-yellow-700/50' :
                         c.status === 'payment_sent'        ? 'bg-blue-900/60 text-blue-400 border border-blue-700/50' :
                         c.status === 'finance_referred'    ? 'bg-purple-900/60 text-purple-400 border border-purple-700/50' :
-                                                             'bg-navy-600 text-gray-400 border border-navy-500'
+                                                             'bg-line text-gray-400 border border-line-strong'
                       }`}>
                         {c.status.replace(/_/g, ' ')}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-gold text-xs font-semibold">
+                        <span className="text-accent text-xs font-semibold">
                           {c.amount_due ? `€${parseFloat(c.amount_due).toLocaleString('en-GB', { minimumFractionDigits: 0 })}` : '—'}
                         </span>
                         {c.payment_method && (
@@ -867,13 +867,13 @@ export default function LeadsPage() {
           </div>
 
           {/* Deals */}
-          <div className="px-6 py-4 border-b border-navy-600">
+          <div className="px-6 py-4 border-b border-line">
             <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
               <Briefcase size={12} /> Deals
             </p>
             {dealsLoading ? (
               <div className="flex items-center justify-center py-4">
-                <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
               </div>
             ) : leadDeals.length === 0 ? (
               <p className="text-gray-600 text-xs">No deals yet.</p>
@@ -885,12 +885,12 @@ export default function LeadsPage() {
                   const balance = agreed - deposit;
                   const overdue = d.balance_due_date ? new Date(d.balance_due_date) < new Date() : false;
                   return (
-                    <div key={d.id} className="bg-navy-700 border border-navy-600 rounded-lg px-3 py-2.5">
+                    <div key={d.id} className="bg-surface-sunken border border-line rounded-lg px-3 py-2.5">
                       <div className="flex items-start justify-between mb-1.5">
                         <span className="text-white text-xs font-medium truncate max-w-[140px]">
                           {d.treatment_name || d.treatment_category}
                         </span>
-                        <span className="text-gold text-xs font-semibold ml-2 shrink-0">
+                        <span className="text-accent text-xs font-semibold ml-2 shrink-0">
                           {agreed > 0 ? fmtGBP(agreed) : '—'}
                         </span>
                       </div>
@@ -908,7 +908,7 @@ export default function LeadsPage() {
                       )}
                       <div className="flex items-center gap-1.5 flex-wrap">
                         {d.billing_entity_key && (
-                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-navy-600 text-gray-300 border border-navy-500">
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-line text-gray-300 border border-line-strong">
                             {ENTITY_LABELS[d.billing_entity_key] ?? d.billing_entity_name ?? d.billing_entity_key}
                           </span>
                         )}
@@ -917,7 +917,7 @@ export default function LeadsPage() {
                           d.status === 'accepted'   ? 'bg-blue-900/40 text-blue-400 border border-blue-700/40' :
                           d.status === 'in_progress'? 'bg-amber-900/40 text-amber-400 border border-amber-700/40' :
                           d.status === 'cancelled'  ? 'bg-red-900/40 text-red-400 border border-red-700/40' :
-                                                      'bg-navy-600 text-gray-400 border border-navy-500'
+                                                      'bg-line text-gray-400 border border-line-strong'
                         }`}>{DEAL_STATUS_LABELS[d.status] ?? d.status}</span>
                       </div>
                       {(deposit > 0 || d.balance_due_date) && (
@@ -943,20 +943,20 @@ export default function LeadsPage() {
           </div>
 
           {/* Invoices */}
-          <div className="px-6 py-4 border-b border-navy-600">
+          <div className="px-6 py-4 border-b border-line">
             <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
               <FileText size={12} /> Invoices
             </p>
             {invoicesLoading ? (
               <div className="flex items-center justify-center py-4">
-                <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
               </div>
             ) : leadInvoices.length === 0 ? (
               <p className="text-gray-600 text-xs">No invoices yet.</p>
             ) : (
               <div className="space-y-2">
                 {leadInvoices.map(inv => (
-                  <div key={inv.id} className="bg-navy-700 border border-navy-600 rounded-lg px-3 py-2.5">
+                  <div key={inv.id} className="bg-surface-sunken border border-line rounded-lg px-3 py-2.5">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-white text-xs font-medium">
                         {inv.invoice_number ?? 'Draft'}
@@ -968,7 +968,7 @@ export default function LeadsPage() {
                       }`}>{inv.payment_status === 'paid' ? 'Paid' : 'Unpaid'}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-gold text-xs font-semibold">{fmtGBP(inv.amount)}</span>
+                      <span className="text-accent text-xs font-semibold">{fmtGBP(inv.amount)}</span>
                       <span className="text-gray-500 text-[10px]">{formatDate(inv.issued_at)}</span>
                     </div>
                     {inv.payment_method && (
@@ -986,7 +986,7 @@ export default function LeadsPage() {
 
             {msgLoading ? (
               <div className="flex items-center justify-center py-10">
-                <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
               </div>
             ) : messages.length === 0 ? (
               <p className="text-center text-gray-500 text-sm py-8">No messages yet.</p>
@@ -1007,16 +1007,16 @@ export default function LeadsPage() {
                     <div className={`flex ${isOutbound ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
                         isOutbound
-                          ? 'bg-gold text-white rounded-br-sm'
-                          : 'bg-navy-700 text-gray-200 rounded-bl-sm'
+                          ? 'bg-accent text-white rounded-br-sm'
+                          : 'bg-surface-sunken text-gray-200 rounded-bl-sm'
                       }`}>
                         <p className="leading-relaxed">{msg.content}</p>
                         <div className={`flex items-center gap-1 mt-1 ${isOutbound ? 'justify-end' : 'justify-start'}`}>
-                          <span className={`text-[10px] ${isOutbound ? 'text-navy-800' : 'text-gray-500'}`}>
+                          <span className={`text-[10px] ${isOutbound ? 'text-white/70' : 'text-gray-500'}`}>
                             {formatTime(msg.createdAt)}
                           </span>
                           {isOutbound && msg.aiGenerated && (
-                            <span className="text-[10px] text-navy-700">· AI</span>
+                            <span className="text-[10px] text-white/70">· AI</span>
                           )}
                         </div>
                       </div>

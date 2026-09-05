@@ -7,7 +7,7 @@ import Footer from '../components/landing/Footer';
 
 const INK = '#0f172a';
 const BODY = '#475569';
-const BLUE = '#2563EB';
+const BLUE = '#1B6FEA';
 const CARD_BORDER = '#e6ebf2';
 const ease = [0.16, 1, 0.3, 1] as const;
 const serif = { fontFamily: "'Instrument Serif', serif" };

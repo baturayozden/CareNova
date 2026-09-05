@@ -30,9 +30,9 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-navy-950 px-4">
+    <div className="flex h-screen items-center justify-center bg-surface-page px-4">
       <AppMeta title="Reset your password | CareNova" />
-      <div className="bg-navy-900 rounded-2xl p-10 w-full max-w-md shadow-2xl border border-navy-600">
+      <div className="bg-surface rounded-2xl p-10 w-full max-w-md shadow-2xl border border-line">
         <div className="text-center mb-8">
           <img
             src={logoSrc}
@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
             <p className="text-gray-300 text-sm leading-relaxed">
               If an account exists for that email, we've sent a reset link. Check your inbox (and spam).
             </p>
-            <Link to="/login" className="block text-gold hover:text-gold-light text-sm transition-colors">
+            <Link to="/login" className="block text-accent hover:text-accent-hover text-sm transition-colors">
               ← Back to login
             </Link>
           </div>
@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); }}
                 autoComplete="email"
-                className="bg-navy-800 border border-navy-600 text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-gold"
+                className="bg-surface-sunken border border-line text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-accent"
               />
             </div>
 
@@ -69,13 +69,13 @@ export default function ForgotPasswordPage() {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || !email.trim()}
-              className="w-full bg-gold hover:bg-gold-light text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Sending…' : 'Send reset link'}
             </button>
 
             <p className="text-center text-sm">
-              <Link to="/login" className="text-gray-400 hover:text-gold transition-colors">
+              <Link to="/login" className="text-gray-400 hover:text-accent transition-colors">
                 ← Back to login
               </Link>
             </p>

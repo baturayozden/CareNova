@@ -114,7 +114,7 @@ const LINK_STATUS_CONFIG: Record<string, { bg: string; label: string }> = {
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   if (!value && value !== 0) return null;
   return (
-    <div className="flex gap-2 py-1.5 border-b border-navy-700/50 last:border-0">
+    <div className="flex gap-2 py-1.5 border-b border-surface-sunken/50 last:border-0">
       <span className="text-gray-500 text-sm w-40 shrink-0">{label}</span>
       <span className="text-gray-200 text-sm flex-1">{value}</span>
     </div>
@@ -311,7 +311,7 @@ export default function CaseDetailPage() {
         <StatusBadge status={tc.status} />
         <button
           onClick={() => setShowEditModal(true)}
-          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-white border border-navy-600 hover:border-navy-500 rounded-lg transition-colors"
+          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-white border border-line hover:border-line-strong rounded-lg transition-colors"
         >
           <Pencil size={13} />
           Edit
@@ -319,7 +319,7 @@ export default function CaseDetailPage() {
       </div>
 
       {/* Summary card */}
-      <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4 space-y-0.5">
+      <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4 space-y-0.5">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Summary</p>
         <Row label="Patient Name"  value={tc.patient_name} />
         <Row label="Date of Birth" value={formatDate(tc.patient_dob)} />
@@ -336,7 +336,7 @@ export default function CaseDetailPage() {
 
       {/* Cardholder — only if third_party */}
       {tc.payer_type === 'third_party' && (tc.cardholder_name || tc.card_last4) && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4 space-y-0.5">
+        <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4 space-y-0.5">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Cardholder</p>
           <Row label="Name"         value={tc.cardholder_name} />
           <Row label="Relationship" value={tc.cardholder_relationship} />
@@ -350,7 +350,7 @@ export default function CaseDetailPage() {
 
       {/* ID docs */}
       {(tc.photo_id_type || tc.photo_id_ref) && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4 space-y-0.5">
+        <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4 space-y-0.5">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Photo ID</p>
           <Row label="Type"      value={tc.photo_id_type ? (PHOTO_ID_LABELS[tc.photo_id_type] ?? tc.photo_id_type) : null} />
           <Row label="Reference" value={tc.photo_id_ref} />
@@ -359,13 +359,13 @@ export default function CaseDetailPage() {
 
       {/* Actions — bank_transfer only */}
       {tc.payment_method === 'bank_transfer' && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4">
+        <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Actions</p>
 
           {!showSendPanel ? (
             <button
               onClick={() => { setShowSendPanel(true); setSendResults(null); }}
-              className="flex items-center gap-2 px-4 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 transition-colors"
             >
               <Send size={14} />
               Send Bank Details
@@ -380,7 +380,7 @@ export default function CaseDetailPage() {
                   checked={sendEmail}
                   disabled={!tc.patient_email}
                   onChange={e => setSendEmail(e.target.checked)}
-                  className="w-4 h-4 accent-gold"
+                  className="w-4 h-4 accent-accent"
                 />
                 <div>
                   <span className="text-sm text-white">Email</span>
@@ -396,7 +396,7 @@ export default function CaseDetailPage() {
                   checked={sendSmsCheck}
                   disabled={!tc.patient_phone}
                   onChange={e => setSendSmsCheck(e.target.checked)}
-                  className="w-4 h-4 accent-gold"
+                  className="w-4 h-4 accent-accent"
                 />
                 <div>
                   <span className="text-sm text-white">SMS</span>
@@ -427,13 +427,13 @@ export default function CaseDetailPage() {
                 <button
                   onClick={handleSendBankDetails}
                   disabled={sending || (!sendEmail && !sendSmsCheck)}
-                  className="flex items-center gap-2 px-4 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 transition-colors disabled:opacity-40"
+                  className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 transition-colors disabled:opacity-40"
                 >
                   {sending ? 'Sending…' : 'Send'}
                 </button>
                 <button
                   onClick={() => { setShowSendPanel(false); setSendResults(null); setSendEmail(false); setSendSmsCheck(false); }}
-                  className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-navy-700 transition-colors"
+                  className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-surface-sunken transition-colors"
                 >
                   Cancel
                 </button>
@@ -445,7 +445,7 @@ export default function CaseDetailPage() {
 
       {/* Actions — card only */}
       {tc.payment_method === 'card' && tc.status !== 'paid' && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4">
+        <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Actions</p>
 
           {!showPayPanel ? (() => {
@@ -483,7 +483,7 @@ export default function CaseDetailPage() {
                     checked={payEmail}
                     disabled={!recipientEmail}
                     onChange={e => setPayEmail(e.target.checked)}
-                    className="w-4 h-4 accent-gold"
+                    className="w-4 h-4 accent-accent"
                   />
                   <div>
                     <span className="text-sm text-white">Email</span>
@@ -499,7 +499,7 @@ export default function CaseDetailPage() {
                     checked={paySmsCheck}
                     disabled={!recipientPhone}
                     onChange={e => setPaySmsCheck(e.target.checked)}
-                    className="w-4 h-4 accent-gold"
+                    className="w-4 h-4 accent-accent"
                   />
                   <div>
                     <span className="text-sm text-white">SMS</span>
@@ -536,7 +536,7 @@ export default function CaseDetailPage() {
                   </button>
                   <button
                     onClick={() => { setShowPayPanel(false); setPayResults(null); setPayEmail(false); setPaySmsCheck(false); }}
-                    className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-navy-700 transition-colors"
+                    className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-surface-sunken transition-colors"
                   >
                     Cancel
                   </button>
@@ -549,7 +549,7 @@ export default function CaseDetailPage() {
 
       {/* Actions — cash only: manual Mark as Paid */}
       {tc.payment_method === 'cash' && tc.status !== 'paid' && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4">
+        <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Actions</p>
           <p className="text-sm text-gray-400 mb-4">
             Once the patient has paid in cash, mark this case as paid manually.
@@ -566,7 +566,7 @@ export default function CaseDetailPage() {
 
       {/* Send Agreement — card, bank_transfer, and finance cases */}
       {(tc.payment_method === 'card' || tc.payment_method === 'bank_transfer' || tc.payment_method === 'finance') && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4">
+        <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">E-Signature</p>
 
           {!agrResult ? (
@@ -602,11 +602,11 @@ export default function CaseDetailPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-green-400 text-sm font-medium">
                 <span>✓</span>
-                <span>Agreement sent — document ID: <code className="text-xs bg-navy-700 px-1.5 py-0.5 rounded">{agrResult.documentId}</code></span>
+                <span>Agreement sent — document ID: <code className="text-xs bg-surface-sunken px-1.5 py-0.5 rounded">{agrResult.documentId}</code></span>
               </div>
               <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold mt-2">Signing links (test mode)</p>
               {agrResult.links.map((l, i) => (
-                <div key={i} className="flex items-start gap-2 bg-navy-700/50 rounded-lg px-3 py-2">
+                <div key={i} className="flex items-start gap-2 bg-surface-sunken/50 rounded-lg px-3 py-2">
                   <span className="text-gray-400 text-xs capitalize w-20 shrink-0 pt-0.5">{l.recipient}</span>
                   <a
                     href={l.signing_url}
@@ -631,7 +631,7 @@ export default function CaseDetailPage() {
 
       {/* View Signed Agreement — shown once document is completed */}
       {tc.signwell_document_id && ['signed', 'payment_sent', 'paid'].includes(tc.status) && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4">
+        <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Signed Document</p>
           {docError && (
             <div className="mb-3 px-3 py-2 bg-red-900/20 border border-red-800/40 rounded-lg text-red-300 text-sm">
@@ -651,7 +651,7 @@ export default function CaseDetailPage() {
       )}
 
       {/* Activity timeline — lifecycle milestones + link events */}
-      <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4">
+      <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Activity</p>
 
         {/* ── Lifecycle milestones ─────────────────────────────────── */}
@@ -666,11 +666,11 @@ export default function CaseDetailPage() {
           milestones.sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime());
           if (milestones.length === 0) return null;
           return (
-            <ol className="relative border-l border-navy-600 space-y-3 ml-3 mb-5">
+            <ol className="relative border-l border-line space-y-3 ml-3 mb-5">
               {milestones.map((m, i) => (
                 <li key={i} className="ml-4">
                   <span
-                    className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full border-2 border-navy-800"
+                    className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full border-2 border-surface-sunken"
                     style={{ backgroundColor: m.dotColor }}
                   />
                   <div className="flex items-center gap-2">
@@ -692,15 +692,15 @@ export default function CaseDetailPage() {
         ) : (
           <>
             <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-3">Links</p>
-            <ol className="relative border-l border-navy-700 space-y-4 ml-3">
+            <ol className="relative border-l border-surface-sunken space-y-4 ml-3">
               {links.map(link => {
                 const kindLabel    = LINK_KIND_LABELS[link.kind] ?? (link.kind || '').replace(/_/g, ' ');
                 const channelLabel = link.channel ? link.channel.toUpperCase() : '';
                 const statusCfg    = LINK_STATUS_CONFIG[link.status] ?? { bg: '#475569', label: link.status };
                 return (
                   <li key={link.id} className="ml-4">
-                    <span className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-gold border-2 border-navy-800" />
-                    <div className="bg-navy-700/50 rounded-lg px-3 py-2">
+                    <span className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-accent border-2 border-surface-sunken" />
+                    <div className="bg-surface-sunken/50 rounded-lg px-3 py-2">
                       <div className="flex items-center justify-between gap-2 flex-wrap">
                         <span className="text-white text-sm font-medium capitalize">
                           {kindLabel}{channelLabel ? ` · ${channelLabel}` : ''}

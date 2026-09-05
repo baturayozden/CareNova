@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 import { AppointmentsTab } from './ClinicDetailPage';
 
-const SEL = 'bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-gold transition-colors';
+const SEL = 'bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-accent transition-colors';
 
 export default function AppointmentsPage() {
   const { user } = useAuth();

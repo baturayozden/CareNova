@@ -381,7 +381,7 @@ export default function NewCaseModal({
 
   if (!isOpen) return null;
 
-  const inputCls = 'w-full min-w-0 bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold/40';
+  const inputCls = 'w-full min-w-0 bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent/40';
   const labelCls = 'block text-xs font-medium text-gray-400 mb-1';
   const optCls   = 'bg-white text-gray-900';
   const statusOptions = isEdit ? ALL_STATUSES : CREATE_STATUSES;
@@ -398,9 +398,9 @@ export default function NewCaseModal({
   return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70" onClick={handleClose} />
-      <div className="relative bg-navy-800 border border-navy-600 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden">
+      <div className="relative bg-surface-sunken border border-line rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-navy-700 sticky top-0 bg-navy-800 z-10">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-surface-sunken sticky top-0 bg-surface-sunken z-10">
           <h2 className="text-white font-semibold text-base">
             {isEdit ? 'Edit Payment Case' : 'New Payment Case'}
           </h2>
@@ -436,13 +436,13 @@ export default function NewCaseModal({
                   >✕</button>
                 )}
                 {showDropdown && filteredLeads.length > 0 && (
-                  <div className="absolute z-20 w-full mt-1 bg-navy-700 border border-navy-600 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                  <div className="absolute z-20 w-full mt-1 bg-surface-sunken border border-line rounded-lg shadow-xl max-h-48 overflow-y-auto">
                     {filteredLeads.slice(0, 20).map(l => (
                       <button
                         key={l.id}
                         type="button"
                         onClick={() => pickLead(l)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-gray-200 hover:bg-navy-600 transition-colors"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-gray-200 hover:bg-line transition-colors"
                       >
                         <span className="font-medium">{l.firstName} {l.lastName}</span>
                         <span className="text-gray-500 text-xs">{l.phone}</span>
@@ -489,7 +489,7 @@ export default function NewCaseModal({
           )}
 
           {/* Patient info */}
-          <div className="border-t border-navy-700 pt-4">
+          <div className="border-t border-surface-sunken pt-4">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Patient</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="col-span-1 sm:col-span-2">
@@ -522,7 +522,7 @@ export default function NewCaseModal({
           </div>
 
           {/* Treatment & Payment */}
-          <div className="border-t border-navy-700 pt-4">
+          <div className="border-t border-surface-sunken pt-4">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Treatment & Payment</p>
             <div className="space-y-3">
               <div>
@@ -621,7 +621,7 @@ export default function NewCaseModal({
 
           {/* Card details — all card payments (self + third_party) */}
           {paymentMethod === 'card' && (
-            <div className="border-t border-navy-700 pt-4">
+            <div className="border-t border-surface-sunken pt-4">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Card Details</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="col-span-1 sm:col-span-2">
@@ -654,7 +654,7 @@ export default function NewCaseModal({
 
           {/* Cardholder identity — third_party only */}
           {showCardholder && (
-            <div className="border-t border-navy-700 pt-4">
+            <div className="border-t border-surface-sunken pt-4">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Cardholder</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="col-span-1 sm:col-span-2">
@@ -683,7 +683,7 @@ export default function NewCaseModal({
 
           {/* Photo ID — card + third_party only */}
           {showCardholder && (
-            <div className="border-t border-navy-700 pt-4">
+            <div className="border-t border-surface-sunken pt-4">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Photo ID</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
@@ -705,7 +705,7 @@ export default function NewCaseModal({
           )}
 
           {/* Status */}
-          <div className="border-t border-navy-700 pt-4">
+          <div className="border-t border-surface-sunken pt-4">
             <label className={labelCls}>Status</label>
             <select className={inputCls} value={status} onChange={e => setStatus(e.target.value)}>
               {statusOptions.map(s => <option className={optCls} key={s.value} value={s.value}>{s.label}</option>)}
@@ -720,14 +720,14 @@ export default function NewCaseModal({
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-navy-700 transition-colors"
+              className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-surface-sunken transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting || (!isEdit && isAdminRole && !assignedStaffId)}
-              className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 transition-colors disabled:opacity-50"
+              className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50"
             >
               {submitting
                 ? (isEdit ? 'Saving…' : 'Creating…')

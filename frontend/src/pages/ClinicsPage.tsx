@@ -23,7 +23,7 @@ const PLAN_BADGE: Record<string, string> = {
   starter:    'bg-gray-800   text-gray-400   border border-gray-600',
   growth:     'bg-blue-900   text-blue-300   border border-blue-700',
   pro:        'bg-purple-900 text-purple-300 border border-purple-700',
-  enterprise: 'bg-gold/10    text-gold       border border-gold/30',
+  enterprise: 'bg-accent/10    text-accent       border border-accent/30',
 };
 
 const STATUS_BADGE: Record<string, string> = {
@@ -95,12 +95,12 @@ export default function ClinicsPage() {
           </div>
           <div className="flex gap-3 pt-1">
             <button onClick={fetchClinics}
-              className="text-xs text-gold hover:text-gold-light transition-colors px-3 py-1 border border-navy-600 rounded-lg">
+              className="text-xs text-accent hover:text-accent-hover transition-colors px-3 py-1 border border-line rounded-lg">
               ↻ Refresh
             </button>
             <button
               onClick={() => setShowAdd(true)}
-              className="text-xs bg-gold hover:bg-gold-light text-white font-medium px-4 py-1.5 rounded-lg transition-colors"
+              className="text-xs bg-accent hover:bg-accent-hover text-white font-medium px-4 py-1.5 rounded-lg transition-colors"
             >
               + Add Clinic
             </button>
@@ -115,10 +115,10 @@ export default function ClinicsPage() {
               { label: 'Booked',         value: totalBooked,                   icon: CheckCircle    },
               { label: 'Pipeline Value', value: formatCurrency(totalPipeline), icon: PoundSterling  },
             ] as { label: string; value: string | number; icon: IconComponent }[]).map(card => (
-              <div key={card.label} className="bg-navy-800 border border-navy-600 rounded-xl p-5 flex items-center gap-4">
-                {(() => { const Icon = card.icon; return <Icon size={24} className="text-gold" />; })()}
+              <div key={card.label} className="bg-surface-sunken border border-line rounded-xl p-5 flex items-center gap-4">
+                {(() => { const Icon = card.icon; return <Icon size={24} className="text-accent" />; })()}
                 <div>
-                  <p className="text-2xl font-semibold text-gold">{card.value}</p>
+                  <p className="text-2xl font-semibold text-accent">{card.value}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
                 </div>
               </div>
@@ -135,7 +135,7 @@ export default function ClinicsPage() {
         {isLoading ? (
           <div className="flex items-center justify-center py-24">
             <div className="text-center space-y-3">
-              <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="text-gray-500 text-sm">Loading clinics…</p>
             </div>
           </div>
@@ -150,9 +150,9 @@ export default function ClinicsPage() {
               />
             ))}
             {clinics.length === 0 && (
-              <div className="py-12 text-center text-gray-500 text-sm bg-navy-800 border border-navy-600 rounded-xl">
+              <div className="py-12 text-center text-gray-500 text-sm bg-surface-sunken border border-line rounded-xl">
                 No clinics yet.{' '}
-                <button onClick={() => setShowAdd(true)} className="text-gold hover:underline">
+                <button onClick={() => setShowAdd(true)} className="text-accent hover:underline">
                   Add your first clinic →
                 </button>
               </div>
@@ -212,21 +212,21 @@ function ClinicCard({ clinic, onEdit, onSuspend }: CardProps) {
   const isSuspended = clinic.status === 'suspended';
 
   return (
-    <div className={`bg-navy-800 border rounded-xl p-6 transition-colors ${
-      isSuspended ? 'border-red-900/50 opacity-75' : 'border-navy-600 hover:border-navy-500'
+    <div className={`bg-surface-sunken border rounded-xl p-6 transition-colors ${
+      isSuspended ? 'border-red-900/50 opacity-75' : 'border-line hover:border-line-strong'
     }`}>
       <div className="flex flex-col lg:flex-row lg:items-start gap-4">
 
         {/* Icon + name */}
         <div className="flex items-start gap-4 flex-1 min-w-0">
-          <div className="w-12 h-12 rounded-xl bg-navy-700 border border-navy-500 flex items-center justify-center shrink-0">
-            <Building2 size={22} className="text-gold" />
+          <div className="w-12 h-12 rounded-xl bg-surface-sunken border border-line-strong flex items-center justify-center shrink-0">
+            <Building2 size={22} className="text-accent" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <Link
                 to={`/clinics/${clinic.id}`}
-                className="text-white font-semibold text-lg hover:text-gold transition-colors"
+                className="text-white font-semibold text-lg hover:text-accent transition-colors"
               >
                 {clinic.name}
               </Link>
@@ -259,13 +259,13 @@ function ClinicCard({ clinic, onEdit, onSuspend }: CardProps) {
         <div className="flex flex-wrap items-center gap-1.5 shrink-0">
           <Link
             to={`/clinics/${clinic.id}`}
-            className="text-xs text-gray-400 hover:text-white bg-navy-700 hover:bg-navy-600 px-3 py-1.5 rounded-lg border border-navy-500 transition-colors"
+            className="text-xs text-gray-400 hover:text-white bg-surface-sunken hover:bg-line px-3 py-1.5 rounded-lg border border-line-strong transition-colors"
           >
             View →
           </Link>
           <button
             onClick={e => { e.stopPropagation(); onEdit(); }}
-            className="text-xs text-gray-400 hover:text-white bg-navy-700 hover:bg-navy-600 px-3 py-1.5 rounded-lg border border-navy-500 transition-colors"
+            className="text-xs text-gray-400 hover:text-white bg-surface-sunken hover:bg-line px-3 py-1.5 rounded-lg border border-line-strong transition-colors"
           >
             ✏
           </button>
@@ -288,7 +288,7 @@ function ClinicCard({ clinic, onEdit, onSuspend }: CardProps) {
 function Stat({ label, value, highlight }: { label: string; value: string | number; highlight?: boolean }) {
   return (
     <div className="text-right">
-      <p className={`text-lg font-semibold ${highlight ? 'text-gold' : 'text-white'}`}>{value}</p>
+      <p className={`text-lg font-semibold ${highlight ? 'text-accent' : 'text-white'}`}>{value}</p>
       <p className="text-xs text-gray-500">{label}</p>
     </div>
   );

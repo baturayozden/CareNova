@@ -71,13 +71,13 @@ export default function MyCommissionCard() {
   // ── Loading ─────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="bg-navy-800 border border-navy-600 rounded-xl p-6">
+      <div className="bg-surface-sunken border border-line rounded-xl p-6">
         <div className="flex items-center gap-2 mb-4">
           <PoundSterling size={16} />
           <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">My Commission</p>
         </div>
         <div className="flex items-center gap-2 text-gray-500 text-sm">
-          <div className="w-4 h-4 border border-gold/40 border-t-gold rounded-full animate-spin shrink-0" />
+          <div className="w-4 h-4 border border-accent/40 border-t-accent rounded-full animate-spin shrink-0" />
           Loading…
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function MyCommissionCard() {
   // ── Error ───────────────────────────────────────────────────────────────────
   if (error) {
     return (
-      <div className="bg-navy-800 border border-navy-600 rounded-xl p-6">
+      <div className="bg-surface-sunken border border-line rounded-xl p-6">
         <div className="flex items-center gap-2 mb-3">
           <PoundSterling size={16} />
           <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">My Commission</p>
@@ -100,7 +100,7 @@ export default function MyCommissionCard() {
   // ── No active period ─────────────────────────────────────────────────────────
   if (!data || !data.activePeriod) {
     return (
-      <div className="bg-navy-800 border border-navy-600 rounded-xl p-6">
+      <div className="bg-surface-sunken border border-line rounded-xl p-6">
         <div className="flex items-center gap-2 mb-3">
           <PoundSterling size={16} />
           <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">My Commission</p>
@@ -115,7 +115,7 @@ export default function MyCommissionCard() {
   const isLocked = est.periodStatus === 'locked';
 
   return (
-    <div className="bg-navy-800 border border-navy-600 rounded-xl p-6 flex flex-col gap-4">
+    <div className="bg-surface-sunken border border-line rounded-xl p-6 flex flex-col gap-4">
 
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
@@ -141,7 +141,7 @@ export default function MyCommissionCard() {
 
       {/* Total commission — primary number */}
       <div>
-        <p className="text-3xl font-semibold text-gold">{formatGBP(est.totalCommission)}</p>
+        <p className="text-3xl font-semibold text-accent">{formatGBP(est.totalCommission)}</p>
         {!isLocked && (
           <p className="text-gray-500 text-xs mt-1">
             This is an estimate and may change before the period closes.
@@ -150,7 +150,7 @@ export default function MyCommissionCard() {
       </div>
 
       {/* Breakdown */}
-      <div className="space-y-1.5 pt-1 border-t border-navy-700">
+      <div className="space-y-1.5 pt-1 border-t border-surface-sunken">
         <BreakdownRow label="Personal Revenue"    value={formatGBP(est.totalRevenue)} />
         <BreakdownRow label="Base Commission"     value={formatGBP(est.baseCommission)} />
         {est.performanceBonus > 0 && (
@@ -193,7 +193,7 @@ export default function MyCommissionCard() {
             <span className="group-open:rotate-90 inline-block transition-transform duration-150 text-[10px]">▶</span>
             How this was calculated
           </summary>
-          <p className="mt-2 text-gray-500 text-xs leading-relaxed bg-navy-900/60 rounded-lg px-3 py-2 border border-navy-700">
+          <p className="mt-2 text-gray-500 text-xs leading-relaxed bg-surface/60 rounded-lg px-3 py-2 border border-surface-sunken">
             {est.reasoning}
           </p>
         </details>

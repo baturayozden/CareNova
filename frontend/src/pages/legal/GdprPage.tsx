@@ -37,7 +37,7 @@ export default function GdprPage() {
             </li>
             <li>
               <strong>Controller</strong> — for clinic user accounts and website visitors (see our{' '}
-              <a href="/privacy" className="text-gold underline">Privacy Policy</a>).
+              <a href="/privacy" className="text-accent underline">Privacy Policy</a>).
             </li>
           </ul>
           <p className="text-gray-700 leading-relaxed mb-4">
@@ -62,7 +62,7 @@ export default function GdprPage() {
           </ul>
           <p className="text-gray-700 leading-relaxed mb-4">
             To arrange a DPA, contact{' '}
-            <a href="mailto:info@carenova.ai" className="text-gold underline">info@carenova.ai</a>.
+            <a href="mailto:info@carenova.ai" className="text-accent underline">info@carenova.ai</a>.
           </p>
 
           <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-3">3. Lawful basis and consent (important for clinics)</h2>
@@ -92,7 +92,7 @@ export default function GdprPage() {
           <p className="text-gray-700 leading-relaxed mb-3">
             We use vetted sub-processors to deliver the Service (including database, hosting, AI, messaging,
             and email providers — see our{' '}
-            <a href="/privacy" className="text-gold underline">Privacy Policy</a> for the current list).
+            <a href="/privacy" className="text-accent underline">Privacy Policy</a> for the current list).
             We:
           </p>
           <ul className="list-disc ml-6 mb-4 space-y-1.5 text-gray-700 leading-relaxed">
@@ -139,7 +139,7 @@ export default function GdprPage() {
           <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-3">11. Your supervisory authority</h2>
           <p className="text-gray-700 leading-relaxed mb-4">
             Individuals in the UK may contact the Information Commissioner's Office (ICO) at{' '}
-            <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" className="text-gold underline">
+            <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" className="text-accent underline">
               ico.org.uk
             </a>. We are registered with the ICO under registration number ZB863194.
           </p>
@@ -152,7 +152,7 @@ export default function GdprPage() {
           <p className="text-gray-700 leading-relaxed mb-1">66 Paul Street, London, England, EC2A 4NA</p>
           <p className="text-gray-700 leading-relaxed mb-1">
             General enquiries:{' '}
-            <a href="mailto:info@carenova.ai" className="text-gold underline">info@carenova.ai</a>
+            <a href="mailto:info@carenova.ai" className="text-accent underline">info@carenova.ai</a>
           </p>
           <p className="text-gray-700 leading-relaxed mb-10">
             Data Protection Officer: Mr Baturay Ozden

@@ -62,14 +62,14 @@ function RequestRow({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         onClick={onToggle}
-        className={`border-b border-navy-700 hover:bg-navy-700/30 transition-colors cursor-pointer ${isExpanded ? 'bg-navy-700/20' : ''}`}
+        className={`border-b border-surface-sunken hover:bg-surface-sunken/30 transition-colors cursor-pointer ${isExpanded ? 'bg-surface-sunken/20' : ''}`}
       >
         <td className="px-4 py-4 text-white text-sm font-medium">{req.name}</td>
         <td className="px-4 py-4">
           <a
             href={`mailto:${req.email}`}
             onClick={e => e.stopPropagation()}
-            className="text-gold text-sm hover:underline"
+            className="text-accent text-sm hover:underline"
           >
             {req.email}
           </a>
@@ -99,7 +99,7 @@ function RequestRow({
       </motion.tr>
 
       {isExpanded && (
-        <tr className="border-b border-navy-700 bg-navy-900/60">
+        <tr className="border-b border-surface-sunken bg-surface/60">
           <td colSpan={7} className="px-6 py-4">
             <div onClick={e => e.stopPropagation()}>
               {/* Meta details */}
@@ -118,13 +118,13 @@ function RequestRow({
                 value={noteDraft}
                 onChange={e => onNoteChange(e.target.value)}
                 placeholder="Add a note about this lead..."
-                className="w-full bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 resize-none focus:outline-none focus:border-gold/50 transition-colors"
+                className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 resize-none focus:outline-none focus:border-accent/50 transition-colors"
               />
               <div className="mt-2 flex items-center gap-3">
                 <button
                   onClick={onSaveNote}
                   disabled={savingNote}
-                  className="px-4 py-1.5 rounded-lg text-sm font-medium bg-gold text-white hover:bg-gold/90 disabled:opacity-50 transition-colors"
+                  className="px-4 py-1.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 disabled:opacity-50 transition-colors"
                 >
                   {savingNote ? 'Saving…' : 'Save note'}
                 </button>
@@ -226,7 +226,7 @@ export default function DemoRequestsPage() {
           { label: 'Contacted', value: counts.contacted, color: 'text-blue-400'       },
           { label: 'Converted', value: counts.converted, color: 'text-green-400'      },
         ].map(s => (
-          <div key={s.label} className="bg-navy-800 border border-navy-600 rounded-xl p-4">
+          <div key={s.label} className="bg-surface-sunken border border-line rounded-xl p-4">
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
             <p className="text-gray-500 text-xs mt-0.5">{s.label}</p>
           </div>
@@ -241,8 +241,8 @@ export default function DemoRequestsPage() {
             onClick={() => setFilter(f.value)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               filter === f.value
-                ? 'bg-gold text-white'
-                : 'bg-navy-700 text-gray-400 hover:text-white'
+                ? 'bg-accent text-white'
+                : 'bg-surface-sunken text-gray-400 hover:text-white'
             }`}
           >
             {f.label}
@@ -251,16 +251,16 @@ export default function DemoRequestsPage() {
             </span>
           </button>
         ))}
-        <button onClick={load} className="ml-auto text-xs text-gray-500 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-navy-700">
+        <button onClick={load} className="ml-auto text-xs text-gray-500 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-surface-sunken">
           ↻ Refresh
         </button>
       </div>
 
       {/* Table */}
-      <div className="bg-navy-800 border border-navy-600 rounded-2xl overflow-hidden">
+      <div className="bg-surface-sunken border border-line rounded-2xl overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="w-8 h-8 border-4 border-navy-600 border-t-gold rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-line border-t-accent rounded-full animate-spin" />
           </div>
         ) : visible.length === 0 ? (
           <div className="text-center py-16 text-gray-500">
@@ -271,7 +271,7 @@ export default function DemoRequestsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-navy-700">
+                <tr className="border-b border-surface-sunken">
                   {['Name', 'Email / Phone', 'Clinic', 'City', 'Status', 'Submitted', 'Actions'].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       {h}

@@ -21,12 +21,12 @@ export default function TrustSection() {
             <motion.div
               key={r.wound}
               variants={fadeUp}
-              className="grid md:grid-cols-[1fr_auto_1.4fr] items-center gap-4 md:gap-8 rounded-2xl border border-brand-900/10 bg-brand-900/[0.02] p-6 md:p-8"
+              className="grid md:grid-cols-[1fr_auto_1.4fr] items-center gap-4 md:gap-8 rounded-2xl border border-line bg-surface-sunken p-6 md:p-8"
             >
               <p className="text-ink-muted italic text-lg">{r.wound}</p>
-              <div className="hidden md:flex items-center justify-center text-accent-500 text-2xl">→</div>
+              <div className="hidden md:flex items-center justify-center text-accent text-2xl">→</div>
               <div>
-                <p className="font-display text-xl text-brand-500 mb-1">{r.answer}</p>
+                <p className="font-display text-xl text-accent mb-1">{r.answer}</p>
                 <p className="text-ink-muted text-sm leading-relaxed">{r.detail}</p>
               </div>
             </motion.div>

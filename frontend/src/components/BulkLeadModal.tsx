@@ -62,7 +62,7 @@ interface Props {
 
 // ─── Shared styles ────────────────────────────────────────────────────────────
 const SELECT_CLS =
-  'w-full bg-navy-900 border border-navy-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40';
+  'w-full bg-surface border border-line text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40';
 const LABEL_CLS = 'block text-gray-400 text-xs mb-1.5';
 
 type Phase = 'upload' | 'mapping' | 'result';
@@ -171,10 +171,10 @@ export default function BulkLeadModal({ isOpen, onClose, onCompleted }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
 
-      <div className="relative bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-surface-sunken border border-line rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
 
         {/* Header */}
-        <div className="px-6 py-5 border-b border-navy-600 flex items-center justify-between">
+        <div className="px-6 py-5 border-b border-line flex items-center justify-between">
           <div>
             <h2 className="text-white font-semibold text-lg">Bulk Lead Upload</h2>
             <p className="text-gray-500 text-xs mt-0.5">
@@ -196,7 +196,7 @@ export default function BulkLeadModal({ isOpen, onClose, onCompleted }: Props) {
                   CSV File <span className="text-red-400">*</span>
                 </label>
                 <div className="flex items-center gap-3">
-                  <label className="cursor-pointer flex items-center gap-2 px-3 py-2 border border-navy-600 rounded-lg text-sm text-gray-300 hover:border-gold/40 hover:text-gold transition-colors shrink-0">
+                  <label className="cursor-pointer flex items-center gap-2 px-3 py-2 border border-line rounded-lg text-sm text-gray-300 hover:border-accent/40 hover:text-accent transition-colors shrink-0">
                     📁 Choose file
                     <input
                       ref={fileInputRef}
@@ -227,7 +227,7 @@ export default function BulkLeadModal({ isOpen, onClose, onCompleted }: Props) {
               )}
 
               {/* Format hint */}
-              <div className="bg-navy-700/50 border border-navy-600 rounded-lg px-4 py-3 text-xs text-gray-500 space-y-1">
+              <div className="bg-surface-sunken/50 border border-line rounded-lg px-4 py-3 text-xs text-gray-500 space-y-1">
                 <p className="text-gray-400 font-medium">Expected format</p>
                 <p>First row must be a header row. Required columns: name, phone.</p>
                 <p>Optional: last name, email, treatment, notes, language (en/tr/ar/de/fr/es).</p>
@@ -238,14 +238,14 @@ export default function BulkLeadModal({ isOpen, onClose, onCompleted }: Props) {
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-navy-500 text-gray-300 text-sm font-medium hover:bg-navy-700 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-line-strong text-gray-300 text-sm font-medium hover:bg-surface-sunken transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => setPhase('mapping')}
                   disabled={csvHeaders.length === 0}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-light text-white text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Next: Map Columns →
                 </button>
@@ -257,7 +257,7 @@ export default function BulkLeadModal({ isOpen, onClose, onCompleted }: Props) {
           {phase === 'mapping' && (
             <>
               {/* GDPR notice */}
-              <div className="bg-navy-700/50 border border-navy-600 rounded-lg px-4 py-3">
+              <div className="bg-surface-sunken/50 border border-line rounded-lg px-4 py-3">
                 <p className="text-gray-500 text-xs leading-relaxed">
                   🔒 Imported leads start with{' '}
                   <span className="text-gray-400 font-medium">AI follow-up OFF</span> and no consent.
@@ -339,17 +339,17 @@ export default function BulkLeadModal({ isOpen, onClose, onCompleted }: Props) {
                 <button
                   type="button"
                   onClick={() => setPhase('upload')}
-                  className="px-4 py-2.5 rounded-xl border border-navy-500 text-gray-300 text-sm font-medium hover:bg-navy-700 transition-colors"
+                  className="px-4 py-2.5 rounded-xl border border-line-strong text-gray-300 text-sm font-medium hover:bg-surface-sunken transition-colors"
                 >
                   ← Back
                 </button>
                 <button
                   onClick={handleUpload}
                   disabled={!canUpload || isUploading}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-light text-white text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isUploading && (
-                    <span className="w-4 h-4 border-2 border-navy-950 border-t-transparent rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-surface-page border-t-transparent rounded-full animate-spin" />
                   )}
                   {isUploading
                     ? `Uploading ${rowCount} rows…`
@@ -402,13 +402,13 @@ export default function BulkLeadModal({ isOpen, onClose, onCompleted }: Props) {
                 <button
                   type="button"
                   onClick={resetAll}
-                  className="px-4 py-2.5 rounded-xl border border-navy-500 text-gray-300 text-sm font-medium hover:bg-navy-700 transition-colors"
+                  className="px-4 py-2.5 rounded-xl border border-line-strong text-gray-300 text-sm font-medium hover:bg-surface-sunken transition-colors"
                 >
                   ↺ Import another
                 </button>
                 <button
                   onClick={() => { onCompleted(); handleClose(); }}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-light text-white text-sm font-medium transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white text-sm font-medium transition-colors"
                 >
                   Done
                 </button>

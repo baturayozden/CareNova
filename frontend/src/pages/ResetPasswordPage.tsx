@@ -45,12 +45,12 @@ export default function ResetPasswordPage() {
     }
   };
 
-  const inputCls = 'bg-navy-800 border border-navy-600 text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-gold';
+  const inputCls = 'bg-surface-sunken border border-line text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-accent';
 
   return (
-    <div className="flex h-screen items-center justify-center bg-navy-950 px-4">
+    <div className="flex h-screen items-center justify-center bg-surface-page px-4">
       <AppMeta title="Set a new password | CareNova" />
-      <div className="bg-navy-900 rounded-2xl p-10 w-full max-w-md shadow-2xl border border-navy-600">
+      <div className="bg-surface rounded-2xl p-10 w-full max-w-md shadow-2xl border border-line">
         <div className="text-center mb-8">
           <img
             src={logoSrc}
@@ -62,7 +62,7 @@ export default function ResetPasswordPage() {
         {!token ? (
           <div className="space-y-5 text-center">
             <p className="text-red-400 text-sm">Invalid reset link.</p>
-            <Link to="/forgot-password" className="block text-gold hover:text-gold-light text-sm transition-colors">
+            <Link to="/forgot-password" className="block text-accent hover:text-accent-hover text-sm transition-colors">
               Request a new link
             </Link>
           </div>
@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
             </p>
             <Link
               to="/login"
-              className="inline-block w-full bg-gold hover:bg-gold-light text-white font-semibold py-3 rounded-lg transition-colors text-center"
+              className="inline-block w-full bg-accent hover:bg-accent-hover text-white font-semibold py-3 rounded-lg transition-colors text-center"
             >
               Go to login
             </Link>
@@ -108,7 +108,7 @@ export default function ResetPasswordPage() {
               <div className="space-y-2">
                 <p className="text-red-400 text-sm">{error}</p>
                 {apiError && (
-                  <Link to="/forgot-password" className="block text-gold hover:text-gold-light text-sm transition-colors">
+                  <Link to="/forgot-password" className="block text-accent hover:text-accent-hover text-sm transition-colors">
                     Request a new link
                   </Link>
                 )}
@@ -118,7 +118,7 @@ export default function ResetPasswordPage() {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || !newPassword || !confirmPassword}
-              className="w-full bg-gold hover:bg-gold-light text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Updating…' : 'Update password'}
             </button>

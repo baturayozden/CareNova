@@ -40,13 +40,13 @@ function redirectAfterLogin(user: User, navigate: ReturnType<typeof useNavigate>
 function LoginCard({ logoSrc, children }: { logoSrc: string; children: React.ReactNode }) {
   const { t } = useTranslation('auth');
   return (
-    <div className="flex h-screen items-center justify-center bg-navy-950 px-4">
-      <div className="bg-navy-900 rounded-2xl p-10 w-full max-w-md shadow-2xl border border-navy-600">
+    <div className="flex h-screen items-center justify-center bg-surface-page px-4">
+      <div className="bg-surface rounded-2xl p-10 w-full max-w-md shadow-2xl border border-line">
         <div className="text-center mb-8">
           <img src={logoSrc} alt="CareNova AI" className="w-full max-w-[240px] h-auto mx-auto block mb-1" />
           {DEMO_MODE && (
-            <span className="inline-flex items-center gap-1.5 mt-3 bg-gold/10 border border-gold/25 text-gold text-xs font-medium px-3 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-gold" /> {t('login.demoMode')}
+            <span className="inline-flex items-center gap-1.5 mt-3 bg-accent/10 border border-accent/25 text-accent text-xs font-medium px-3 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent" /> {t('login.demoMode')}
             </span>
           )}
         </div>
@@ -86,7 +86,7 @@ function ClinicSelectionScreen({ tenants, selecting, error, onSelect, onBack }: 
             key={tenant.tenantId}
             onClick={() => onSelect(tenant.tenantId)}
             disabled={selecting}
-            className="w-full text-left bg-navy-800 hover:bg-navy-700 border border-navy-600 hover:border-gold rounded-xl px-5 py-4 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full text-left bg-surface-sunken hover:bg-surface-sunken border border-line hover:border-accent rounded-xl px-5 py-4 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span className="block text-white font-semibold">{tenant.tenantName}</span>
             <span className="block text-gray-400 text-xs mt-0.5 capitalize">
@@ -209,7 +209,7 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            className="bg-navy-800 border border-navy-600 text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-gold"
+            className="bg-surface-sunken border border-line text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-accent"
           />
         </div>
 
@@ -223,7 +223,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
-            className="bg-navy-800 border border-navy-600 text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-gold"
+            className="bg-surface-sunken border border-line text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-accent"
           />
         </div>
 
@@ -234,13 +234,13 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-gold hover:bg-gold-light text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isSubmitting ? t('login.submitting') : t('login.submit')}
         </button>
 
         <p className="text-center text-sm mt-1">
-          <Link to="/forgot-password" className="text-gray-400 hover:text-gold transition-colors">
+          <Link to="/forgot-password" className="text-gray-400 hover:text-accent transition-colors">
             {t('login.forgotPassword')}
           </Link>
         </p>

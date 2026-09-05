@@ -14,14 +14,14 @@ const API         = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 const INK         = '#0f172a';
 const BODY        = '#475569';
 const MUTED       = '#94a3b8';
-const BLUE        = '#2563EB';
+const BLUE        = '#1B6FEA';
 const GOLD        = '#c9a84c';
 const CARD_BORDER = '#e6ebf2';
 const ease        = [0.16, 1, 0.3, 1] as const;
 const serif       = { fontFamily: "'Instrument Serif', serif" };
 
 const CAT_COLORS: Record<string, string> = {
-  'Lead Recovery':         '#2563EB',
+  'Lead Recovery':         '#1B6FEA',
   'Automation':            '#7c3aed',
   'Buyer Guides':          '#c9a84c',
   'Conversion':            '#0891b2',

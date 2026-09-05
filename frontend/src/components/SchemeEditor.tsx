@@ -56,9 +56,9 @@ const SCHEME_TYPE_LABELS: Record<string, string> = {
 
 // ─── Shared input classes ─────────────────────────────────────────────────────
 const inputCls =
-  'w-full bg-navy-900 border border-navy-600 text-white rounded-lg px-3 py-2 text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-gold/40';
+  'w-full bg-surface border border-line text-white rounded-lg px-3 py-2 text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-accent/40';
 const selectCls =
-  'w-full bg-navy-900 border border-navy-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40';
+  'w-full bg-surface border border-line text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40';
 
 // ─── Section header sub-component ────────────────────────────────────────────
 function SectionHeader({
@@ -71,11 +71,11 @@ function SectionHeader({
   onAdd: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between px-5 py-3.5 border-b border-navy-700">
+    <div className="flex items-center justify-between px-5 py-3.5 border-b border-surface-sunken">
       <h4 className="text-white font-semibold text-sm">{title}</h4>
       <button
         onClick={onAdd}
-        className="flex items-center gap-1.5 text-xs text-gold hover:text-gold/80 transition-colors border border-gold/30 hover:border-gold/60 rounded-lg px-2.5 py-1"
+        className="flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 transition-colors border border-accent/30 hover:border-accent/60 rounded-lg px-2.5 py-1"
       >
         <span className="text-base leading-none">+</span>
         {addLabel}
@@ -387,7 +387,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center gap-2 text-gray-400 text-sm py-12">
-        <div className="w-4 h-4 border border-gold/40 border-t-gold rounded-full animate-spin" />
+        <div className="w-4 h-4 border border-accent/40 border-t-accent rounded-full animate-spin" />
         Loading scheme…
       </div>
     );
@@ -419,7 +419,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
 
       {/* ── No scheme yet ─────────────────────────────────────────────────── */}
       {!scheme && !topError && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-12 flex flex-col items-center text-center gap-4">
+        <div className="bg-surface-sunken border border-line rounded-xl p-12 flex flex-col items-center text-center gap-4">
           <span className="text-4xl">📋</span>
           <div>
             <p className="text-white font-semibold text-base mb-1">No commission scheme yet</p>
@@ -429,7 +429,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
           </div>
           <button
             onClick={() => openSchemeForm(null)}
-            className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 transition-colors"
+            className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 transition-colors"
           >
             + Create Scheme
           </button>
@@ -438,7 +438,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
 
       {/* ── Scheme header card ─────────────────────────────────────────────── */}
       {scheme && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-6">
+        <div className="bg-surface-sunken border border-line rounded-xl p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
@@ -474,7 +474,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
             </div>
             <button
               onClick={() => openSchemeForm(scheme)}
-              className="px-3 py-1.5 border border-navy-600 text-gold text-xs rounded-lg hover:border-gold/40 transition-colors shrink-0"
+              className="px-3 py-1.5 border border-line text-accent text-xs rounded-lg hover:border-accent/40 transition-colors shrink-0"
             >
               ✏ Edit
             </button>
@@ -484,7 +484,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
 
       {/* ── Commission Tiers ──────────────────────────────────────────────── */}
       {scheme && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
+        <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
           <SectionHeader
             title="Commission Tiers"
             addLabel="Add Tier"
@@ -498,7 +498,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-navy-700 bg-navy-900/40">
+                  <tr className="border-b border-surface-sunken bg-surface/40">
                     <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Order</th>
                     <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Min Revenue</th>
                     <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Max Revenue</th>
@@ -507,11 +507,11 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
                     <th className="px-4 py-2.5 w-28"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-navy-700">
+                <tbody className="divide-y divide-surface-sunken">
                   {[...tiers]
                     .sort((a, b) => a.tier_order - b.tier_order)
                     .map(t => (
-                      <tr key={t.id} className="hover:bg-navy-700/30 transition-colors">
+                      <tr key={t.id} className="hover:bg-surface-sunken/30 transition-colors">
                         <td className="px-4 py-2.5 text-gray-300">{t.tier_order}</td>
                         <td className="px-4 py-2.5 text-right text-gray-300">{formatGBP(t.min_revenue)}</td>
                         <td className="px-4 py-2.5 text-right text-gray-300">
@@ -544,7 +544,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
                             <div className="flex items-center gap-3 justify-end">
                               <button
                                 onClick={() => openTierModal(t)}
-                                className="text-gold hover:text-gold/80 text-xs transition-colors"
+                                className="text-accent hover:text-accent/80 text-xs transition-colors"
                               >
                                 Edit
                               </button>
@@ -568,7 +568,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
 
       {/* ── Performance Thresholds ────────────────────────────────────────── */}
       {scheme && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
+        <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
           <SectionHeader
             title="Performance Thresholds"
             addLabel="Add Threshold"
@@ -583,18 +583,18 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-navy-700 bg-navy-900/40">
+                  <tr className="border-b border-surface-sunken bg-surface/40">
                     <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Target %</th>
                     <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Multiplier</th>
                     <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Label</th>
                     <th className="px-4 py-2.5 w-28"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-navy-700">
+                <tbody className="divide-y divide-surface-sunken">
                   {[...thresholds]
                     .sort((a, b) => Number(a.target_percent) - Number(b.target_percent))
                     .map(t => (
-                      <tr key={t.id} className="hover:bg-navy-700/30 transition-colors">
+                      <tr key={t.id} className="hover:bg-surface-sunken/30 transition-colors">
                         <td className="px-4 py-2.5 text-gray-300">
                           {Number(t.target_percent).toFixed(1)}%
                         </td>
@@ -625,7 +625,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
                             <div className="flex items-center gap-3 justify-end">
                               <button
                                 onClick={() => openThreshModal(t)}
-                                className="text-gold hover:text-gold/80 text-xs transition-colors"
+                                className="text-accent hover:text-accent/80 text-xs transition-colors"
                               >
                                 Edit
                               </button>
@@ -649,7 +649,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
 
       {/* ── Team Bonus Tiers ──────────────────────────────────────────────── */}
       {scheme && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
+        <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
           <SectionHeader
             title="Team Bonus Tiers"
             addLabel="Add Team Bonus Tier"
@@ -664,7 +664,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-navy-700 bg-navy-900/40">
+                  <tr className="border-b border-surface-sunken bg-surface/40">
                     <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Order</th>
                     <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Min Clinic Revenue</th>
                     <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Max Clinic Revenue</th>
@@ -672,11 +672,11 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
                     <th className="px-4 py-2.5 w-28"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-navy-700">
+                <tbody className="divide-y divide-surface-sunken">
                   {[...tbTiers]
                     .sort((a, b) => a.tier_order - b.tier_order)
                     .map(t => (
-                      <tr key={t.id} className="hover:bg-navy-700/30 transition-colors">
+                      <tr key={t.id} className="hover:bg-surface-sunken/30 transition-colors">
                         <td className="px-4 py-2.5 text-gray-300">{t.tier_order}</td>
                         <td className="px-4 py-2.5 text-right text-gray-300">{formatGBP(t.min_revenue)}</td>
                         <td className="px-4 py-2.5 text-right text-gray-300">
@@ -684,7 +684,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
                             ? formatGBP(t.max_revenue)
                             : <span className="text-gray-500 italic text-xs">open-ended</span>}
                         </td>
-                        <td className="px-4 py-2.5 text-right text-gold font-medium">
+                        <td className="px-4 py-2.5 text-right text-accent font-medium">
                           {formatGBP(t.bonus_per_staff)}
                         </td>
                         <td className="px-4 py-2.5">
@@ -708,7 +708,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
                             <div className="flex items-center gap-3 justify-end">
                               <button
                                 onClick={() => openTbModal(t)}
-                                className="text-gold hover:text-gold/80 text-xs transition-colors"
+                                className="text-accent hover:text-accent/80 text-xs transition-colors"
                               >
                                 Edit
                               </button>
@@ -735,7 +735,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
       ════════════════════════════════════════════════════════════════════ */}
       {showSchemeForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-md mx-4 p-6">
+          <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-md mx-4 p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-white font-semibold text-lg">
                 {scheme ? 'Edit Scheme' : 'Create Scheme'}
@@ -814,7 +814,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
                 <button
                   type="submit"
                   disabled={schemeFormLoading}
-                  className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {schemeFormLoading ? 'Saving…' : (scheme ? 'Save Changes' : 'Create')}
                 </button>
@@ -829,7 +829,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
       ════════════════════════════════════════════════════════════════════ */}
       {showTierModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-md mx-4 p-6">
+          <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-md mx-4 p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-white font-semibold text-lg">
                 {editingTier ? 'Edit Tier' : 'Add Tier'}
@@ -934,7 +934,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
                 <button
                   type="submit"
                   disabled={tierLoading}
-                  className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {tierLoading ? 'Saving…' : (editingTier ? 'Save Changes' : 'Add Tier')}
                 </button>
@@ -949,7 +949,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
       ════════════════════════════════════════════════════════════════════ */}
       {showThreshModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-sm mx-4 p-6">
+          <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-sm mx-4 p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-white font-semibold text-lg">
                 {editingThresh ? 'Edit Threshold' : 'Add Threshold'}
@@ -1021,7 +1021,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
                 <button
                   type="submit"
                   disabled={threshLoading}
-                  className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {threshLoading ? 'Saving…' : (editingThresh ? 'Save Changes' : 'Add Threshold')}
                 </button>
@@ -1036,7 +1036,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
       ════════════════════════════════════════════════════════════════════ */}
       {showTbModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-md mx-4 p-6">
+          <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-md mx-4 p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-white font-semibold text-lg">
                 {editingTb ? 'Edit Team Bonus Tier' : 'Add Team Bonus Tier'}
@@ -1124,7 +1124,7 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
                 <button
                   type="submit"
                   disabled={tbLoading}
-                  className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {tbLoading ? 'Saving…' : (editingTb ? 'Save Changes' : 'Add Tier')}
                 </button>

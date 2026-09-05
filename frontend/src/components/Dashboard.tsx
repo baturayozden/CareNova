@@ -28,8 +28,8 @@ function HotLeadsCard({ leads }: { leads: Lead[] }) {
     .slice(0, 5);
 
   return (
-    <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-      <div className="px-5 py-4 border-b border-navy-700 flex items-center justify-between">
+    <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+      <div className="px-5 py-4 border-b border-surface-sunken flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Flame size={16} className="text-red-300" />
           <h3 className="text-white font-semibold text-sm">Hot Leads</h3>
@@ -41,7 +41,7 @@ function HotLeadsCard({ leads }: { leads: Lead[] }) {
         </div>
         <button
           onClick={() => navigate('/leads')}
-          className="text-xs text-gold hover:text-gold-light transition-colors"
+          className="text-xs text-accent hover:text-accent-hover transition-colors"
         >
           View all →
         </button>
@@ -53,16 +53,16 @@ function HotLeadsCard({ leads }: { leads: Lead[] }) {
           <span className="text-xs text-gray-600">Score 75+ required</span>
         </div>
       ) : (
-        <div className="divide-y divide-navy-700">
+        <div className="divide-y divide-surface-sunken">
           {hotLeads.map(lead => {
             const style = lead.scoreLabel ? (SCORE_STYLES[lead.scoreLabel] ?? SCORE_STYLES['Cool']) : SCORE_STYLES['Cool'];
             return (
               <div
                 key={lead.id}
                 onClick={() => navigate(`/leads?lead=${lead.id}`)}
-                className="px-5 py-3 flex items-center gap-3 hover:bg-navy-700 cursor-pointer transition-colors"
+                className="px-5 py-3 flex items-center gap-3 hover:bg-surface-sunken cursor-pointer transition-colors"
               >
-                <div className="w-8 h-8 rounded-full bg-navy-700 flex items-center justify-center text-gold text-xs font-bold shrink-0">
+                <div className="w-8 h-8 rounded-full bg-surface-sunken flex items-center justify-center text-accent text-xs font-bold shrink-0">
                   {lead.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -146,16 +146,16 @@ export default function Dashboard() {
                   disabled={scoreState === 'running'}
                   className={`flex items-center gap-2 text-xs px-3 py-1 border rounded-lg transition-colors ${
                     scoreState === 'running'
-                      ? 'border-gold/40 text-gold/40 cursor-not-allowed'
+                      ? 'border-accent/40 text-accent/40 cursor-not-allowed'
                       : scoreState === 'done'
                       ? 'border-green-700 text-green-400 hover:text-green-300'
                       : scoreState === 'error'
                       ? 'border-red-700 text-red-400'
-                      : 'border-navy-600 text-gold hover:text-gold-light hover:border-gold/40'
+                      : 'border-line text-accent hover:text-accent-hover hover:border-accent/40'
                   }`}
                 >
                   {scoreState === 'running' && (
-                    <span className="w-3 h-3 border border-gold/40 border-t-gold rounded-full animate-spin" />
+                    <span className="w-3 h-3 border border-accent/40 border-t-accent rounded-full animate-spin" />
                   )}
                   {scoreState === 'done'    ? '✓ Scoring started' :
                    scoreState === 'error'   ? '✕ Failed' :
@@ -172,7 +172,7 @@ export default function Dashboard() {
 
             <button
               onClick={refresh}
-              className="text-xs text-gold hover:text-gold-light transition-colors px-3 py-1 border border-navy-600 rounded-lg"
+              className="text-xs text-accent hover:text-accent-hover transition-colors px-3 py-1 border border-line rounded-lg"
             >
               ↻ Refresh
             </button>
@@ -188,7 +188,7 @@ export default function Dashboard() {
         {isLoading ? (
           <div className="flex items-center justify-center py-24">
             <div className="text-center space-y-3">
-              <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="text-gray-500 text-sm">Loading dashboard…</p>
             </div>
           </div>

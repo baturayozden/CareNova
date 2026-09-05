@@ -72,7 +72,7 @@ interface ReviewItem {
 
 // ─── Shared styles ────────────────────────────────────────────────────────────
 const selectCls =
-  'w-full bg-navy-900 border border-navy-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40';
+  'w-full bg-surface border border-line text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40';
 
 // ─── Sub-component: confidence badge ─────────────────────────────────────────
 function ConfidenceBadge({ score }: { score: number }) {
@@ -265,7 +265,7 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
 
       {/* ── Upload form ─────────────────────────────────────────────────────── */}
       {summary === null && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-6 space-y-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-6 space-y-5">
           <div>
             <h3 className="text-white font-semibold text-base">Import Payment CSV</h3>
             <p className="text-gray-400 text-sm mt-0.5">
@@ -279,7 +279,7 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
               CSV File <span className="text-red-400">*</span>
             </label>
             <div className="flex items-center gap-3">
-              <label className="cursor-pointer flex items-center gap-2 px-3 py-2 border border-navy-600 rounded-lg text-sm text-gray-300 hover:border-gold/40 hover:text-gold transition-colors shrink-0">
+              <label className="cursor-pointer flex items-center gap-2 px-3 py-2 border border-line rounded-lg text-sm text-gray-300 hover:border-accent/40 hover:text-accent transition-colors shrink-0">
                 📁 Choose file
                 <input
                   ref={fileInputRef}
@@ -373,10 +373,10 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
             <button
               onClick={handleImport}
               disabled={!canImport || importLoading}
-              className="flex items-center gap-2 px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-2 px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {importLoading && (
-                <span className="w-3 h-3 border-2 border-navy-950/30 border-t-navy-950 rounded-full animate-spin" />
+                <span className="w-3 h-3 border-2 border-surface-page/30 border-t-surface-page rounded-full animate-spin" />
               )}
               {importLoading ? 'Importing…' : '▶ Run Import'}
             </button>
@@ -391,7 +391,7 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
 
       {/* ── Import summary ───────────────────────────────────────────────────── */}
       {summary && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-6">
+        <div className="bg-surface-sunken border border-line rounded-xl p-6">
           <div className="flex items-start justify-between gap-4 mb-5">
             <div>
               <h3 className="text-white font-semibold text-base flex items-center gap-2">
@@ -409,7 +409,7 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
             </div>
             <button
               onClick={handleReset}
-              className="shrink-0 text-xs text-gray-500 hover:text-gray-300 transition-colors border border-navy-600 rounded-lg px-3 py-1.5"
+              className="shrink-0 text-xs text-gray-500 hover:text-gray-300 transition-colors border border-line rounded-lg px-3 py-1.5"
             >
               ↺ New Import
             </button>
@@ -433,7 +433,7 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
               </div>
             </div>
             {/* Unmatched */}
-            <div className="flex items-center gap-3 bg-navy-900/60 border border-navy-700 rounded-lg px-4 py-2.5">
+            <div className="flex items-center gap-3 bg-surface/60 border border-surface-sunken rounded-lg px-4 py-2.5">
               <span className="text-gray-500 text-lg">○</span>
               <div>
                 <p className="text-gray-300 font-bold text-xl leading-none">{summary.unmatched}</p>
@@ -475,8 +475,8 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
 
           {/* Loading */}
           {reviewLoading && (
-            <div className="bg-navy-800 border border-navy-600 rounded-xl p-8 flex items-center justify-center gap-2 text-gray-400 text-sm">
-              <div className="w-4 h-4 border border-gold/40 border-t-gold rounded-full animate-spin" />
+            <div className="bg-surface-sunken border border-line rounded-xl p-8 flex items-center justify-center gap-2 text-gray-400 text-sm">
+              <div className="w-4 h-4 border border-accent/40 border-t-accent rounded-full animate-spin" />
               Loading review queue…
             </div>
           )}
@@ -500,7 +500,7 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
           {!reviewLoading && !reviewError && reviewItems.map(item => (
             <div
               key={item.id}
-              className="bg-navy-800 border border-navy-600 rounded-xl p-4"
+              className="bg-surface-sunken border border-line rounded-xl p-4"
             >
               <div className="flex items-start gap-3 sm:gap-5">
 
@@ -512,7 +512,7 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
                   <p className="text-white font-medium text-sm truncate">
                     {item.patient_name ?? <span className="italic text-gray-500">Unknown patient</span>}
                   </p>
-                  <p className="text-gold font-semibold text-sm">{formatGBP(item.gross_amount)}</p>
+                  <p className="text-accent font-semibold text-sm">{formatGBP(item.gross_amount)}</p>
                   <p className="text-gray-400 text-xs">{formatDate(item.payment_date)}</p>
                 </div>
 
@@ -561,7 +561,7 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
 
               {/* Per-item error */}
               {itemErrors[item.id] && (
-                <p className="text-red-400 text-xs mt-2.5 pt-2.5 border-t border-navy-700">
+                <p className="text-red-400 text-xs mt-2.5 pt-2.5 border-t border-surface-sunken">
                   {itemErrors[item.id]}
                 </p>
               )}

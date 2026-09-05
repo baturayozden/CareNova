@@ -37,8 +37,8 @@ export const heroBadge = (lang: string) => pick(lang,
 );
 
 export const heroHeadline = (lang: string) => pick(lang,
-  <>Gelen her hastaya <span className="text-accent-500">5 saniyede</span>, kendi dilinde cevap verin.</>,
-  <>Reply to every patient in <span className="text-accent-500">5 seconds</span>, in their own language.</>,
+  <>Gelen her hastaya <span className="text-accent">5 saniyede</span>, kendi dilinde cevap verin.</>,
+  <>Reply to every patient in <span className="text-accent">5 seconds</span>, in their own language.</>,
 );
 
 export const heroSub = (lang: string) => pick(lang,

@@ -22,7 +22,7 @@ export default function CookiePage() {
             This Cookie Policy explains how B4MIND Brand Consulting and Digital Marketing Ltd ("CareNova",
             "we", "us") uses cookies and similar technologies on carenova.ai and within the CareNova
             platform (the "Service"). It should be read together with our{' '}
-            <a href="/privacy" className="text-gold underline">Privacy Policy</a>.
+            <a href="/privacy" className="text-accent underline">Privacy Policy</a>.
           </p>
 
           <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-3">1. What are cookies?</h2>
@@ -93,7 +93,7 @@ export default function CookiePage() {
             You can control and delete cookies through your browser settings. Blocking strictly necessary
             cookies may prevent you from signing in or using parts of the Service. For more information on
             managing cookies, see your browser's help pages or{' '}
-            <a href="https://www.aboutcookies.org" target="_blank" rel="noopener noreferrer" className="text-gold underline">
+            <a href="https://www.aboutcookies.org" target="_blank" rel="noopener noreferrer" className="text-accent underline">
               aboutcookies.org
             </a>.
           </p>
@@ -107,7 +107,7 @@ export default function CookiePage() {
           <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-3">6. Contact</h2>
           <p className="text-gray-700 leading-relaxed mb-10">
             Questions about our use of cookies? Contact{' '}
-            <a href="mailto:info@carenova.ai" className="text-gold underline">info@carenova.ai</a>.
+            <a href="mailto:info@carenova.ai" className="text-accent underline">info@carenova.ai</a>.
           </p>
 
         </div>

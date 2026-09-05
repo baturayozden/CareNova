@@ -8,10 +8,10 @@ export default function Footer() {
   const links = footerLinks(i18n.language);
 
   return (
-    <footer className="border-t border-brand-900/10 bg-surface text-ink-muted">
+    <footer className="border-t border-line bg-surface text-ink-muted">
       <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="font-display text-lg text-ink">
-          Care<span className="text-accent-500">Nova</span>
+          Care<span className="text-accent">Nova</span>
         </div>
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
           <Link to="/legal/privacy" className="hover:text-ink transition-colors">{links.privacy}</Link>

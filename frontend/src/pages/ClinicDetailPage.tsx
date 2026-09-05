@@ -40,7 +40,7 @@ const PLAN_BADGE: Record<string, string> = {
   starter:    'bg-gray-800   text-gray-400   border border-gray-600',
   growth:     'bg-blue-900   text-blue-300   border border-blue-700',
   pro:        'bg-purple-900 text-purple-300 border border-purple-700',
-  enterprise: 'bg-gold/10    text-gold       border border-gold/30',
+  enterprise: 'bg-accent/10    text-accent       border border-accent/30',
 };
 
 const STATUS_BADGE: Record<string, string> = {
@@ -51,7 +51,7 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 const ROLE_BADGE: Record<string, string> = {
-  director:               'bg-gold/10    text-gold       border border-gold/30',
+  director:               'bg-accent/10    text-accent       border border-accent/30',
   clinic_admin:           'bg-blue-900   text-blue-300   border border-blue-700',
   treatment_coordinator:  'bg-purple-900 text-purple-300 border border-purple-700',
   receptionist:           'bg-green-900  text-green-300  border border-green-700',
@@ -192,10 +192,10 @@ function WhatsAppWizardModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="bg-navy-900 border border-navy-600 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+      <div className="bg-surface border border-line rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-navy-700">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-surface-sunken">
           <div className="flex items-center gap-2">
             <MessageCircle size={24} className="text-[#25D366] shrink-0" />
             <div>
@@ -213,17 +213,17 @@ function WhatsAppWizardModal({
               <div className="flex flex-col items-center">
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
                   step === s.n
-                    ? 'bg-gold border-gold text-white'
+                    ? 'bg-accent border-accent text-white'
                     : step > s.n
                     ? 'bg-green-600 border-green-600 text-white'
-                    : 'bg-transparent border-navy-500 text-gray-500'
+                    : 'bg-transparent border-line-strong text-gray-500'
                 }`}>
                   {step > s.n ? '✓' : s.n}
                 </div>
-                <span className={`text-xs mt-1 whitespace-nowrap ${step === s.n ? 'text-gold' : 'text-gray-600'}`}>{s.label}</span>
+                <span className={`text-xs mt-1 whitespace-nowrap ${step === s.n ? 'text-accent' : 'text-gray-600'}`}>{s.label}</span>
               </div>
               {idx < steps.length - 1 && (
-                <div className={`flex-1 h-0.5 mb-4 mx-1 transition-all ${step > s.n ? 'bg-green-600' : 'bg-navy-600'}`} />
+                <div className={`flex-1 h-0.5 mb-4 mx-1 transition-all ${step > s.n ? 'bg-green-600' : 'bg-line'}`} />
               )}
             </React.Fragment>
           ))}
@@ -241,7 +241,7 @@ function WhatsAppWizardModal({
                   Go to <strong className="text-gray-300">Meta for Developers</strong> → Your App → <strong className="text-gray-300">WhatsApp</strong> → API Setup. Copy the <em>Phone Number ID</em> (not the phone number itself).
                 </p>
               </div>
-              <div className="bg-navy-800 rounded-xl p-4 border border-navy-600 flex items-center gap-3 text-xs text-gray-400">
+              <div className="bg-surface-sunken rounded-xl p-4 border border-line flex items-center gap-3 text-xs text-gray-400">
                 <ClipboardList size={22} className="shrink-0 text-gray-400" />
                 <span>Navigate to <strong className="text-white">developers.facebook.com</strong> → My Apps → [Your App] → WhatsApp → API Setup → Phone numbers</span>
               </div>
@@ -252,7 +252,7 @@ function WhatsAppWizardModal({
                   placeholder="e.g. 123456789012345"
                   value={state.phoneNumberId}
                   onChange={e => set({ phoneNumberId: e.target.value })}
-                  className="w-full bg-navy-800 border border-navy-600 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-gold placeholder-gray-600"
+                  className="w-full bg-surface-sunken border border-line rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent placeholder-gray-600"
                 />
               </div>
             </div>
@@ -267,7 +267,7 @@ function WhatsAppWizardModal({
                   In the same API Setup page, copy your <strong className="text-gray-300">temporary or permanent access token</strong>. For production, use a <em>System User</em> permanent token.
                 </p>
               </div>
-              <div className="bg-navy-800 rounded-xl p-4 border border-yellow-900/50 flex items-start gap-3 text-xs text-yellow-400/80">
+              <div className="bg-surface-sunken rounded-xl p-4 border border-yellow-900/50 flex items-start gap-3 text-xs text-yellow-400/80">
                 <Lock size={16} className="shrink-0 mt-0.5 text-yellow-400/80" />
                 <span>This token is stored securely and used only to send WhatsApp messages on your behalf.</span>
               </div>
@@ -278,7 +278,7 @@ function WhatsAppWizardModal({
                   placeholder="EAAxxxxxxxxxxxxxxx..."
                   value={state.accessToken}
                   onChange={e => set({ accessToken: e.target.value })}
-                  className="w-full bg-navy-800 border border-navy-600 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-gold placeholder-gray-600 font-mono"
+                  className="w-full bg-surface-sunken border border-line rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent placeholder-gray-600 font-mono"
                 />
               </div>
             </div>
@@ -294,28 +294,28 @@ function WhatsAppWizardModal({
                 </p>
               </div>
               <div className="space-y-3">
-                <div className="bg-navy-800 rounded-xl p-3 border border-navy-600">
+                <div className="bg-surface-sunken rounded-xl p-3 border border-line">
                   <p className="text-gray-500 text-xs mb-1">Callback URL</p>
                   <div className="flex items-center justify-between gap-2">
                     <code className="text-green-400 text-xs font-mono break-all">{WEBHOOK_URL}</code>
                     <button
                       onClick={() => copyToClipboard(WEBHOOK_URL)}
-                      className="shrink-0 text-xs text-gray-500 hover:text-white border border-navy-500 rounded-lg px-2.5 py-1 transition-colors"
+                      className="shrink-0 text-xs text-gray-500 hover:text-white border border-line-strong rounded-lg px-2.5 py-1 transition-colors"
                     >📋 Copy</button>
                   </div>
                 </div>
-                <div className="bg-navy-800 rounded-xl p-3 border border-navy-600">
+                <div className="bg-surface-sunken rounded-xl p-3 border border-line">
                   <p className="text-gray-500 text-xs mb-1">Verify Token</p>
                   <div className="flex items-center justify-between gap-2">
                     <code className="text-green-400 text-xs font-mono">{VERIFY_TOKEN}</code>
                     <button
                       onClick={() => copyToClipboard(VERIFY_TOKEN)}
-                      className="shrink-0 text-xs text-gray-500 hover:text-white border border-navy-500 rounded-lg px-2.5 py-1 transition-colors"
+                      className="shrink-0 text-xs text-gray-500 hover:text-white border border-line-strong rounded-lg px-2.5 py-1 transition-colors"
                     >📋 Copy</button>
                   </div>
                 </div>
               </div>
-              <div className="bg-navy-800 rounded-xl p-3 border border-navy-600 text-xs text-gray-400 space-y-1.5">
+              <div className="bg-surface-sunken rounded-xl p-3 border border-line text-xs text-gray-400 space-y-1.5">
                 <p className="text-gray-300 font-medium">Webhook fields to subscribe:</p>
                 <p>• <code className="text-green-400">messages</code> — inbound patient messages</p>
                 <p>• <code className="text-green-400">message_deliveries</code> — delivery receipts</p>
@@ -332,7 +332,7 @@ function WhatsAppWizardModal({
                   <CheckCircle size={48} className="text-green-400" />
                   <p className="text-white font-semibold">WhatsApp Connected!</p>
                   <p className="text-gray-400 text-sm text-center">{state.displayName} is now active. AI follow-ups will be sent via this number.</p>
-                  <button onClick={onClose} className="mt-2 bg-gold text-white font-semibold text-sm px-6 py-2.5 rounded-xl hover:bg-gold/80 transition-colors">
+                  <button onClick={onClose} className="mt-2 bg-accent text-white font-semibold text-sm px-6 py-2.5 rounded-xl hover:bg-accent/80 transition-colors">
                     Close
                   </button>
                 </div>
@@ -344,7 +344,7 @@ function WhatsAppWizardModal({
                       Click Test to verify your credentials work with Meta's API before saving.
                     </p>
                   </div>
-                  <div className="bg-navy-800 rounded-xl p-4 border border-navy-600 space-y-2 text-xs text-gray-400">
+                  <div className="bg-surface-sunken rounded-xl p-4 border border-line space-y-2 text-xs text-gray-400">
                     <div className="flex justify-between"><span>Phone Number ID</span><code className="text-gray-300 font-mono">{state.phoneNumberId.slice(0, 12)}…</code></div>
                     <div className="flex justify-between"><span>Access Token</span><code className="text-gray-300 font-mono">{'•'.repeat(12)}</code></div>
                   </div>
@@ -357,7 +357,7 @@ function WhatsAppWizardModal({
                     <button
                       onClick={handleTest}
                       disabled={state.testStatus === 'testing'}
-                      className="flex-1 bg-navy-700 hover:bg-navy-600 text-white border border-navy-500 text-sm font-medium py-2.5 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="flex-1 bg-surface-sunken hover:bg-line text-white border border-line-strong text-sm font-medium py-2.5 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {state.testStatus === 'testing' && <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
                       <Search size={16} /> Test Connection
@@ -379,7 +379,7 @@ function WhatsAppWizardModal({
 
         {/* Footer buttons */}
         {!state.saved && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-navy-700">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-surface-sunken">
             <button
               onClick={() => step > 1 ? setStep((step - 1) as WizardStep) : onClose()}
               className="text-sm text-gray-400 hover:text-white transition-colors"
@@ -393,7 +393,7 @@ function WhatsAppWizardModal({
                   (step === 1 && !state.phoneNumberId.trim()) ||
                   (step === 2 && !state.accessToken.trim())
                 }
-                className="bg-gold hover:bg-gold/80 text-white font-semibold text-sm px-6 py-2 rounded-xl transition-colors disabled:opacity-40"
+                className="bg-accent hover:bg-accent/80 text-white font-semibold text-sm px-6 py-2 rounded-xl transition-colors disabled:opacity-40"
               >
                 Next →
               </button>
@@ -435,7 +435,7 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-7 h-7 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+        <div className="w-7 h-7 border-2 border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -470,7 +470,7 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
         <select
           value={selectedMonth}
           onChange={e => setSelectedMonth(e.target.value)}
-          className="bg-navy-800 border border-navy-600 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-gold transition-colors"
+          className="bg-surface-sunken border border-line text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-accent transition-colors"
         >
           {monthOptions.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -487,7 +487,7 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
       <div className="grid grid-cols-2 gap-4">
 
         {/* AI Messages */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5">
           <p className="text-gray-500 text-xs uppercase tracking-wider mb-3">AI Messages — This Month</p>
           <p className="text-3xl font-semibold text-white">{thisMonth.messages.toLocaleString()}</p>
           <p className={`text-xs mt-1 ${deltaClass(msgDelta)}`}>
@@ -496,9 +496,9 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
         </div>
 
         {/* Estimated Cost */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5">
           <p className="text-gray-500 text-xs uppercase tracking-wider mb-3">Est. Anthropic Cost — This Month</p>
-          <p className="text-3xl font-semibold text-gold">${thisMonth.estimatedCost.toFixed(2)}</p>
+          <p className="text-3xl font-semibold text-accent">${thisMonth.estimatedCost.toFixed(2)}</p>
           <p className={`text-xs mt-1 ${deltaClass(costDelta, false)}`}>
             {deltaSign(costDelta)}${costDelta.toFixed(2)} vs last month · ${(thisMonth.messages ? (thisMonth.estimatedCost / thisMonth.messages).toFixed(4) : '0.0000')} per msg
           </p>
@@ -509,7 +509,7 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
       <div className="grid grid-cols-2 gap-4">
 
         {/* Top Scenarios */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5">
           <p className="text-white font-medium text-sm mb-4">Top Scenarios <span className="text-gray-500 font-normal">(last 30 days)</span></p>
           {topScenarios.length === 0 ? (
             <p className="text-gray-600 text-xs">No scenario data yet.</p>
@@ -521,7 +521,7 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
                     <span className="text-gray-300 text-xs">{SCENARIO_LABELS[s.scenario] ?? s.scenario}</span>
                     <span className="text-gray-400 text-xs font-medium">{s.count}</span>
                   </div>
-                  <div className="h-1.5 bg-navy-700 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-surface-sunken rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${SCENARIO_COLORS[s.scenario] ?? 'bg-gray-500'}`}
                       style={{ width: `${(s.count / maxScenario) * 100}%` }}
@@ -534,7 +534,7 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
         </div>
 
         {/* Language Breakdown */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5">
           <p className="text-white font-medium text-sm mb-4">Language Breakdown</p>
           {languageBreakdown.length === 0 ? (
             <p className="text-gray-600 text-xs">No data yet.</p>
@@ -548,9 +548,9 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
                       <span className="text-gray-300 text-xs">{LANG_NAMES[l.language] ?? l.language.toUpperCase()}</span>
                       <span className="text-gray-400 text-xs font-medium">{l.count} <span className="text-gray-600">({pct}%)</span></span>
                     </div>
-                    <div className="h-1.5 bg-navy-700 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-surface-sunken rounded-full overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-gold transition-all"
+                        className="h-full rounded-full bg-accent transition-all"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -566,7 +566,7 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
       <div className="grid grid-cols-2 gap-4">
 
         {/* Response Time Trend */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5">
           <div className="flex items-start justify-between mb-3">
             <div>
               <p className="text-white font-medium text-sm">Response Time Trend</p>
@@ -574,7 +574,7 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
             </div>
             {respValues.length > 0 && (
               <div className="text-right">
-                <p className="text-gold text-lg font-semibold">{fmtSecs(respValues[respValues.length - 1] ?? 0)}</p>
+                <p className="text-accent text-lg font-semibold">{fmtSecs(respValues[respValues.length - 1] ?? 0)}</p>
                 <p className="text-gray-600 text-[10px]">latest</p>
               </div>
             )}
@@ -587,7 +587,7 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
         </div>
 
         {/* Lead Recovery Rate Trend */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5">
           <div className="flex items-start justify-between mb-3">
             <div>
               <p className="text-white font-medium text-sm">Lead Recovery Rate</p>
@@ -595,7 +595,7 @@ function AiUsageTab({ clinicId }: { clinicId: string }) {
             </div>
             {recovValues.length > 0 && (
               <div className="text-right">
-                <p className="text-gold text-lg font-semibold">{recovValues[recovValues.length - 1].toFixed(1)}%</p>
+                <p className="text-accent text-lg font-semibold">{recovValues[recovValues.length - 1].toFixed(1)}%</p>
                 <p className="text-gray-600 text-[10px]">this week</p>
               </div>
             )}
@@ -631,7 +631,7 @@ function AddStaffForm({ clinicId, onAdded, onCancel }: AddStaffFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
 
-  const INPUT = 'w-full min-w-0 bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold/40 transition-colors';
+  const INPUT = 'w-full min-w-0 bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent/40 transition-colors';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -652,7 +652,7 @@ function AddStaffForm({ clinicId, onAdded, onCancel }: AddStaffFormProps) {
   const labelCls = 'block text-xs font-medium text-gray-400 mb-1';
 
   return (
-    <form onSubmit={handleSubmit} className="bg-navy-800 border border-navy-600 rounded-xl p-4 space-y-3 mt-3">
+    <form onSubmit={handleSubmit} className="bg-surface-sunken border border-line rounded-xl p-4 space-y-3 mt-3">
       <p className="text-xs font-semibold text-gray-300 uppercase tracking-widest">New Staff Member</p>
       <div className="grid grid-cols-2 gap-3 min-w-0">
         <div className="min-w-0">
@@ -685,11 +685,11 @@ function AddStaffForm({ clinicId, onAdded, onCancel }: AddStaffFormProps) {
       {error && <p className="text-red-400 text-xs bg-red-900/20 border border-red-800/40 rounded-lg px-3 py-2">{error}</p>}
       <div className="flex gap-2 pt-1">
         <button type="button" onClick={onCancel}
-          className="flex-1 py-2 rounded-lg border border-navy-500 text-gray-400 text-xs hover:text-white hover:bg-navy-700 transition-colors">
+          className="flex-1 py-2 rounded-lg border border-line-strong text-gray-400 text-xs hover:text-white hover:bg-surface-sunken transition-colors">
           Cancel
         </button>
         <button type="submit" disabled={isLoading}
-          className="flex-1 py-2 rounded-lg bg-gold text-white text-xs font-semibold hover:bg-gold/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5">
+          className="flex-1 py-2 rounded-lg bg-accent text-white text-xs font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5">
           {isLoading && <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
           Add Member
         </button>
@@ -759,7 +759,7 @@ function AiSettingsTab({ clinicId }: { clinicId: string }) {
 
   if (loading) return (
     <div className="flex items-center justify-center py-20">
-      <div className="w-8 h-8 border-4 border-navy-600 border-t-gold rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 border-line border-t-accent rounded-full animate-spin" />
     </div>
   );
 
@@ -773,15 +773,15 @@ function AiSettingsTab({ clinicId }: { clinicId: string }) {
   return (
     <div className="max-w-2xl space-y-6 pt-2">
       {/* Tone */}
-      <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+      <div className="bg-surface-sunken border border-line rounded-xl p-5">
         <h3 className="text-white font-semibold text-sm mb-4">AI Tone</h3>
         <div className="grid grid-cols-2 gap-3">
           {toneOptions.map(t => (
             <button key={t.value} onClick={() => setSettings(s => ({ ...s, tone: t.value }))}
               className={`text-left p-3 rounded-lg border transition-colors ${
                 settings.tone === t.value
-                  ? 'border-gold bg-gold/10 text-gold'
-                  : 'border-navy-600 text-gray-400 hover:border-navy-500 hover:text-white'
+                  ? 'border-accent bg-accent/10 text-accent'
+                  : 'border-line text-gray-400 hover:border-line-strong hover:text-white'
               }`}>
               <p className="font-semibold text-sm">{t.label}</p>
               <p className="text-xs mt-0.5 opacity-70">{t.desc}</p>
@@ -791,7 +791,7 @@ function AiSettingsTab({ clinicId }: { clinicId: string }) {
       </div>
 
       {/* Welcome message */}
-      <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+      <div className="bg-surface-sunken border border-line rounded-xl p-5">
         <h3 className="text-white font-semibold text-sm mb-1">Welcome Message</h3>
         <p className="text-gray-500 text-xs mb-3">Shown to first-time patients. Leave blank for the AI default.</p>
         <textarea
@@ -799,12 +799,12 @@ function AiSettingsTab({ clinicId }: { clinicId: string }) {
           value={settings.welcomeMessage}
           onChange={e => setSettings(s => ({ ...s, welcomeMessage: e.target.value }))}
           placeholder="Hi! Welcome to [Clinic Name]. How can we help you today? 😊"
-          className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50 resize-none"
+          className="w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50 resize-none"
         />
       </div>
 
       {/* Out-of-hours message */}
-      <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+      <div className="bg-surface-sunken border border-line rounded-xl p-5">
         <h3 className="text-white font-semibold text-sm mb-1">Out-of-Hours Message</h3>
         <p className="text-gray-500 text-xs mb-3">Sent automatically when a patient messages outside working hours.</p>
         <textarea
@@ -812,19 +812,19 @@ function AiSettingsTab({ clinicId }: { clinicId: string }) {
           value={settings.outOfHoursMessage}
           onChange={e => setSettings(s => ({ ...s, outOfHoursMessage: e.target.value }))}
           placeholder="We're currently closed. Our hours are Mon–Fri 9am–6pm. Would you like to book an appointment?"
-          className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50 resize-none"
+          className="w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50 resize-none"
         />
       </div>
 
       {/* Escalation */}
-      <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+      <div className="bg-surface-sunken border border-line rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-white font-semibold text-sm">Escalation</h3>
             <p className="text-gray-500 text-xs mt-0.5">AI pauses and connects patient to human team when keywords are detected.</p>
           </div>
           <button onClick={() => setSettings(s => ({ ...s, escalationEnabled: !s.escalationEnabled }))}
-            className={`w-11 h-6 rounded-full transition-colors relative ${settings.escalationEnabled ? 'bg-gold' : 'bg-navy-600'}`}>
+            className={`w-11 h-6 rounded-full transition-colors relative ${settings.escalationEnabled ? 'bg-accent' : 'bg-line'}`}>
             <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${settings.escalationEnabled ? 'left-6' : 'left-1'}`} />
           </button>
         </div>
@@ -837,7 +837,7 @@ function AiSettingsTab({ clinicId }: { clinicId: string }) {
           onChange={e => setKwInput(e.target.value)}
           disabled={!settings.escalationEnabled}
           placeholder="urgent, pain, emergency, bleeding, swelling, broken"
-          className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50 disabled:opacity-40"
+          className="w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50 disabled:opacity-40"
         />
         <div className="mt-4">
           <label className="text-xs text-gray-400 font-medium uppercase tracking-wider block mb-1.5">
@@ -849,7 +849,7 @@ function AiSettingsTab({ clinicId }: { clinicId: string }) {
             onChange={e => setSettings(s => ({ ...s, alertPhone: e.target.value }))}
             disabled={!settings.escalationEnabled}
             placeholder="+447700900123"
-            className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50 disabled:opacity-40"
+            className="w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50 disabled:opacity-40"
           />
           <p className="text-gray-600 text-xs mt-1">International format with country code. Leave blank to disable WhatsApp alerts.</p>
         </div>
@@ -858,8 +858,8 @@ function AiSettingsTab({ clinicId }: { clinicId: string }) {
       {/* Save */}
       <div className="flex items-center gap-3">
         <button onClick={save} disabled={saving}
-          className="px-6 py-2.5 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light transition-colors disabled:opacity-60 flex items-center gap-2">
-          {saving && <span className="w-3.5 h-3.5 border-2 border-navy-950 border-t-transparent rounded-full animate-spin" />}
+          className="px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover transition-colors disabled:opacity-60 flex items-center gap-2">
+          {saving && <span className="w-3.5 h-3.5 border-2 border-surface-page border-t-transparent rounded-full animate-spin" />}
           {saving ? 'Saving…' : 'Save Settings'}
         </button>
         {saved && <span className="text-green-400 text-sm">✓ Saved</span>}
@@ -939,7 +939,7 @@ function KnowledgeBaseTab({ clinicId }: { clinicId: string }) {
 
   if (loading) return (
     <div className="flex items-center justify-center py-20">
-      <div className="w-8 h-8 border-4 border-navy-600 border-t-gold rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 border-line border-t-accent rounded-full animate-spin" />
     </div>
   );
 
@@ -952,22 +952,22 @@ function KnowledgeBaseTab({ clinicId }: { clinicId: string }) {
         const catEntries = entries.filter(e => e.category === cat);
         const isOpen = openCat === cat;
         return (
-          <div key={cat} className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
+          <div key={cat} className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
             <button onClick={() => setOpenCat(isOpen ? null : cat)}
-              className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-navy-700/40 transition-colors">
+              className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-surface-sunken/40 transition-colors">
               <div className="flex items-center gap-3">
                 <span className="text-sm font-semibold text-white">{KB_CAT_LABELS[cat]}</span>
                 {catEntries.length > 0 && (
-                  <span className="bg-navy-600 text-gray-400 text-xs px-2 py-0.5 rounded-full">{catEntries.length}</span>
+                  <span className="bg-line text-gray-400 text-xs px-2 py-0.5 rounded-full">{catEntries.length}</span>
                 )}
               </div>
               <span className="text-gray-500 text-sm">{isOpen ? '▲' : '▼'}</span>
             </button>
 
             {isOpen && (
-              <div className="px-5 pb-4 space-y-3 border-t border-navy-700/50">
+              <div className="px-5 pb-4 space-y-3 border-t border-surface-sunken/50">
                 {catEntries.map(entry => (
-                  <div key={entry.id} className="bg-navy-900/50 border border-navy-700 rounded-lg p-3">
+                  <div key={entry.id} className="bg-surface/50 border border-surface-sunken rounded-lg p-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <p className="text-white text-sm font-medium truncate">{entry.title}</p>
@@ -975,7 +975,7 @@ function KnowledgeBaseTab({ clinicId }: { clinicId: string }) {
                       </div>
                       <div className="flex gap-1.5 shrink-0">
                         <button onClick={() => startEdit(entry)}
-                          className="text-xs px-2.5 py-1 rounded-md bg-navy-700 text-gray-300 hover:text-white transition-colors">Edit</button>
+                          className="text-xs px-2.5 py-1 rounded-md bg-surface-sunken text-gray-300 hover:text-white transition-colors">Edit</button>
                         <button onClick={() => deleteEntry(entry.id)}
                           className="text-xs px-2.5 py-1 rounded-md bg-red-900/30 text-red-400 hover:bg-red-900/60 transition-colors">Delete</button>
                       </div>
@@ -985,28 +985,28 @@ function KnowledgeBaseTab({ clinicId }: { clinicId: string }) {
 
                 {/* Add / Edit form */}
                 {showForm === cat ? (
-                  <div className="bg-navy-900 border border-navy-600 rounded-lg p-4 space-y-3">
-                    <p className="text-gold text-xs font-semibold uppercase tracking-wider">{editId ? 'Edit Entry' : 'New Entry'}</p>
+                  <div className="bg-surface border border-line rounded-lg p-4 space-y-3">
+                    <p className="text-accent text-xs font-semibold uppercase tracking-wider">{editId ? 'Edit Entry' : 'New Entry'}</p>
                     <input type="text" placeholder="Title" value={form.title}
                       onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                      className="w-full bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50"
+                      className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50"
                     />
                     <textarea rows={5} placeholder="Content — paste price lists, doctor bios, FAQs, policies..." value={form.content}
                       onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
-                      className="w-full bg-navy-800 border border-navy-600 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50 resize-y"
+                      className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50 resize-y"
                     />
                     <div className="flex gap-2">
                       <button onClick={() => saveEntry(cat)} disabled={saving}
-                        className="px-4 py-1.5 rounded-lg bg-gold text-white text-xs font-semibold hover:bg-gold-light disabled:opacity-60 flex items-center gap-1.5">
-                        {saving && <span className="w-3 h-3 border-2 border-navy-950 border-t-transparent rounded-full animate-spin" />}
+                        className="px-4 py-1.5 rounded-lg bg-accent text-white text-xs font-semibold hover:bg-accent-hover disabled:opacity-60 flex items-center gap-1.5">
+                        {saving && <span className="w-3 h-3 border-2 border-surface-page border-t-transparent rounded-full animate-spin" />}
                         {saving ? 'Saving…' : editId ? 'Update' : 'Add Entry'}
                       </button>
-                      <button onClick={cancelForm} className="px-4 py-1.5 rounded-lg bg-navy-700 text-gray-400 text-xs hover:text-white transition-colors">Cancel</button>
+                      <button onClick={cancelForm} className="px-4 py-1.5 rounded-lg bg-surface-sunken text-gray-400 text-xs hover:text-white transition-colors">Cancel</button>
                     </div>
                   </div>
                 ) : (
                   <button onClick={() => { setShowForm(cat); setEditId(null); setForm({ title: '', content: '', is_active: true }); }}
-                    className="w-full py-2 border border-dashed border-navy-600 rounded-lg text-gray-500 text-xs hover:text-gold hover:border-gold/40 transition-colors">
+                    className="w-full py-2 border border-dashed border-line rounded-lg text-gray-500 text-xs hover:text-accent hover:border-accent/40 transition-colors">
                     + Add entry to {KB_CAT_LABELS[cat]}
                   </button>
                 )}
@@ -1120,22 +1120,22 @@ export function AppointmentsTab({ clinicId }: { clinicId: string }) {
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
         <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)}
-          className="bg-navy-800 border border-navy-600 rounded-lg px-3 py-1.5 text-white text-sm outline-none focus:border-gold/50"
+          className="bg-surface-sunken border border-line rounded-lg px-3 py-1.5 text-white text-sm outline-none focus:border-accent/50"
         />
         {filterDate && (
           <button onClick={() => setFilterDate('')} className="text-xs text-gray-500 hover:text-white transition-colors">✕ Clear</button>
         )}
-        <button onClick={load} className="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg hover:bg-navy-700 transition-colors">↻ Refresh</button>
+        <button onClick={load} className="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg hover:bg-surface-sunken transition-colors">↻ Refresh</button>
         <button onClick={() => setShowNew(v => !v)}
-          className="ml-auto px-4 py-1.5 rounded-lg bg-gold text-white text-xs font-semibold hover:bg-gold-light transition-colors">
+          className="ml-auto px-4 py-1.5 rounded-lg bg-accent text-white text-xs font-semibold hover:bg-accent-hover transition-colors">
           + New Appointment
         </button>
       </div>
 
       {/* New appointment form */}
       {showNew && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5 space-y-4">
-          <p className="text-gold text-xs font-semibold uppercase tracking-wider">New Appointment</p>
+        <div className="bg-surface-sunken border border-line rounded-xl p-5 space-y-4">
+          <p className="text-accent text-xs font-semibold uppercase tracking-wider">New Appointment</p>
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Patient Name *',  key: 'patient_name',      type: 'text',  placeholder: 'Sarah Mitchell' },
@@ -1149,7 +1149,7 @@ export function AppointmentsTab({ clinicId }: { clinicId: string }) {
                 <label className="text-xs text-gray-500 font-medium block mb-1">{f.label}</label>
                 <input type={f.type} placeholder={f.placeholder}
                   value={(newForm as any)[f.key]} onChange={e => setNewForm(x => ({ ...x, [f.key]: e.target.value }))}
-                  className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50"
+                  className="w-full bg-surface border border-line rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50"
                 />
               </div>
             ))}
@@ -1159,7 +1159,7 @@ export function AppointmentsTab({ clinicId }: { clinicId: string }) {
             <div>
               <label className="text-xs text-gray-500 font-medium block mb-1">Assigned Dentist / Nurse (optional)</label>
               <select value={newForm.assigned_to} onChange={e => setNewForm(x => ({ ...x, assigned_to: e.target.value }))}
-                className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-gold/50">
+                className="w-full bg-surface border border-line rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-accent/50">
                 <option value="">— Unassigned —</option>
                 {staffList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
@@ -1167,24 +1167,24 @@ export function AppointmentsTab({ clinicId }: { clinicId: string }) {
           )}
           <textarea rows={2} placeholder="Notes (optional)" value={newForm.notes}
             onChange={e => setNewForm(x => ({ ...x, notes: e.target.value }))}
-            className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50 resize-none"
+            className="w-full bg-surface border border-line rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50 resize-none"
           />
           <div className="flex gap-2">
             <button onClick={createAppt} disabled={saving}
-              className="px-5 py-2 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light disabled:opacity-60 flex items-center gap-2">
-              {saving && <span className="w-3.5 h-3.5 border-2 border-navy-950 border-t-transparent rounded-full animate-spin" />}
+              className="px-5 py-2 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 flex items-center gap-2">
+              {saving && <span className="w-3.5 h-3.5 border-2 border-surface-page border-t-transparent rounded-full animate-spin" />}
               {saving ? 'Saving…' : 'Create Appointment'}
             </button>
-            <button onClick={() => setShowNew(false)} className="px-5 py-2 rounded-lg bg-navy-700 text-gray-400 text-sm hover:text-white transition-colors">Cancel</button>
+            <button onClick={() => setShowNew(false)} className="px-5 py-2 rounded-lg bg-surface-sunken text-gray-400 text-sm hover:text-white transition-colors">Cancel</button>
           </div>
         </div>
       )}
 
       {/* Appointments list */}
-      <div className="bg-navy-800 border border-navy-600 rounded-2xl overflow-hidden">
+      <div className="bg-surface-sunken border border-line rounded-2xl overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-14">
-            <div className="w-8 h-8 border-4 border-navy-600 border-t-gold rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-line border-t-accent rounded-full animate-spin" />
           </div>
         ) : appts.length === 0 ? (
           <div className="text-center py-14 text-gray-500">
@@ -1195,7 +1195,7 @@ export function AppointmentsTab({ clinicId }: { clinicId: string }) {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-navy-700">
+                <tr className="border-b border-surface-sunken">
                   {['Patient','Phone','Treatment','Date & Time','Branch','Clinic','Patient','Status','Actions'].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                   ))}
@@ -1210,7 +1210,7 @@ export function AppointmentsTab({ clinicId }: { clinicId: string }) {
                   const timeStr = (appt.appointmentTime as string).slice(0, 5); // "14:00"
                   const otherStatuses = (Object.keys(APPT_STATUS_CONFIG) as ApptStatus[]).filter(s => s !== appt.status);
                   return (
-                    <tr key={appt.id} className="border-b border-navy-700/50 hover:bg-navy-700/20 transition-colors">
+                    <tr key={appt.id} className="border-b border-surface-sunken/50 hover:bg-surface-sunken/20 transition-colors">
                       <td className="px-4 py-3 text-white text-sm font-medium">{appt.patientName}</td>
                       <td className="px-4 py-3 text-gray-400 text-sm">{appt.patientPhone}</td>
                       <td className="px-4 py-3 text-gray-300 text-sm">{appt.treatmentType || '—'}</td>
@@ -1462,7 +1462,7 @@ export default function ClinicDetailPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center space-y-3">
-          <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-gray-500 text-sm">Loading clinic…</p>
         </div>
       </div>
@@ -1473,7 +1473,7 @@ export default function ClinicDetailPage() {
     return (
       <div className="p-4 md:p-8 text-center">
         <p className="text-red-400">{error || 'Clinic not found'}</p>
-        <Link to="/clinics" className="text-gold text-sm mt-3 inline-block hover:underline">← Back to Clinics</Link>
+        <Link to="/clinics" className="text-accent text-sm mt-3 inline-block hover:underline">← Back to Clinics</Link>
       </div>
     );
   }
@@ -1501,8 +1501,8 @@ export default function ClinicDetailPage() {
         {/* Page header */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-navy-700 border border-navy-500 flex items-center justify-center shrink-0">
-              <Building2 size={28} className="text-gold" />
+            <div className="w-16 h-16 rounded-2xl bg-surface-sunken border border-line-strong flex items-center justify-center shrink-0">
+              <Building2 size={28} className="text-accent" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
@@ -1520,11 +1520,11 @@ export default function ClinicDetailPage() {
 
           <div className="flex gap-2 shrink-0">
             <button onClick={fetchClinic}
-              className="text-xs text-gold hover:text-gold-light px-3 py-1.5 border border-navy-600 rounded-lg transition-colors">
+              className="text-xs text-accent hover:text-accent-hover px-3 py-1.5 border border-line rounded-lg transition-colors">
               ↻
             </button>
             <button onClick={() => setShowEdit(true)}
-              className="text-xs bg-navy-700 hover:bg-navy-600 text-white px-4 py-1.5 border border-navy-500 rounded-lg transition-colors">
+              className="text-xs bg-surface-sunken hover:bg-line text-white px-4 py-1.5 border border-line-strong rounded-lg transition-colors">
               ✏ Edit
             </button>
             {isSuspended ? (
@@ -1557,22 +1557,22 @@ export default function ClinicDetailPage() {
           {[
             { label: 'Total Leads',   value: clinic.totalLeads,                         icon: <Users size={18} /> },
             { label: 'Booked',        value: clinic.bookedLeads,                         icon: <CheckCircle size={18} /> },
-            { label: 'Booking Rate',  value: `${clinic.bookingRate}%`,                   icon: <TrendingUp size={18} />, gold: true },
-            { label: 'Pipeline',      value: formatCurrency(clinic.mrrPipeline),         icon: <PoundSterling size={18} />, gold: true },
+            { label: 'Booking Rate',  value: `${clinic.bookingRate}%`,                   icon: <TrendingUp size={18} />, accent: true },
+            { label: 'Pipeline',      value: formatCurrency(clinic.mrrPipeline),         icon: <PoundSterling size={18} />, accent: true },
             { label: 'Avg Response',  value: formatResponseTime(clinic.avgResponseSecs), icon: <Zap size={18} /> },
           ].map(card => (
-            <div key={card.label} className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+            <div key={card.label} className="bg-surface-sunken border border-line rounded-xl p-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-gray-500 uppercase tracking-wider">{card.label}</span>
                 <span className="text-lg">{card.icon}</span>
               </div>
-              <p className={`text-2xl font-semibold ${card.gold ? 'text-gold' : 'text-white'}`}>{card.value}</p>
+              <p className={`text-2xl font-semibold ${card.accent ? 'text-accent' : 'text-white'}`}>{card.value}</p>
             </div>
           ))}
         </div>
 
         {/* Tab bar */}
-        <div className="flex gap-1 border-b border-navy-600 pb-0 flex-wrap">
+        <div className="flex gap-1 border-b border-line pb-0 flex-wrap">
           {([
             { value: 'overview',     label: 'Overview',      icon: Building2    },
             { value: 'ai_usage',     label: 'AI Usage',      icon: Bot          },
@@ -1584,7 +1584,7 @@ export default function ClinicDetailPage() {
               onClick={() => setActiveTab(tab.value)}
               className={`flex items-center px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 activeTab === tab.value
-                  ? 'border-gold text-gold'
+                  ? 'border-accent text-accent'
                   : 'border-transparent text-gray-500 hover:text-white'
               }`}
             >
@@ -1616,11 +1616,11 @@ export default function ClinicDetailPage() {
           <div className="lg:col-span-1 space-y-5">
 
             {/* Clinic Profile */}
-            <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-navy-600 flex items-center justify-between">
+            <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-line flex items-center justify-between">
                 <h2 className="text-white font-medium text-sm">Clinic Profile</h2>
                 <button onClick={() => setShowEdit(true)}
-                  className="text-xs text-gold hover:text-gold-light transition-colors">Edit</button>
+                  className="text-xs text-accent hover:text-accent-hover transition-colors">Edit</button>
               </div>
               <div className="px-5 py-4 space-y-3">
                 {([
@@ -1644,8 +1644,8 @@ export default function ClinicDetailPage() {
             </div>
 
             {/* WhatsApp Status */}
-            <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-navy-600 flex items-center justify-between">
+            <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-line flex items-center justify-between">
                 <h2 className="text-white font-medium text-sm">WhatsApp Integration</h2>
                 {!clinic.whatsapp.connected && (
                   <button
@@ -1666,7 +1666,7 @@ export default function ClinicDetailPage() {
                 {clinic.whatsapp.configs.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {clinic.whatsapp.configs.map(cfg => (
-                      <div key={cfg.id} className="bg-navy-700 rounded-lg px-3 py-2 flex items-center justify-between">
+                      <div key={cfg.id} className="bg-surface-sunken rounded-lg px-3 py-2 flex items-center justify-between">
                         <div>
                           <p className="text-white text-xs font-medium">{cfg.displayName}</p>
                           <p className="text-gray-500 text-xs mt-0.5">ID: {cfg.phoneNumberId}</p>
@@ -1723,15 +1723,15 @@ export default function ClinicDetailPage() {
             )}
 
             {/* Onboarding Checklist */}
-            <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-navy-600 flex items-center justify-between">
+            <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-line flex items-center justify-between">
                 <h2 className="text-white font-medium text-sm">Setup Progress</h2>
                 <span className="text-xs text-gray-500">{onboardingScore}/{onboardingSteps.length}</span>
               </div>
               {/* Progress bar */}
-              <div className="h-1 bg-navy-700">
+              <div className="h-1 bg-surface-sunken">
                 <div
-                  className="h-full bg-gold transition-all duration-500"
+                  className="h-full bg-accent transition-all duration-500"
                   style={{ width: `${(onboardingScore / onboardingSteps.length) * 100}%` }}
                 />
               </div>
@@ -1741,7 +1741,7 @@ export default function ClinicDetailPage() {
                     <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 text-xs transition-all ${
                       step.done
                         ? 'bg-green-900 border-green-600 text-green-400'
-                        : 'border-navy-500 text-transparent'
+                        : 'border-line-strong text-transparent'
                     }`}>
                       {step.done ? '✓' : ''}
                     </div>
@@ -1755,19 +1755,19 @@ export default function ClinicDetailPage() {
             </div>
 
             {/* AI Quota */}
-            <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-navy-600 flex items-center justify-between">
+            <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-line flex items-center justify-between">
                 <h2 className="text-white font-medium text-sm">AI Quota</h2>
                 {!quotaEdit ? (
                   isSuperAdmin && (
                     <button onClick={() => { setQuotaEdit(true); setQuotaForm({ monthlyLimit: clinic.aiMonthlyLimit, overagePolicy: clinic.aiOveragePolicy }); }}
-                      className="text-xs text-gold hover:text-gold-light transition-colors">Edit</button>
+                      className="text-xs text-accent hover:text-accent-hover transition-colors">Edit</button>
                   )
                 ) : (
                   <div className="flex gap-2">
                     <button onClick={() => setQuotaEdit(false)} className="text-xs text-gray-400 hover:text-white transition-colors">Cancel</button>
                     <button onClick={handleSaveQuota} disabled={quotaSaving}
-                      className="text-xs text-gold hover:text-gold-light transition-colors disabled:opacity-50">
+                      className="text-xs text-accent hover:text-accent-hover transition-colors disabled:opacity-50">
                       {quotaSaving ? 'Saving…' : 'Save'}
                     </button>
                   </div>
@@ -1783,14 +1783,14 @@ export default function ClinicDetailPage() {
                           {clinic.thisMonthAiMessages} / {clinic.aiMonthlyLimit.toLocaleString()}
                         </span>
                       </div>
-                      <div className="h-2 bg-navy-700 rounded-full overflow-hidden">
+                      <div className="h-2 bg-surface-sunken rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all ${
                             clinic.thisMonthAiMessages / clinic.aiMonthlyLimit > 0.9
                               ? 'bg-red-500'
                               : clinic.thisMonthAiMessages / clinic.aiMonthlyLimit > 0.7
                               ? 'bg-yellow-500'
-                              : 'bg-gold'
+                              : 'bg-accent'
                           }`}
                           style={{ width: `${Math.min(100, (clinic.thisMonthAiMessages / clinic.aiMonthlyLimit) * 100)}%` }}
                         />
@@ -1818,7 +1818,7 @@ export default function ClinicDetailPage() {
                         min={0}
                         value={quotaForm.monthlyLimit}
                         onChange={e => setQuotaForm(f => ({ ...f, monthlyLimit: parseInt(e.target.value) || 0 }))}
-                        className="w-full bg-navy-700 border border-navy-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-gold transition-colors"
+                        className="w-full bg-surface-sunken border border-line-strong rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent transition-colors"
                       />
                     </div>
                     <div>
@@ -1826,7 +1826,7 @@ export default function ClinicDetailPage() {
                       <select
                         value={quotaForm.overagePolicy}
                         onChange={e => setQuotaForm(f => ({ ...f, overagePolicy: e.target.value }))}
-                        className="w-full bg-navy-700 border border-navy-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-gold transition-colors"
+                        className="w-full bg-surface-sunken border border-line-strong rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent transition-colors"
                       >
                         <option value="block">Block — stop AI replies when limit hit</option>
                         <option value="notify">Notify — alert admin but continue</option>
@@ -1841,15 +1841,15 @@ export default function ClinicDetailPage() {
 
           {/* Right column — staff */}
           <div className="lg:col-span-2">
-            <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-navy-600 flex items-center justify-between">
+            <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-line flex items-center justify-between">
                 <div>
                   <h2 className="text-white font-medium">Staff Members</h2>
                   <p className="text-gray-500 text-xs mt-0.5">{clinic.staff.length} member{clinic.staff.length !== 1 ? 's' : ''}</p>
                 </div>
                 <button
                   onClick={() => setShowAddStaff(s => !s)}
-                  className="text-xs bg-gold hover:bg-gold-light text-white font-medium px-3 py-1.5 rounded-lg transition-colors"
+                  className="text-xs bg-accent hover:bg-accent-hover text-white font-medium px-3 py-1.5 rounded-lg transition-colors"
                 >
                   {showAddStaff ? '✕ Cancel' : '+ Add Staff'}
                 </button>
@@ -1875,11 +1875,11 @@ export default function ClinicDetailPage() {
                 </div>
               )}
 
-              <div className="divide-y divide-navy-600">
+              <div className="divide-y divide-line">
                 {clinic.staff.map(member => (
-                  <div key={member.id} className="px-6 py-4 flex items-center gap-4 hover:bg-navy-700 transition-colors group">
+                  <div key={member.id} className="px-6 py-4 flex items-center gap-4 hover:bg-surface-sunken transition-colors group">
                     {/* Avatar */}
-                    <div className="w-10 h-10 rounded-full bg-navy-600 border border-navy-500 flex items-center justify-center text-sm font-semibold text-white shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-line border border-line-strong flex items-center justify-center text-sm font-semibold text-white shrink-0">
                       {member.firstName[0]}{member.lastName?.[0] || ''}
                     </div>
 
@@ -1890,7 +1890,7 @@ export default function ClinicDetailPage() {
                           {member.firstName} {member.lastName}
                         </p>
                         {!member.isActive && (
-                          <span className="text-xs text-gray-500 bg-navy-700 px-1.5 py-0.5 rounded-full border border-navy-500">
+                          <span className="text-xs text-gray-500 bg-surface-sunken px-1.5 py-0.5 rounded-full border border-line-strong">
                             Inactive
                           </span>
                         )}
@@ -1937,7 +1937,7 @@ export default function ClinicDetailPage() {
                         <button
                           type="button"
                           onClick={e => { e.stopPropagation(); handleResetPassword(member.id); }}
-                          className="text-gray-500 hover:text-gold transition-colors text-sm p-1 rounded"
+                          className="text-gray-500 hover:text-accent transition-colors text-sm p-1 rounded"
                           title="Reset password"
                         >
                           <KeyRound size={16} />
@@ -1973,7 +1973,7 @@ export default function ClinicDetailPage() {
         </div>
 
         {/* Danger Zone — overview tab only */}
-        <div className={`bg-navy-800 border border-red-900/40 rounded-xl p-6 ${activeTab !== 'overview' ? 'hidden' : ''}`}>
+        <div className={`bg-surface-sunken border border-red-900/40 rounded-xl p-6 ${activeTab !== 'overview' ? 'hidden' : ''}`}>
           <h2 className="text-red-400 font-medium text-sm mb-4">Danger Zone</h2>
           <div className="flex items-center justify-between">
             <div>
@@ -2058,8 +2058,8 @@ export default function ClinicDetailPage() {
       {/* ── Edit Staff Modal ──────────────────────────────────────────────── */}
       {editStaffId && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="px-6 py-5 border-b border-navy-700 flex items-center justify-between">
+          <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="px-6 py-5 border-b border-surface-sunken flex items-center justify-between">
               <h3 className="text-white font-semibold">Edit Staff Member</h3>
               <button onClick={() => setEditStaffId(null)} className="text-gray-500 hover:text-white text-xl leading-none">✕</button>
             </div>
@@ -2079,7 +2079,7 @@ export default function ClinicDetailPage() {
                       value={editStaffForm[f.key]}
                       onChange={e => setEditStaffForm(x => ({ ...x, [f.key]: e.target.value }))}
                       placeholder={f.placeholder}
-                      className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50"
+                      className="w-full bg-surface border border-line rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50"
                     />
                   </div>
                 ))}
@@ -2091,7 +2091,7 @@ export default function ClinicDetailPage() {
                   value={editStaffForm.email}
                   onChange={e => setEditStaffForm(x => ({ ...x, email: e.target.value }))}
                   placeholder="jane@clinic.com"
-                  className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50"
+                  className="w-full bg-surface border border-line rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50"
                 />
               </div>
               <div>
@@ -2103,7 +2103,7 @@ export default function ClinicDetailPage() {
                   value={editStaffForm.phone}
                   onChange={e => setEditStaffForm(x => ({ ...x, phone: e.target.value }))}
                   placeholder="+447700900123"
-                  className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50"
+                  className="w-full bg-surface border border-line rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50"
                 />
               </div>
               <div>
@@ -2111,7 +2111,7 @@ export default function ClinicDetailPage() {
                 <select
                   value={editStaffForm.role}
                   onChange={e => setEditStaffForm(x => ({ ...x, role: e.target.value }))}
-                  className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-gold/50"
+                  className="w-full bg-surface border border-line rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-accent/50"
                 >
                   <option value="receptionist">Receptionist</option>
                   <option value="clinic_admin">Clinic Admin</option>
@@ -2127,14 +2127,14 @@ export default function ClinicDetailPage() {
               <button
                 onClick={saveEditStaff}
                 disabled={editStaffSaving}
-                className="flex-1 py-2.5 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light disabled:opacity-60 flex items-center justify-center gap-2"
+                className="flex-1 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 flex items-center justify-center gap-2"
               >
-                {editStaffSaving && <span className="w-3.5 h-3.5 border-2 border-navy-950 border-t-transparent rounded-full animate-spin" />}
+                {editStaffSaving && <span className="w-3.5 h-3.5 border-2 border-surface-page border-t-transparent rounded-full animate-spin" />}
                 {editStaffSaving ? 'Saving…' : 'Save Changes'}
               </button>
               <button
                 onClick={() => setEditStaffId(null)}
-                className="px-5 py-2.5 rounded-lg bg-navy-700 text-gray-400 text-sm hover:text-white transition-colors"
+                className="px-5 py-2.5 rounded-lg bg-surface-sunken text-gray-400 text-sm hover:text-white transition-colors"
               >
                 Cancel
               </button>

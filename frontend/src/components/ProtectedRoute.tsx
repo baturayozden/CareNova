@@ -25,8 +25,8 @@ export default function ProtectedRoute({ roles }: ProtectedRouteProps) {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-navy-950">
-        <div className="w-10 h-10 border-4 border-navy-600 border-t-gold rounded-full animate-spin" />
+      <div className="flex h-screen items-center justify-center bg-surface-page">
+        <div className="w-10 h-10 border-4 border-line border-t-accent rounded-full animate-spin" />
       </div>
     );
   }

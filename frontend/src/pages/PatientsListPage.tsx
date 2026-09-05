@@ -51,8 +51,8 @@ const STATUS_STYLES: Record<string, string> = {
   archived:  'bg-gray-800 text-gray-400',
 };
 
-const selectCls = 'bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-gold/50 cursor-pointer';
-const inputCls  = 'bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-gold/50';
+const selectCls = 'bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/50 cursor-pointer';
+const inputCls  = 'bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/50';
 
 const COLS = 'grid-cols-[1fr_140px_72px_90px_60px_80px_88px_24px]';
 
@@ -100,7 +100,7 @@ function JourneyBadge({ p }: { p: Patient }) {
     <div className="flex flex-col items-center gap-1 shrink-0">
       <div className="flex gap-1">
         {steps.map((checked, i) => (
-          <div key={i} className={`w-2 h-2 rounded-full ${checked ? 'bg-green-400' : 'bg-navy-600'}`} />
+          <div key={i} className={`w-2 h-2 rounded-full ${checked ? 'bg-green-400' : 'bg-line'}`} />
         ))}
       </div>
       <span className="text-[10px] text-gray-500">{done}/3</span>
@@ -130,7 +130,7 @@ function SortTh({ label, colSort, sort, onSort, className }: {
     <button
       onClick={handleClick}
       className={`flex items-center gap-0.5 uppercase tracking-widest text-[10px] font-semibold transition-colors ${
-        isActive ? 'text-gold' : 'text-gray-600 hover:text-gray-400'
+        isActive ? 'text-accent' : 'text-gray-600 hover:text-gray-400'
       } ${className ?? ''}`}
     >
       {label}
@@ -236,7 +236,7 @@ export default function PatientsListPage() {
         <div className="relative flex-1 min-w-[180px] max-w-xs">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
           <input
-            className="w-full bg-navy-800 border border-navy-600 rounded-lg pl-9 pr-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-gold/50"
+            className="w-full bg-surface-sunken border border-line rounded-lg pl-9 pr-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent/50"
             placeholder="Search by name, phone or email…"
             value={search}
             onChange={e => handleSearch(e.target.value)}
@@ -294,9 +294,9 @@ export default function PatientsListPage() {
           <p className="text-gray-500 text-sm">No patients match filters</p>
         </div>
       ) : (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
+        <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
           {/* Column headers */}
-          <div className={`hidden md:grid ${COLS} gap-3 px-5 py-2.5 border-b border-navy-700`}>
+          <div className={`hidden md:grid ${COLS} gap-3 px-5 py-2.5 border-b border-surface-sunken`}>
             <SortTh label="Patient"     colSort="name_asc"     sort={sort} onSort={handleSort} />
             <SortTh label="Assigned to" colSort="assigned_asc" sort={sort} onSort={handleSort} />
             <span className="uppercase tracking-widest text-[10px] font-semibold text-gray-600 text-right">Deals</span>
@@ -314,11 +314,11 @@ export default function PatientsListPage() {
               <button
                 key={p.id}
                 onClick={() => navigate(`/patients/${p.id}`)}
-                className={`w-full text-left hover:bg-navy-700 transition-colors ${i > 0 ? 'border-t border-navy-700' : ''}`}
+                className={`w-full text-left hover:bg-surface-sunken transition-colors ${i > 0 ? 'border-t border-surface-sunken' : ''}`}
               >
                 {/* Mobile */}
                 <div className="flex items-center gap-3 px-5 py-4 md:hidden">
-                  <div className="w-9 h-9 rounded-full bg-navy-700 flex items-center justify-center text-sm font-semibold text-gray-300 shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-surface-sunken flex items-center justify-center text-sm font-semibold text-gray-300 shrink-0">
                     {initials}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -337,7 +337,7 @@ export default function PatientsListPage() {
                 {/* Desktop */}
                 <div className={`hidden md:grid ${COLS} gap-3 items-center px-5 py-3.5`}>
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-navy-700 flex items-center justify-center text-xs font-semibold text-gray-300 shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-surface-sunken flex items-center justify-center text-xs font-semibold text-gray-300 shrink-0">
                       {initials}
                     </div>
                     <div className="min-w-0">
@@ -362,7 +362,7 @@ export default function PatientsListPage() {
                   </div>
 
                   <div className="text-right">
-                    <span className={`text-sm font-medium ${p.totalAgreed > 0 ? 'text-gold' : 'text-gray-600'}`}>
+                    <span className={`text-sm font-medium ${p.totalAgreed > 0 ? 'text-accent' : 'text-gray-600'}`}>
                       {fmtGBP(p.totalAgreed)}
                     </span>
                   </div>
@@ -395,7 +395,7 @@ export default function PatientsListPage() {
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-navy-600 rounded-lg disabled:opacity-30 transition-colors"
+            className="px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-line rounded-lg disabled:opacity-30 transition-colors"
           >
             ← Prev
           </button>
@@ -403,7 +403,7 @@ export default function PatientsListPage() {
           <button
             onClick={() => setPage(p => p + 1)}
             disabled={page >= totalPages}
-            className="px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-navy-600 rounded-lg disabled:opacity-30 transition-colors"
+            className="px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-line rounded-lg disabled:opacity-30 transition-colors"
           >
             Next →
           </button>

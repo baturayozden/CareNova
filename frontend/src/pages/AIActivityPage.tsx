@@ -98,11 +98,11 @@ function DeliveryProgress({ status, hasReply }: { status: string | null; hasRepl
           <div
             title={step.charAt(0).toUpperCase() + step.slice(1)}
             className={`w-2 h-2 rounded-full transition-all ${
-              i < done ? 'bg-gold' : 'bg-navy-600'
+              i < done ? 'bg-accent' : 'bg-line'
             }`}
           />
           {i < steps.length - 1 && (
-            <div className={`w-3 h-px ${i < done - 1 ? 'bg-gold' : 'bg-navy-600'}`} />
+            <div className={`w-3 h-px ${i < done - 1 ? 'bg-accent' : 'bg-line'}`} />
           )}
         </React.Fragment>
       ))}
@@ -176,8 +176,8 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
   const hasReply    = !!conv.lastReplyContent;
 
   return (
-    <div className={`bg-navy-800 border rounded-xl overflow-hidden transition-colors ${
-      conv.actionRequired ? 'border-yellow-800/60' : 'border-navy-600'
+    <div className={`bg-surface-sunken border rounded-xl overflow-hidden transition-colors ${
+      conv.actionRequired ? 'border-yellow-800/60' : 'border-line'
     }`}>
       {/* ── Card header ── */}
       <div className="px-5 py-4">
@@ -188,7 +188,7 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
             <div className={`w-10 h-10 rounded-full border flex items-center justify-center text-sm font-semibold shrink-0 ${
               conv.actionRequired
                 ? 'bg-yellow-950 border-yellow-700 text-yellow-300'
-                : 'bg-navy-700 border-navy-500 text-white'
+                : 'bg-surface-sunken border-line-strong text-white'
             }`}>
               {conv.patientName.charAt(0)}
             </div>
@@ -208,7 +208,7 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
                 <p className="text-xs text-gray-400 mt-0.5">
                   {conv.treatment}
                   {conv.treatmentValue != null && (
-                    <span className="text-gold ml-1">{formatCurrency(conv.treatmentValue)}</span>
+                    <span className="text-accent ml-1">{formatCurrency(conv.treatmentValue)}</span>
                   )}
                 </p>
               )}
@@ -270,7 +270,7 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
                 <button
                   onClick={handleTakeOver}
                   disabled={takingOver}
-                  className="text-xs text-gray-400 hover:text-white bg-navy-700 hover:bg-navy-600 border border-navy-500 px-2.5 py-1 rounded-lg transition-colors disabled:opacity-50"
+                  className="text-xs text-gray-400 hover:text-white bg-surface-sunken hover:bg-line border border-line-strong px-2.5 py-1 rounded-lg transition-colors disabled:opacity-50"
                 >
                   {takingOver ? '…' : 'Take Over'}
                 </button>
@@ -301,14 +301,14 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
       </div>
 
       {showReply && (
-        <div className="border-t border-navy-600 bg-navy-900 px-5 py-3 flex items-center gap-2" onClick={e => e.stopPropagation()}>
+        <div className="border-t border-line bg-surface px-5 py-3 flex items-center gap-2" onClick={e => e.stopPropagation()}>
           <input
             type="text"
             value={replyText}
             onChange={e => setReplyText(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') handleSendReply(e as any); }}
             placeholder="Type your message..."
-            className="flex-1 bg-navy-800 border border-navy-600 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#25D366]/50"
+            className="flex-1 bg-surface-sunken border border-line rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#25D366]/50"
             autoFocus
           />
           <button
@@ -323,10 +323,10 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
 
       {/* ── Expanded thread ── */}
       {expanded && (
-        <div className="border-t border-navy-600 bg-navy-900 px-5 py-4 max-h-80 overflow-y-auto space-y-3">
+        <div className="border-t border-line bg-surface px-5 py-4 max-h-80 overflow-y-auto space-y-3">
           {msgLoading ? (
             <div className="flex items-center justify-center py-4">
-              <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
             </div>
           ) : !messages?.length ? (
             <p className="text-gray-600 text-xs text-center py-3">No messages yet.</p>
@@ -337,16 +337,16 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
                 <div key={msg.id} className={`flex ${isOut ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs ${
                     isOut
-                      ? 'bg-gold text-white rounded-br-sm'
-                      : 'bg-navy-700 text-gray-200 rounded-bl-sm'
+                      ? 'bg-accent text-white rounded-br-sm'
+                      : 'bg-surface-sunken text-gray-200 rounded-bl-sm'
                   }`}>
                     <p className="leading-relaxed">{msg.content}</p>
                     <div className={`flex items-center gap-1 mt-1 ${isOut ? 'justify-end' : ''}`}>
-                      <span className={`text-[10px] ${isOut ? 'text-navy-700' : 'text-gray-500'}`}>
+                      <span className={`text-[10px] ${isOut ? 'text-white/70' : 'text-gray-500'}`}>
                         {new Date(msg.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       {isOut && msg.aiGenerated && (
-                        <span className="text-[10px] text-navy-700">· AI</span>
+                        <span className="text-[10px] text-white/70">· AI</span>
                       )}
                     </div>
                   </div>
@@ -439,7 +439,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
   }
 
   return (
-    <div className="bg-navy-800 border border-yellow-800/50 rounded-xl p-5">
+    <div className="bg-surface-sunken border border-yellow-800/50 rounded-xl p-5">
       <div className="flex items-start gap-4">
         <div className="w-10 h-10 rounded-full bg-yellow-950 border border-yellow-700 flex items-center justify-center text-yellow-300 font-semibold text-sm shrink-0">
           {conv.patientName.charAt(0)}
@@ -456,7 +456,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
           {conv.treatment && (
             <p className="text-gray-300 text-sm mt-1.5">
               Interested in <strong className="text-white">{conv.treatment}</strong>
-              {conv.treatmentValue && <span className="text-gold ml-1">{formatCurrency(conv.treatmentValue)}</span>}
+              {conv.treatmentValue && <span className="text-accent ml-1">{formatCurrency(conv.treatmentValue)}</span>}
               {' '}— hasn't booked yet
             </p>
           )}
@@ -504,9 +504,9 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
 
           {/* Inline compose box */}
           {composing && (
-            <div className="mt-3 bg-navy-900 border border-[#25D366]/20 rounded-xl overflow-hidden">
+            <div className="mt-3 bg-surface border border-[#25D366]/20 rounded-xl overflow-hidden">
               {/* Header */}
-              <div className="flex items-center gap-2 px-3 py-2 border-b border-navy-700">
+              <div className="flex items-center gap-2 px-3 py-2 border-b border-surface-sunken">
                 <MessageCircle size={14} className="text-[#25D366] shrink-0" />
                 <span className="text-gray-400 text-xs">
                   Sending as <strong className="text-gray-200">{conv.clinic}</strong> → {conv.patientName} ({conv.phone})
@@ -537,7 +537,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
               )}
 
               {/* Footer */}
-              <div className="flex items-center justify-between px-3 py-2 border-t border-navy-700 bg-navy-900/50">
+              <div className="flex items-center justify-between px-3 py-2 border-t border-surface-sunken bg-surface/50">
                 <span className="text-gray-600 text-xs">⌘↵ to send · Esc to cancel</span>
                 <div className="flex gap-2">
                   <button
@@ -631,7 +631,7 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
   const topScenarioCfg = c?.topScenario ? SCENARIO_CONFIG[c.topScenario] : null;
 
   return (
-    <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
+    <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
       {/* Header row */}
       <div className="px-6 py-4 flex items-center justify-between gap-4">
         <button
@@ -655,7 +655,7 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
             value={period}
             onChange={(e: ChangeEvent<HTMLSelectElement>) => setPeriod(e.target.value)}
             onClick={e => e.stopPropagation()}
-            className="bg-navy-700 border border-navy-500 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-gold transition-colors"
+            className="bg-surface-sunken border border-line-strong rounded-lg px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-accent transition-colors"
           >
             {PERIOD_OPTIONS.map(o => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -665,10 +665,10 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
           <button
             onClick={e => { e.stopPropagation(); onExport({ period, dateFrom, dateTo }); }}
             disabled={isExporting}
-            className="text-xs text-gold hover:text-gold-light border border-gold/30 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+            className="text-xs text-accent hover:text-accent-hover border border-accent/30 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
           >
             {isExporting
-              ? <span className="w-3 h-3 border border-gold border-t-transparent rounded-full animate-spin" />
+              ? <span className="w-3 h-3 border border-accent border-t-transparent rounded-full animate-spin" />
               : '↓'}
             Export CSV
           </button>
@@ -680,29 +680,29 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
 
       {/* Custom date pickers */}
       {period === 'custom' && (
-        <div className="px-6 pb-3 flex items-center gap-3 border-t border-navy-700">
+        <div className="px-6 pb-3 flex items-center gap-3 border-t border-surface-sunken">
           <span className="text-gray-500 text-xs">From</span>
           <input
             type="date"
             value={dateFrom}
             onChange={e => setDateFrom(e.target.value)}
-            className="bg-navy-700 border border-navy-500 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-gold transition-colors"
+            className="bg-surface-sunken border border-line-strong rounded-lg px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-accent transition-colors"
           />
           <span className="text-gray-500 text-xs">to</span>
           <input
             type="date"
             value={dateTo}
             onChange={e => setDateTo(e.target.value)}
-            className="bg-navy-700 border border-navy-500 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-gold transition-colors"
+            className="bg-surface-sunken border border-line-strong rounded-lg px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-accent transition-colors"
           />
         </div>
       )}
 
       {open && (
-        <div className="px-6 pb-5 border-t border-navy-600">
+        <div className="px-6 pb-5 border-t border-line">
           {loading ? (
             <div className="flex items-center justify-center py-8 gap-2">
-              <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
               <span className="text-gray-500 text-sm">Loading report…</span>
             </div>
           ) : !c ? (
@@ -717,7 +717,7 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
                     ? Math.round(Math.abs(s.cur - s.prev) / s.prev * 100)
                     : null;
                   return (
-                    <div key={s.label} className="bg-navy-700 border border-navy-500 rounded-xl p-4">
+                    <div key={s.label} className="bg-surface-sunken border border-line-strong rounded-xl p-4">
                       <p className="text-gray-500 text-xs mb-2">{s.label}</p>
                       <p className="text-white text-xl font-semibold">{s.fmt(s.cur)}</p>
                       <div className="flex items-center gap-1 mt-1">
@@ -752,24 +752,24 @@ function SummaryBar({ data, onPendingClick }: { data: ActivitySummaryData; onPen
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
       {([
-        { label: "Today's AI Messages", value: data.todayMessages,        icon: Bot,           gold: false },
-        { label: 'Leads Contacted',     value: data.todayLeadsContacted,  icon: Users,         gold: false },
-        { label: 'Reply Rate',          value: `${data.replyRate}%`,      icon: MessageCircle, gold: true  },
-        { label: 'Conversion Rate',     value: `${data.conversionRate}%`, icon: TrendingUp,    gold: true  },
+        { label: "Today's AI Messages", value: data.todayMessages,        icon: Bot,           accent: false },
+        { label: 'Leads Contacted',     value: data.todayLeadsContacted,  icon: Users,         accent: false },
+        { label: 'Reply Rate',          value: `${data.replyRate}%`,      icon: MessageCircle, accent: true  },
+        { label: 'Conversion Rate',     value: `${data.conversionRate}%`, icon: TrendingUp,    accent: true  },
         {
           label: 'Pending Actions',
           value: data.pendingActions,
           icon: AlertTriangle,
-          gold: false,
+          accent: false,
           badge: data.pendingActions > 0,
           clickable: true,
         },
-      ] as { label: string; value: string | number; icon: IconComponent; gold: boolean; badge?: boolean; clickable?: boolean }[]).map(card => (
+      ] as { label: string; value: string | number; icon: IconComponent; accent: boolean; badge?: boolean; clickable?: boolean }[]).map(card => (
         <div
           key={card.label}
           onClick={card.clickable ? onPendingClick : undefined}
-          className={`bg-navy-800 border rounded-xl p-4 ${'clickable' in card && card.clickable ? 'cursor-pointer hover:border-yellow-700/60 hover:bg-navy-700 transition-colors' : ''} ${
-            'badge' in card && card.badge ? 'border-yellow-800/50' : 'border-navy-600'
+          className={`bg-surface-sunken border rounded-xl p-4 ${'clickable' in card && card.clickable ? 'cursor-pointer hover:border-yellow-700/60 hover:bg-surface-sunken transition-colors' : ''} ${
+            'badge' in card && card.badge ? 'border-yellow-800/50' : 'border-line'
           }`}
         >
           <div className="flex items-center justify-between mb-2">
@@ -777,7 +777,7 @@ function SummaryBar({ data, onPendingClick }: { data: ActivitySummaryData; onPen
             {(() => { const Icon = card.icon; return <Icon size={20} className="text-gray-400" />; })()}
           </div>
           <div className="flex items-end gap-1.5">
-            <span className={`text-2xl font-semibold ${card.gold ? 'text-gold' : 'badge' in card && card.badge ? 'text-yellow-400' : 'text-white'}`}>
+            <span className={`text-2xl font-semibold ${card.accent ? 'text-accent' : 'badge' in card && card.badge ? 'text-yellow-400' : 'text-white'}`}>
               {card.value}
             </span>
             {'badge' in card && card.badge ? (
@@ -811,7 +811,7 @@ interface FiltersBarProps {
   isExporting: boolean;
 }
 
-const SEL = 'bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-gold transition-colors';
+const SEL = 'bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-accent transition-colors';
 
 function FiltersBar({ filters, clinicOptions, showClinicFilter, onChange, onExport, isExporting }: FiltersBarProps) {
   const set = (k: keyof Filters) => (e: React.ChangeEvent<HTMLSelectElement>) =>
@@ -869,10 +869,10 @@ function FiltersBar({ filters, clinicOptions, showClinicFilter, onChange, onExpo
       <button
         onClick={onExport}
         disabled={isExporting}
-        className="ml-auto flex items-center gap-1.5 text-xs text-gold hover:text-gold-light border border-gold/30 px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
+        className="ml-auto flex items-center gap-1.5 text-xs text-accent hover:text-accent-hover border border-accent/30 px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
       >
         {isExporting
-          ? <span className="w-3.5 h-3.5 border border-gold border-t-transparent rounded-full animate-spin" />
+          ? <span className="w-3.5 h-3.5 border border-accent border-t-transparent rounded-full animate-spin" />
           : '↓'}
         Export CSV
       </button>
@@ -905,7 +905,7 @@ function InsightsTab() {
 
   if (loading) return (
     <div className="flex items-center justify-center py-20">
-      <div className="w-7 h-7 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      <div className="w-7 h-7 border-2 border-accent border-t-transparent rounded-full animate-spin" />
     </div>
   );
   if (error || !data) return (
@@ -926,10 +926,10 @@ function InsightsTab() {
     <div className="space-y-5 pt-1">
 
       {/* Phase 2 banner */}
-      <div className="bg-navy-800 border border-gold/20 rounded-xl px-5 py-3 flex items-center gap-3">
-        <Rocket size={24} className="text-gold shrink-0" />
+      <div className="bg-surface-sunken border border-accent/20 rounded-xl px-5 py-3 flex items-center gap-3">
+        <Rocket size={24} className="text-accent shrink-0" />
         <div>
-          <p className="text-gold text-sm font-medium">Phase 2 Analytics — Live Preview</p>
+          <p className="text-accent text-sm font-medium">Phase 2 Analytics — Live Preview</p>
           <p className="text-gray-500 text-xs">Advanced ML-powered insights and cross-clinic benchmarking coming soon.</p>
         </div>
       </div>
@@ -944,8 +944,8 @@ function InsightsTab() {
               onClick={() => setPeriod(p.value)}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
                 period === p.value
-                  ? 'bg-gold text-white border-gold font-medium'
-                  : 'border-navy-600 text-gray-400 hover:text-white hover:border-navy-500'
+                  ? 'bg-accent text-white border-accent font-medium'
+                  : 'border-line text-gray-400 hover:text-white hover:border-line-strong'
               }`}
             >
               {p.label}
@@ -958,7 +958,7 @@ function InsightsTab() {
       <div className="grid grid-cols-2 gap-5">
 
         {/* Top Objections */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5">
           <p className="text-white font-medium text-sm mb-4">Top Patient Objections</p>
           {topObjections.length === 0 ? (
             <p className="text-gray-600 text-xs">No objection data yet.</p>
@@ -975,7 +975,7 @@ function InsightsTab() {
                       </span>
                       <span className="text-gray-400 text-xs font-medium">{obj.count}</span>
                     </div>
-                    <div className="h-1.5 bg-navy-700 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-surface-sunken rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all ${cfg?.color.split(' ')[0] ?? 'bg-gray-500'}`}
                         style={{ width: `${(obj.count / maxObjection) * 100}%` }}
@@ -989,7 +989,7 @@ function InsightsTab() {
         </div>
 
         {/* Language Distribution */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5">
           <p className="text-white font-medium text-sm mb-4">Language Distribution</p>
           {languageDistribution.length === 0 ? (
             <p className="text-gray-600 text-xs">No data yet.</p>
@@ -1003,8 +1003,8 @@ function InsightsTab() {
                     </span>
                     <span className="text-gray-400 text-xs">{l.count} <span className="text-gray-600">({l.pct}%)</span></span>
                   </div>
-                  <div className="h-1.5 bg-navy-700 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full bg-gold" style={{ width: `${l.pct}%` }} />
+                  <div className="h-1.5 bg-surface-sunken rounded-full overflow-hidden">
+                    <div className="h-full rounded-full bg-accent" style={{ width: `${l.pct}%` }} />
                   </div>
                 </div>
               ))}
@@ -1017,12 +1017,12 @@ function InsightsTab() {
       <div className="grid grid-cols-2 gap-5">
 
         {/* Scenario Performance */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5">
           <p className="text-white font-medium text-sm mb-4">Scenario Conversion Rates</p>
           {scenarioPerformance.length === 0 ? (
             <p className="text-gray-600 text-xs">No scenario data yet.</p>
           ) : (
-            <div className="divide-y divide-navy-700">
+            <div className="divide-y divide-surface-sunken">
               {scenarioPerformance.map(s => {
                 const cfg = SCENARIO_CONFIG[s.scenario];
                 return (
@@ -1044,7 +1044,7 @@ function InsightsTab() {
         </div>
 
         {/* Lead Funnel */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5">
           <p className="text-white font-medium text-sm mb-4">Lead Funnel</p>
           {funnel.length === 0 ? (
             <p className="text-gray-600 text-xs">No funnel data yet.</p>
@@ -1058,9 +1058,9 @@ function InsightsTab() {
                       <span className="text-gray-300 text-xs capitalize">{stage.stage}</span>
                       <span className="text-gray-400 text-xs">{stage.count} <span className="text-gray-600">({stage.pct}%)</span></span>
                     </div>
-                    <div className="h-1.5 bg-navy-700 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-surface-sunken rounded-full overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-gold transition-all"
+                        className="h-full rounded-full bg-accent transition-all"
                         style={{ width: `${stage.pct}%` }}
                       />
                     </div>
@@ -1073,7 +1073,7 @@ function InsightsTab() {
       </div>
 
       {/* Row 3: Clinic Activity Leaderboard */}
-      <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+      <div className="bg-surface-sunken border border-line rounded-xl p-5">
         <p className="text-white font-medium text-sm mb-4">Clinic Activity Leaderboard</p>
         {clinicActivity.length === 0 ? (
           <p className="text-gray-600 text-xs">No clinic data yet.</p>
@@ -1081,7 +1081,7 @@ function InsightsTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="text-gray-500 uppercase tracking-wider text-[10px] border-b border-navy-600">
+                <tr className="text-gray-500 uppercase tracking-wider text-[10px] border-b border-line">
                   <th className="text-left pb-2 font-medium">Clinic</th>
                   <th className="text-right pb-2 font-medium">Leads</th>
                   <th className="text-right pb-2 font-medium">AI Messages</th>
@@ -1090,18 +1090,18 @@ function InsightsTab() {
                   <th className="pb-2 pl-4" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-700">
+              <tbody className="divide-y divide-surface-sunken">
                 {clinicActivity.map(c => (
-                  <tr key={c.clinicId} className="hover:bg-navy-700 transition-colors">
+                  <tr key={c.clinicId} className="hover:bg-surface-sunken transition-colors">
                     <td className="py-2.5 text-gray-200 font-medium">{c.clinicName}</td>
                     <td className="py-2.5 text-right text-gray-300">{c.leads}</td>
                     <td className="py-2.5 text-right text-gray-300">{c.aiMessages}</td>
                     <td className="py-2.5 text-right text-gray-300">{c.bookings}</td>
-                    <td className="py-2.5 text-right text-gold font-semibold">{c.conversionRate.toFixed(1)}%</td>
+                    <td className="py-2.5 text-right text-accent font-semibold">{c.conversionRate.toFixed(1)}%</td>
                     <td className="py-2.5 pl-4">
-                      <div className="w-20 h-1.5 bg-navy-700 rounded-full overflow-hidden">
+                      <div className="w-20 h-1.5 bg-surface-sunken rounded-full overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gold"
+                          className="h-full rounded-full bg-accent"
                           style={{ width: `${(c.aiMessages / maxActivity) * 100}%` }}
                         />
                       </div>
@@ -1115,7 +1115,7 @@ function InsightsTab() {
       </div>
 
       {/* Row 4: Sentiment Trend */}
-      <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+      <div className="bg-surface-sunken border border-line rounded-xl p-5">
         <p className="text-white font-medium text-sm mb-4">Sentiment Trend <span className="text-gray-500 font-normal">(by week)</span></p>
         {sentimentTrend.length === 0 ? (
           <p className="text-gray-600 text-xs">No sentiment data yet.</p>
@@ -1327,7 +1327,7 @@ export default function AIActivityPage() {
           {isLoading ? (
             <Spinner />
           ) : actionItems.length === 0 ? (
-            <div className="bg-navy-800 border border-navy-600 rounded-xl py-16 text-center">
+            <div className="bg-surface-sunken border border-line rounded-xl py-16 text-center">
               <p className="text-3xl mb-3">🎉</p>
               <p className="text-white font-medium">All caught up!</p>
               <p className="text-gray-500 text-sm mt-1">No action required right now.</p>
@@ -1360,7 +1360,7 @@ export default function AIActivityPage() {
           </div>
           <button
             onClick={fetchAll}
-            className="text-xs text-gold hover:text-gold-light px-3 py-1.5 border border-navy-600 rounded-lg transition-colors mt-1"
+            className="text-xs text-accent hover:text-accent-hover px-3 py-1.5 border border-line rounded-lg transition-colors mt-1"
           >
             ↻ Refresh
           </button>
@@ -1404,7 +1404,7 @@ export default function AIActivityPage() {
         {/* Tab bar + filters */}
         <div className="space-y-3">
           {/* Tabs */}
-          <div className="flex gap-2 border-b border-navy-600 pb-0">
+          <div className="flex gap-2 border-b border-line pb-0">
             {([
               { value: 'all',             label: `All Conversations (${total})` },
               { value: 'action_required', label: `Action Required (${actionCount})`, alert: actionCount > 0 },
@@ -1415,7 +1415,7 @@ export default function AIActivityPage() {
                 onClick={() => setActiveTab(tab.value)}
                 className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
                   activeTab === tab.value
-                    ? 'border-gold text-gold'
+                    ? 'border-accent text-accent'
                     : 'border-transparent text-gray-500 hover:text-white'
                 }`}
               >
@@ -1446,7 +1446,7 @@ export default function AIActivityPage() {
         {activeTab !== 'insights' && (isLoading ? (
           <Spinner />
         ) : conversations.length === 0 ? (
-          <div className="bg-navy-800 border border-navy-600 rounded-xl py-16 text-center">
+          <div className="bg-surface-sunken border border-line rounded-xl py-16 text-center">
             <div className="mb-3"><Bot size={48} className="mx-auto text-gray-400" /></div>
             <p className="text-white font-medium">No conversations match your filters</p>
             <p className="text-gray-500 text-sm mt-1">Try adjusting the date range or filters above.</p>
@@ -1480,7 +1480,7 @@ export default function AIActivityPage() {
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="text-xs px-3 py-1.5 border border-navy-600 rounded-lg text-gray-400 hover:text-white disabled:opacity-40 transition-colors"
+              className="text-xs px-3 py-1.5 border border-line rounded-lg text-gray-400 hover:text-white disabled:opacity-40 transition-colors"
             >
               ← Prev
             </button>
@@ -1488,7 +1488,7 @@ export default function AIActivityPage() {
             <button
               onClick={() => setPage(p => Math.min(pages, p + 1))}
               disabled={page === pages}
-              className="text-xs px-3 py-1.5 border border-navy-600 rounded-lg text-gray-400 hover:text-white disabled:opacity-40 transition-colors"
+              className="text-xs px-3 py-1.5 border border-line rounded-lg text-gray-400 hover:text-white disabled:opacity-40 transition-colors"
             >
               Next →
             </button>
@@ -1503,7 +1503,7 @@ function Spinner() {
   return (
     <div className="flex items-center justify-center py-20">
       <div className="text-center space-y-3">
-        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
         <p className="text-gray-500 text-sm">Loading activity…</p>
       </div>
     </div>

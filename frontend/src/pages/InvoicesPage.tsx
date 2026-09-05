@@ -79,8 +79,8 @@ const DATE_OPTIONS = [
 ];
 
 const ctrl =
-  'h-10 bg-navy-800 border border-navy-600 text-white rounded-lg px-3 text-sm ' +
-  'focus:outline-none focus:border-gold transition-colors';
+  'h-10 bg-surface-sunken border border-line text-white rounded-lg px-3 text-sm ' +
+  'focus:outline-none focus:border-accent transition-colors';
 
 const EMPTY_SUMMARY: InvoiceSummary = { paidLast30: 0, unpaidCount: 0, unpaidTotal: 0, draftCount: 0 };
 
@@ -245,7 +245,7 @@ function RowMenu({ invoice, onSend, onEdit, onFinalize, onDelete, onPaymentChang
       <button
         ref={btnRef}
         onClick={e => { e.stopPropagation(); handleToggle(); }}
-        className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-navy-700 transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors"
       >
         <MoreHorizontal size={16} />
       </button>
@@ -253,33 +253,33 @@ function RowMenu({ invoice, onSend, onEdit, onFinalize, onDelete, onPaymentChang
         <div
           ref={menuRef}
           style={{ top: menuPos.top, right: menuPos.right }}
-          className="fixed w-48 bg-navy-800 border border-navy-600 rounded-xl shadow-xl z-50 overflow-hidden"
+          className="fixed w-48 bg-surface-sunken border border-line rounded-xl shadow-xl z-50 overflow-hidden"
           onClick={e => e.stopPropagation()}
         >
           {isDraft ? (
             <>
               <button
                 onClick={() => { setOpen(false); onEdit(invoice); }}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-navy-700 transition-colors"
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-surface-sunken transition-colors"
               >
                 <Edit size={14} /> Edit draft
               </button>
               <button
                 onClick={handleView}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-navy-700 transition-colors"
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-surface-sunken transition-colors"
               >
                 <Eye size={14} /> Preview PDF
               </button>
               <button
                 onClick={() => { setOpen(false); onFinalize(invoice); }}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-navy-700 transition-colors"
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-surface-sunken transition-colors"
               >
                 <Check size={14} /> Finalize
               </button>
-              <div className="border-t border-navy-700" />
+              <div className="border-t border-surface-sunken" />
               <button
                 onClick={() => { setOpen(false); onDelete(invoice); }}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-navy-700 transition-colors"
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-surface-sunken transition-colors"
               >
                 <Trash2 size={14} /> Delete draft
               </button>
@@ -288,32 +288,32 @@ function RowMenu({ invoice, onSend, onEdit, onFinalize, onDelete, onPaymentChang
             <>
               <button
                 onClick={handleView}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-navy-700 transition-colors"
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-surface-sunken transition-colors"
               >
                 <Eye size={14} /> View invoice
               </button>
               <button
                 onClick={handleDownload}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-navy-700 transition-colors"
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-surface-sunken transition-colors"
               >
                 <Download size={14} /> Download PDF
               </button>
               {invoice.patient_email && (
                 <button
                   onClick={() => { setOpen(false); onSend(invoice); }}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-navy-700 transition-colors"
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-surface-sunken transition-colors"
                 >
                   <Send size={14} /> Send email
                 </button>
               )}
-              <div className="border-t border-navy-700" />
+              <div className="border-t border-surface-sunken" />
               <button
                 onClick={handleMarkPaid}
                 disabled={markingPaid}
                 className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm transition-colors disabled:opacity-50 ${
                   invoice.payment_status === 'unpaid'
-                    ? 'text-green-400 hover:text-green-300 hover:bg-navy-700'
-                    : 'text-amber-400 hover:text-amber-300 hover:bg-navy-700'
+                    ? 'text-green-400 hover:text-green-300 hover:bg-surface-sunken'
+                    : 'text-amber-400 hover:text-amber-300 hover:bg-surface-sunken'
                 }`}
               >
                 <CreditCard size={14} />
@@ -330,8 +330,8 @@ function RowMenu({ invoice, onSend, onEdit, onFinalize, onDelete, onPaymentChang
 // ── Shared input style ────────────────────────────────────────────────────────
 
 const inputCls =
-  'w-full bg-navy-800 border border-navy-600 text-white rounded-lg px-3 py-2.5 text-sm ' +
-  'focus:outline-none focus:border-gold transition-colors';
+  'w-full bg-surface-sunken border border-line text-white rounded-lg px-3 py-2.5 text-sm ' +
+  'focus:outline-none focus:border-accent transition-colors';
 
 // ── Create Invoice Modal ──────────────────────────────────────────────────────
 
@@ -434,10 +434,10 @@ function CreateInvoiceModal({ onClose, onCreated }: CreateModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-      <div className="bg-navy-900 border border-navy-600 rounded-2xl w-full max-w-xl shadow-2xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-navy-600 shrink-0">
+      <div className="bg-surface border border-line rounded-2xl w-full max-w-xl shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-line shrink-0">
           <h2 className="text-white font-semibold text-lg flex items-center gap-2">
-            <FileText size={18} className="text-gold" /> Create Invoice
+            <FileText size={18} className="text-accent" /> Create Invoice
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
             <X size={20} />
@@ -450,7 +450,7 @@ function CreateInvoiceModal({ onClose, onCreated }: CreateModalProps) {
               key={t}
               onClick={() => setTab(t)}
               className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                tab === t ? 'bg-navy-700 text-white' : 'text-gray-400 hover:text-white'
+                tab === t ? 'bg-surface-sunken text-white' : 'text-gray-400 hover:text-white'
               }`}
             >
               {t === 'case' ? 'From treatment case' : 'Manual entry'}
@@ -471,7 +471,7 @@ function CreateInvoiceModal({ onClose, onCreated }: CreateModalProps) {
                   className={`${inputCls} pl-8`}
                 />
               </div>
-              <div className="max-h-40 overflow-y-auto space-y-1 border border-navy-700 rounded-lg p-1">
+              <div className="max-h-40 overflow-y-auto space-y-1 border border-surface-sunken rounded-lg p-1">
                 {filteredCases.length === 0 && (
                   <p className="text-gray-500 text-sm px-2 py-3 text-center">No cases found</p>
                 )}
@@ -481,8 +481,8 @@ function CreateInvoiceModal({ onClose, onCreated }: CreateModalProps) {
                     onClick={() => selectCase(c)}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                       selectedCase?.id === c.id
-                        ? 'bg-gold/20 border border-gold/40 text-white'
-                        : 'text-gray-300 hover:bg-navy-700'
+                        ? 'bg-accent/20 border border-accent/40 text-white'
+                        : 'text-gray-300 hover:bg-surface-sunken'
                     }`}
                   >
                     <span className="font-medium">{c.patient_name ?? '—'}</span>
@@ -530,7 +530,7 @@ function CreateInvoiceModal({ onClose, onCreated }: CreateModalProps) {
                     <input
                       type="radio" name="payStatus" value={s}
                       checked={payStatus === s} onChange={() => setPayStatus(s)}
-                      className="accent-gold"
+                      className="accent-accent"
                     />
                     {s === 'paid' ? 'Paid' : 'Unpaid'}
                   </label>
@@ -557,11 +557,11 @@ function CreateInvoiceModal({ onClose, onCreated }: CreateModalProps) {
           </div>
 
           {/* VAT toggle */}
-          <div className="rounded-lg border border-navy-600 bg-navy-800/50 px-4 py-3">
+          <div className="rounded-lg border border-line bg-surface-sunken/50 px-4 py-3">
             <label className="flex items-center gap-3 cursor-pointer select-none">
               <div
                 onClick={() => setVatApplied(v => !v)}
-                className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${vatApplied ? 'bg-gold' : 'bg-navy-600'}`}
+                className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${vatApplied ? 'bg-accent' : 'bg-line'}`}
               >
                 <div className={`w-4 h-4 rounded-full bg-white transition-transform ${vatApplied ? 'translate-x-4' : 'translate-x-0'}`} />
               </div>
@@ -577,7 +577,7 @@ function CreateInvoiceModal({ onClose, onCreated }: CreateModalProps) {
                   <span>VAT (20%)</span>
                   <span>€{vatBreakdown.vat}</span>
                 </div>
-                <div className="flex justify-between text-white font-medium border-t border-navy-600 pt-0.5 mt-1">
+                <div className="flex justify-between text-white font-medium border-t border-line pt-0.5 mt-1">
                   <span>Total</span>
                   <span>€{vatBreakdown.total}</span>
                 </div>
@@ -594,18 +594,18 @@ function CreateInvoiceModal({ onClose, onCreated }: CreateModalProps) {
           {error && <p className="text-red-400 text-sm">{error}</p>}
         </div>
 
-        <div className="flex gap-3 px-6 py-4 border-t border-navy-600 shrink-0">
+        <div className="flex gap-3 px-6 py-4 border-t border-line shrink-0">
           <button
             onClick={() => submit('draft')}
             disabled={submitting}
-            className="px-4 bg-navy-700 hover:bg-navy-600 text-gray-300 hover:text-white font-medium py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60 whitespace-nowrap"
+            className="px-4 bg-surface-sunken hover:bg-line text-gray-300 hover:text-white font-medium py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60 whitespace-nowrap"
           >
             Save as Draft
           </button>
           <button
             onClick={() => submit('create')}
             disabled={submitting}
-            className="flex-1 bg-gold hover:bg-gold-light text-white font-semibold py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60"
+            className="flex-1 bg-accent hover:bg-accent-hover text-white font-semibold py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60"
           >
             {submitting ? 'Creating…' : 'Create'}
           </button>
@@ -675,10 +675,10 @@ function EditInvoiceModal({ invoice, onClose, onUpdated }: EditModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-      <div className="bg-navy-900 border border-navy-600 rounded-2xl w-full max-w-xl shadow-2xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-navy-600 shrink-0">
+      <div className="bg-surface border border-line rounded-2xl w-full max-w-xl shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-line shrink-0">
           <h2 className="text-white font-semibold text-lg flex items-center gap-2">
-            <Edit size={18} className="text-gold" /> Edit Draft
+            <Edit size={18} className="text-accent" /> Edit Draft
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
             <X size={20} />
@@ -718,7 +718,7 @@ function EditInvoiceModal({ invoice, onClose, onUpdated }: EditModalProps) {
                     <input
                       type="radio" name="editPayStatus" value={s}
                       checked={payStatus === s} onChange={() => setPayStatus(s)}
-                      className="accent-gold"
+                      className="accent-accent"
                     />
                     {s === 'paid' ? 'Paid' : 'Unpaid'}
                   </label>
@@ -745,11 +745,11 @@ function EditInvoiceModal({ invoice, onClose, onUpdated }: EditModalProps) {
           </div>
 
           {/* VAT toggle */}
-          <div className="rounded-lg border border-navy-600 bg-navy-800/50 px-4 py-3">
+          <div className="rounded-lg border border-line bg-surface-sunken/50 px-4 py-3">
             <label className="flex items-center gap-3 cursor-pointer select-none">
               <div
                 onClick={() => setVatApplied(v => !v)}
-                className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${vatApplied ? 'bg-gold' : 'bg-navy-600'}`}
+                className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${vatApplied ? 'bg-accent' : 'bg-line'}`}
               >
                 <div className={`w-4 h-4 rounded-full bg-white transition-transform ${vatApplied ? 'translate-x-4' : 'translate-x-0'}`} />
               </div>
@@ -765,7 +765,7 @@ function EditInvoiceModal({ invoice, onClose, onUpdated }: EditModalProps) {
                   <span>VAT (20%)</span>
                   <span>€{vatBreakdown.vat}</span>
                 </div>
-                <div className="flex justify-between text-white font-medium border-t border-navy-600 pt-0.5 mt-1">
+                <div className="flex justify-between text-white font-medium border-t border-line pt-0.5 mt-1">
                   <span>Total</span>
                   <span>€{vatBreakdown.total}</span>
                 </div>
@@ -782,13 +782,13 @@ function EditInvoiceModal({ invoice, onClose, onUpdated }: EditModalProps) {
           {error && <p className="text-red-400 text-sm">{error}</p>}
         </div>
 
-        <div className="flex gap-3 px-6 py-4 border-t border-navy-600 shrink-0">
+        <div className="flex gap-3 px-6 py-4 border-t border-line shrink-0">
           <button onClick={onClose} disabled={submitting}
-            className="px-5 bg-navy-700 hover:bg-navy-600 text-gray-300 hover:text-white font-medium py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60">
+            className="px-5 bg-surface-sunken hover:bg-line text-gray-300 hover:text-white font-medium py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60">
             Cancel
           </button>
           <button onClick={handleSave} disabled={submitting}
-            className="flex-1 bg-gold hover:bg-gold-light text-white font-semibold py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60">
+            className="flex-1 bg-accent hover:bg-accent-hover text-white font-semibold py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60">
             {submitting ? 'Saving…' : 'Save Changes'}
           </button>
         </div>
@@ -828,10 +828,10 @@ function ConfirmFinalizeModal({ invoice, onClose, onFinalized }: FinalizeModalPr
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-      <div className="bg-navy-900 border border-navy-600 rounded-2xl w-full max-w-sm shadow-2xl p-6">
+      <div className="bg-surface border border-line rounded-2xl w-full max-w-sm shadow-2xl p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-gold/15 flex items-center justify-center shrink-0">
-            <Check size={18} className="text-gold" />
+          <div className="w-10 h-10 rounded-full bg-accent/15 flex items-center justify-center shrink-0">
+            <Check size={18} className="text-accent" />
           </div>
           <div>
             <p className="text-white font-semibold">Finalize invoice?</p>
@@ -839,7 +839,7 @@ function ConfirmFinalizeModal({ invoice, onClose, onFinalized }: FinalizeModalPr
           </div>
         </div>
 
-        <div className="bg-navy-800 rounded-xl px-4 py-3 mb-4 text-sm space-y-1">
+        <div className="bg-surface-sunken rounded-xl px-4 py-3 mb-4 text-sm space-y-1">
           <p className="text-white font-medium">{invoice.patient_name ?? '—'}</p>
           <p className="text-gray-400">{fmtGBP(invoice.amount)}</p>
           {invoice.treatment_description && (
@@ -866,12 +866,12 @@ function ConfirmFinalizeModal({ invoice, onClose, onFinalized }: FinalizeModalPr
           <button
             onClick={() => handleFinalize(false)}
             disabled={submitting}
-            className="w-full bg-gold hover:bg-gold-light text-white font-semibold py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60"
+            className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60"
           >
             {submitting ? 'Finalizing…' : 'Finalize'}
           </button>
           <button onClick={onClose} disabled={submitting}
-            className="w-full bg-navy-700 hover:bg-navy-600 text-gray-300 py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60">
+            className="w-full bg-surface-sunken hover:bg-line text-gray-300 py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60">
             Cancel
           </button>
         </div>
@@ -907,7 +907,7 @@ function ConfirmDeleteModal({ invoice, onClose, onDeleted }: DeleteModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-      <div className="bg-navy-900 border border-navy-600 rounded-2xl w-full max-w-sm shadow-2xl p-6">
+      <div className="bg-surface border border-line rounded-2xl w-full max-w-sm shadow-2xl p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-red-500/15 flex items-center justify-center shrink-0">
             <Trash2 size={18} className="text-red-400" />
@@ -924,7 +924,7 @@ function ConfirmDeleteModal({ invoice, onClose, onDeleted }: DeleteModalProps) {
         {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
         <div className="flex gap-3 mt-5">
           <button onClick={onClose} disabled={deleting}
-            className="flex-1 bg-navy-700 hover:bg-navy-600 text-gray-300 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-60">
+            className="flex-1 bg-surface-sunken hover:bg-line text-gray-300 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-60">
             Cancel
           </button>
           <button onClick={handleDelete} disabled={deleting}
@@ -966,12 +966,12 @@ function SendConfirmModal({ invoice, onClose }: { invoice: Invoice; onClose: () 
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-      <div className="bg-navy-900 border border-navy-600 rounded-2xl w-full max-w-sm shadow-2xl p-6">
+      <div className="bg-surface border border-line rounded-2xl w-full max-w-sm shadow-2xl p-6">
         {done ? (
           <>
             <p className="text-white font-semibold mb-2">Invoice sent</p>
             <p className="text-gray-400 text-sm mb-5">Email delivered to {invoice.patient_email}.</p>
-            <button onClick={onClose} className="w-full bg-navy-700 hover:bg-navy-600 text-white py-2.5 rounded-lg text-sm font-medium transition-colors">Close</button>
+            <button onClick={onClose} className="w-full bg-surface-sunken hover:bg-line text-white py-2.5 rounded-lg text-sm font-medium transition-colors">Close</button>
           </>
         ) : (
           <>
@@ -980,7 +980,7 @@ function SendConfirmModal({ invoice, onClose }: { invoice: Invoice; onClose: () 
             <p className="text-gray-500 text-sm mb-5">To: {invoice.patient_email}</p>
             {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
             <div className="flex gap-3">
-              <button onClick={onClose} disabled={sending} className="flex-1 bg-navy-700 hover:bg-navy-600 text-white py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-60">Cancel</button>
+              <button onClick={onClose} disabled={sending} className="flex-1 bg-surface-sunken hover:bg-line text-white py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-60">Cancel</button>
               <button onClick={handleSend} disabled={sending} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-60">
                 {sending ? 'Sending…' : 'Send'}
               </button>
@@ -1101,13 +1101,13 @@ function InvoiceDetailModal({ invoice, onClose, onEdit, onFinalize, onDelete, on
       onClick={onClose}
     >
       <div
-        className="bg-navy-900 border border-navy-600 rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh]"
+        className="bg-surface border border-line rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh]"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-navy-600 shrink-0">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-line shrink-0">
           <h2 className="text-white font-semibold text-lg flex items-center gap-2">
-            <FileText size={18} className="text-gold" />
+            <FileText size={18} className="text-accent" />
             {invoice.invoice_number ?? 'Draft Invoice'}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
@@ -1128,18 +1128,18 @@ function InvoiceDetailModal({ invoice, onClose, onEdit, onFinalize, onDelete, on
         </div>
 
         {/* Actions */}
-        <div className="px-6 py-4 border-t border-navy-600 shrink-0 space-y-2">
+        <div className="px-6 py-4 border-t border-line shrink-0 space-y-2">
           {/* PDF row */}
           <div className="flex gap-2">
             <button
               onClick={handleViewPdf}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-navy-700 hover:bg-navy-600 text-gray-300 hover:text-white py-2 rounded-lg text-sm transition-colors"
+              className="flex-1 flex items-center justify-center gap-1.5 bg-surface-sunken hover:bg-line text-gray-300 hover:text-white py-2 rounded-lg text-sm transition-colors"
             >
               <Eye size={14} /> View PDF
             </button>
             <button
               onClick={handleDownloadPdf}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-navy-700 hover:bg-navy-600 text-gray-300 hover:text-white py-2 rounded-lg text-sm transition-colors"
+              className="flex-1 flex items-center justify-center gap-1.5 bg-surface-sunken hover:bg-line text-gray-300 hover:text-white py-2 rounded-lg text-sm transition-colors"
             >
               <Download size={14} /> Download
             </button>
@@ -1150,19 +1150,19 @@ function InvoiceDetailModal({ invoice, onClose, onEdit, onFinalize, onDelete, on
             <div className="flex gap-2">
               <button
                 onClick={() => { onClose(); onEdit(invoice); }}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-navy-700 hover:bg-navy-600 text-gray-300 hover:text-white py-2 rounded-lg text-sm transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-surface-sunken hover:bg-line text-gray-300 hover:text-white py-2 rounded-lg text-sm transition-colors"
               >
                 <Edit size={14} /> Edit
               </button>
               <button
                 onClick={() => { onClose(); onFinalize(invoice); }}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-gold hover:bg-gold-light text-white font-medium py-2 rounded-lg text-sm transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-accent hover:bg-accent-hover text-white font-medium py-2 rounded-lg text-sm transition-colors"
               >
                 <Check size={14} /> Finalize
               </button>
               <button
                 onClick={() => { onClose(); onDelete(invoice); }}
-                className="w-9 flex items-center justify-center bg-navy-700 hover:bg-red-900/40 text-red-400 hover:text-red-300 py-2 rounded-lg text-sm transition-colors"
+                className="w-9 flex items-center justify-center bg-surface-sunken hover:bg-red-900/40 text-red-400 hover:text-red-300 py-2 rounded-lg text-sm transition-colors"
               >
                 <Trash2 size={14} />
               </button>
@@ -1182,26 +1182,26 @@ function InvoiceDetailModal({ invoice, onClose, onEdit, onFinalize, onDelete, on
           {/* Finalized: change date only */}
           {!isDraft && (
             showDateEdit ? (
-              <div className="space-y-2 p-3 bg-navy-800 rounded-lg border border-navy-600">
+              <div className="space-y-2 p-3 bg-surface-sunken rounded-lg border border-line">
                 <p className="text-xs text-amber-400">Only the invoice date can be changed. Amount and patient details are locked.</p>
                 <input
                   type="date" value={editDateVal} max={TODAY}
                   onChange={e => setEditDateVal(e.target.value)}
-                  className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-gold/50"
+                  className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent/50"
                 />
                 {dateError && <p className="text-red-400 text-xs">{dateError}</p>}
                 <div className="flex gap-2">
                   <button
                     onClick={() => { setShowDateEdit(false); setDateError(''); }}
                     disabled={dateSubmitting}
-                    className="flex-1 bg-navy-700 hover:bg-navy-600 text-gray-300 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
+                    className="flex-1 bg-surface-sunken hover:bg-line text-gray-300 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSaveDate}
                     disabled={dateSubmitting || !editDateVal}
-                    className="flex-1 bg-gold hover:bg-gold/90 text-white font-medium py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
+                    className="flex-1 bg-accent hover:bg-accent/90 text-white font-medium py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
                   >
                     {dateSubmitting ? 'Saving…' : 'Save date'}
                   </button>
@@ -1210,7 +1210,7 @@ function InvoiceDetailModal({ invoice, onClose, onEdit, onFinalize, onDelete, on
             ) : (
               <button
                 onClick={() => { setShowDateEdit(true); setEditDateVal(invoice.issued_at?.slice(0, 10) ?? TODAY); }}
-                className="w-full flex items-center justify-center gap-1.5 bg-navy-700 hover:bg-navy-600 text-gray-300 hover:text-white py-2 rounded-lg text-sm transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 bg-surface-sunken hover:bg-line text-gray-300 hover:text-white py-2 rounded-lg text-sm transition-colors"
               >
                 <CalendarDays size={14} /> Change date
               </button>
@@ -1220,7 +1220,7 @@ function InvoiceDetailModal({ invoice, onClose, onEdit, onFinalize, onDelete, on
           {/* Finalized: change payment status / method */}
           {!isDraft && (
             showPayEdit ? (
-              <div className="space-y-2 p-3 bg-navy-800 rounded-lg border border-navy-600">
+              <div className="space-y-2 p-3 bg-surface-sunken rounded-lg border border-line">
                 <p className="text-xs text-amber-400">Amount and patient details are locked. Payment status and method can be updated.</p>
                 <div className="flex gap-3">
                   {(['unpaid', 'paid'] as const).map(s => (
@@ -1228,7 +1228,7 @@ function InvoiceDetailModal({ invoice, onClose, onEdit, onFinalize, onDelete, on
                       <input
                         type="radio" name="detailPayStatus" value={s}
                         checked={editPayStatus === s} onChange={() => setEditPayStatus(s)}
-                        className="accent-gold"
+                        className="accent-accent"
                       />
                       {s === 'paid' ? 'Paid' : 'Unpaid'}
                     </label>
@@ -1237,7 +1237,7 @@ function InvoiceDetailModal({ invoice, onClose, onEdit, onFinalize, onDelete, on
                 <select
                   value={editPayMethod}
                   onChange={e => setEditPayMethod(e.target.value)}
-                  className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-gold/50"
+                  className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent/50"
                 >
                   <option value="card">Card</option>
                   <option value="bank_transfer">Bank Transfer</option>
@@ -1248,14 +1248,14 @@ function InvoiceDetailModal({ invoice, onClose, onEdit, onFinalize, onDelete, on
                   <button
                     onClick={() => { setShowPayEdit(false); setPayError(''); }}
                     disabled={paySubmitting}
-                    className="flex-1 bg-navy-700 hover:bg-navy-600 text-gray-300 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
+                    className="flex-1 bg-surface-sunken hover:bg-line text-gray-300 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSavePayment}
                     disabled={paySubmitting}
-                    className="flex-1 bg-gold hover:bg-gold/90 text-white font-medium py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
+                    className="flex-1 bg-accent hover:bg-accent/90 text-white font-medium py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
                   >
                     {paySubmitting ? 'Saving…' : 'Save payment'}
                   </button>
@@ -1264,7 +1264,7 @@ function InvoiceDetailModal({ invoice, onClose, onEdit, onFinalize, onDelete, on
             ) : (
               <button
                 onClick={() => { setShowPayEdit(true); setEditPayStatus(invoice.payment_status); setEditPayMethod(invoice.payment_method ?? 'card'); }}
-                className="w-full flex items-center justify-center gap-1.5 bg-navy-700 hover:bg-navy-600 text-gray-300 hover:text-white py-2 rounded-lg text-sm transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 bg-surface-sunken hover:bg-line text-gray-300 hover:text-white py-2 rounded-lg text-sm transition-colors"
               >
                 <CreditCard size={14} /> Change payment
               </button>
@@ -1423,9 +1423,9 @@ export default function InvoicesPage() {
   const canCreate = user && ['director', 'clinic_admin', 'treatment_coordinator', 'admin', 'super_admin'].includes(user.role);
 
   return (
-    <div className="min-h-screen bg-navy-950 text-white">
+    <div className="min-h-screen bg-surface-page text-white">
       {/* Page header */}
-      <div className="px-6 py-6 border-b border-navy-700">
+      <div className="px-6 py-6 border-b border-surface-sunken">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Invoices</h1>
@@ -1434,7 +1434,7 @@ export default function InvoicesPage() {
           {canCreate && (
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 bg-gold hover:bg-gold-light text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors"
+              className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors"
             >
               <Plus size={16} /> Create Invoice
             </button>
@@ -1443,15 +1443,15 @@ export default function InvoicesPage() {
 
         {/* Summary strip */}
         <div className="grid grid-cols-3 gap-4 max-w-2xl">
-          <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4">
+          <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
             <p className="text-gray-400 text-xs font-medium mb-1">Paid — Last 30 days</p>
             <p className="text-2xl font-bold text-green-400">{fmtGBP(summary.paidLast30)}</p>
           </div>
-          <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4">
+          <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
             <p className="text-gray-400 text-xs font-medium mb-1">Unpaid ({summary.unpaidCount})</p>
             <p className="text-2xl font-bold text-amber-400">{fmtGBP(summary.unpaidTotal)}</p>
           </div>
-          <div className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4">
+          <div className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
             <p className="text-gray-400 text-xs font-medium mb-1">Drafts</p>
             <p className="text-2xl font-bold text-slate-400">{summary.draftCount}</p>
           </div>
@@ -1459,7 +1459,7 @@ export default function InvoicesPage() {
       </div>
 
       {/* Filter bar */}
-      <div className="px-6 py-4 border-b border-navy-700 flex flex-wrap items-center gap-3">
+      <div className="px-6 py-4 border-b border-surface-sunken flex flex-wrap items-center gap-3">
         <div className="relative min-w-[240px]">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
@@ -1504,15 +1504,15 @@ export default function InvoicesPage() {
             <button
               onClick={() => setShowExport(v => !v)}
               disabled={filtered.length === 0}
-              className="flex items-center gap-1.5 h-10 px-3 bg-navy-800 border border-navy-600 text-gray-300 hover:text-white rounded-lg text-sm transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 h-10 px-3 bg-surface-sunken border border-line text-gray-300 hover:text-white rounded-lg text-sm transition-colors disabled:opacity-50"
             >
               <Download size={14} /> Export
             </button>
             {showExport && (
-              <div className="absolute right-0 top-full mt-1 w-36 bg-navy-800 border border-navy-600 rounded-xl shadow-xl z-10 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-36 bg-surface-sunken border border-line rounded-xl shadow-xl z-10 overflow-hidden">
                 <button
                   onClick={() => { exportCSV(filtered); setShowExport(false); }}
-                  className="w-full px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-navy-700 transition-colors text-left"
+                  className="w-full px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-surface-sunken transition-colors text-left"
                 >
                   CSV (.csv)
                 </button>
@@ -1534,12 +1534,12 @@ export default function InvoicesPage() {
           <div className="flex items-center justify-center py-20 text-gray-500 text-sm">Loading…</div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <FileText size={40} className="text-navy-700 mb-4" />
+            <FileText size={40} className="text-ink-subtle mb-4" />
             <p className="text-gray-400 font-medium">No invoices yet</p>
             {!hasFilters && canCreate && (
               <button
                 onClick={() => setShowModal(true)}
-                className="mt-4 flex items-center gap-2 bg-gold hover:bg-gold-light text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
+                className="mt-4 flex items-center gap-2 bg-accent hover:bg-accent-hover text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
               >
                 <Plus size={14} /> Create your first invoice
               </button>
@@ -1554,18 +1554,18 @@ export default function InvoicesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-navy-700">
+                <tr className="border-b border-surface-sunken">
                   {['Date', 'Customer', 'Payment Method', 'Treatment', 'Status', 'Amount', ''].map(h => (
                     <th key={h} className="text-left text-xs text-gray-400 font-medium pb-3 pr-4 last:pr-0">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-800">
+              <tbody className="divide-y divide-surface-sunken">
                 {filtered.map(inv => (
                   <tr
                     key={inv.id}
                     onClick={() => setDetailTarget(inv)}
-                    className="hover:bg-navy-800/40 transition-colors group cursor-pointer"
+                    className="hover:bg-surface-sunken/40 transition-colors group cursor-pointer"
                   >
                     <td className="py-3 pr-4 text-gray-400 whitespace-nowrap">{formatDate(inv.issued_at)}</td>
                     <td className="py-3 pr-4 font-medium max-w-[180px]">

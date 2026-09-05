@@ -9,13 +9,13 @@ export default function ComplianceSection() {
   const items = complianceItems(i18n.language);
 
   return (
-    <section id="compliance" className="relative py-24 bg-brand-900 text-white overflow-hidden">
+    <section id="compliance" className="relative py-24 bg-slate-900 text-white overflow-hidden">
       <div className="absolute inset-0 pointer-events-none opacity-40" style={{
-        backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(217,154,43,0.15), transparent 50%)',
+        backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(27,111,234,0.15), transparent 50%)',
       }} />
       <div className="relative mx-auto max-w-6xl px-6">
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={stagger()} className="max-w-2xl mb-14">
-          <motion.span variants={fadeUp} className="inline-block text-accent-300 text-xs font-semibold tracking-widest uppercase mb-4">
+          <motion.span variants={fadeUp} className="inline-block text-accent-hover text-xs font-semibold tracking-widest uppercase mb-4">
             🛡️ {complianceHeading(i18n.language)}
           </motion.span>
           <motion.h2 variants={fadeUp} className="font-display text-3xl md:text-4xl text-white leading-tight">

@@ -30,7 +30,7 @@ export default function PrivacyPage() {
           </p>
           <p className="text-gray-700 leading-relaxed mb-8">
             If you have any questions about this policy or your personal data, contact us at{' '}
-            <a href="mailto:info@carenova.ai" className="text-gold underline">info@carenova.ai</a>.
+            <a href="mailto:info@carenova.ai" className="text-accent underline">info@carenova.ai</a>.
             For data-protection matters you may also contact our Data Protection Officer, Mr Baturay Ozden.
           </p>
 
@@ -165,12 +165,12 @@ export default function PrivacyPage() {
             Under UK GDPR, you have the right to: access your data; request rectification or erasure;
             restrict or object to processing; data portability; and to withdraw consent. You also have the
             right to lodge a complaint with the ICO (
-            <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" className="text-gold underline">ico.org.uk</a>
+            <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" className="text-accent underline">ico.org.uk</a>
             ).
           </p>
           <p className="text-gray-700 leading-relaxed mb-4">
             To exercise any right, contact{' '}
-            <a href="mailto:info@carenova.ai" className="text-gold underline">info@carenova.ai</a>.
+            <a href="mailto:info@carenova.ai" className="text-accent underline">info@carenova.ai</a>.
             If your request concerns data we process on behalf of a clinic (as processor), we will refer
             you to, or act on the instructions of, that clinic.
           </p>
@@ -193,7 +193,7 @@ export default function PrivacyPage() {
           <p className="text-gray-700 leading-relaxed mb-1">66 Paul Street, London, England, EC2A 4NA</p>
           <p className="text-gray-700 leading-relaxed mb-1">
             General enquiries:{' '}
-            <a href="mailto:info@carenova.ai" className="text-gold underline">info@carenova.ai</a>
+            <a href="mailto:info@carenova.ai" className="text-accent underline">info@carenova.ai</a>
           </p>
           <p className="text-gray-700 leading-relaxed mb-10">
             Data Protection Officer: Mr Baturay Ozden

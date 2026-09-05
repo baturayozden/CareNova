@@ -49,16 +49,16 @@ export default function StatsCards({ stats, hideClinicMetrics = false }: Props) 
       {cards.map((card) => (
         <div
           key={card.label}
-          className="bg-navy-800 border border-navy-600 rounded-xl p-4 md:p-6 flex flex-col gap-3"
+          className="bg-surface rounded-xl p-4 md:p-6 flex flex-col gap-3 shadow-sm"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
               {card.label}
             </span>
-            {(() => { const Icon = card.icon; return <Icon size={20} className="text-gold" />; })()}
+            {(() => { const Icon = card.icon; return <Icon size={20} className="text-accent" />; })()}
           </div>
           <div>
-            <p className="text-3xl font-semibold text-gold">{card.value}</p>
+            <p className="text-3xl font-semibold text-accent">{card.value}</p>
             <p className="text-xs text-gray-500 mt-1">{card.subtitle}</p>
           </div>
         </div>

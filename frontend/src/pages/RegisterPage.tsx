@@ -56,16 +56,16 @@ export default function RegisterPage() {
   };
 
   const inputClass =
-    'bg-navy-800 border border-navy-600 text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-gold';
+    'bg-surface-sunken border border-line text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-accent';
   const labelClass = 'block text-sm font-medium text-gray-400 mb-1';
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-navy-950 px-4 py-10">
-      <div className="bg-navy-900 rounded-2xl p-10 w-full max-w-md shadow-2xl border border-navy-600">
+    <div className="flex min-h-screen items-center justify-center bg-surface-page px-4 py-10">
+      <div className="bg-surface rounded-2xl p-10 w-full max-w-md shadow-2xl border border-line">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             <span className="text-2xl font-serif">
-              <span className="text-gold">Care</span>
+              <span className="text-accent">Care</span>
               <span className="text-white">Nova</span>
             </span>
           </div>
@@ -144,7 +144,7 @@ export default function RegisterPage() {
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as Role)}
-              className="bg-navy-800 border border-navy-600 text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-gold appearance-none"
+              className="bg-surface-sunken border border-line text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-accent appearance-none"
             >
               {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
                 <option key={r} value={r}>
@@ -159,7 +159,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gold hover:bg-gold-light text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Creating account…' : 'Create account'}
           </button>
@@ -167,7 +167,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-gray-400 text-sm mt-6">
           Already have an account?{' '}
-          <Link to="/login" className="text-gold font-semibold hover:text-gold-light">
+          <Link to="/login" className="text-accent font-semibold hover:text-accent-hover">
             Sign in
           </Link>
         </p>

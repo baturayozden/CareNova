@@ -99,7 +99,7 @@ function TeamSection({ currentUserId }: { currentUserId: string }) {
           <p className="text-gray-500 text-xs mt-0.5">Manage super admins and platform admins.</p>
         </div>
         <button onClick={() => setShowAdd(v => !v)}
-          className="px-4 py-1.5 rounded-lg bg-gold text-white text-xs font-semibold hover:bg-gold-light transition-colors">
+          className="px-4 py-1.5 rounded-lg bg-accent text-white text-xs font-semibold hover:bg-accent-hover transition-colors">
           + Add User
         </button>
       </div>
@@ -111,8 +111,8 @@ function TeamSection({ currentUserId }: { currentUserId: string }) {
       )}
 
       {showAdd && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5 space-y-3">
-          <p className="text-gold text-xs font-semibold uppercase tracking-wider">New Platform User</p>
+        <div className="bg-surface-sunken border border-line rounded-xl p-5 space-y-3">
+          <p className="text-accent text-xs font-semibold uppercase tracking-wider">New Platform User</p>
           <div className="grid grid-cols-2 gap-3">
             {[
               { key: 'firstName', label: 'First Name', type: 'text' },
@@ -124,7 +124,7 @@ function TeamSection({ currentUserId }: { currentUserId: string }) {
                 <label className="text-xs text-gray-500 font-medium block mb-1">{f.label}</label>
                 <input type={f.type} value={(form as any)[f.key]}
                   onChange={e => setForm(x => ({ ...x, [f.key]: e.target.value }))}
-                  className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50"
+                  className="w-full bg-surface border border-line rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50"
                 />
               </div>
             ))}
@@ -138,7 +138,7 @@ function TeamSection({ currentUserId }: { currentUserId: string }) {
               ].map(r => (
                 <button key={r.value} type="button" onClick={() => setForm(x => ({ ...x, role: r.value }))}
                   className={`flex-1 text-left p-3 rounded-lg border transition-colors ${
-                    form.role === r.value ? 'border-gold bg-gold/10 text-gold' : 'border-navy-600 text-gray-400 hover:border-navy-500 hover:text-white'
+                    form.role === r.value ? 'border-accent bg-accent/10 text-accent' : 'border-line text-gray-400 hover:border-line-strong hover:text-white'
                   }`}>
                   <p className="font-semibold text-sm">{r.label}</p>
                   <p className="text-xs mt-0.5 opacity-70">{r.desc}</p>
@@ -148,39 +148,39 @@ function TeamSection({ currentUserId }: { currentUserId: string }) {
           </div>
           <div className="flex gap-2 pt-1">
             <button onClick={addUser} disabled={saving}
-              className="px-5 py-2 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light disabled:opacity-60">
+              className="px-5 py-2 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60">
               {saving ? 'Adding…' : 'Add User'}
             </button>
             <button onClick={() => setShowAdd(false)}
-              className="px-5 py-2 rounded-lg bg-navy-700 text-gray-400 text-sm hover:text-white transition-colors">
+              className="px-5 py-2 rounded-lg bg-surface-sunken text-gray-400 text-sm hover:text-white transition-colors">
               Cancel
             </button>
           </div>
         </div>
       )}
 
-      <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
+      <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-10">
-            <div className="w-6 h-6 border-4 border-navy-600 border-t-gold rounded-full animate-spin" />
+            <div className="w-6 h-6 border-4 border-line border-t-accent rounded-full animate-spin" />
           </div>
         ) : users.length === 0 ? (
           <p className="text-gray-500 text-sm text-center py-10">No platform users found.</p>
         ) : (
-          <div className="divide-y divide-navy-700">
+          <div className="divide-y divide-surface-sunken">
             {users.map(u => (
               <div key={u.id} className="px-5 py-3.5 flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center text-gold text-xs font-bold shrink-0">
+                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold shrink-0">
                   {u.firstName[0]}{u.lastName[0]}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-sm font-medium">{u.firstName} {u.lastName}</p>
                   <p className="text-gray-500 text-xs truncate">{u.email}</p>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full border capitalize ${ROLE_BADGE[u.role] || 'text-gray-400 bg-navy-700 border-navy-600'}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full border capitalize ${ROLE_BADGE[u.role] || 'text-gray-400 bg-surface-sunken border-line'}`}>
                   {u.role.replace(/_/g, ' ')}
                 </span>
-                <span className={`text-xs px-2 py-0.5 rounded-full border ${u.isActive ? 'text-green-300 bg-green-900/40 border-green-700/50' : 'text-gray-500 bg-navy-700 border-navy-600'}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full border ${u.isActive ? 'text-green-300 bg-green-900/40 border-green-700/50' : 'text-gray-500 bg-surface-sunken border-line'}`}>
                   {u.isActive ? 'Active' : 'Inactive'}
                 </span>
                 {u.id !== currentUserId && (
@@ -375,7 +375,7 @@ function IntegrationsSection() {
         ] as { key: string; label: string; icon: IconComponent }[]).map(s => (
           <button key={s.key} onClick={() => setSection(s.key as any)}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              section === s.key ? 'bg-gold text-white' : 'bg-navy-700 text-gray-400 hover:text-white'
+              section === s.key ? 'bg-accent text-white' : 'bg-surface-sunken text-gray-400 hover:text-white'
             }`}>
             <s.icon size={13} />
             {s.label}
@@ -385,16 +385,16 @@ function IntegrationsSection() {
 
       {/* WhatsApp Wizard */}
       {section === 'whatsapp' && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
+        <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
           {/* Step progress */}
-          <div className="px-6 py-4 border-b border-navy-700 flex items-center gap-2">
+          <div className="px-6 py-4 border-b border-surface-sunken flex items-center gap-2">
             {([1,2,3,4,5] as WizardStep[]).map(n => (
               <React.Fragment key={n}>
                 <button onClick={() => setWizardStep(n)}
                   className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors ${
-                    wizardStep === n ? 'bg-gold text-white' : wizardStep > n ? 'bg-green-700 text-white' : 'bg-navy-700 text-gray-500'
+                    wizardStep === n ? 'bg-accent text-white' : wizardStep > n ? 'bg-green-700 text-white' : 'bg-surface-sunken text-gray-500'
                   }`}>{wizardStep > n ? '✓' : n}</button>
-                {n < 5 && <div className={`h-px flex-1 ${wizardStep > n ? 'bg-green-700' : 'bg-navy-700'}`} />}
+                {n < 5 && <div className={`h-px flex-1 ${wizardStep > n ? 'bg-green-700' : 'bg-surface-sunken'}`} />}
               </React.Fragment>
             ))}
           </div>
@@ -406,7 +406,7 @@ function IntegrationsSection() {
                 <p className="text-gray-400 text-sm">In Meta Business Manager → WhatsApp → Get your Business Account ID.</p>
                 <input type="text" placeholder="123456789012345" value={waForm.business_account_id}
                   onChange={e => setWaForm(f => ({ ...f, business_account_id: e.target.value }))}
-                  className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50"
+                  className="w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50"
                 />
               </>
             )}
@@ -416,18 +416,18 @@ function IntegrationsSection() {
                 <p className="text-gray-400 text-sm">In Meta for Developers → Your App → WhatsApp → Phone Number ID.</p>
                 <input type="text" placeholder="987654321098765" value={waForm.phone_number_id}
                   onChange={e => setWaForm(f => ({ ...f, phone_number_id: e.target.value }))}
-                  className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50"
+                  className="w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50"
                 />
               </>
             )}
             {wizardStep === 3 && (
               <>
                 <h3 className="text-white font-semibold">Step 3: Access Token</h3>
-                <p className="text-gray-400 text-sm">Generate a permanent System User token in Meta Business Manager with <code className="text-gold text-xs">whatsapp_business_messaging</code> permission.</p>
+                <p className="text-gray-400 text-sm">Generate a permanent System User token in Meta Business Manager with <code className="text-accent text-xs">whatsapp_business_messaging</code> permission.</p>
                 <div className="relative">
                   <input type={showKey ? 'text' : 'password'} placeholder="EAA…" value={waForm.access_token}
                     onChange={e => setWaForm(f => ({ ...f, access_token: e.target.value }))}
-                    className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 pr-10 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50"
+                    className="w-full bg-surface border border-line rounded-lg px-3 py-2.5 pr-10 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50"
                   />
                   <button onClick={() => setShowKey(v => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xs">
@@ -441,8 +441,8 @@ function IntegrationsSection() {
                 <h3 className="text-white font-semibold">Step 4: Test Connection</h3>
                 <p className="text-gray-400 text-sm">Verify your credentials work before setting up the webhook.</p>
                 <button onClick={testConnection} disabled={testResult === 'testing'}
-                  className="px-5 py-2 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light disabled:opacity-60 flex items-center gap-2">
-                  {testResult === 'testing' && <span className="w-4 h-4 border-2 border-navy-950 border-t-transparent rounded-full animate-spin" />}
+                  className="px-5 py-2 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 flex items-center gap-2">
+                  {testResult === 'testing' && <span className="w-4 h-4 border-2 border-surface-page border-t-transparent rounded-full animate-spin" />}
                   {testResult === 'testing' ? 'Testing…' : 'Test Connection'}
                 </button>
                 {testResult === 'ok'   && <p className="text-green-400 text-sm">✅ Connection successful!</p>}
@@ -457,9 +457,9 @@ function IntegrationsSection() {
                   <div>
                     <label className="text-xs text-gray-500 font-medium uppercase tracking-wider block mb-1.5">Webhook URL</label>
                     <div className="flex items-center gap-2">
-                      <code className="flex-1 bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-gold text-xs font-mono break-all">{WEBHOOK_URL}</code>
+                      <code className="flex-1 bg-surface border border-line rounded-lg px-3 py-2 text-accent text-xs font-mono break-all">{WEBHOOK_URL}</code>
                       <button onClick={() => copy(WEBHOOK_URL, 'url')}
-                        className="px-3 py-2 rounded-lg bg-navy-700 text-gray-400 text-xs hover:text-white transition-colors shrink-0">
+                        className="px-3 py-2 rounded-lg bg-surface-sunken text-gray-400 text-xs hover:text-white transition-colors shrink-0">
                         {copied === 'url' ? '✓ Copied' : 'Copy'}
                       </button>
                     </div>
@@ -467,14 +467,14 @@ function IntegrationsSection() {
                   <div>
                     <label className="text-xs text-gray-500 font-medium uppercase tracking-wider block mb-1.5">Verify Token</label>
                     <div className="flex items-center gap-2">
-                      <code className="flex-1 bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-gold text-xs font-mono">{VERIFY_TOKEN}</code>
+                      <code className="flex-1 bg-surface border border-line rounded-lg px-3 py-2 text-accent text-xs font-mono">{VERIFY_TOKEN}</code>
                       <button onClick={() => copy(VERIFY_TOKEN, 'token')}
-                        className="px-3 py-2 rounded-lg bg-navy-700 text-gray-400 text-xs hover:text-white transition-colors shrink-0">
+                        className="px-3 py-2 rounded-lg bg-surface-sunken text-gray-400 text-xs hover:text-white transition-colors shrink-0">
                         {copied === 'token' ? '✓ Copied' : 'Copy'}
                       </button>
                     </div>
                   </div>
-                  <div className="bg-navy-900/60 border border-navy-700 rounded-lg p-4">
+                  <div className="bg-surface/60 border border-surface-sunken rounded-lg p-4">
                     <p className="text-gray-400 text-xs leading-relaxed">
                       <strong className="text-white">Subscribe to:</strong> messages, message_deliveries, message_reads.<br />
                       After saving, Meta will send a verification request to your webhook URL — it will be confirmed automatically.
@@ -492,13 +492,13 @@ function IntegrationsSection() {
             <div className="flex gap-2 pt-2">
               {wizardStep > 1 && (
                 <button onClick={() => setWizardStep(s => (s - 1) as WizardStep)}
-                  className="px-4 py-2 rounded-lg bg-navy-700 text-gray-400 text-sm hover:text-white transition-colors">
+                  className="px-4 py-2 rounded-lg bg-surface-sunken text-gray-400 text-sm hover:text-white transition-colors">
                   ← Back
                 </button>
               )}
               {wizardStep < 5 && (
                 <button onClick={() => setWizardStep(s => (s + 1) as WizardStep)}
-                  className="px-4 py-2 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light transition-colors">
+                  className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover transition-colors">
                   Next →
                 </button>
               )}
@@ -509,7 +509,7 @@ function IntegrationsSection() {
 
       {/* AI Provider */}
       {section === 'ai' && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-6 space-y-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-6 space-y-5">
           <div>
             <h3 className="text-white font-semibold mb-1">AI Provider</h3>
             <p className="text-gray-500 text-xs">Choose the AI model powering your WhatsApp assistant.</p>
@@ -521,8 +521,8 @@ function IntegrationsSection() {
                 <button key={p.value} onClick={() => { setAiProvider(p.value); setAiModel(p.models[0]); }}
                   className={`text-left p-3 rounded-lg border transition-colors ${
                     aiProvider === p.value
-                      ? 'border-gold bg-gold/10 text-gold'
-                      : 'border-navy-600 text-gray-400 hover:border-navy-500 hover:text-white'
+                      ? 'border-accent bg-accent/10 text-accent'
+                      : 'border-line text-gray-400 hover:border-line-strong hover:text-white'
                   }`}>
                   <p className="font-semibold text-sm">{p.label}</p>
                 </button>
@@ -532,7 +532,7 @@ function IntegrationsSection() {
           <div>
             <label className="text-xs text-gray-500 font-medium uppercase tracking-wider block mb-2">Model</label>
             <select value={aiModel} onChange={e => setAiModel(e.target.value)}
-              className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 text-white text-sm outline-none focus:border-gold/50">
+              className="w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-white text-sm outline-none focus:border-accent/50">
               {providerModels.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
@@ -541,7 +541,7 @@ function IntegrationsSection() {
             <div className="relative">
               <input type={showKey ? 'text' : 'password'} placeholder="sk-…" value={aiKey}
                 onChange={e => setAiKey(e.target.value)}
-                className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 pr-10 text-white text-sm placeholder-gray-600 outline-none focus:border-gold/50"
+                className="w-full bg-surface border border-line rounded-lg px-3 py-2.5 pr-10 text-white text-sm placeholder-gray-600 outline-none focus:border-accent/50"
               />
               <button onClick={() => setShowKey(v => !v)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xs">
@@ -552,7 +552,7 @@ function IntegrationsSection() {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={saveAiProvider} disabled={aiSaving}
-              className="px-6 py-2.5 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light disabled:opacity-60">
+              className="px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60">
               {aiSaving ? 'Saving…' : 'Save Provider Settings'}
             </button>
             {aiSaved && <span className="text-green-400 text-sm">✓ Saved</span>}
@@ -562,7 +562,7 @@ function IntegrationsSection() {
 
       {/* Calendar */}
       {section === 'calendar' && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-6 space-y-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-6 space-y-5">
           <div>
             <h3 className="text-white font-semibold mb-1">Calendar Integrations</h3>
             <p className="text-gray-500 text-xs">Sync appointments with your calendar provider.</p>
@@ -583,7 +583,7 @@ function IntegrationsSection() {
           )}
 
           {/* Google Calendar card */}
-          <div className="bg-navy-900/60 border border-navy-700 rounded-xl p-5">
+          <div className="bg-surface/60 border border-surface-sunken rounded-xl p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0"><Calendar size={20} className="text-gray-700" /></div>
@@ -594,7 +594,7 @@ function IntegrationsSection() {
               </div>
               {calStatus?.connected
                 ? <span className="text-xs bg-green-900/50 text-green-400 border border-green-700/50 px-2.5 py-1 rounded-full flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block" />Connected</span>
-                : <span className="text-xs bg-navy-700 text-gray-500 border border-navy-600 px-2.5 py-1 rounded-full">Not connected</span>
+                : <span className="text-xs bg-surface-sunken text-gray-500 border border-line px-2.5 py-1 rounded-full">Not connected</span>
               }
             </div>
 
@@ -605,7 +605,7 @@ function IntegrationsSection() {
               </div>
             ) : calStatus?.connected ? (
               <div className="mt-4 space-y-3">
-                <div className="bg-navy-800 rounded-lg px-4 py-3 space-y-2">
+                <div className="bg-surface-sunken rounded-lg px-4 py-3 space-y-2">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-500">Account</span>
                     <span className="text-gray-200">{calStatus.email}</span>
@@ -639,7 +639,7 @@ function IntegrationsSection() {
                 </p>
                 <button
                   onClick={connectGoogleCalendar}
-                  className="px-5 py-2.5 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold/80 transition-colors flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent/80 transition-colors flex items-center gap-2"
                 >
                   <Calendar size={16} /> Connect Google Calendar
                 </button>
@@ -653,11 +653,11 @@ function IntegrationsSection() {
               { name: 'Outlook / Exchange', icon: <Mail size={28} />, desc: 'Microsoft 365 calendar sync' },
               { name: 'Dentally PMS',       icon: '🦷', desc: 'Practice management system' },
             ].map(c => (
-              <div key={c.name} className="bg-navy-900/60 border border-navy-700 rounded-xl p-4 text-center opacity-50">
+              <div key={c.name} className="bg-surface/60 border border-surface-sunken rounded-xl p-4 text-center opacity-50">
                 <div className="text-3xl mb-3">{c.icon}</div>
                 <p className="text-white text-sm font-medium mb-1">{c.name}</p>
                 <p className="text-gray-500 text-xs mb-3">{c.desc}</p>
-                <span className="text-xs bg-navy-700 text-gray-500 border border-navy-600 px-2.5 py-1 rounded-full">Coming Soon</span>
+                <span className="text-xs bg-surface-sunken text-gray-500 border border-line px-2.5 py-1 rounded-full">Coming Soon</span>
               </div>
             ))}
           </div>
@@ -666,7 +666,7 @@ function IntegrationsSection() {
 
       {/* Website & WordPress */}
       {section === 'website' && canAccessWebsite && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-6 space-y-5">
+        <div className="bg-surface-sunken border border-line rounded-xl p-6 space-y-5">
           <div>
             <h3 className="text-white font-semibold mb-1">Website & WordPress</h3>
             <p className="text-gray-500 text-xs">Embed a booking widget on your clinic website.</p>
@@ -678,7 +678,7 @@ function IntegrationsSection() {
             </div>
           )}
 
-          <div className="bg-navy-900/60 border border-navy-700 rounded-xl p-5 space-y-5">
+          <div className="bg-surface/60 border border-surface-sunken rounded-xl p-5 space-y-5">
             {/* Card header */}
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0">
@@ -703,11 +703,11 @@ function IntegrationsSection() {
                   <input
                     readOnly
                     value={siteKey}
-                    className="flex-1 min-w-0 bg-navy-800 border border-navy-600 rounded-lg px-3 py-2 text-xs font-mono text-gray-200 outline-none"
+                    className="flex-1 min-w-0 bg-surface-sunken border border-line rounded-lg px-3 py-2 text-xs font-mono text-gray-200 outline-none"
                   />
                   <button
                     onClick={() => copy(siteKey, 'siteKey')}
-                    className="px-3 py-2 rounded-lg bg-navy-700 border border-navy-600 text-xs text-gray-300 hover:text-white hover:border-gold transition-colors whitespace-nowrap"
+                    className="px-3 py-2 rounded-lg bg-surface-sunken border border-line text-xs text-gray-300 hover:text-white hover:border-accent transition-colors whitespace-nowrap"
                   >
                     {copied === 'siteKey' ? 'Copied!' : 'Copy'}
                   </button>
@@ -719,13 +719,13 @@ function IntegrationsSection() {
             <a
               href="/care-dental.zip"
               download
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold/80 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent/80 transition-colors"
             >
               Download WordPress Plugin
             </a>
 
             {/* Setup steps */}
-            <div className="border-t border-navy-700 pt-4 space-y-3">
+            <div className="border-t border-surface-sunken pt-4 space-y-3">
               <p className="text-gray-400 text-xs font-medium">Setup instructions</p>
               {[
                 'Install the Care Dental plugin on your WordPress site (Plugins → Add New → Upload).',
@@ -733,7 +733,7 @@ function IntegrationsSection() {
                 'Add [carenova_booking] to any page. Enquiries appear in your dashboard.',
               ].map((step, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <span className="w-5 h-5 rounded-full bg-navy-700 text-gray-300 flex items-center justify-center shrink-0 font-semibold text-[10px] mt-0.5">{i + 1}</span>
+                  <span className="w-5 h-5 rounded-full bg-surface-sunken text-gray-300 flex items-center justify-center shrink-0 font-semibold text-[10px] mt-0.5">{i + 1}</span>
                   <span className="text-xs text-gray-400 leading-relaxed">{step}</span>
                 </div>
               ))}
@@ -826,21 +826,21 @@ function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () 
   }
 
   const CIN  = (disabled: boolean) =>
-    `w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gold/50 transition-colors${disabled ? ' opacity-50 cursor-not-allowed' : ''}`;
+    `w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent/50 transition-colors${disabled ? ' opacity-50 cursor-not-allowed' : ''}`;
   const CLB  = 'block text-xs text-gray-500 font-medium mb-1.5';
   const CMSG = (type: 'success' | 'error') =>
     `px-4 py-2.5 rounded-lg text-sm border ${type === 'success' ? 'bg-green-950 border-green-800 text-green-300' : 'bg-red-950 border-red-800 text-red-300'}`;
 
   return (
-    <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-      <div className="px-6 py-4 border-b border-navy-600 flex items-center gap-2">
+    <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+      <div className="px-6 py-4 border-b border-line flex items-center gap-2">
         <Building2 size={20} />
         <h2 className="font-medium text-white text-sm">Clinic Settings</h2>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-10">
-          <div className="w-6 h-6 border-4 border-navy-600 border-t-gold rounded-full animate-spin" />
+          <div className="w-6 h-6 border-4 border-line border-t-accent rounded-full animate-spin" />
         </div>
       ) : !user?.tenantId ? (
         <div className="px-6 py-5">
@@ -896,14 +896,14 @@ function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () 
             </select>
           </div>
 
-          <div className="bg-navy-900/60 border border-navy-700 rounded-lg px-4 py-3 flex items-center justify-between">
+          <div className="bg-surface/60 border border-surface-sunken rounded-lg px-4 py-3 flex items-center justify-between">
             <div>
               <p className="text-gray-300 text-sm">WhatsApp Number</p>
               <p className="text-gray-600 text-xs mt-0.5">Managed via WhatsApp Cloud API</p>
             </div>
             <button
               onClick={() => { onGoToIntegrations(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className="text-xs text-gold border border-gold/30 bg-gold/10 hover:bg-gold/20 px-2.5 py-1 rounded-full cursor-pointer transition-colors">
+              className="text-xs text-accent border border-accent/30 bg-accent/10 hover:bg-accent/20 px-2.5 py-1 rounded-full cursor-pointer transition-colors">
               → Integrations
             </button>
           </div>
@@ -911,7 +911,7 @@ function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () 
           {canEdit ? (
             <div className="pt-1">
               <button onClick={save} disabled={saving}
-                className="px-6 py-2.5 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light disabled:opacity-60 transition-colors">
+                className="px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 transition-colors">
                 {saving ? 'Saving…' : 'Save Clinic Settings'}
               </button>
             </div>
@@ -986,7 +986,7 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
     }
   }
 
-  const INPUT = 'w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gold/50 transition-colors';
+  const INPUT = 'w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent/50 transition-colors';
   const LABEL = 'block text-xs text-gray-500 font-medium mb-1.5';
   const MSG   = (type: 'success' | 'error') =>
     `px-4 py-2.5 rounded-lg text-sm border ${type === 'success' ? 'bg-green-950 border-green-800 text-green-300' : 'bg-red-950 border-red-800 text-red-300'}`;
@@ -995,8 +995,8 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
     <div className="space-y-5">
 
       {/* ── Profile info ────────────────────────────────────────────────────── */}
-      <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-navy-600 flex items-center gap-2">
+      <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-line flex items-center gap-2">
           <User size={20} />
           <h2 className="font-medium text-white text-sm">Profile</h2>
         </div>
@@ -1038,7 +1038,7 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
 
           <div className="pt-1">
             <button onClick={saveProfile} disabled={profSaving}
-              className="px-6 py-2.5 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light disabled:opacity-60 transition-colors">
+              className="px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 transition-colors">
               {profSaving ? 'Saving…' : 'Save Profile'}
             </button>
           </div>
@@ -1046,8 +1046,8 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
       </div>
 
       {/* ── Change password ──────────────────────────────────────────────────── */}
-      <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-navy-600 flex items-center gap-2">
+      <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-line flex items-center gap-2">
           <Lock size={20} />
           <h2 className="font-medium text-white text-sm">Change Password</h2>
         </div>
@@ -1073,7 +1073,7 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
 
           <div className="pt-1">
             <button onClick={changePassword} disabled={pwSaving}
-              className="px-6 py-2.5 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light disabled:opacity-60 transition-colors">
+              className="px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 transition-colors">
               {pwSaving ? 'Changing…' : 'Change Password'}
             </button>
           </div>
@@ -1106,8 +1106,8 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gold/50 ${
-        checked ? 'bg-gold' : 'bg-navy-600'
+      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent/50 ${
+        checked ? 'bg-accent' : 'bg-line'
       }`}
     >
       <span
@@ -1156,8 +1156,8 @@ function NotificationsSection() {
     `px-4 py-2.5 rounded-lg text-sm border ${type === 'success' ? 'bg-green-950 border-green-800 text-green-300' : 'bg-red-950 border-red-800 text-red-300'}`;
 
   return (
-    <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-      <div className="px-6 py-4 border-b border-navy-600 flex items-center justify-between">
+    <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+      <div className="px-6 py-4 border-b border-line flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Bell size={20} />
           <h2 className="font-medium text-white text-sm">Notifications</h2>
@@ -1168,13 +1168,13 @@ function NotificationsSection() {
 
       {loading ? (
         <div className="flex items-center justify-center py-10">
-          <div className="w-6 h-6 border-4 border-navy-600 border-t-gold rounded-full animate-spin" />
+          <div className="w-6 h-6 border-4 border-line border-t-accent rounded-full animate-spin" />
         </div>
       ) : (
         <>
           {msg && <div className={`mx-6 mt-4 ${NMSG(msg.type)}`}>{msg.text}</div>}
 
-          <div className="divide-y divide-navy-600">
+          <div className="divide-y divide-line">
             {prefs.map(p => {
               const label = EVENT_LABELS[p.eventType];
               if (!label) return null;
@@ -1190,9 +1190,9 @@ function NotificationsSection() {
             })}
           </div>
 
-          <div className="px-6 py-4 border-t border-navy-600">
+          <div className="px-6 py-4 border-t border-line">
             <button onClick={save} disabled={saving}
-              className="px-6 py-2.5 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light disabled:opacity-60 transition-colors">
+              className="px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 transition-colors">
               {saving ? 'Saving…' : 'Save Notification Preferences'}
             </button>
           </div>
@@ -1294,7 +1294,7 @@ function ArchivedPatientsSection() {
           placeholder="Search by name or phone…"
           value={search}
           onChange={e => { setSearch(e.target.value); fetchArchived(e.target.value); }}
-          className="w-full pl-9 pr-4 py-2 bg-navy-900 border border-navy-600 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gold/50"
+          className="w-full pl-9 pr-4 py-2 bg-surface border border-line rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-accent/50"
         />
       </div>
 
@@ -1308,10 +1308,10 @@ function ArchivedPatientsSection() {
           <p className="text-sm">No archived patients</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-navy-600">
+        <div className="overflow-x-auto rounded-xl border border-line">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-navy-600 bg-navy-900/60">
+              <tr className="border-b border-line bg-surface/60">
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Patient</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Phone</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Archived on</th>
@@ -1320,9 +1320,9 @@ function ArchivedPatientsSection() {
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-navy-700/60">
+            <tbody className="divide-y divide-surface-sunken/60">
               {patients.map(p => (
-                <tr key={p.id} className="hover:bg-navy-800/40 transition-colors">
+                <tr key={p.id} className="hover:bg-surface-sunken/40 transition-colors">
                   <td className="px-4 py-3 text-white font-medium">
                     {p.first_name} {p.last_name}
                   </td>
@@ -1338,7 +1338,7 @@ function ArchivedPatientsSection() {
                     <button
                       disabled={restoring === p.id}
                       onClick={() => setConfirmId(p.id)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-navy-500 text-gray-300 hover:border-gold/60 hover:text-gold transition-colors disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-line-strong text-gray-300 hover:border-accent/60 hover:text-accent transition-colors disabled:opacity-50"
                     >
                       <RotateCcw size={12} />
                       {restoring === p.id ? 'Restoring…' : 'Restore'}
@@ -1354,7 +1354,7 @@ function ArchivedPatientsSection() {
       {/* Confirm restore modal */}
       {confirmId && confirmPatient && (
         <div className="fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4">
-          <div className="bg-navy-800 border border-navy-600 rounded-xl p-6 max-w-sm w-full shadow-2xl">
+          <div className="bg-surface-sunken border border-line rounded-xl p-6 max-w-sm w-full shadow-2xl">
             <h3 className="text-white font-semibold mb-2">Restore patient?</h3>
             <p className="text-gray-400 text-sm mb-4">
               Restore <span className="text-white font-medium">{confirmPatient.first_name} {confirmPatient.last_name}</span> and{' '}
@@ -1369,7 +1369,7 @@ function ArchivedPatientsSection() {
               </button>
               <button
                 onClick={() => handleRestore(confirmPatient)}
-                className="px-4 py-2 text-sm font-semibold bg-gold text-white rounded-lg hover:bg-gold/90 transition-colors"
+                className="px-4 py-2 text-sm font-semibold bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors"
               >
                 Restore
               </button>
@@ -1412,26 +1412,26 @@ export default function SettingsPage({ initialTab }: SettingsPageProps) {
         </div>
 
         {/* Current user card */}
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-5 flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 rounded-full bg-gold flex items-center justify-center text-white font-bold text-lg shrink-0">
+        <div className="bg-surface-sunken border border-line rounded-xl p-5 flex items-center gap-4 mb-6">
+          <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-white font-bold text-lg shrink-0">
             {user ? `${user.firstName[0]}${user.lastName[0]}` : 'DC'}
           </div>
           <div>
             <p className="text-white font-semibold">{user ? `${user.firstName} ${user.lastName}` : 'Demo User'}</p>
             <p className="text-gray-400 text-sm">{user?.email}</p>
-            <span className="inline-flex mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gold/10 text-gold border border-gold/20 capitalize">
+            <span className="inline-flex mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent border border-accent/20 capitalize">
               {user?.role?.replace(/_/g, ' ')}
             </span>
           </div>
         </div>
 
         {/* Tab bar */}
-        <div className="flex flex-wrap gap-1 border-b border-navy-600 mb-6">
+        <div className="flex flex-wrap gap-1 border-b border-line mb-6">
           {tabs.filter(t => (!t.superAdminOnly || isSuperAdmin) && (!t.adminOnly || isAdmin)).map(t => (
             <button key={t.value} onClick={() => setActiveTab(t.value)}
               className={`flex items-center gap-1.5 px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 activeTab === t.value
-                  ? 'border-gold text-gold'
+                  ? 'border-accent text-accent'
                   : 'border-transparent text-gray-500 hover:text-white'
               }`}>
               <t.icon size={14} />

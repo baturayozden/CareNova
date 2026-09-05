@@ -32,7 +32,7 @@ const sizeMap: Record<Size, string> = {
 const variantBase: Record<Variant, string> = {
   primary:   "text-white font-semibold",
   secondary: "text-white     font-medium border border-white/10",
-  ghost:     "text-gold       font-medium",
+  ghost:     "text-accent       font-medium",
 };
 
 // ─── shimmer component ────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ function GlowHalo({ active }: { active: boolean }) {
       className="pointer-events-none absolute -inset-px rounded-[inherit] transition-opacity duration-300"
       style={{
         opacity:    active ? 1 : 0,
-        boxShadow: "0 0 0 2px rgba(37,99,235,0.55), 0 0 28px 4px rgba(37,99,235,0.35)",
+        boxShadow: "0 0 0 2px rgba(27,111,234,0.55), 0 0 28px 4px rgba(27,111,234,0.35)",
       }}
     />
   );
@@ -121,7 +121,7 @@ export const AnimatedButton = React.forwardRef<
       variant === "primary"
         ? {
             background:
-              "linear-gradient(135deg, #2563EB 0%, #3B82F6 50%, #1D4ED8 100%)",
+              "linear-gradient(135deg, #1B6FEA 0%, #3B82F6 50%, #1559C4 100%)",
             backgroundSize: "200% 200%",
           }
         : variant === "secondary"
@@ -132,7 +132,7 @@ export const AnimatedButton = React.forwardRef<
       "relative inline-flex items-center justify-center overflow-hidden",
       "select-none outline-none cursor-pointer",
       "transition-colors duration-200",
-      "focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-navy-950",
+      "focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page",
       "disabled:opacity-40 disabled:pointer-events-none",
       sizeMap[size],
       variantBase[variant],
@@ -156,8 +156,8 @@ export const AnimatedButton = React.forwardRef<
         // glow box-shadow on hover (primary only)
         animate={
           variant === "primary" && hovered && !reduced
-            ? { boxShadow: "0 0 42px rgba(37,99,235,0.55)" }
-            : { boxShadow: "0 0 0px rgba(37,99,235,0)" }
+            ? { boxShadow: "0 0 42px rgba(27,111,234,0.55)" }
+            : { boxShadow: "0 0 0px rgba(27,111,234,0)" }
         }
         // events
         onHoverStart={() => setHovered(true)}

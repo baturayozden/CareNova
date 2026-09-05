@@ -243,6 +243,97 @@ teslimat olurdu. Sadece kullanıcının doğrudan talep ettiği, geri alınabili
 (protection tekrar açılabilir) ve yıkıcı olmayan (proje silme onunla teyit
 edilerek yapıldı) işlemler gerçekleştirildi.
 
-**Commit:** `343ef40` fix(build): split Vercel install/build into separate commands, `2425470` docs: B3, `583d300` fix(deploy): serve _hosts/app-shell.html
+**Commit:** `343ef40` fix(build): split Vercel install/build into separate commands, `2425470` docs: B3, `583d300` fix(deploy): serve _hosts/app-shell.html, `11098ac` docs: record incident + BLOKAJLAR/morning report update
+
+---
+## [10:15] Talep: (A) Renk sistemi birleştirme, (B) app.carenova.ai admin, (C) Landing tam kapsam
+
+Baturay üç parçalı yeni bir iş talebi verdi (A→B→C sırayla, her biri ayrı commit).
+Bu bölüm PART A'yı kapsıyor.
+
+### BÖLÜM A — "Klinik Beyazı" renk sistemi
+
+**Yapıldı:**
+- `frontend/src/index.css` sıfırdan yazıldı: `:root` artık AÇIK tema (surface-0/1/2,
+  border/border-strong, ink/ink-muted/ink-subtle, accent/accent-hover/accent-soft,
+  success/warning/danger + soft varyantları, shadow-sm/md/lg). `[data-theme="dark"]`
+  ikincil koyu tema. Eskisi tam tersiydi (`:root`=koyu, `[data-theme="light"]`=açık) —
+  brief'in istediği gibi çevrildi.
+- Dashboard'un Tailwind built-in renk override bloğu (text-white, bg-red-900/50,
+  bg-gray-800 vb. — 40+ dosyada literal kullanılan yüzlerce class) da TERS ÇEVRİLDİ:
+  artık kural UNSCOPED (açık varsayılan), `[data-theme="dark"]` eski koyu-uyumlu
+  değerleri geri getiriyor. Bu sayede 40+ dashboard dosyasının JSX'ine hiç
+  dokunmadan (text-white, bg-red-900 gibi Tailwind'in KENDİ paleti, benim custom
+  token'larım değil) ışık/koyu tutarlılığı sağlandı.
+- `tailwind.config.js` tek sisteme indirildi: `navy`/`gold`/eski `brand`/eski
+  `accent` (amber) skalaları KALDIRILDI. Yeni: `surface` (DEFAULT/page/sunken),
+  `line` (DEFAULT/strong), `ink` (DEFAULT/muted/subtle), `accent`
+  (DEFAULT/hover/soft), `success`/`warning`/`danger`. `boxShadow.sm/md/lg` CSS
+  değişkenlerine bağlandı (koyu temada `none`).
+- **50 dosyada** eski token kullanımı taşındı: navy-950→surface-page,
+  navy-900→surface, navy-800/700→surface-sunken, navy-600→line,
+  navy-500/400→line-strong, navy-750→surface-sunken, gold/gold-light→accent/
+  accent-hover (458+60 kullanım). Mekanik sed YETMEDİĞİ doğru çıktı — macOS'un
+  BSD sed'i `\b` word-boundary desteklemiyor, ilk geçişte "gold" (gold-light hariç)
+  hiç değişmedi, fark edip düz alt-string eşleşmesiyle düzelttim. 6 özel durumu
+  (mesaj balonu üzerindeki zaman damgası, sarı rozet üzerindeki metin, boş durum
+  ikonu) elle tek tek düzelttim çünkü bunlar "her zaman koyu/açık kalmalı" türü
+  bağlam-bağımlı renklerdi, blanket sed onları bozardı.
+- Landing bileşenlerinde (10 dosya + `landingContent.tsx`) brand-900/500/700 ve
+  eski amber accent-300/400/500/700 aynı şekilde yeni token'lara taşındı. **Bunu
+  kasıtlı olarak hızlı/pragmatik yaptım** çünkü BÖLÜM C bu dosyaların içeriğini
+  ZATEN baştan yazacak — token mimarisini şimdi doğru kurup görsel derinliği
+  Bölüm C'ye bıraktım.
+- Logo SVG'leri (`carenova-logo*.svg`, `favicon.svg`) ve türetilmiş PNG/ICO'lar
+  eski teal/amber'dan yeni accent mavisine güncellendi — bu sırada bir gerçek
+  hata buldum: ilk sed geçişimde koyu-zemin logo varyantlarında "Nova" harfleri
+  koyu lacivert (`ink`) rengine boyanmıştı, yani KOYU zemin üzerinde KOYU metin
+  (görünmez) oluyordu. Fark edip düzelttim (`#60A5FA` açık mavi kullanıldı).
+  `index.html`/`manifest.json`'daki `theme-color`/`background_color` de güncellendi.
+- `scripts/check-contrast.js` yazıldı — WCAG AA (normal 4.5:1, büyük/UI 3:1) oranlarını
+  hesaplayıp `docs/contrast-report.md` üretiyor. **İlk çalıştırmada brief'in tam
+  öngördüğü gibi `ink-subtle` başarısız oldu** (surface-2 üzerinde 2.60:1, gereken 3:1)
+  — brief'in verdiği `#8A98A6` değerini Tailwind'in `slate-500` (`#64748B`) ile
+  değiştirdim (4.19-4.76:1 aralığına çıktı). **Ayrıca brief'in vermediği, script'in
+  bulduğu 2 gerçek hata daha:** koyu temada `white` metin `accent`/`accent-hover`
+  üzerinde sırasıyla 3.68:1 ve 2.54:1 çıktı (gereken 4.5:1) — koyu tema accent
+  rengini brief'in `#3B82F6`'sından `#2563EB`'e (5.17:1), accent-hover'ı `#2E6EE0`'a
+  (4.75:1) çektim. **Son durum: TÜM çiftler geçiyor, hem açık hem koyu temada.**
+- Başlık tipografisi: `h1,h2,h3,.font-display` için `font-weight:500` +
+  `letter-spacing:-0.02em` eklendi (brief'in istediği gibi, açık zeminde ağır serif
+  "bağırmasın" diye).
+- `prefers-reduced-motion` desteği index.css'e eklendi (Bölüm C'nin de gerektireceği).
+- Gölge-tabanlı derinlik ilkesi (`shadow-sm`) en görünür kart bileşenine
+  (`StatsCards.tsx`) uygulandı; `LoginPage` zaten `shadow-2xl` kullanıyordu.
+  **40+ dashboard kartının TAMAMINA bu ilkeyi uygulamadım** — zaman bütçesi,
+  ve mevcut `border-line` kullanımı zaten okunabilir/tutarlı, sadece "ideal" değil.
+- `ThemeContext.tsx`'e dokunmadım — zaten `'light'` varsayılana sahipti (yorumu
+  yanıltıcıydı, kodun kendisi zaten doğruydu). Sidebar'daki mevcut tema toggle
+  butonu ve TR/EN dil değiştirici zaten "header'a toggle koy" gereksinimini
+  karşılıyordu.
+- **Tarayıcıda uçtan uca doğrulandı:** Login (Demo Modu rozeti, mavi buton, temiz
+  kart), Dashboard (istatistik kartları, lead tablosu, rozetler, Hot Leads paneli)
+  hem açık hem koyu temada, tema geçişi çalışıyor, landing sayfası (Nav, Hero,
+  WhatsApp animasyonu) açık temada düzgün render oluyor.
+
+**Karar:** Landing dosyalarının (10 dosya) görsel derinliği (gölge, ikon, layout
+zenginliği) BÖLÜM C'ye bırakıldı — bu dosyalar orada zaten baştan yazılacak,
+şimdiden tam görsel cila yapmak çöp işti olurdu. Dashboard'un ~40 sayfasının
+TAMAMI tek tek pixel-pixel görsel olarak doğrulanmadı (55 dosyalık bir migration,
+her biri ekran görüntüsüyle kontrol edilseydi bu tek başına gecelik bir iş olurdu)
+— bunun yerine (1) CSS override mekanizması matematik olarak doğru kuruldu (aynı
+Tailwind class'ları, sadece scope ters çevrildi, davranış garantili), (2) en
+yüksek trafikli sayfalar (Login/Dashboard/Sidebar) görsel olarak doğrulandı,
+(3) `grep` ile SIFIR kalan eski token doğrulandı, (4) contrast script'i TÜM
+token çiftlerini otomatik doğruladı. Bu, "hiç görsel kontrol yapılmadı"dan çok
+daha güçlü bir güvence ama "her sayfa elle kontrol edildi" de değil — dürüstçe
+belirtiyorum.
+
+**Kabul kriteri:** ✅ `cd frontend && npm run build` temiz. ✅ `docs/contrast-report.md`
+tüm çiftlerde geçti. ✅ Emoji ikon YOK diye bir kabul kriteri Part A'da yoktu (o
+Part C'de). ✅ Login/Dashboard/Landing görsel olarak tutarlı, okunmayan metin
+gözlemlenmedi.
+
+**Commit:** (push sonrası eklenecek)
 
 ---

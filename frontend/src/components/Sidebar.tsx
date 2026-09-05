@@ -214,7 +214,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           'fixed inset-y-0 left-0 z-50',          // mobile: overlay drawer
           'md:relative md:inset-auto md:z-auto',   // desktop: back in flow
           // ── Size & style ──
-          'w-72 shrink-0 bg-navy-900 flex flex-col h-[100dvh] border-r border-navy-600',
+          'w-72 shrink-0 bg-surface flex flex-col h-[100dvh] border-r border-line',
           // ── Slide transition ──
           'transition-transform duration-300 ease-in-out',
           isOpen ? 'translate-x-0' : '-translate-x-full',
@@ -222,7 +222,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         ].join(' ')}
       >
         {/* ── Header: logo + bell + mobile close ─────────────────────── */}
-        <div className="px-6 py-7 border-b border-navy-600 relative" ref={bellRef}>
+        <div className="px-6 py-7 border-b border-line relative" ref={bellRef}>
           <div className="flex items-center justify-center">
             <div>
               <img src={logoSrc} alt="CareNova AI" className="w-full max-w-[220px] h-auto" />
@@ -232,7 +232,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="ml-auto">
               <button
                 onClick={() => setBellOpen(v => !v)}
-                className="relative w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-navy-700 transition-colors"
+                className="relative w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors"
               >
                 <Bell size={18} />
                 {unreadCount > 0 && (
@@ -247,7 +247,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             {/* eslint-disable i18next/no-literal-string -- ✕ is a symbol, not translatable text */}
             <button
               onClick={onClose}
-              className="md:hidden ml-2 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-navy-700 transition-colors text-base"
+              className="md:hidden ml-2 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors text-base"
               aria-label={t('closeMenu')}
             >
               ✕
@@ -257,27 +257,27 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           {/* Dropdown — anchored to header-div, fits inside sidebar */}
           {bellOpen && (
-            <div className="absolute left-3 right-3 top-full bg-navy-800 border border-navy-600 rounded-xl shadow-2xl z-50 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-navy-700">
+            <div className="absolute left-3 right-3 top-full bg-surface-sunken border border-line rounded-xl shadow-2xl z-50 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-surface-sunken">
                 <p className="text-white text-sm font-semibold">{t('notifications')}</p>
                 {unreadCount > 0 && (
                   <button onClick={markAllRead}
-                    className="text-xs text-gold hover:text-gold-light transition-colors">
+                    className="text-xs text-accent hover:text-accent-hover transition-colors">
                     {t('markAllRead')}
                   </button>
                 )}
               </div>
-              <div className="max-h-80 overflow-y-auto divide-y divide-navy-700">
+              <div className="max-h-80 overflow-y-auto divide-y divide-surface-sunken">
                 {notifications.length === 0 ? (
                   <p className="text-gray-500 text-sm text-center py-8">{t('noNotifications')}</p>
                 ) : notifications.map(n => (
                   <div
                     key={n.id}
                     onClick={() => { markRead(n.id); if (n.link) { setBellOpen(false); } }}
-                    className={`px-4 py-3 cursor-pointer hover:bg-navy-700 transition-colors ${!n.read ? 'bg-navy-750' : ''}`}
+                    className={`px-4 py-3 cursor-pointer hover:bg-surface-sunken transition-colors ${!n.read ? 'bg-surface-sunken' : ''}`}
                   >
                     <div className="flex items-start gap-2">
-                      {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-gold mt-1.5 shrink-0" />}
+                      {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />}
                       <div className={!n.read ? '' : 'ml-3.5'}>
                         <p className={`text-sm font-medium ${n.read ? 'text-gray-300' : 'text-white'}`}>{n.title}</p>
                         <p className="text-gray-500 text-xs mt-0.5 line-clamp-2">{n.message}</p>
@@ -301,15 +301,15 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               className={({ isActive }) =>
                 `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'border-l-2 border-gold text-gold bg-navy-700 pl-[10px]'
-                    : 'text-gray-400 hover:text-white hover:bg-navy-700'
+                    ? 'border-l-2 border-accent text-accent bg-surface-sunken pl-[10px]'
+                    : 'text-gray-400 hover:text-white hover:bg-surface-sunken'
                 }`
               }
             >
               {(() => { const Icon = item.icon; return <Icon size={18} className="shrink-0" />; })()}
               <span className="flex-1">{t(item.labelKey)}</span>
               {item.path === '/ai-activity' && escalationCount > 0 && (
-                <span className="ml-auto bg-yellow-500 text-navy-950 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                <span className="ml-auto bg-yellow-500 text-slate-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {escalationCount > 99 ? '99+' : escalationCount}
                 </span>
               )}
@@ -329,8 +329,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className={({ isActive }) =>
                     `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isActive
-                        ? 'border-l-2 border-gold text-gold bg-navy-700 pl-[10px]'
-                        : 'text-gray-400 hover:text-white hover:bg-navy-700'
+                        ? 'border-l-2 border-accent text-accent bg-surface-sunken pl-[10px]'
+                        : 'text-gray-400 hover:text-white hover:bg-surface-sunken'
                     }`
                   }
                 >
@@ -354,8 +354,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className={({ isActive }) =>
                     `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isActive
-                        ? 'border-l-2 border-gold text-gold bg-navy-700 pl-[10px]'
-                        : 'text-gray-400 hover:text-white hover:bg-navy-700'
+                        ? 'border-l-2 border-accent text-accent bg-surface-sunken pl-[10px]'
+                        : 'text-gray-400 hover:text-white hover:bg-surface-sunken'
                     }`
                   }
                 >
@@ -368,9 +368,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         </nav>
 
         {/* ── Footer: user info, theme toggle, logout ─────────────────── */}
-        <div className="shrink-0 px-4 py-5 border-t border-navy-600 space-y-3">
+        <div className="shrink-0 px-4 py-5 border-t border-line space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gold flex items-center justify-center text-white font-semibold text-sm shrink-0">
+            <div className="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-white font-semibold text-sm shrink-0">
               {initials}
             </div>
             <div className="min-w-0">
@@ -385,7 +385,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <button
                 onClick={() => setSwitcherOpen(v => !v)}
                 disabled={switching}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-navy-700 transition-colors disabled:opacity-50"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors disabled:opacity-50"
               >
                 <Building2 size={16} className="shrink-0" />
                 <span className="flex-1 text-left truncate">
@@ -398,7 +398,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </button>
 
               {switcherOpen && (
-                <div className="absolute bottom-full left-0 right-0 mb-1 bg-navy-800 border border-navy-600 rounded-xl shadow-xl overflow-hidden z-50">
+                <div className="absolute bottom-full left-0 right-0 mb-1 bg-surface-sunken border border-line rounded-xl shadow-xl overflow-hidden z-50">
                   {myTenants.map(tenant => {
                     const isActive = tenant.tenantId === user?.tenantId;
                     return (
@@ -409,8 +409,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         className={[
                           'w-full text-left px-4 py-3 text-sm transition-colors',
                           isActive
-                            ? 'bg-navy-700 cursor-default'
-                            : 'hover:bg-navy-700',
+                            ? 'bg-surface-sunken cursor-default'
+                            : 'hover:bg-surface-sunken',
                         ].join(' ')}
                       >
                         <span className={`block font-medium ${isActive ? 'text-white' : 'text-gray-200'}`}>
@@ -420,7 +420,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                           {tenant.role.replace(/_/g, ' ')}
                         </span>
                         {isActive && (
-                          <span className="block text-xs text-gold mt-0.5">{t('active')}</span>
+                          <span className="block text-xs text-accent mt-0.5">{t('active')}</span>
                         )}
                       </button>
                     );
@@ -438,8 +438,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 aria-current={i18n.language?.startsWith(lng)}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide transition-colors ${
                   i18n.language?.startsWith(lng)
-                    ? 'bg-navy-700 text-gold'
-                    : 'text-gray-500 hover:text-white hover:bg-navy-700'
+                    ? 'bg-surface-sunken text-accent'
+                    : 'text-gray-500 hover:text-white hover:bg-surface-sunken'
                 }`}
               >
                 {lng}
@@ -449,7 +449,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           <button
             onClick={toggleTheme}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-navy-700 transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors"
             title={theme === 'dark' ? t('switchToLight') : t('switchToDark')}
           >
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
@@ -458,7 +458,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           <button
             onClick={logout}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:text-red-300 hover:bg-navy-700 transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:text-red-300 hover:bg-surface-sunken transition-colors"
           >
             <LogOut size={16} />
             {t('signOut')}

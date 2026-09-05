@@ -37,8 +37,8 @@ export default function ActivityFeed({ events }: Props) {
   );
 
   return (
-    <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden flex flex-col">
-      <div className="px-6 py-4 border-b border-navy-600 shrink-0">
+    <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden flex flex-col">
+      <div className="px-6 py-4 border-b border-line shrink-0">
         <h2 className="font-serif text-xl text-white">AI Activity</h2>
         <p className="text-xs text-gray-500 mt-0.5">Real-time lead interactions</p>
       </div>
@@ -47,7 +47,7 @@ export default function ActivityFeed({ events }: Props) {
         {sorted.map((event, idx) => (
           <div
             key={event.id}
-            className={`px-5 py-4 ${idx !== sorted.length - 1 ? 'border-b border-navy-600' : ''} hover:bg-navy-700 transition-colors`}
+            className={`px-5 py-4 ${idx !== sorted.length - 1 ? 'border-b border-line' : ''} hover:bg-surface-sunken transition-colors`}
           >
             <div className="flex gap-3">
               <div
@@ -57,7 +57,7 @@ export default function ActivityFeed({ events }: Props) {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-gold text-sm font-medium truncate">
+                  <span className="text-accent text-sm font-medium truncate">
                     {event.leadName}
                   </span>
                   <span className="text-gray-500 text-xs shrink-0">

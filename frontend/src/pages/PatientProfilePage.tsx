@@ -582,7 +582,7 @@ export default function PatientProfilePage() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-4 text-gray-500">
         <p>Patient not found.</p>
-        <button onClick={() => navigate('/patients')} className="text-gold hover:underline text-sm">
+        <button onClick={() => navigate('/patients')} className="text-accent hover:underline text-sm">
           ← Back to patients
         </button>
       </div>
@@ -606,7 +606,7 @@ export default function PatientProfilePage() {
     <div className="flex flex-col flex-1 min-w-0 h-full overflow-auto">
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="px-6 py-4 border-b border-navy-600 flex items-center gap-4 shrink-0">
+      <div className="px-6 py-4 border-b border-line flex items-center gap-4 shrink-0">
         <button
           onClick={() => navigate(-1)}
           className="text-gray-400 hover:text-white transition-colors"
@@ -621,7 +621,7 @@ export default function PatientProfilePage() {
           <button
             onClick={handleDeletePreview}
             disabled={deleteLoading}
-            className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 border border-navy-600 hover:border-red-500/50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 border border-line hover:border-red-500/50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
           >
             <Trash2 size={12} />
             Archive
@@ -630,7 +630,7 @@ export default function PatientProfilePage() {
         {canEdit && (
           <button
             onClick={openEdit}
-            className="flex items-center gap-1.5 text-xs text-gold hover:text-gold-light border border-navy-600 hover:border-gold/50 px-3 py-1.5 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 text-xs text-accent hover:text-accent-hover border border-line hover:border-accent/50 px-3 py-1.5 rounded-lg transition-colors"
           >
             <Pencil size={12} />
             Edit
@@ -645,9 +645,9 @@ export default function PatientProfilePage() {
         <div className="w-full lg:w-72 xl:w-80 shrink-0 flex flex-col gap-4">
 
           {/* Patient card */}
-          <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+          <div className="bg-surface-sunken border border-line rounded-xl p-5">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-gold flex items-center justify-center text-navy-900 font-bold text-lg shrink-0">
+              <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-surface font-bold text-lg shrink-0">
                 {initials}
               </div>
               <div className="min-w-0">
@@ -696,19 +696,19 @@ export default function PatientProfilePage() {
             </div>
 
             {lead.notes && (
-              <div className="mt-4 pt-4 border-t border-navy-700">
+              <div className="mt-4 pt-4 border-t border-surface-sunken">
                 <p className="text-gray-500 text-xs mb-1">Notes</p>
                 <p className="text-gray-300 text-sm leading-relaxed">{lead.notes}</p>
               </div>
             )}
 
-            <div className="mt-4 pt-4 border-t border-navy-700 text-xs text-gray-500">
+            <div className="mt-4 pt-4 border-t border-surface-sunken text-xs text-gray-500">
               Added {formatDate(lead.createdAt)}
             </div>
           </div>
 
           {/* Checklist */}
-          <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+          <div className="bg-surface-sunken border border-line rounded-xl p-5">
             <p className="text-white font-semibold text-sm mb-4">Patient Journey</p>
             <div className="space-y-3">
 
@@ -784,7 +784,7 @@ export default function PatientProfilePage() {
                 const checked  = !!item?.checked;
                 const toggling = togglingCheck === 'physical_id_check';
                 return (
-                  <div className="flex items-start gap-3 border-t border-navy-700 pt-3 mt-1">
+                  <div className="flex items-start gap-3 border-t border-surface-sunken pt-3 mt-1">
                     <button
                       onClick={() => handleToggleCheck('physical_id_check', checked)}
                       disabled={toggling}
@@ -816,14 +816,14 @@ export default function PatientProfilePage() {
             </div>
           </div>
           {/* Documents */}
-          <div className="bg-navy-800 border border-navy-600 rounded-xl p-5">
+          <div className="bg-surface-sunken border border-line rounded-xl p-5">
             <p className="text-white font-semibold text-sm mb-3">Documents</p>
             <div className="flex items-center gap-2 mb-3">
               <select
                 value={docType}
                 onChange={e => setDocType(e.target.value as typeof docType)}
                 disabled={uploading}
-                className="flex-1 bg-navy-700 border border-navy-600 rounded-lg px-2 py-1.5 text-gray-300 text-xs focus:outline-none focus:border-gold/50 disabled:opacity-40"
+                className="flex-1 bg-surface-sunken border border-line rounded-lg px-2 py-1.5 text-gray-300 text-xs focus:outline-none focus:border-accent/50 disabled:opacity-40"
               >
                 <option value="passport">Passport</option>
                 <option value="id_card">ID Card</option>
@@ -832,7 +832,7 @@ export default function PatientProfilePage() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="flex items-center gap-1 text-xs text-gold hover:text-gold-light border border-navy-600 hover:border-gold/50 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-40 shrink-0"
+                className="flex items-center gap-1 text-xs text-accent hover:text-accent-hover border border-line hover:border-accent/50 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-40 shrink-0"
               >
                 <Upload size={11} />
                 {uploading ? 'Uploading…' : 'Upload'}
@@ -870,7 +870,7 @@ export default function PatientProfilePage() {
                     <div key={doc.id} className={`rounded-lg border px-3 py-2.5 ${
                       isHighRisk  ? 'border-red-500/50 bg-red-900/10' :
                       isFlagged   ? 'border-yellow-500/40 bg-yellow-900/10' :
-                                    'border-navy-600 bg-navy-700/50'
+                                    'border-line bg-surface-sunken/50'
                     }`}>
                       {/* Warning banner */}
                       {isHighRisk && (
@@ -940,7 +940,7 @@ export default function PatientProfilePage() {
                           </span>
                         )}
                         {vs === 'unreviewed' && (doc.ai_analysis !== null || doc.mime_type === 'application/pdf') && (
-                          <span className="inline-flex items-center gap-1 text-[10px] text-gray-400 bg-navy-800 border border-navy-600 rounded px-1.5 py-0.5">
+                          <span className="inline-flex items-center gap-1 text-[10px] text-gray-400 bg-surface-sunken border border-line rounded px-1.5 py-0.5">
                             ⚪ Not reviewed
                           </span>
                         )}
@@ -970,7 +970,7 @@ export default function PatientProfilePage() {
                           <button
                             onClick={() => handleAnalyzeDoc(doc.id)}
                             disabled={analyzingDoc === doc.id}
-                            className="text-[10px] px-3 py-1.5 rounded bg-navy-600 border border-navy-500 text-gray-200 hover:text-white hover:bg-navy-500 transition-colors disabled:opacity-40"
+                            className="text-[10px] px-3 py-1.5 rounded bg-line border border-line-strong text-gray-200 hover:text-white hover:bg-line-strong transition-colors disabled:opacity-40"
                           >
                             {analyzingDoc === doc.id ? '⏳ Analysing…' : '🔁 Re-check'}
                           </button>
@@ -1013,19 +1013,19 @@ export default function PatientProfilePage() {
           {/* Financial summary cards */}
           {(deals.length > 0 || cases.length > 0) && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="bg-navy-800 border border-navy-600 rounded-xl p-4">
+              <div className="bg-surface-sunken border border-line rounded-xl p-4">
                 <p className="text-gray-500 text-xs mb-1">Total Agreed</p>
                 <p className="text-white font-bold text-xl">{fmtGBP(totalAgreed)}</p>
                 <p className="text-gray-600 text-xs mt-1">{deals.length} deal{deals.length !== 1 ? 's' : ''}</p>
               </div>
-              <div className="bg-navy-800 border border-navy-600 rounded-xl p-4">
+              <div className="bg-surface-sunken border border-line rounded-xl p-4">
                 <p className="text-gray-500 text-xs mb-1">Deposited</p>
-                <p className="text-gold font-bold text-xl">{fmtGBP(totalDeposit)}</p>
+                <p className="text-accent font-bold text-xl">{fmtGBP(totalDeposit)}</p>
                 <p className="text-gray-600 text-xs mt-1">
                   {totalAgreed > 0 ? `${Math.round((totalDeposit / totalAgreed) * 100)}%` : '—'}
                 </p>
               </div>
-              <div className="bg-navy-800 border border-navy-600 rounded-xl p-4">
+              <div className="bg-surface-sunken border border-line rounded-xl p-4">
                 <p className="text-gray-500 text-xs mb-1">Balance Due</p>
                 <p className={`font-bold text-xl ${balance > 0 ? 'text-orange-400' : 'text-green-400'}`}>
                   {fmtGBP(balance)}
@@ -1038,16 +1038,16 @@ export default function PatientProfilePage() {
           )}
 
           {/* Tabs */}
-          <div className="bg-navy-800 border border-navy-600 rounded-xl flex flex-col flex-1 min-h-0 overflow-hidden">
+          <div className="bg-surface-sunken border border-line rounded-xl flex flex-col flex-1 min-h-0 overflow-hidden">
             {/* Tab bar */}
-            <div className="flex border-b border-navy-700 shrink-0 overflow-x-auto">
+            <div className="flex border-b border-surface-sunken shrink-0 overflow-x-auto">
               {TABS.map(t => (
                 <button
                   key={t.key}
                   onClick={() => setActiveTab(t.key)}
                   className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                     activeTab === t.key
-                      ? 'text-gold border-b-2 border-gold -mb-px'
+                      ? 'text-accent border-b-2 border-accent -mb-px'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
@@ -1065,23 +1065,23 @@ export default function PatientProfilePage() {
                   <div>
                     <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest mb-3">Summary</p>
                     <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="bg-navy-700/50 rounded-lg px-4 py-3">
+                      <div className="bg-surface-sunken/50 rounded-lg px-4 py-3">
                         <p className="text-gray-500 text-xs mb-1">Status</p>
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[lead.status] ?? 'bg-gray-800 text-gray-400'}`}>
                           {statusLabel(lead.status)}
                         </span>
                       </div>
-                      <div className="bg-navy-700/50 rounded-lg px-4 py-3">
+                      <div className="bg-surface-sunken/50 rounded-lg px-4 py-3">
                         <p className="text-gray-500 text-xs mb-1">Language</p>
                         <p className="text-gray-300">{LANGUAGE_OPTIONS.find(l => l.value === lead.language)?.label ?? lead.language}</p>
                       </div>
-                      <div className="bg-navy-700/50 rounded-lg px-4 py-3">
+                      <div className="bg-surface-sunken/50 rounded-lg px-4 py-3">
                         <p className="text-gray-500 text-xs mb-1">AI Follow-up</p>
                         <p className={lead.aiFollowUpEnabled ? 'text-green-400' : 'text-gray-500'}>
                           {lead.aiFollowUpEnabled ? `Enabled · ${lead.aiFollowUpCount} sent` : 'Disabled'}
                         </p>
                       </div>
-                      <div className="bg-navy-700/50 rounded-lg px-4 py-3">
+                      <div className="bg-surface-sunken/50 rounded-lg px-4 py-3">
                         <p className="text-gray-500 text-xs mb-1">GDPR Consent</p>
                         <p className={lead.gdprConsentGiven ? 'text-green-400' : 'text-red-400'}>
                           {lead.gdprConsentGiven ? 'Given' : 'Not given'}
@@ -1115,7 +1115,7 @@ export default function PatientProfilePage() {
                     </p>
                     <button
                       onClick={() => setShowNewSale(true)}
-                      className="flex items-center gap-1.5 text-xs text-gold hover:text-gold-light border border-navy-600 hover:border-gold/50 px-3 py-1.5 rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 text-xs text-accent hover:text-accent-hover border border-line hover:border-accent/50 px-3 py-1.5 rounded-lg transition-colors"
                     >
                       <Plus size={12} />
                       New Sale
@@ -1129,7 +1129,7 @@ export default function PatientProfilePage() {
                   ) : (
                     <div className="space-y-3">
                       {deals.map(d => (
-                        <div key={d.id} className="bg-navy-700/50 border border-navy-600 rounded-lg p-4">
+                        <div key={d.id} className="bg-surface-sunken/50 border border-line rounded-lg p-4">
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <div>
                               <p className="text-white font-medium text-sm">
@@ -1152,23 +1152,23 @@ export default function PatientProfilePage() {
                                 <div className="relative" ref={el => { menuRefs.current[d.id] = el; }}>
                                   <button
                                     onClick={e => { e.stopPropagation(); setOpenMenu(openMenu === d.id ? null : d.id); }}
-                                    className="p-1 rounded text-gray-500 hover:text-white hover:bg-navy-600 transition-colors"
+                                    className="p-1 rounded text-gray-500 hover:text-white hover:bg-line transition-colors"
                                   >
                                     <MoreHorizontal size={14} />
                                   </button>
                                   {openMenu === d.id && (
                                     <div
-                                      className="absolute right-0 top-7 z-20 bg-navy-800 border border-navy-600 rounded-lg shadow-xl py-1 w-28"
+                                      className="absolute right-0 top-7 z-20 bg-surface-sunken border border-line rounded-lg shadow-xl py-1 w-28"
                                       onClick={e => e.stopPropagation()}
                                     >
                                       <button
-                                        className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-navy-700 transition-colors"
+                                        className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-surface-sunken transition-colors"
                                         onClick={() => { setEditingDeal(d); setOpenMenu(null); }}
                                       >
                                         Edit
                                       </button>
                                       <button
-                                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-navy-700 transition-colors"
+                                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-surface-sunken transition-colors"
                                         onClick={() => { setDeleteId(d.id); setOpenMenu(null); }}
                                       >
                                         Delete
@@ -1186,7 +1186,7 @@ export default function PatientProfilePage() {
                             </div>
                             <div>
                               <p className="text-gray-500">Deposit</p>
-                              <p className="text-gold font-medium">{fmtGBP(d.deposit_amount)}</p>
+                              <p className="text-accent font-medium">{fmtGBP(d.deposit_amount)}</p>
                             </div>
                             {d.balance_due_date && (
                               <div>
@@ -1224,7 +1224,7 @@ export default function PatientProfilePage() {
                   ) : (
                     <div className="space-y-3">
                       {cases.map(c => (
-                        <div key={c.id} className="bg-navy-700/50 border border-navy-600 rounded-lg p-4">
+                        <div key={c.id} className="bg-surface-sunken/50 border border-line rounded-lg p-4">
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <div>
                               <p className="text-white font-medium text-sm">
@@ -1257,7 +1257,7 @@ export default function PatientProfilePage() {
                           <div className="mt-2 flex items-center gap-3 flex-wrap">
                             <button
                               onClick={() => navigate(`/payments/${c.id}`)}
-                              className="text-xs text-gold hover:underline"
+                              className="text-xs text-accent hover:underline"
                             >
                               View case →
                             </button>
@@ -1310,7 +1310,7 @@ export default function PatientProfilePage() {
                   ) : (
                     <div className="space-y-3">
                       {invoices.map(inv => (
-                        <div key={inv.id} className="bg-navy-700/50 border border-navy-600 rounded-lg p-4">
+                        <div key={inv.id} className="bg-surface-sunken/50 border border-line rounded-lg p-4">
                           <div className="flex items-start justify-between gap-2">
                             <div>
                               <p className="text-white font-medium text-sm">
@@ -1353,14 +1353,14 @@ export default function PatientProfilePage() {
                         >
                           <div className={`max-w-[80%] rounded-xl px-4 py-2.5 text-sm ${
                             m.direction === 'outbound'
-                              ? 'bg-gold/20 border border-gold/30 text-gray-200'
-                              : 'bg-navy-700 border border-navy-600 text-gray-200'
+                              ? 'bg-accent/20 border border-accent/30 text-gray-200'
+                              : 'bg-surface-sunken border border-line text-gray-200'
                           }`}>
                             <p className="leading-relaxed">{m.content}</p>
                             <div className="flex items-center gap-2 mt-1.5">
                               <p className="text-gray-500 text-[10px]">{formatDate(m.createdAt)}</p>
                               {m.aiGenerated && (
-                                <span className="text-[9px] text-gold/70 border border-gold/20 px-1 rounded">AI</span>
+                                <span className="text-[9px] text-accent/70 border border-accent/20 px-1 rounded">AI</span>
                               )}
                             </div>
                           </div>
@@ -1394,7 +1394,7 @@ export default function PatientProfilePage() {
       {/* ── Delete confirm ──────────────────────────────────────────────────── */}
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-navy-900 border border-navy-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+          <div className="bg-surface border border-surface-sunken rounded-2xl p-6 w-full max-w-sm shadow-2xl">
             <h3 className="text-white font-semibold mb-2">Delete Deal</h3>
             <p className="text-gray-400 text-sm mb-5">
               This deal will be permanently deleted. This cannot be undone.
@@ -1438,8 +1438,8 @@ export default function PatientProfilePage() {
       {editOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60" onClick={() => setEditOpen(false)} />
-          <div className="relative bg-navy-800 border border-navy-600 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-navy-700">
+          <div className="relative bg-surface-sunken border border-line rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-surface-sunken">
               <h3 className="text-white font-semibold">Edit Patient</h3>
               <button onClick={() => setEditOpen(false)} className="text-gray-500 hover:text-white">
                 <X size={18} />
@@ -1457,7 +1457,7 @@ export default function PatientProfilePage() {
                 <div>
                   <label className="block text-gray-400 text-xs mb-1">First name</label>
                   <input
-                    className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50"
+                    className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent/50"
                     value={editFirstName}
                     onChange={e => setEditFirstName(e.target.value)}
                   />
@@ -1465,7 +1465,7 @@ export default function PatientProfilePage() {
                 <div>
                   <label className="block text-gray-400 text-xs mb-1">Last name</label>
                   <input
-                    className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50"
+                    className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent/50"
                     value={editLastName}
                     onChange={e => setEditLastName(e.target.value)}
                   />
@@ -1475,7 +1475,7 @@ export default function PatientProfilePage() {
               <div>
                 <label className="block text-gray-400 text-xs mb-1">Phone</label>
                 <input
-                  className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50"
+                  className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent/50"
                   value={editPhone}
                   onChange={e => setEditPhone(e.target.value)}
                 />
@@ -1485,7 +1485,7 @@ export default function PatientProfilePage() {
                 <label className="block text-gray-400 text-xs mb-1">Email</label>
                 <input
                   type="email"
-                  className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50"
+                  className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent/50"
                   value={editEmail}
                   onChange={e => setEditEmail(e.target.value)}
                 />
@@ -1495,7 +1495,7 @@ export default function PatientProfilePage() {
                 <div>
                   <label className="block text-gray-400 text-xs mb-1">Status</label>
                   <select
-                    className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50"
+                    className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent/50"
                     value={editStatus}
                     onChange={e => setEditStatus(e.target.value)}
                   >
@@ -1507,7 +1507,7 @@ export default function PatientProfilePage() {
                 <div>
                   <label className="block text-gray-400 text-xs mb-1">Language</label>
                   <select
-                    className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50"
+                    className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent/50"
                     value={editLanguage}
                     onChange={e => setEditLanguage(e.target.value)}
                   >
@@ -1522,7 +1522,7 @@ export default function PatientProfilePage() {
                 <div>
                   <label className="block text-gray-400 text-xs mb-1">Assigned to</label>
                   <select
-                    className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50"
+                    className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent/50"
                     value={editAssignedTo}
                     onChange={e => setEditAssignedTo(e.target.value)}
                   >
@@ -1539,7 +1539,7 @@ export default function PatientProfilePage() {
               <div>
                 <label className="block text-gray-400 text-xs mb-1">Treatment interest</label>
                 <input
-                  className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50"
+                  className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent/50"
                   value={editTreatment}
                   onChange={e => setEditTreatment(e.target.value)}
                 />
@@ -1549,7 +1549,7 @@ export default function PatientProfilePage() {
                 <label className="block text-gray-400 text-xs mb-1">Notes</label>
                 <textarea
                   rows={3}
-                  className="w-full bg-navy-700 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50 resize-none"
+                  className="w-full bg-surface-sunken border border-line rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent/50 resize-none"
                   value={editNotes}
                   onChange={e => setEditNotes(e.target.value)}
                 />
@@ -1562,7 +1562,7 @@ export default function PatientProfilePage() {
                       if (!editGdpr && editAiEnabled) setEditAiEnabled(false);
                       setEditGdpr(v => !v);
                     }}
-                    className={`w-8 h-4 rounded-full transition-colors ${editGdpr ? 'bg-gold' : 'bg-navy-600'}`}
+                    className={`w-8 h-4 rounded-full transition-colors ${editGdpr ? 'bg-accent' : 'bg-line'}`}
                   >
                     <div className={`w-3 h-3 bg-white rounded-full mt-0.5 transition-transform ${editGdpr ? 'translate-x-4 ml-0.5' : 'translate-x-0.5'}`} />
                   </div>
@@ -1571,7 +1571,7 @@ export default function PatientProfilePage() {
                 <label className={`flex items-center gap-2 cursor-pointer ${!editGdpr ? 'opacity-40 pointer-events-none' : ''}`}>
                   <div
                     onClick={() => setEditAiEnabled(v => !v)}
-                    className={`w-8 h-4 rounded-full transition-colors ${editAiEnabled ? 'bg-gold' : 'bg-navy-600'}`}
+                    className={`w-8 h-4 rounded-full transition-colors ${editAiEnabled ? 'bg-accent' : 'bg-line'}`}
                   >
                     <div className={`w-3 h-3 bg-white rounded-full mt-0.5 transition-transform ${editAiEnabled ? 'translate-x-4 ml-0.5' : 'translate-x-0.5'}`} />
                   </div>
@@ -1580,7 +1580,7 @@ export default function PatientProfilePage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-navy-700">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-surface-sunken">
               <button
                 onClick={() => setEditOpen(false)}
                 className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
@@ -1590,7 +1590,7 @@ export default function PatientProfilePage() {
               <button
                 onClick={handleSave}
                 disabled={editSaving}
-                className="flex items-center gap-1.5 px-4 py-2 bg-gold hover:bg-gold-light text-navy-900 font-semibold text-sm rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent-hover text-surface font-semibold text-sm rounded-lg transition-colors disabled:opacity-50"
               >
                 {editSaving ? 'Saving…' : <><Check size={14} /> Save</>}
               </button>
@@ -1602,8 +1602,8 @@ export default function PatientProfilePage() {
       {/* ── Archive patient confirmation modal ─────────────────────────────── */}
       {deleteConfirming && deletePreview && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-navy-800 border border-navy-600 rounded-xl w-full max-w-sm">
-            <div className="px-6 py-4 border-b border-navy-700 flex items-center justify-between">
+          <div className="bg-surface-sunken border border-line rounded-xl w-full max-w-sm">
+            <div className="px-6 py-4 border-b border-surface-sunken flex items-center justify-between">
               <h3 className="text-white font-semibold">Archive patient?</h3>
               <button
                 onClick={() => { setDeleteConfirming(false); setDeleteError(''); }}
@@ -1617,7 +1617,7 @@ export default function PatientProfilePage() {
                 This will archive <strong className="text-white">{fullName}</strong> and all linked records.
                 This action cannot be undone.
               </p>
-              <div className="bg-navy-700 rounded-lg p-3 text-sm space-y-1.5 text-gray-400">
+              <div className="bg-surface-sunken rounded-lg p-3 text-sm space-y-1.5 text-gray-400">
                 <div className="flex justify-between"><span>Deals</span><span className="text-white font-medium">{deletePreview.deals}</span></div>
                 <div className="flex justify-between"><span>Payment cases</span><span className="text-white font-medium">{deletePreview.cases}</span></div>
                 <div className="flex justify-between"><span>Documents</span><span className="text-white font-medium">{deletePreview.documents}</span></div>
@@ -1625,7 +1625,7 @@ export default function PatientProfilePage() {
               </div>
               {deleteError && <p className="text-red-400 text-xs">{deleteError}</p>}
             </div>
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-navy-700">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-surface-sunken">
               <button
                 onClick={() => { setDeleteConfirming(false); setDeleteError(''); }}
                 className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"

@@ -546,7 +546,7 @@ export default function CommissionPage() {
     : '#ef4444';
   const toTarget      = Math.max(0, targetAmount - effectiveRev);
 
-  const inputCls = 'w-full bg-navy-900 border border-navy-600 text-white rounded-lg px-3 py-2 text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-gold/40';
+  const inputCls = 'w-full bg-surface border border-line text-white rounded-lg px-3 py-2 text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-accent/40';
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -568,7 +568,7 @@ export default function CommissionPage() {
             <select
               value={selectedClinicId ?? ''}
               onChange={e => setSelectedClinicId(e.target.value || null)}
-              className="bg-navy-800 border border-navy-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 min-w-[240px]"
+              className="bg-surface-sunken border border-line text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 min-w-[240px]"
             >
               <option value="">— Select a clinic —</option>
               {clinics.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -578,13 +578,13 @@ export default function CommissionPage() {
       )}
 
       {/* Tab bar */}
-      <div className="flex items-center gap-1 border-b border-navy-700 -mb-2">
+      <div className="flex items-center gap-1 border-b border-surface-sunken -mb-2">
         {(['report', 'deals', 'schemes', 'payments'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-              activeTab === tab ? 'border-gold text-gold' : 'border-transparent text-gray-400 hover:text-gray-200'
+              activeTab === tab ? 'border-accent text-accent' : 'border-transparent text-gray-400 hover:text-gray-200'
             }`}
           >
             {tab === 'report'
@@ -600,7 +600,7 @@ export default function CommissionPage() {
 
       {/* Clinic placeholder */}
       {isPlatformAdmin && !selectedClinicId ? (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-12 flex flex-col items-center text-center">
+        <div className="bg-surface-sunken border border-line rounded-xl p-12 flex flex-col items-center text-center">
           <Building2 size={48} className="mx-auto mb-4 text-gray-400" />
           <p className="text-white font-semibold text-base mb-1">Select a clinic to view commission data</p>
           <p className="text-gray-400 text-sm">Choose a clinic from the dropdown above to get started.</p>
@@ -624,7 +624,7 @@ export default function CommissionPage() {
           <span className="text-gray-500 text-sm">
             No periods yet.{' '}
             {canManage && (
-              <button onClick={() => setShowNewPeriod(true)} className="text-gold underline">
+              <button onClick={() => setShowNewPeriod(true)} className="text-accent underline">
                 Create one.
               </button>
             )}
@@ -633,7 +633,7 @@ export default function CommissionPage() {
           <select
             value={selectedId}
             onChange={e => setSelectedId(e.target.value)}
-            className="bg-navy-800 border border-navy-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 min-w-[200px]"
+            className="bg-surface-sunken border border-line text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 min-w-[200px]"
           >
             {periods.map(p => <option key={p.id} value={p.id}>{p.period_label}</option>)}
           </select>
@@ -646,7 +646,7 @@ export default function CommissionPage() {
         {canManage && (
           <button
             onClick={() => setShowNewPeriod(true)}
-            className="px-3 py-1.5 text-xs bg-navy-700 text-gray-300 border border-navy-600 rounded-lg hover:bg-navy-600 transition-colors"
+            className="px-3 py-1.5 text-xs bg-surface-sunken text-gray-300 border border-line rounded-lg hover:bg-line transition-colors"
           >
             + New Period
           </button>
@@ -701,7 +701,7 @@ export default function CommissionPage() {
 
       {/* ── Hero — clinic target progress ─────────────────────────────────────── */}
       {period && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-6">
+        <div className="bg-surface-sunken border border-line rounded-xl p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
 
             {/* Ring + numbers */}
@@ -723,7 +723,7 @@ export default function CommissionPage() {
                 <p className="text-white text-2xl font-bold tabular-nums leading-tight">
                   <AnimatedGBP value={effectiveRev} />
                 </p>
-                <p className="text-[10px] text-gold/60 mt-0.5">UK TC sales only</p>
+                <p className="text-[10px] text-accent/60 mt-0.5">UK TC sales only</p>
                 {hasTarget ? (
                   <>
                     <p className="text-gray-500 text-sm tabular-nums mt-0.5">
@@ -744,7 +744,7 @@ export default function CommissionPage() {
                     {canManage && !isLocked && (
                       <button
                         onClick={() => { setTargetInput(''); setTargetError(''); setShowSetTarget(true); }}
-                        className="text-xs text-gold underline hover:text-gold/80 transition-colors"
+                        className="text-xs text-accent underline hover:text-accent/80 transition-colors"
                       >
                         Set target
                       </button>
@@ -769,7 +769,7 @@ export default function CommissionPage() {
                   <div
                     key={gate.label}
                     className={`flex flex-col items-center px-3 py-2 rounded-lg border text-center min-w-[64px] transition-all ${
-                      hasTarget ? gateColor(gate, attainmentPct) : 'bg-navy-900/60 text-gray-600 border-navy-700'
+                      hasTarget ? gateColor(gate, attainmentPct) : 'bg-surface/60 text-gray-600 border-surface-sunken'
                     }`}
                   >
                     <span className="text-[10px] font-semibold mb-0.5">{gate.label}</span>
@@ -783,7 +783,7 @@ export default function CommissionPage() {
           {/* Progress bar */}
           {hasTarget && targetAmount > 0 && (
             <div className="mt-5">
-              <div className="h-1.5 bg-navy-900 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-surface rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-1000"
                   style={{
@@ -826,7 +826,7 @@ export default function CommissionPage() {
               loading: liveDealsLoading,
             },
           ].map(card => (
-            <div key={card.label} className="bg-navy-800 border border-navy-600 rounded-xl px-5 py-4">
+            <div key={card.label} className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
               <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">{card.label}</p>
               <p className="text-white text-2xl font-bold tabular-nums leading-tight">
                 {card.loading ? <span className="text-gray-600">…</span> : card.value}
@@ -839,9 +839,9 @@ export default function CommissionPage() {
 
       {/* ── TC Leaderboard ────────────────────────────────────────────────────── */}
       {period && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-navy-700 flex items-center gap-2">
-            <Trophy size={15} className="text-gold" />
+        <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-surface-sunken flex items-center gap-2">
+            <Trophy size={15} className="text-accent" />
             <h3 className="text-white font-semibold text-sm">Sales Leaderboard</h3>
             <span className="text-gray-600 text-xs ml-1">— live from deals</span>
             {hasRecords && (
@@ -860,7 +860,7 @@ export default function CommissionPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-navy-700 bg-navy-900/40">
+                  <tr className="border-b border-surface-sunken bg-surface/40">
                     <th className="text-left px-4 py-2.5 text-gray-500 font-medium text-[11px] uppercase tracking-wide w-8">#</th>
                     <th className="text-left px-4 py-2.5 text-gray-500 font-medium text-[11px] uppercase tracking-wide">Name</th>
                     <th className="text-right px-4 py-2.5 text-gray-500 font-medium text-[11px] uppercase tracking-wide">Sales</th>
@@ -871,7 +871,7 @@ export default function CommissionPage() {
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-navy-700">
+                <tbody className="divide-y divide-surface-sunken">
                   {leaderboard.map((tc, i) => {
                     const isNonQuota   = tc.role !== 'treatment_coordinator';
                     const tcPct        = targetAmount > 0 ? Math.min((tc.totalSales / targetAmount) * 100, 100) : 0;
@@ -881,7 +881,7 @@ export default function CommissionPage() {
                     return (
                       <React.Fragment key={tc.staffId}>
                         <tr
-                          className="hover:bg-navy-700/30 transition-colors cursor-pointer select-none"
+                          className="hover:bg-surface-sunken/30 transition-colors cursor-pointer select-none"
                           onClick={() => setExpandedTCs(prev => {
                             const next = new Set(prev);
                             next.has(tc.staffId) ? next.delete(tc.staffId) : next.add(tc.staffId);
@@ -908,15 +908,15 @@ export default function CommissionPage() {
                           </td>
                           <td className="px-4 py-3 text-right tabular-nums">
                             {tc.commission !== null
-                              ? <span className="text-gold font-semibold">{formatGBP(tc.commission)}</span>
+                              ? <span className="text-accent font-semibold">{formatGBP(tc.commission)}</span>
                               : <span className="text-gray-600">—</span>}
                           </td>
                           {targetAmount > 0 && (
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2">
-                                <div className="flex-1 h-1.5 bg-navy-900 rounded-full overflow-hidden">
+                                <div className="flex-1 h-1.5 bg-surface rounded-full overflow-hidden">
                                   <div
-                                    className="h-full rounded-full bg-gold/70 transition-all duration-700"
+                                    className="h-full rounded-full bg-accent/70 transition-all duration-700"
                                     style={{ width: `${tcPct}%` }}
                                   />
                                 </div>
@@ -928,11 +928,11 @@ export default function CommissionPage() {
                           )}
                         </tr>
                         {isExpanded && (
-                          <tr className="bg-navy-900/60">
+                          <tr className="bg-surface/60">
                             <td colSpan={colSpan} className="px-0 py-0">
                               <table className="w-full text-xs">
                                 <thead>
-                                  <tr className="border-b border-navy-700/60">
+                                  <tr className="border-b border-surface-sunken/60">
                                     <th className="text-left pl-12 pr-3 py-2 text-gray-600 font-medium uppercase tracking-wide">Patient</th>
                                     <th className="text-left px-3 py-2 text-gray-600 font-medium uppercase tracking-wide">Treatment</th>
                                     <th className="text-left px-3 py-2 text-gray-600 font-medium uppercase tracking-wide">Date</th>
@@ -941,19 +941,19 @@ export default function CommissionPage() {
                                     <th className="text-left px-3 py-2 text-gray-600 font-medium uppercase tracking-wide">Entity</th>
                                   </tr>
                                 </thead>
-                                <tbody className="divide-y divide-navy-800/60">
+                                <tbody className="divide-y divide-surface-sunken/60">
                                   {tcDeals.length === 0 ? (
                                     <tr>
                                       <td colSpan={6} className="pl-12 pr-3 py-3 text-gray-600 italic">No active deals</td>
                                     </tr>
                                   ) : tcDeals.map(d => (
-                                    <tr key={d.id} className="hover:bg-navy-800/40 transition-colors">
+                                    <tr key={d.id} className="hover:bg-surface-sunken/40 transition-colors">
                                       <td className="pl-12 pr-3 py-2.5">
                                         {d.lead_id ? (
                                           <a
                                             href={`/patients/${d.lead_id}`}
                                             onClick={e => e.stopPropagation()}
-                                            className="text-gold/80 hover:text-gold hover:underline"
+                                            className="text-accent/80 hover:text-accent hover:underline"
                                           >
                                             {d.patient_name || '—'}
                                           </a>
@@ -1014,7 +1014,7 @@ export default function CommissionPage() {
 
       {/* ── Report loading / error ────────────────────────────────────────────── */}
       {reportLoading && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl p-8 text-center text-gray-400 text-sm">
+        <div className="bg-surface-sunken border border-line rounded-xl p-8 text-center text-gray-400 text-sm">
           Loading commission records…
         </div>
       )}
@@ -1026,8 +1026,8 @@ export default function CommissionPage() {
 
       {/* ── Commission records table (post-Calculate) ─────────────────────────── */}
       {!reportLoading && !reportError && hasRecords && report && (
-        <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-navy-700 flex items-center justify-between">
+        <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-surface-sunken flex items-center justify-between">
             <h3 className="text-white font-semibold text-sm">Commission Detail</h3>
             <p className="text-gray-500 text-xs">Click a row to expand breakdown</p>
           </div>
@@ -1035,7 +1035,7 @@ export default function CommissionPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-navy-700 bg-navy-900/40">
+                <tr className="border-b border-surface-sunken bg-surface/40">
                   <th className="text-left px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Staff</th>
                   <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Personal Rev</th>
                   <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Base</th>
@@ -1047,11 +1047,11 @@ export default function CommissionPage() {
                   <th className="px-3 py-3 w-8"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-700">
+              <tbody className="divide-y divide-surface-sunken">
                 {report.records.map(rec => (
                   <React.Fragment key={rec.id}>
                     <tr
-                      className="hover:bg-navy-700/50 cursor-pointer transition-colors"
+                      className="hover:bg-surface-sunken/50 cursor-pointer transition-colors"
                       onClick={() => toggleRow(rec.id)}
                     >
                       <td className="px-4 py-3">
@@ -1062,7 +1062,7 @@ export default function CommissionPage() {
                       <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatGBP(rec.base_commission)}</td>
                       <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatGBP(rec.performance_bonus)}</td>
                       <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatGBP(rec.team_bonus)}</td>
-                      <td className="px-4 py-3 text-right text-gold font-semibold tabular-nums">{formatGBP(rec.total_commission)}</td>
+                      <td className="px-4 py-3 text-right text-accent font-semibold tabular-nums">{formatGBP(rec.total_commission)}</td>
                       <td className="px-4 py-3 text-right text-gray-400 text-xs tabular-nums">
                         {rec.target_attainment ? pct(rec.target_attainment) : '—'}
                       </td>
@@ -1078,12 +1078,12 @@ export default function CommissionPage() {
                     </tr>
 
                     {expandedRows.has(rec.id) && (
-                      <tr className="bg-navy-900/60">
+                      <tr className="bg-surface/60">
                         <td colSpan={9} className="px-6 py-5">
                           <div className="space-y-2">
                             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Calculation Breakdown</p>
                             {rec.notes ? (
-                              <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap font-mono bg-navy-900/60 rounded-lg px-4 py-3 border border-navy-700">
+                              <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap font-mono bg-surface/60 rounded-lg px-4 py-3 border border-surface-sunken">
                                 {rec.notes}
                               </p>
                             ) : (
@@ -1106,7 +1106,7 @@ export default function CommissionPage() {
               </tbody>
 
               <tfoot>
-                <tr className="border-t-2 border-navy-600 bg-navy-900/40">
+                <tr className="border-t-2 border-line bg-surface/40">
                   <td className="px-4 py-3 text-gray-400 text-xs font-semibold uppercase tracking-wide">
                     Total ({report.records.length} {report.records.length === 1 ? 'staff member' : 'staff members'})
                   </td>
@@ -1120,7 +1120,7 @@ export default function CommissionPage() {
                   <td className="px-4 py-3 text-right text-white font-semibold text-sm tabular-nums">
                     {formatGBP(report.records.reduce((s, r) => s + Number(r.team_bonus), 0))}
                   </td>
-                  <td className="px-4 py-3 text-right text-gold font-bold text-sm tabular-nums">{formatGBP(totalCommission)}</td>
+                  <td className="px-4 py-3 text-right text-accent font-bold text-sm tabular-nums">{formatGBP(totalCommission)}</td>
                   <td colSpan={3}></td>
                 </tr>
               </tfoot>
@@ -1156,7 +1156,7 @@ export default function CommissionPage() {
       ══════════════════════════════════════════════════════════════════════ */}
       {showNewPeriod && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-md mx-4 p-6">
+          <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-md mx-4 p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-white font-semibold text-lg">New Commission Period</h2>
               <button onClick={() => setShowNewPeriod(false)} className="text-gray-400 hover:text-white text-xl leading-none">✕</button>
@@ -1200,7 +1200,7 @@ export default function CommissionPage() {
 
               <div className="flex justify-end gap-3 pt-1">
                 <button type="button" onClick={() => setShowNewPeriod(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
-                <button type="submit" disabled={newPeriodLoading} className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 disabled:opacity-50 transition-colors">
+                <button type="submit" disabled={newPeriodLoading} className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 transition-colors">
                   {newPeriodLoading ? 'Creating…' : 'Create'}
                 </button>
               </div>
@@ -1214,7 +1214,7 @@ export default function CommissionPage() {
       ══════════════════════════════════════════════════════════════════════ */}
       {showRevenue && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-sm mx-4 p-6">
+          <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-sm mx-4 p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-white font-semibold text-lg">Override Quota Revenue</h2>
               <button onClick={() => setShowRevenue(false)} className="text-gray-400 hover:text-white text-xl leading-none">✕</button>
@@ -1235,7 +1235,7 @@ export default function CommissionPage() {
 
               <div className="flex justify-end gap-3 pt-1">
                 <button type="button" onClick={() => setShowRevenue(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
-                <button type="submit" disabled={revenueLoading} className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 disabled:opacity-50 transition-colors">
+                <button type="submit" disabled={revenueLoading} className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 transition-colors">
                   {revenueLoading ? 'Saving…' : 'Save Override'}
                 </button>
               </div>
@@ -1249,7 +1249,7 @@ export default function CommissionPage() {
       ══════════════════════════════════════════════════════════════════════ */}
       {showUnlockConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-sm mx-4 p-6">
+          <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-sm mx-4 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-white font-semibold text-lg">Unlock Period</h2>
               <button onClick={() => setShowUnlockConfirm(false)} className="text-gray-400 hover:text-white text-xl leading-none">✕</button>
@@ -1279,7 +1279,7 @@ export default function CommissionPage() {
       ══════════════════════════════════════════════════════════════════════ */}
       {showSetTarget && period && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-sm mx-4 p-6">
+          <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-sm mx-4 p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-white font-semibold text-lg">Set Revenue Target</h2>
               <button onClick={() => setShowSetTarget(false)} className="text-gray-400 hover:text-white text-xl leading-none">✕</button>
@@ -1306,7 +1306,7 @@ export default function CommissionPage() {
 
               <div className="flex justify-end gap-3 pt-1">
                 <button type="button" onClick={() => setShowSetTarget(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
-                <button type="submit" disabled={targetLoading} className="px-5 py-2 bg-gold text-white rounded-lg text-sm font-semibold hover:bg-gold/90 disabled:opacity-50 transition-colors">
+                <button type="submit" disabled={targetLoading} className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 transition-colors">
                   {targetLoading ? 'Saving…' : 'Save Target'}
                 </button>
               </div>

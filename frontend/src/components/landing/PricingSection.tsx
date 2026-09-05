@@ -19,16 +19,16 @@ export default function PricingSection() {
         </motion.div>
 
         <div className="flex justify-center mb-12">
-          <div className="inline-flex items-center gap-1 rounded-xl border border-brand-900/15 p-1">
+          <div className="inline-flex items-center gap-1 rounded-xl border border-line p-1">
             <button
               onClick={() => setAnnual(true)}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${annual ? 'bg-brand-500 text-white' : 'text-ink-muted'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${annual ? 'bg-accent text-white' : 'text-ink-muted'}`}
             >
               {annualLabel}
             </button>
             <button
               onClick={() => setAnnual(false)}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${!annual ? 'bg-brand-500 text-white' : 'text-ink-muted'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${!annual ? 'bg-accent text-white' : 'text-ink-muted'}`}
             >
               {monthlyLabel}
             </button>
@@ -40,10 +40,10 @@ export default function PricingSection() {
             <motion.div
               key={tier.name}
               variants={fadeUp}
-              className={`rounded-2xl p-8 border ${tier.highlight ? 'border-accent-500 bg-brand-900 text-white shadow-2xl md:scale-105' : 'border-brand-900/10 bg-surface-raised'}`}
+              className={`rounded-2xl p-8 border ${tier.highlight ? 'border-accent bg-slate-900 text-white shadow-2xl md:scale-105' : 'border-line bg-surface-raised'}`}
             >
               {tier.highlight && (
-                <span className="inline-block mb-3 text-[11px] font-bold uppercase tracking-widest text-accent-400">★ {i18n.language?.startsWith('tr') ? 'En Popüler' : 'Most Popular'}</span>
+                <span className="inline-block mb-3 text-[11px] font-bold uppercase tracking-widest text-accent-hover">★ {i18n.language?.startsWith('tr') ? 'En Popüler' : 'Most Popular'}</span>
               )}
               <h3 className={`font-display text-2xl mb-1 ${tier.highlight ? 'text-white' : 'text-ink'}`}>{tier.name}</h3>
               <p className={`text-xs mb-5 ${tier.highlight ? 'text-white/60' : 'text-ink-muted'}`}>{tier.audience}</p>
@@ -54,15 +54,13 @@ export default function PricingSection() {
               <ul className="space-y-2.5 mb-8">
                 {tier.features.map(f => (
                   <li key={f} className={`text-sm flex items-start gap-2 ${tier.highlight ? 'text-white/85' : 'text-ink-muted'}`}>
-                    <span className={tier.highlight ? 'text-accent-400' : 'text-brand-500'}>✓</span> {f}
+                    <span className={tier.highlight ? 'text-accent-hover' : 'text-accent'}>✓</span> {f}
                   </li>
                 ))}
               </ul>
               <a
                 href="#cta"
-                className={`block text-center rounded-xl py-3 text-sm font-semibold transition-colors ${
-                  tier.highlight ? 'bg-accent-500 text-brand-900 hover:bg-accent-300' : 'bg-brand-500 text-white hover:bg-brand-700'
-                }`}
+                className="block text-center rounded-xl py-3 text-sm font-semibold transition-colors bg-accent text-white hover:bg-accent-hover"
               >
                 {pricingCta(i18n.language)}
               </a>

@@ -20,7 +20,7 @@ const TIMEZONE_OPTIONS = [
   'America/New_York', 'America/Los_Angeles', 'Asia/Dubai', 'Asia/Riyadh',
 ];
 
-const INPUT = 'w-full bg-navy-700 border border-navy-500 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gold transition-colors';
+const INPUT = 'w-full bg-surface-sunken border border-line-strong rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-accent transition-colors';
 const LABEL = 'block text-xs font-medium text-gray-400 mb-1.5';
 
 export default function EditClinicModal({ clinic, onClose, onUpdated }: Props) {
@@ -68,8 +68,8 @@ export default function EditClinicModal({ clinic, onClose, onUpdated }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-navy-800 border border-navy-600 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="px-6 py-5 border-b border-navy-600 flex items-center justify-between">
+      <div className="relative bg-surface-sunken border border-line rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="px-6 py-5 border-b border-line flex items-center justify-between">
           <div>
             <h2 className="text-white font-semibold text-lg">Edit Clinic</h2>
             <p className="text-gray-500 text-xs mt-0.5">{clinic.name}</p>
@@ -131,12 +131,12 @@ export default function EditClinicModal({ clinic, onClose, onUpdated }: Props) {
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-xl border border-navy-500 text-gray-300 text-sm font-medium hover:bg-navy-700 transition-colors">
+              className="flex-1 px-4 py-2.5 rounded-xl border border-line-strong text-gray-300 text-sm font-medium hover:bg-surface-sunken transition-colors">
               Cancel
             </button>
             <button type="submit" disabled={isLoading}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-light text-white text-sm font-medium transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
-              {isLoading && <span className="w-4 h-4 border-2 border-navy-950 border-t-transparent rounded-full animate-spin" />}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white text-sm font-medium transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
+              {isLoading && <span className="w-4 h-4 border-2 border-surface-page border-t-transparent rounded-full animate-spin" />}
               Save Changes
             </button>
           </div>

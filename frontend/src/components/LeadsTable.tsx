@@ -50,8 +50,8 @@ export default function LeadsTable({ leads, onRowClick }: Props) {
     filter === 'all' ? leads : leads.filter((l) => l.status === filter);
 
   return (
-    <div className="bg-navy-800 border border-navy-600 rounded-xl overflow-hidden">
-      <div className="px-6 py-4 border-b border-navy-600 flex items-center justify-between">
+    <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
+      <div className="px-6 py-4 border-b border-line flex items-center justify-between">
         <h2 className="font-serif text-xl text-white">Leads</h2>
         <div className="flex gap-2">
           {filterButtons.map((btn) => (
@@ -60,8 +60,8 @@ export default function LeadsTable({ leads, onRowClick }: Props) {
               onClick={() => setFilter(btn.value)}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                 filter === btn.value
-                  ? 'bg-gold text-white'
-                  : 'bg-navy-700 text-gray-400 hover:text-white'
+                  ? 'bg-accent text-white'
+                  : 'bg-surface-sunken text-gray-400 hover:text-white'
               }`}
             >
               {btn.label}
@@ -87,7 +87,7 @@ export default function LeadsTable({ leads, onRowClick }: Props) {
               <tr
                 key={lead.id}
                 onClick={() => onRowClick?.(lead.id)}
-                className={`border-t border-navy-600 bg-navy-800 transition-colors ${onRowClick ? 'hover:bg-navy-700 cursor-pointer' : ''}`}
+                className={`border-t border-line bg-surface-sunken transition-colors ${onRowClick ? 'hover:bg-surface-sunken cursor-pointer' : ''}`}
               >
                 <td className="px-6 py-3">
                   <div>
@@ -110,7 +110,7 @@ export default function LeadsTable({ leads, onRowClick }: Props) {
                   {formatRelativeTime(lead.lastContact)}
                 </td>
                 <td className="px-4 py-3">
-                  <span className="text-gold font-semibold">{lead.aiMessages}</span>
+                  <span className="text-accent font-semibold">{lead.aiMessages}</span>
                 </td>
               </tr>
             ))}

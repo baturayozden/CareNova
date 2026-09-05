@@ -12,7 +12,7 @@ import Footer from '../components/landing/Footer';
 const INK = '#0f172a';
 const BODY = '#475569';
 const MUTED = '#94a3b8';
-const BLUE = '#2563EB';
+const BLUE = '#1B6FEA';
 const GOLD = '#c9a84c'; // eslint-disable-line @typescript-eslint/no-unused-vars
 const LINE = '#e2e8f0';
 const CARD_BORDER = '#e6ebf2';
@@ -162,7 +162,7 @@ export default function AboutPage() {
               <span key={i} style={{
                 display: 'block',
                 color: line.blue ? 'transparent' : INK,
-                background: line.blue ? 'linear-gradient(135deg,#2563EB,#60A5FA,#2563EB)' : 'none',
+                background: line.blue ? 'linear-gradient(135deg,#1B6FEA,#60A5FA,#1B6FEA)' : 'none',
                 WebkitBackgroundClip: line.blue ? 'text' : 'initial',
                 backgroundClip: line.blue ? 'text' : 'initial',
                 WebkitTextFillColor: line.blue ? 'transparent' : 'inherit',

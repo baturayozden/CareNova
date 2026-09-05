@@ -181,7 +181,7 @@ export default function TermsPage() {
           <p className="text-gray-700 leading-relaxed mb-1">66 Paul Street, London, England, EC2A 4NA</p>
           <p className="text-gray-700 leading-relaxed mb-10">
             Email:{' '}
-            <a href="mailto:info@carenova.ai" className="text-gold underline">info@carenova.ai</a>
+            <a href="mailto:info@carenova.ai" className="text-accent underline">info@carenova.ai</a>
           </p>
 
         </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const API = process.env.REACT_APP_API_URL || '';
-const BLUE = '#2563EB';
+const BLUE = '#1B6FEA';
 const INK = '#0f172a';
 const BODY = '#475569';
 const MUTED = '#94a3b8';

@@ -1,10 +1,10 @@
 // CareNovaIcons.tsx
 // 7 custom line icons for CareNova. Single-color via `currentColor` —
-// set the color through CSS (text-[#2563EB] / style color) on the icon or a parent.
+// set the color through CSS (text-[#1B6FEA] / style color) on the icon or a parent.
 // Default size 24px. Each accepts `size` plus any standard <svg> prop (className, style, aria-label…).
 //
 //   import { WhatsAppNativeIcon } from '../icons/CareNovaIcons';
-//   <WhatsAppNativeIcon size={32} className="text-gold" />
+//   <WhatsAppNativeIcon size={32} className="text-accent" />
 //
 import React from 'react';
 
