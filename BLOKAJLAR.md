@@ -56,3 +56,38 @@ eklenenler, hata verirlerse önce onlara bak.
 çıkarabilir.
 
 **Aciliyet:** Orta — backend deploy edilene kadar acil değil.
+
+## B3 — carenova-two.vercel.app 404 veriyor + hesapta beklenmedik "frontend"/"backend" projeleri (aciliyet: yüksek)
+
+**Ne oldu:** İlk canlı link paylaşıldıktan sonra kullanıcı `carenova-two.vercel.app`
+adresinde `404: NOT_FOUND` (`x-vercel-error: NOT_FOUND`) aldı. Aynı anda Vercel'den
+"Production deployment failed" e-postası geldi (commit 3f51e31 / sonra 6583b93
+için — kök dizin `install`/`build` komutlarını tek bir zincirlenmiş script'te
+birleştirmemden kaynaklanan kırılgan bir yapılandırma; `343ef40` commit'inde
+Vercel'in kendi ayrı installCommand/buildCommand fazlarına geçirilerek
+düzeltildi ve doğrulandı — yeni deploy `Ready`).
+
+Ayrı bir bulgu: `vercel alias ls` çıktısında, projeler listesinde **9 dakika önce
+oluşturulmuş** `frontend` ve `backend` adında, `carenova`dan bağımsız iki YENİ
+proje görüldü. Ben bu oturumda hiçbir zaman `vercel deploy`/`vercel link`/
+`vercel --prod` çalıştırmadım (brief §2.2 yasağına uyuldu) — bu projelerin nasıl
+oluştuğunu bilmiyorum, muhtemelen kullanıcının kendi troubleshooting denemesi.
+
+`vercel alias ls` çıktısı `carenova-two.vercel.app`'in doğru deployment'a
+(`carenova-eeprusvu6-...`, Ready) işaret ettiğini gösteriyor ama gerçek HTTP
+yanıtı 404 — yani alias tablosu ile edge routing arasında bir tutarsızlık var.
+Bu tutarsızlığın yeni "frontend"/"backend" projeleriyle ilişkili olup olmadığı
+belirsiz.
+
+**Ne denedim:** `vercel domains inspect` (yetki hatası — bu araç top-level custom
+domain'ler için, `.vercel.app` alt-domain'leri için değil), `vercel alias ls`
+(salt-okunur, çalıştı), tekrar tekrar `curl` ile 3 kez doğrulama (hep 404).
+Domain/alias ayarlarını DEĞİŞTİRMEDİM — bu benim salt-okunur CLI sınırımın dışında.
+
+**Ne gerekiyor:**
+1. `vercel.com/baturay-ozden-s-projects/carenova/settings/domains` → `carenova-two.vercel.app`'in gerçekten `carenova` projesine bağlı olduğunu doğrula.
+2. Eğer kasıtlı oluşturulmadıysa `frontend` ve `backend` projelerini incele/sil.
+3. Şimdilik çalışan linkler: `https://carenova-baturay-ozden-s-projects.vercel.app` veya `https://carenova-git-main-baturay-ozden-s-projects.vercel.app` (ikisi de B1'deki SSO duvarına takılıyor, ayrı konu).
+
+**Etkisi:** Kullanıcının ilk denediği kısa link çalışmıyor; alternatif linkler çalışıyor (B1 çözülünce herkese açık olacaklar).
+**Aciliyet:** Yüksek — canlı URL'in "tıklanabilir" olması gece brifinginin #1 önceliği.
