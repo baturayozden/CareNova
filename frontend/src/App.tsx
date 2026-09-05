@@ -40,11 +40,19 @@ import GdprPage from './pages/legal/GdprPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 
 // Determine at runtime whether we're on an app/admin subdomain.
-// Uses build-time env vars; if not set (local dev) falls back to false → LandingPage shown.
+// Two independent signals, either one is enough:
+//   1. REACT_APP_APP_URL / REACT_APP_ADMIN_URL env vars (set on Vercel, baked
+//      in at BUILD time — see docs/domain-setup.md) matched exactly.
+//   2. A plain "app." / "admin." hostname prefix, so routing still works
+//      correctly even if the env vars are never configured or a deploy
+//      forgets to set them — CRA env vars are easy to lose track of since
+//      they're build-time, not runtime.
 const hostname  = window.location.hostname;
 const appHost   = process.env.REACT_APP_APP_URL   ? new URL(process.env.REACT_APP_APP_URL).hostname   : null;
 const adminHost = process.env.REACT_APP_ADMIN_URL ? new URL(process.env.REACT_APP_ADMIN_URL).hostname : null;
-const isAppOrAdminSubdomain = (appHost && hostname === appHost) || (adminHost && hostname === adminHost);
+const isAppOrAdminSubdomain =
+  hostname.startsWith('app.') || hostname.startsWith('admin.') ||
+  (appHost && hostname === appHost) || (adminHost && hostname === adminHost);
 
 export default function App() {
   return (

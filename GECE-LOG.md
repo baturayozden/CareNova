@@ -1,7 +1,8 @@
 # SABAH RAPORU
 
 ## 🔗 Canlı URL — herkese açık, doğrulandı (HTTP 200)
-https://carenova-baturay-ozden-s-projects.vercel.app
+https://carenova-5rjq2obpf-baturay-ozden-s-projects.vercel.app
+(veya kalıcı: https://carenova-baturay-ozden-s-projects.vercel.app)
 
 ✅ Bu rapor ilk yazıldığında link SSO duvarının arkasındaydı ve ayrıca gerçek bir
 routing hatası vardı (build'in son adımı `index.html`'i taşıyordu, kök
@@ -333,6 +334,35 @@ belirtiyorum.
 tüm çiftlerde geçti. ✅ Emoji ikon YOK diye bir kabul kriteri Part A'da yoktu (o
 Part C'de). ✅ Login/Dashboard/Landing görsel olarak tutarlı, okunmayan metin
 gözlemlenmedi.
+
+**Commit:** `d9d22f3` refactor(theme): unify color system to light-first Clinical White palette
+
+---
+### BÖLÜM B — app.carenova.ai admin erişimi
+
+**Yapıldı:**
+- `frontend/.env.example`'a `REACT_APP_APP_URL=https://app.carenova.ai` ve
+  `REACT_APP_ADMIN_URL=https://admin.carenova.ai` örnek değerleri eklendi
+  (önceden boş placeholder olarak duruyorlardı).
+- `App.tsx`'teki hostname kontrolü sağlamlaştırıldı: artık sadece env
+  değişkeni eşleşmesine değil, hostname'in düz `app.`/`admin.` ile
+  başlamasına da bakıyor — env değişkeni build sırasında ayarlanmayı
+  unutulsa bile `/login`'e doğru yönlendirme çalışır.
+- Demo modu bilgi kutusu ("Demo Modu" rozeti + "herhangi bir e-posta/şifre ile
+  giriş yapabilirsiniz" ipucu) **zaten mevcuttu** (PAKET 5'te eklenmişti) —
+  doğrulandı, ek iş gerekmedi.
+- `docs/domain-setup.md` yazıldı: Vercel Domains ekleme, DNS CNAME kaydı,
+  Environment Variables (Production + Preview, CRA'nın build-time gömme
+  davranışı özellikle vurgulandı), zorunlu Redeploy adımı, DNS yayılma süresi,
+  `admin.carenova.ai` için aynı akış, ve "env unutulsa bile çalışır" notu.
+  `carenova.ai` kök domain'ine (WordPress) dokunulmayacağı açıkça belirtildi.
+
+**Karar:** Bu bölümün asıl işi zaten koddaydı (brief'in kendi ifadesiyle "Kod
+hazır, yapılandırma eksik") — DNS/Vercel dashboard adımları Claude Code
+tarafından yapılamayacağı için sadece dokümante edildi, Baturay'ın kendisinin
+uygulaması gerekiyor.
+
+**Kabul kriteri:** ✅ Build temiz. ✅ `docs/domain-setup.md` hazır.
 
 **Commit:** (push sonrası eklenecek)
 
