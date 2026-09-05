@@ -521,6 +521,6 @@ girmedi" (dokunulmuyor, doğru) hem "ekranda ama donuk" (düzeltiliyor) hem
 doğrulandı. ⚠️ Gerçek görünür sekmede elle doğrulama kullanıcıya bırakıldı
 (araç kısıtı, yukarıda açıklandı).
 
-**Commit:** (push sonrası eklenecek)
+**Commit:** `41f4e44` fix(landing): stop scroll-reveal animations getting stuck at opacity:0
 
 ---
