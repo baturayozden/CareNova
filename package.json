@@ -2,8 +2,8 @@
   "name": "carenova",
   "private": true,
   "version": "1.0.0",
+  "comment": "Root shim only so Vercel treats this as a Node project when Root Directory is './' (repo was empty at import time). Actual install/build commands are explicit in vercel.json (cd frontend && ...) and do not use the scripts below.",
   "scripts": {
-    "build": "cd frontend && npm install --legacy-peer-deps && npm run build",
-    "vercel-build": "npm run build"
+    "build": "cd frontend && npm install --legacy-peer-deps && npm run build"
   }
 }
