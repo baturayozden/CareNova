@@ -46,4 +46,12 @@ i18n
     },
   });
 
+// Keep <html lang> in sync so screen readers and search engines see the
+// active language — i18next only swaps React-rendered text by itself.
+const syncHtmlLang = (lng: string) => {
+  document.documentElement.lang = lng;
+};
+syncHtmlLang(i18n.language);
+i18n.on('languageChanged', syncHtmlLang);
+
 export default i18n;

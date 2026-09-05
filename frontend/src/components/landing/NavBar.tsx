@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 import { navLinks, navCta } from '../../data/landingContent';
 
 export default function NavBar() {
@@ -11,7 +12,7 @@ export default function NavBar() {
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 border-b border-line bg-surface/85 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <nav aria-label={i18n.language?.startsWith('tr') ? 'Ana menü' : 'Main navigation'} className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link to="/" className="font-display text-xl text-ink shrink-0">
           Care<span className="text-accent">Nova</span>
         </Link>
@@ -46,9 +47,10 @@ export default function NavBar() {
         <button
           onClick={() => setOpen(v => !v)}
           className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-ink"
-          aria-label="Menu"
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
         >
-          {open ? '✕' : '☰'}
+          {open ? <X size={22} strokeWidth={1.5} aria-hidden="true" /> : <Menu size={22} strokeWidth={1.5} aria-hidden="true" />}
         </button>
       </nav>
 

@@ -364,6 +364,70 @@ uygulaması gerekiyor.
 
 **Kabul kriteri:** ✅ Build temiz. ✅ `docs/domain-setup.md` hazır.
 
+**Commit:** `7cd4266` feat(admin-access): harden app/admin subdomain routing, document DNS setup
+
+---
+### BÖLÜM C — Landing sayfası kapsamlı revizyon
+
+**Yapıldı:**
+- `data/landingContent.tsx` tamamen genişletildi: her bölümün TR/EN metni
+  `pick(lang, tr, en)` fonksiyonlarıyla tek dosyada. Yeni tablolar/veri setleri:
+  `branchesTable` (9 branş, her biri kendi yasal/etik notuyla — örn. IVF için
+  "donör yumurta/sperm Türkiye'de yasak" notu), `comparisonRows` (tipli
+  `'no'|'partial'|'yes'|'na'` hücreler, rakip marka adı YOK, sadece kategori),
+  `roiRows` (7 sütunlu, açıkça "örnek veri" etiketli, gerçek müşteri verisi değil).
+- 6 yeni bölüm sıfırdan yazıldı: `HowItWorksSection` (5 adım), `BranchesSection`
+  (9 satırlık yetki matrisi, `<th scope>` ile erişilebilir), `AftercareSection`
+  (8 noktalı interaktif zaman çizelgesi + örnek mesaj balonu), `ComparisonSection`
+  (4 sütunlu tablo, `Check`/`X`/`Minus` ikonları), `RoiSection` (7 sütun, "gerçek
+  veri değil" rozetiyle), `SetupSection` (7 adımlı 2 sütun grid).
+  8 mevcut bölüm zenginleştirildi (Hero, Problem, Trust, Platform, Compliance,
+  Pricing, FAQ, CTA, Footer, NavBar, SEOMeta).
+- **Tüm emoji-ikon kullanımı `lucide-react` ile değiştirildi** (☰/✕/✓/💡/★/✅/+
+  gibi metin glifleri dahil) — brief'in "emoji yasak" kuralı gereği. Sohbet
+  içeriğindeki/bayrak emojileri (WhatsApp mock, dil etiketleri) bilerek dokunulmadı,
+  onlar ikon değil gerçek içerik.
+- **Dürüstlük kısıtları koda gömüldü:** sahte müşteri/logo/metrik YOK (ürünün henüz
+  müşterisi yok); her sektör istatistiği satır içi "Kaynak: ..." ile geliyor;
+  rakip karşılaştırmasında marka adı yok, sadece kategori ("Genel ajans",
+  "Kendi ekibiniz" vb.); `Footer.tsx`'te tüzel kişilik satırı
+  `businessDetails.ts` boşsa hiç render edilmiyor (uydurma adres/vergi no yok).
+- SEO/a11y: her sayfada tek `<h1>` (Hero'da), her `<section>` `aria-labelledby`
+  ile, FAQ bölümünde `FAQPage` JSON-LD + `aria-controls`/`role="region"`,
+  `SEOMeta.tsx`'e hreflang eklendi (tr/en/x-default — hepsi aynı URL'e, çünkü
+  mimari ayrı dil path'i değil client-side toggle kullanıyor; bunu dürüstçe
+  yansıtıyor, olmayan URL'ler iddia etmiyor).
+- **Mobil (360px) test edildi:** `body.scrollWidth`/`innerWidth` karşılaştırmasıyla
+  yatay taşma YOK doğrulandı. 3 tablonun (Branches/Comparison/ROI) üçü de
+  `overflow-x-auto` sarmalayıcı içinde (`min-w-[640..720px]` ile), brief'in
+  istediği gibi. Ekran görüntüsü yerine DOM/computed-style doğrulaması
+  kullanıldı — bu oturum boyunca `scroll`/`scrollIntoView` sonrası ekran
+  görüntülerinin güvenilmez (boş/gri) çıktığı tekrar tekrar gözlemlendi
+  (Bölüm A'da da aynı tespit not edilmişti); bu yüzden `getBoundingClientRect`/
+  `javascript_tool` tabanlı doğrulama tercih edildi.
+- **EN dil geçişi test edildi ve gerçek bir hata bulundu:** `i18n.changeLanguage`
+  React içeriğini doğru değiştiriyordu ama `<html lang>` niteliği hep `"tr"`de
+  kalıyordu (ekran okuyucular ve arama motorları için yanlış sinyal). `i18n/index.ts`'e
+  `i18n.on('languageChanged', ...)` dinleyicisi eklendi, `document.documentElement.lang`
+  artık aktif dille senkron. Doğrulandı: EN'e geçince `lang="en"` oluyor.
+
+**Karar:** Landing içeriği flat i18next JSON'a taşınmadı, Bölüm A'da alınan
+"TS veri modülü" kararı korundu — tekrarlayan yapılı içerik (tablo/FAQ/pricing)
+için hâlâ daha bakımı kolay. `ComplianceSection` iki `<section>` döndürüyor
+(uyumluluk + "neye dayanıyoruz" güven şeridi) — tek bileşen ama iki landmark,
+`aria-labelledby` ayrı ayrı veriliyor. Rakip karşılaştırma tablosunda hiçbir
+marka adı geçmiyor; sadece "Genel pazarlama ajansı", "Serbest çalışan" gibi
+kategoriler var, brief'in "rakip ismi yok" kuralı böyle uygulandı.
+
+**Kabul kriteri:** ✅ `cd frontend && CI=true npm run build` temiz (blog API
+uyarıları beklenen davranış — yerel ortamda `api.carenova.ai` çözülmüyor,
+build'i bloklamıyor, "degraded mode" olarak devam ediyor). ✅ Emoji ikon sıfır
+(grep ile doğrulandı). ✅ Sahte sosyal kanıt yok. ✅ İstatistikler kaynaklı.
+✅ Rakip marka adı yok. ✅ TR ve EN tam (ikisi de tarayıcıda metin çıkarımıyla
+doğrulandı). ✅ Mobil 360px'de taşma yok, tablolar `overflow-x-auto` içinde.
+✅ `docs/domain-setup.md` zaten hazırdı (Bölüm B). ✅ `<html lang>` düzeltmesi
+dahil, build tekrar temiz.
+
 **Commit:** (push sonrası eklenecek)
 
 ---

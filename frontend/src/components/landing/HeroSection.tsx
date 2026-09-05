@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { Sparkles, Send } from 'lucide-react';
 import {
   heroBadge, heroHeadline, heroSub, heroCtaPrimary, heroCtaSecondary, heroTrust, heroStats,
-  heroConversations, heroCycleOrder, heroLangLabel,
+  heroStatsFootnote, heroConversations, heroCycleOrder, heroLangLabel,
 } from '../../data/landingContent';
 import { stagger, scaleIn, fadeUp, ease } from './variants';
 
@@ -51,8 +52,8 @@ function WhatsAppMock() {
       </div>
 
       <div className="flex items-center gap-3 px-4 py-3 bg-surface-sunken border-b border-line">
-        <div className="w-9 h-9 rounded-full bg-accent/20 flex items-center justify-center shrink-0 text-lg">
-          🏥
+        <div className="w-9 h-9 rounded-full bg-accent/15 flex items-center justify-center shrink-0">
+          <Sparkles size={18} strokeWidth={1.5} className="text-accent" aria-hidden="true" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-ink truncate">Nova Hair Clinic</p>
@@ -118,7 +119,9 @@ function WhatsAppMock() {
 
       <div className="flex items-center gap-2 px-4 py-3 bg-surface-raised border-t border-line">
         <div className="flex-1 bg-surface-sunken rounded-full px-4 py-2 text-xs text-ink-muted">AI yanıt veriyor…</div>
-        <div className="w-8 h-8 rounded-full bg-[#25d366] flex items-center justify-center shrink-0 text-white text-sm">➤</div>
+        <div className="w-8 h-8 rounded-full bg-[#25d366] flex items-center justify-center shrink-0 text-white">
+          <Send size={14} strokeWidth={2} aria-hidden="true" />
+        </div>
       </div>
     </div>
   );
@@ -138,7 +141,7 @@ export default function HeroSection() {
   const reduced = useReducedMotion();
 
   return (
-    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-surface pt-24 pb-16">
+    <section id="hero" aria-labelledby="hero-heading" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-surface pt-24 pb-16">
       <div className="absolute inset-0 pointer-events-none" style={{
         backgroundImage: 'linear-gradient(rgba(21,89,196,0.05) 1px, transparent 1px), linear-gradient(90deg,rgba(21,89,196,0.05) 1px,transparent 1px)',
         backgroundSize: '60px 60px',
@@ -163,7 +166,7 @@ export default function HeroSection() {
                 </span>
               </motion.div>
 
-              <motion.h1 variants={fadeUp} className="font-display text-4xl md:text-5xl lg:text-6xl font-normal text-ink leading-[1.12] max-w-2xl">
+              <motion.h1 id="hero-heading" variants={fadeUp} className="font-display text-4xl md:text-5xl lg:text-6xl font-normal text-ink leading-[1.12] max-w-2xl">
                 {heroHeadline(i18n.language)}
               </motion.h1>
 
@@ -175,7 +178,7 @@ export default function HeroSection() {
                 <a href="#cta" className="rounded-2xl bg-accent hover:bg-accent-hover transition-colors px-9 py-4 text-lg font-semibold text-white text-center">
                   {heroCtaPrimary(i18n.language)}
                 </a>
-                <a href="#platform" className="rounded-2xl border border-line hover:bg-surface-sunken transition-colors px-9 py-4 text-lg font-medium text-ink text-center">
+                <a href="#nasil-calisir" className="rounded-2xl border border-line hover:bg-surface-sunken transition-colors px-9 py-4 text-lg font-medium text-ink text-center">
                   {heroCtaSecondary(i18n.language)}
                 </a>
               </motion.div>
@@ -192,6 +195,9 @@ export default function HeroSection() {
                   </React.Fragment>
                 ))}
               </motion.div>
+              <motion.p variants={fadeUp} className="text-ink-subtle text-xs -mt-3">
+                {heroStatsFootnote(i18n.language)}
+              </motion.p>
             </motion.div>
           </div>
 

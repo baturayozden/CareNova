@@ -17,7 +17,7 @@ const DEFAULT_OG_IMAGE = 'https://carenova.ai/og-image.png';
 // Actual file dimensions (frontend/public/og-image.png) — must match the real
 // asset or platforms that read these before fetching the image render it
 // cropped or blank.
-const DEFAULT_OG_IMAGE_ALT = 'CareNova — WhatsApp AI for UK dental clinics';
+const DEFAULT_OG_IMAGE_ALT = 'CareNova — WhatsApp AI for Turkish health tourism clinics';
 
 // React 19 hoists <title>, <meta> and <link> into <head> natively — no library.
 // It does NOT hoist <script type="application/ld+json">, so that is rendered
@@ -40,6 +40,12 @@ export default function SEOMeta({
       <title>{title}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={url} />
+      {/* TR/EN is a client-side toggle, not separate URLs — so both alternates
+          and x-default point at the same path. Honest given the architecture:
+          declares language support without claiming URLs that don't exist. */}
+      <link rel="alternate" hrefLang="tr" href={url} />
+      <link rel="alternate" hrefLang="en" href={url} />
+      <link rel="alternate" hrefLang="x-default" href={url} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={url} />
