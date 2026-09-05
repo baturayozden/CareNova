@@ -1,38 +1,38 @@
 # Blokajlar — Baturay'ın müdahalesi gerekiyor
 
-## B1 — Canlı URL Vercel SSO duvarının arkasında (aciliyet: yüksek, 30 saniye)
+## ✅ B1 — Vercel SSO duvarı — ÇÖZÜLDÜ (kullanıcı isteğiyle canlı oturumda)
 
-**Ne oldu:** Build başarılı, deployment "Ready" durumunda, içerik doğru (CareNova
-markası, doğru title). Ama URL'e giden HERKES (ben dahil, giriş yapmamış tarayıcı)
-`https://vercel.com/sso-api?...` adresine 302 ile yönlendiriliyor — yani proje
-**Vercel Deployment Protection / Vercel Authentication** ile korunuyor. Sadece
-Vercel hesabına giriş yapmış ve bu projeye yetkili biri (örn. sen, tarayıcında
-zaten giriş yapmışken) sayfayı görebiliyor. Sabah "tıklanabilir canlı bir URL"
-kriteri teknik olarak build/deploy açısından karşılandı ama link, giriş yapmamış
-biri için (örn. bir yatırımcıya paylaşmak) çalışmayacak.
+Kullanıcı canlı linkin çalışmadığını bildirince, doğrudan onayıyla
+`vercel project protection disable carenova --sso` çalıştırıldı (bu artık
+salt-okunur CLI sınırının dışında, kullanıcının açık isteğiyle yapıldı).
+SSO/Deployment Protection tamamen kapatıldı. Doğrulandı: proje artık
+`"ssoProtection": null`.
 
-**Ne denedim:**
-- `https://carenova-owfx5aiu6-baturay-ozden-s-projects.vercel.app` (production deployment) → 302 → `vercel.com/sso-api`
-- `https://carenova-baturay-ozden-s-projects.vercel.app` (proje alias'ı) → aynı 302
-- Brief'in kesin kuralı gereği (bkz. GECE-CALISMA-BRIEFI.md §2.2: "CLI'yi sadece
-  OKUMA için kullanabilirsin") bu bir proje AYARI değişikliği olduğu için
-  `vercel` CLI veya API ile bunu kendim KAPATMADIM — salt-okunur sınırın dışına
-  çıkardı.
+## ✅ B3 (eski) — carenova-two.vercel.app 404 + stray "frontend"/"backend" projeleri — ÇÖZÜLDÜ
 
-**Ne gerekiyor (30 saniyelik tek tık):**
-1. https://vercel.com/baturay-ozden-s-projects/carenova/settings/deployment-protection
-2. "Vercel Authentication" (veya "Deployment Protection") → **Disabled** / "Only Preview Deployments" yap (Production'ı herkese açık bırak)
-3. Kaydet — mevcut deployment'ı yeniden build etmeye gerek yok, ayar anında etkili olur.
+**Gerçek kök neden bulundu:** SSO koruması kapatılınca ASIL sorun ortaya çıktı —
+`frontend/scripts/prerender.js` build'in son adımında `build/index.html`'i
+`build/_hosts/app-shell.html`'e taşıyor ("root is now empty"). Kök dizindeki
+`vercel.json`'ın basit SPA rewrite kuralı hâlâ artık var olmayan `/index.html`'e
+yönlendiriyordu → gerçek bir 404. **SSO koruması bunu gece boyu gizlemiş** —
+her istek routing katmanına hiç ulaşmadan Vercel'in login ekranına
+yönlendiriliyordu, ben de bunu "sadece SSO engeli" sanıp geçmiştim.
 
-**Etkisi:** Şu an sadece Baturay'ın kendi Vercel oturumu üzerinden linke
-girenler görebiliyor. Herkese açık paylaşım (yatırımcı, ekip, telefon üzerinden
-giriş yapılmamış tarayıcı) şu an ÇALIŞMIYOR.
+**Düzeltme (commit `583d300`):** Kök `vercel.json`'a `frontend/vercel.json`'daki
+aynı host-aware rewrite/redirect/header kuralları kopyalandı — catch-all artık
+`/_hosts/app-shell.html`'e düşüyor. Yerelde `_hosts/app-shell.html`'in build
+çıktısında gerçekten var olduğu doğrulandı, sonra canlı deploy ile teyit edildi.
 
-**Aciliyet:** Yüksek — brief'in #1 önceliği ("canlı URL en geç 3. iş paketinde
-çıkmalı") teknik olarak karşılandı ama "tıklanabilir" kriteri tam karşılanmıyor.
+**Ayrıca:** Kullanıcının kendi troubleshooting'i sırasında oluşturduğu, aynı
+repo'yu farklı Root Directory'lerle (`frontend`, `backend`) tekrar import eden
+iki gereksiz proje kullanıcının onayıyla silindi (`vercel project rm frontend`,
+`vercel project rm backend`). `carenova` projesinin "Latest Production URL"
+alanı bu temizlikten sonra doğru şekilde `carenova-baturay-ozden-s-projects.vercel.app`'e döndü.
 
-**Güncel URL:** `https://carenova-owfx5aiu6-baturay-ozden-s-projects.vercel.app`
-(her yeni push sonrası değişebilir — `GECE-LOG.md`'nin en üstünde güncel tutulacak)
+**Doğrulanmış çalışan URL (HTTP 200, içerik doğru):**
+👉 **https://carenova-baturay-ozden-s-projects.vercel.app**
+
+---
 
 ## B2 — Yeni migration'lar (056-058) gerçek bir veritabanına karşı hiç çalıştırılmadı (aciliyet: orta)
 
@@ -56,38 +56,3 @@ eklenenler, hata verirlerse önce onlara bak.
 çıkarabilir.
 
 **Aciliyet:** Orta — backend deploy edilene kadar acil değil.
-
-## B3 — carenova-two.vercel.app 404 veriyor + hesapta beklenmedik "frontend"/"backend" projeleri (aciliyet: yüksek)
-
-**Ne oldu:** İlk canlı link paylaşıldıktan sonra kullanıcı `carenova-two.vercel.app`
-adresinde `404: NOT_FOUND` (`x-vercel-error: NOT_FOUND`) aldı. Aynı anda Vercel'den
-"Production deployment failed" e-postası geldi (commit 3f51e31 / sonra 6583b93
-için — kök dizin `install`/`build` komutlarını tek bir zincirlenmiş script'te
-birleştirmemden kaynaklanan kırılgan bir yapılandırma; `343ef40` commit'inde
-Vercel'in kendi ayrı installCommand/buildCommand fazlarına geçirilerek
-düzeltildi ve doğrulandı — yeni deploy `Ready`).
-
-Ayrı bir bulgu: `vercel alias ls` çıktısında, projeler listesinde **9 dakika önce
-oluşturulmuş** `frontend` ve `backend` adında, `carenova`dan bağımsız iki YENİ
-proje görüldü. Ben bu oturumda hiçbir zaman `vercel deploy`/`vercel link`/
-`vercel --prod` çalıştırmadım (brief §2.2 yasağına uyuldu) — bu projelerin nasıl
-oluştuğunu bilmiyorum, muhtemelen kullanıcının kendi troubleshooting denemesi.
-
-`vercel alias ls` çıktısı `carenova-two.vercel.app`'in doğru deployment'a
-(`carenova-eeprusvu6-...`, Ready) işaret ettiğini gösteriyor ama gerçek HTTP
-yanıtı 404 — yani alias tablosu ile edge routing arasında bir tutarsızlık var.
-Bu tutarsızlığın yeni "frontend"/"backend" projeleriyle ilişkili olup olmadığı
-belirsiz.
-
-**Ne denedim:** `vercel domains inspect` (yetki hatası — bu araç top-level custom
-domain'ler için, `.vercel.app` alt-domain'leri için değil), `vercel alias ls`
-(salt-okunur, çalıştı), tekrar tekrar `curl` ile 3 kez doğrulama (hep 404).
-Domain/alias ayarlarını DEĞİŞTİRMEDİM — bu benim salt-okunur CLI sınırımın dışında.
-
-**Ne gerekiyor:**
-1. `vercel.com/baturay-ozden-s-projects/carenova/settings/domains` → `carenova-two.vercel.app`'in gerçekten `carenova` projesine bağlı olduğunu doğrula.
-2. Eğer kasıtlı oluşturulmadıysa `frontend` ve `backend` projelerini incele/sil.
-3. Şimdilik çalışan linkler: `https://carenova-baturay-ozden-s-projects.vercel.app` veya `https://carenova-git-main-baturay-ozden-s-projects.vercel.app` (ikisi de B1'deki SSO duvarına takılıyor, ayrı konu).
-
-**Etkisi:** Kullanıcının ilk denediği kısa link çalışmıyor; alternatif linkler çalışıyor (B1 çözülünce herkese açık olacaklar).
-**Aciliyet:** Yüksek — canlı URL'in "tıklanabilir" olması gece brifinginin #1 önceliği.

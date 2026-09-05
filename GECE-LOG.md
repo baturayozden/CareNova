@@ -1,14 +1,16 @@
 # SABAH RAPORU
 
-## 🔗 Canlı URL
-https://carenova-31f341be3-baturay-ozden-s-projects.vercel.app
+## 🔗 Canlı URL — herkese açık, doğrulandı (HTTP 200)
+https://carenova-baturay-ozden-s-projects.vercel.app
 
-⚠️ **Şu an Vercel SSO/Deployment Protection arkasında** — link sadece senin kendi
-Vercel oturumundan (tarayıcında zaten giriş yapmışken) açılıyor, başka biriyle
-paylaşırsan `vercel.com/sso-api`'ye düşer. **30 saniyelik tek-tık düzeltme:**
-`BLOKAJLAR.md` B1'e bak (Settings → Deployment Protection → Disabled). Build ve
-deploy'un kendisi tamamen sağlıklı, içerik doğru — sadece bu ayar engelliyor.
-URL her push'ta değişir; en güncelini görmek için `vercel ls carenova`.
+✅ Bu rapor ilk yazıldığında link SSO duvarının arkasındaydı ve ayrıca gerçek bir
+routing hatası vardı (build'in son adımı `index.html`'i taşıyordu, kök
+`vercel.json` hâlâ eskisini arıyordu). Kullanıcı canlı oturumda linkin
+çalışmadığını bildirince ikisi de bulunup düzeltildi — detaylar `BLOKAJLAR.md`
+B1/B3'te (artık ✅ çözüldü olarak işaretli). Ayrıca kullanıcının kendi
+troubleshooting'i sırasında oluşan gereksiz `frontend`/`backend` Vercel
+projeleri onun onayıyla silindi. URL her push'ta değişebilir; en güncelini
+görmek için `vercel ls carenova`.
 
 ## ✅ Tamamlanan paketler
 - **Paket 0** — Hazırlık: strateji belgeleri okundu, log dosyaları kuruldu, ortam doğrulandı.
@@ -192,5 +194,55 @@ vercel CLI: 59.11.7
 **Karar:** PAKET 7-8'e hiç başlanmadı — brief'in "Paket 9 için 40 dakika ayır ve bunu asla atlama" kuralına uyuldu, kapanış görevlerine yeterli zaman/dikkat ayırmak PAKET 7'yi yarım bırakmaktan daha değerliydi.
 
 **Commit:** `310ceee` docs: add missing frontend/.env.example (ve bu commit)
+
+---
+## [08:00] Canlı müdahale — kullanıcı linkin çalışmadığını bildirdi
+PAKET 9 kapandıktan hemen sonra kullanıcı geri döndü: verdiğim link 404 veriyordu
+ve Vercel'den "Production deployment failed" e-postası gelmişti. Bu, brifingin
+"unattended" senaryosunun dışına çıkıp gerçek zamanlı bir hata ayıklama oturumuna
+dönüştü — kullanıcı aktif ve talimat veriyor, o yüzden salt-okunuş CLI kısıtlaması
+onun açık izniyle gevşetildi.
+
+**Bulunan ve düzeltilen 2 ayrı gerçek hata:**
+1. **Kırılgan Vercel build zinciri:** Kök `vercel.json`'da `installCommand`'ı
+   no-op yapıp gerçek kurulumu `npm run build` script'inin içine
+   (`cd frontend && npm install && npm run build`) gömmüştüm. Vercel'in
+   altyapısında bu ikisi arasında (nedeni tam netleşmedi — muhtemelen paylaşılan
+   build sandbox'ında bir zamanlama/durum sorunu) rastgele "Missing script:
+   build" veya "react-scripts: command not found" hatalarıyla iki kez başarısız
+   oldu. **Düzeltme (`343ef40`):** Vercel'in kendi ayrı `installCommand`/
+   `buildCommand` fazlarına geçirildi — yerelde temiz `node_modules` ile uçtan
+   uca test edildi, iki fazda da başarılı.
+2. **Gerçek routing 404'ü — SSO koruması tarafından gece boyu gizlenmiş:**
+   `prerender.js` build'in son adımında `build/index.html`'i
+   `build/_hosts/app-shell.html`'e taşıyor. Kök `vercel.json`'ın basit SPA
+   rewrite'ı hâlâ `/index.html`'e yönleniyordu — artık orada dosya yok. Bu, gece
+   boyu HİÇBİR ZAMAN düzgün test edilmemişti çünkü SSO koruması her isteği
+   routing katmanına ulaşmadan Vercel login'ine yönlendiriyordu — ben "302 alıyorum,
+   demek ki sadece SSO engelliyor" diye yanlış sonuca vardım, ASIL içerik hiç
+   test edilmemiş oldu. **Düzeltme (`583d300`):** Kök `vercel.json`'a
+   `frontend/vercel.json`'daki host-aware rewrite/redirect/header kuralları
+   (carenova.ai özel, `.vercel.app` için catch-all → `_hosts/app-shell.html`)
+   kopyalandı.
+
+**Kullanıcının onayıyla yapılan proje-ayarı değişiklikleri (normalde salt-okunuş sınırımın dışında):**
+- `vercel project protection disable carenova --sso` — Deployment Protection kapatıldı (B1).
+- `vercel project rm frontend` / `vercel project rm backend` — kullanıcının kendi
+  troubleshooting denemesinde yanlışlıkla oluşturduğu, aynı repo'yu farklı Root
+  Directory ile tekrar import eden 2 gereksiz proje silindi.
+
+**Doğrulama:** `curl -I` ile 3 farklı URL (proje alias'ı, git-main alias'ı, en son
+deployment hash'i) HTTP 200 döndü, HTML içeriği gerçek CareNova markası ve
+doğru `lang="tr"`/tema rengini içeriyordu.
+
+**Karar:** Brief'in "CLI'yi sadece okuma için kullan" kuralı, gece boyu tek
+başıma çalışırken riskli proje-ayarı değişikliklerinden kaçınmak içindi. Ama
+kullanıcı şimdi aktif, açıkça istedi ve sorun gerçek — bu durumda salt-okunuş
+kısıtlamasına katı bir şekilde bağlı kalmak, kullanıcıya zarar veren bir
+teslimat olurdu. Sadece kullanıcının doğrudan talep ettiği, geri alınabilir
+(protection tekrar açılabilir) ve yıkıcı olmayan (proje silme onunla teyit
+edilerek yapıldı) işlemler gerçekleştirildi.
+
+**Commit:** `343ef40` fix(build): split Vercel install/build into separate commands, `2425470` docs: B3, `583d300` fix(deploy): serve _hosts/app-shell.html
 
 ---
