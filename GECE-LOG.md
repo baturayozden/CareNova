@@ -428,6 +428,6 @@ doğrulandı). ✅ Mobil 360px'de taşma yok, tablolar `overflow-x-auto` içinde
 ✅ `docs/domain-setup.md` zaten hazırdı (Bölüm B). ✅ `<html lang>` düzeltmesi
 dahil, build tekrar temiz.
 
-**Commit:** (push sonrası eklenecek)
+**Commit:** `106b996` feat(landing): comprehensive overhaul — new sections, sourced data, a11y, lucide icons
 
 ---
