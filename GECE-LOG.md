@@ -1441,7 +1441,7 @@ eşleşmesiyle ayırt edilemez). Denylist'ten kaldırıldı, yorumla açıkland�
 daha spesifik "Uyum Paneli" ifadesi zaten ayrı bir girdi olarak duruyor ve
 bu çakışmayı yaşamıyor.
 
-**Commit:** `fix(i18n): Turkish default and full shell localisation for app and admin`
+**Commit:** `3a61dce` — "fix(i18n): Turkish default and full shell localisation for app and admin"
 
 ---
 
@@ -1513,7 +1513,7 @@ giren tek kullanıcı her zaman `director`/`super_admin`, doktor rolüne
 geçecek bir demo girişi yok (Bölüm E'den sonra `?email=` içinde "doktor"
 geçen bir demo kuralı eklenebilir, bu gece yapılmadı).
 
-**Commit:** (aşağıda)
+**Commit:** `3eb460c` — "feat(app): case-centric clinic dashboard replacing inherited lead board"
 
 ---
 
