@@ -119,7 +119,13 @@ function WhatsAppMock() {
 
       <div className="flex items-center gap-2 px-4 py-3 bg-surface-raised border-t border-line">
         <div className="flex-1 bg-surface-sunken rounded-full px-4 py-2 text-xs text-ink-muted">AI yanıt veriyor…</div>
-        <div className="w-8 h-8 rounded-full bg-[#25d366] flex items-center justify-center shrink-0 text-white">
+        {/* !text-white (Tailwind's important-prefixed variant) is a distinct
+            compiled class from plain .text-white, which index.css redefines
+            to a dark color in light mode for elements missing a matching
+            bg-* pairing (see the "Inverted-surface scope" comment there) —
+            this badge's bg-[#25d366] arbitrary value has no such pairing,
+            so plain text-white would render the icon dark-on-green. */}
+        <div className="w-8 h-8 rounded-full bg-[#25d366] flex items-center justify-center shrink-0 !text-white">
           <Send size={14} strokeWidth={2} aria-hidden="true" />
         </div>
       </div>
@@ -183,7 +189,7 @@ export default function HeroSection() {
                 </a>
               </motion.div>
 
-              <motion.p variants={fadeUp} className="text-ink-muted/70 text-sm">
+              <motion.p variants={fadeUp} className="text-ink-muted text-sm">
                 {heroTrust(i18n.language)}
               </motion.p>
 

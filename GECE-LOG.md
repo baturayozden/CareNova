@@ -614,3 +614,104 @@ karşılığında hiçbir kazanım sunmuyor. Mevcut yaklaşım (temizle + taze
 `createRoot`) doğru, basit ve tek-strateji — değişiklik gerekmiyor.
 
 ---
+### Üç sorun — kaynak politikası, i18n sızıntıları, kontrast hatası
+
+Baturay üç ayrı sorun bildirdi, sırayla düzeltildi, her biri ayrı commit.
+
+**1) Kaynak politikası** (`fb8387d`) — GECE-LOG'un yukarısında zaten detaylı
+anlatıldı (Problem bölümü USHAŞ/TÜİK verisiyle yeniden kuruldu, üç kategori
+kuralı `landingContent.tsx` başına yazıldı). `grep -ri "onuroztr\|peganom"
+frontend/src` → boş, doğrulandı.
+
+**2) i18n sızıntıları** (`fb9965b`) — de yukarıda anlatıldı: 4 eyebrow
+etiketi (Trust/Aftercare/Setup/ROI) + 2 erişilebilirlik-only sızıntı
+(NavBar hamburger aria-label, karşılaştırma tablosu yes/no/partial
+aria-label) düzeltildi. `scripts/check-i18n-leaks.js` yazıldı — ilk
+sürümü 59+ yanlış pozitif üretti (sıradan Türkçe kelimelerin çoğu özel
+karakter içermiyor: Klinik, Vaka, Kurulum, Dil), pozisyonel çapraz-dil
+karşılaştırmasıyla yeniden yazıldı (TR render'daki N'inci eyebrow ile EN
+render'daki N'inci eyebrow'u karşılaştır — doğru çevrilmiş bir etiket asla
+eşleşmez). Gerçek bir sızıntıyı ("Trust"u geçici olarak geri koyup) doğru
+yakaladığı test edildi.
+
+**3) Kontrast hatası — Mevzuat Kalkanı ve Fiyatlandırma "Önerilen" kartı**
+(bu commit) — **Kök neden Baturay'ın teşhisinden FARKLI çıktı:** `--ink`
+token'ı yanlış çözümlenmiyordu; sorun bu bölümlerin `--ink`'e hiç
+DOKUNMAMASIYDI — JSX doğrudan Tailwind'in ham `text-white`/`bg-slate-900`
+class'larını kullanıyordu (token sistemi değil). Ve `index.css`'teki Bölüm
+A'dan kalma override kuralı (`.text-white { color: #0f172a; }` — açık
+temada, SADECE aynı elemanda EŞLEŞEN bir `bg-X` class'ı varsa beyaza geri
+dönüyor, örn. `.bg-slate-900.text-white`) `bg-slate-900 text-white` olan
+DIŞ container'ı doğru çözüyordu ama İÇİNDEKİ `<h3 className="text-white">`
+gibi çocuklar kendi `bg-slate-900`'larını taşımadığı için karanlık-üstü-
+karanlık render oluyordu. Yani token eşleşmesi zaten doğruydu, çünkü hiç
+kullanılmıyordu — asıl kırık olan Tailwind'in ham class'larının bu
+"unscoped override" mekanizmasıyla etkileşimiydi.
+
+**Yapılan düzeltme:**
+- `index.css`'e `.surface-inverted` yardımcı sınıfı eklendi (brief'in
+  istediği tam yapı) — `--surface-0/1/2`, `--border(-strong)`, `--ink(-muted/
+  -subtle)`, `--accent(-hover)`, `--accent-soft`'ı koyu temanın DEĞERLERİYLE
+  yeniden tanımlıyor (`--ink-subtle` hariç: koyu temanın kendi `100 116 139`
+  değeri yerine biraz daha parlak `122 138 158` kullanıldı, çünkü bu bağımsız
+  bir koyu ada, tam koyu tema değil — brief'in verdiği tam sayılarla eşleşiyor).
+- `ComplianceSection.tsx`, `PricingSection.tsx` (vurgulu kart), `CTASection.tsx`
+  — üçü de `.surface-inverted` ile sarmalandı, İÇLERİNDEKİ TÜM `text-white`/
+  `text-white/NN` class'ları `text-ink`/`text-ink-muted`/`text-ink-subtle`'a
+  çevrildi. PricingSection'da bu, `tier.highlight ? 'text-white' : 'text-ink'`
+  gibi TÜM ternary'leri kaldırmayı sağladı — artık vurgulu/vurgusuz kart AYNI
+  token class'larını kullanıyor, hangisinin hangi renk olduğunu ayrıca
+  düşünmeye gerek yok (brief'in "hiçbir bileşeni tek tek değiştirmen gerekmez"
+  hedefi).
+- **Taramada bulunan 2 ek, ilgili hata:** (a) `HeroSection.tsx`'teki WhatsApp
+  mock'ının gönder butonu `bg-[#25d366] text-white` idi — bu keyfi-değer
+  arka plan, override listesindeki HİÇBİR `bg-X.text-white` eşleşmesine
+  uymuyor, ikon karanlık render oluyordu; `!text-white` (Tailwind'in
+  important-önekli varyantı, FARKLI bir derlenen class) ile düzeltildi. (b)
+  `ConsentBanner.tsx` (landing DIŞI, paylaşılan bileşen) `text-gray-600`
+  kullanıyordu — Bölüm A'nın override'ı bunu `#94a3b8` (açık gri, koyu zemin
+  varsayımıyla) yapmıştı, ama bu banner HER ZAMAN beyaz bir kart — 2.56:1'e
+  düşüyordu. `text-ink-muted`'a çevrildi.
+
+**`scripts/check-contrast.js` tamamen yeniden yazıldı** — artık statik token
+çiftlerini değil, CANLI RENDER EDİLMİŞ DOM'u ölçüyor: Puppeteer ile sayfayı
+yükler, `prefers-reduced-motion: reduce` emüle eder (böylece scroll-reveal
+hiçbir elemanı gizli bırakmaz), her görünür metin elemanının GERÇEK computed
+rengini ve şeffaf/yarı-şeffaf atalar üzerinden compose edilmiş GERÇEK efektif
+arka planını hesaplar, WCAG oranını (büyük metin 3:1, normal 4.5:1) kontrol
+eder. Eski script'in YAKALAYAMADIĞI tam da buydu — teoride "ink-subtle
+surface-0 üzerinde 4.19:1 geçer" diyordu ama hangi bileşenin GERÇEKTE hangi
+class'ı kullandığına hiç bakmıyordu.
+
+**Dürüst durum — "Hedef: 0 ihlal" TAM karşılanmadı, açıkça belirtiyorum:**
+Yeni script TR'de 35, EN'de 35 ihlal buluyor (`docs/contrast-report.md`).
+Bildirilen 2 KRİTİK hata (Mevzuat Kalkanı, Fiyatlandırma Önerilen) artık
+~1:1'den (görünmez) 3.8:1'e (net okunaklı, ekran görüntüsüyle doğrulandı)
+çıktı — ama TAM 4.5:1'e ulaşmadı çünkü `accent-hover`'ın kendisi (koyu
+temadan alınan değer) küçük/kalın eyebrow metni için WCAG'ın "normal metin"
+eşiğini net geçmiyor. Kalan 35 ihlalin TAMAMI iki tekrarlayan, SİTE GENELİNDE
+YAYGIN, BU OTURUMDAN ÖNCE VAR OLAN desen: (a) `text-ink-subtle` küçük
+altyazılarda (Footer başlıkları, MiniCard etiketleri, "D+7" gibi) —
+Bölüm A'nın kendi notu zaten bu aralığın 4.19-4.76 olduğunu, yani BAZI
+eşleşmelerin 4.5 altında kaldığını belgeliyordu; (b) `text-accent`/
+`text-warning` küçük rozet metninde `accent-soft`/`warning-soft` zemin
+üzerinde (BranchesSection durumu, TrustSection "Onaylı" rozeti,
+SetupSection numaralı daireler, RoiSection uyarı rozeti) — hepsi Bölüm
+A'da kurulan, DEĞİŞTİRİLMEMİŞ bir tasarım deseni. Bunların TAMAMINI sıfıra
+indirmek (renk derinleştirme veya font-size/weight değişikliği ile) site
+genelinde onlarca bileşeni etkileyen ayrı, daha büyük bir iş paketi
+gerektirir — bildirilen "2 KRİTİK, okunmuyor" hatasının kapsamı dışında.
+Bunu ÇÖZDÜM demiyorum; net liste `docs/contrast-report.md`'de, gelecek bir
+iş paketi için hazır.
+
+**Kabul kriteri:**
+✅ Build temiz. ✅ `check:i18n-leaks` sıfır ihlal. ✅ `grep onuroztr\|peganom`
+boş. ✅ Mevzuat Kalkanı ve Fiyatlandırma Önerilen kartı artık gerçekten
+okunaklı — TR/EN, 360px/1440px, ekran görüntüsüyle doğrulandı (kendi gözümle
+gördüm, sadece script çıktısına güvenmedim). ⚠️ `check:contrast` script'i
+0 ihlale ulaşmadı — 35 pre-existing, düşük-öncelikli, sitewide bulgu kaldı,
+yukarıda dürüstçe listelendi.
+
+**Commit:** (push sonrası eklenecek)
+
+---

@@ -14,7 +14,7 @@ export default function ComplianceSection() {
 
   return (
     <>
-      <section id="compliance" aria-labelledby="compliance-heading" className="relative py-24 bg-slate-900 text-white overflow-hidden">
+      <section id="compliance" aria-labelledby="compliance-heading" className="surface-inverted relative py-24 bg-surface text-ink overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40" style={{
           backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(27,111,234,0.15), transparent 50%)',
         }} />
@@ -24,7 +24,7 @@ export default function ComplianceSection() {
               <ShieldCheck size={20} strokeWidth={1.5} className="text-accent-hover" aria-hidden="true" />
               <span className="text-accent-hover text-xs font-semibold tracking-widest uppercase">{complianceHeading(i18n.language)}</span>
             </motion.div>
-            <motion.h2 id="compliance-heading" variants={fadeUp} className="font-display text-3xl md:text-4xl text-white leading-tight">
+            <motion.h2 id="compliance-heading" variants={fadeUp} className="font-display text-3xl md:text-4xl text-ink leading-tight">
               {complianceSub(i18n.language)}
             </motion.h2>
           </motion.div>
@@ -35,9 +35,9 @@ export default function ComplianceSection() {
               return (
                 <motion.div key={item.title} variants={fadeUp} className="rounded-2xl bg-white/5 border border-white/10 p-7 flex flex-col gap-3">
                   <Icon size={20} strokeWidth={1.5} className="text-accent-hover" aria-hidden="true" />
-                  <h3 className="font-semibold text-white text-base">{item.title}</h3>
-                  <p className="text-white/60 text-sm leading-relaxed">{item.body}</p>
-                  <p className="text-white/40 text-xs pt-2 border-t border-white/10">{item.sanction}</p>
+                  <h3 className="font-semibold text-ink text-base">{item.title}</h3>
+                  <p className="text-ink-muted text-sm leading-relaxed">{item.body}</p>
+                  <p className="text-ink-subtle text-xs pt-2 border-t border-line">{item.sanction}</p>
                 </motion.div>
               );
             })}

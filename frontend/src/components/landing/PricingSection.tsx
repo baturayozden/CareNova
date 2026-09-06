@@ -41,22 +41,22 @@ export default function PricingSection() {
             <motion.div
               key={tier.name}
               variants={fadeUp}
-              className={`rounded-2xl p-8 border ${tier.highlight ? 'border-accent bg-slate-900 text-white shadow-2xl md:scale-105' : 'border-line bg-surface-raised'}`}
+              className={`rounded-2xl p-8 border ${tier.highlight ? 'surface-inverted border-accent bg-surface shadow-2xl md:scale-105' : 'border-line bg-surface-raised'}`}
             >
               {tier.highlight && (
                 <span className="inline-flex items-center gap-1 mb-3 text-[11px] font-bold uppercase tracking-widest text-accent-hover">
                   <Star size={12} strokeWidth={2} fill="currentColor" aria-hidden="true" /> {pricingRecommendedBadge(i18n.language)}
                 </span>
               )}
-              <h3 className={`font-display text-2xl mb-1 ${tier.highlight ? 'text-white' : 'text-ink'}`}>{tier.name}</h3>
-              <p className={`text-xs mb-5 ${tier.highlight ? 'text-white/60' : 'text-ink-muted'}`}>{tier.audience}</p>
-              <p className={`mb-6 ${tier.highlight ? 'text-white' : 'text-ink'}`}>
+              <h3 className="font-display text-2xl mb-1 text-ink">{tier.name}</h3>
+              <p className="text-xs mb-5 text-ink-muted">{tier.audience}</p>
+              <p className="mb-6 text-ink">
                 <span className="font-display text-4xl">€{annual ? tier.annual : tier.monthly}</span>
-                <span className={`text-sm ${tier.highlight ? 'text-white/50' : 'text-ink-muted'}`}> / {i18n.language?.startsWith('tr') ? 'ay' : 'mo'}</span>
+                <span className="text-sm text-ink-muted"> / {i18n.language?.startsWith('tr') ? 'ay' : 'mo'}</span>
               </p>
               <ul className="space-y-2.5 mb-8">
                 {tier.features.map(f => (
-                  <li key={f} className={`text-sm flex items-start gap-2 ${tier.highlight ? 'text-white/85' : 'text-ink-muted'}`}>
+                  <li key={f} className="text-sm flex items-start gap-2 text-ink-muted">
                     <Check size={16} strokeWidth={2} className={`shrink-0 mt-0.5 ${tier.highlight ? 'text-accent-hover' : 'text-accent'}`} aria-hidden="true" /> {f}
                   </li>
                 ))}

@@ -82,7 +82,7 @@ export default function ConsentBanner() {
         {!managing ? (
           /* ── Simple banner ── */
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <p className="text-sm text-gray-600 flex-1 leading-relaxed">
+            <p className="text-sm text-ink-muted flex-1 leading-relaxed">
               We use cookies to improve your experience and measure performance.{' '}
               <Link to="/cookies" className="underline hover:text-gray-900 transition-colors">
                 Cookie Policy
@@ -97,7 +97,7 @@ export default function ConsentBanner() {
               </button>
               <button
                 onClick={() => setManaging(true)}
-                className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 text-ink-muted hover:bg-gray-50 transition-colors"
               >
                 Manage
               </button>
@@ -152,7 +152,7 @@ export default function ConsentBanner() {
               </button>
               <button
                 onClick={() => setManaging(false)}
-                className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 text-ink-muted hover:bg-gray-50 transition-colors"
               >
                 Back
               </button>

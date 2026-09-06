@@ -83,6 +83,48 @@
   --shadow-lg: none;
 }
 
+/* ─── Inverted-surface scope ──────────────────────────────────────────────
+   For a small number of landing blocks that are ALWAYS a dark panel,
+   regardless of the active theme (Compliance/CTA/Pricing's highlighted
+   tier) — not a theme toggle, a permanent design choice for that one block.
+   Redefines the same semantic tokens the rest of the site already uses
+   (--ink, --surface-0/1, --border, ...), so anything inside using
+   `text-ink`/`text-ink-muted`/`bg-surface`/`border-line` etc. automatically
+   reads correctly with no per-element color class to remember.
+
+   This exists because the alternative — literal Tailwind classes like
+   `text-white` on each child — silently breaks: `.text-white` is redefined
+   ABOVE to the light theme's dark ink color (see the override block below),
+   and that only gets corrected back to white on an element that ALSO
+   carries a matching `bg-*` class from the compound-selector list further
+   down. A `<h3 className="text-white">` inside a `bg-slate-900` PARENT has
+   no such pairing on itself, so it silently rendered dark-on-dark — the
+   exact bug this class exists to make structurally impossible: `text-ink`
+   has no theme-dependent light/dark split to get out of sync with its
+   surroundings, it just reads whatever `--ink` resolves to in its own
+   scope. Values below match [data-theme="dark"]'s own dark palette so an
+   inverted block looks identical regardless of which theme the rest of the
+   page is in. --ink-subtle is tuned slightly brighter than the dark theme's
+   own value (100 116 139) because this is a standalone dark island inside
+   an otherwise-light page, not the full dark theme — see
+   docs/contrast-report.md for the measured ratios. */
+.surface-inverted {
+  --surface-0: 15 22 38;      /* #0F1626 */
+  --surface-1: 7 11 20;       /* #070B14 */
+  --surface-2: 26 36 55;      /* #1A2437 */
+  --border:        36 49 74;  /* #24314A */
+  --border-strong: 52 68 95;
+  --ink:        232 237 245;  /* #E8EDF5 */
+  --ink-muted:  148 163 184;  /* #94A3B8 */
+  --ink-subtle: 122 138 158;  /* #7A8A9E */
+  --accent:       37 99 235;  /* #2563EB — dark theme's accent, not the light
+                                  theme's #1B6FEA, which was tuned for
+                                  contrast against a WHITE background and
+                                  fails on this dark one */
+  --accent-hover: 46 110 224; /* #2E6EE0 — dark theme's accent-hover, same reason */
+  --accent-soft: 30 58 95;    /* dark-tinted accent wash, matches dark theme */
+}
+
 /* ─── Content text — Tailwind-built-in-palette overrides ────────────────────
    The dashboard's JSX was written against Tailwind's literal utility colors
    (text-white, bg-red-900/50, bg-gray-800, ...) rather than custom tokens —
