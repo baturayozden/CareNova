@@ -712,6 +712,6 @@ gördüm, sadece script çıktısına güvenmedim). ⚠️ `check:contrast` scri
 0 ihlale ulaşmadı — 35 pre-existing, düşük-öncelikli, sitewide bulgu kaldı,
 yukarıda dürüstçe listelendi.
 
-**Commit:** (push sonrası eklenecek)
+**Commit:** `5686af2` fix(landing): fix dark-on-dark contrast bug, rewrite contrast checker for live DOM
 
 ---
