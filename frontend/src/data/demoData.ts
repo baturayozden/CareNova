@@ -19,7 +19,7 @@ export const DEMO_USER = {
   email: 'demo@carenova.ai',
   firstName: 'Demo',
   lastName: 'Kullanıcı',
-  role: 'director' as const,
+  role: 'operasyon_muduru' as const,
   tenantId: DEMO_TENANT_ID,
   phone: null,
   avatarUrl: null,

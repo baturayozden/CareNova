@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 
 // ─── Role constants ───────────────────────────────────────────────────────────
-const APPROVE_ROLES = ['super_admin', 'admin', 'director'];
-const MANAGE_ROLES  = ['super_admin', 'admin', 'director', 'clinic_admin'];
+const APPROVE_ROLES = ['super_admin', 'admin', 'operasyon_muduru'];
+const MANAGE_ROLES  = ['super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi'];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatGBP(n: number | string | null | undefined): string {
@@ -506,7 +506,7 @@ export default function CommissionPage() {
   const activeDeals     = liveDeals.filter(d => !['lost', 'cancelled'].includes(d.status));
   const liveTotalSales  = activeDeals.reduce((s, d) => s + (Number(d.agreed_amount) || 0), 0);
   const liveQuotaSales  = activeDeals
-    .filter(d => d.staff_role === 'treatment_coordinator')
+    .filter(d => d.staff_role === 'hasta_danismani')
     .reduce((s, d) => s + (Number(d.agreed_amount) || 0), 0);
 
   // Build leaderboard from live deals, overlay commission records
@@ -873,7 +873,7 @@ export default function CommissionPage() {
                 </thead>
                 <tbody className="divide-y divide-surface-sunken">
                   {leaderboard.map((tc, i) => {
-                    const isNonQuota   = tc.role !== 'treatment_coordinator';
+                    const isNonQuota   = tc.role !== 'hasta_danismani';
                     const tcPct        = targetAmount > 0 ? Math.min((tc.totalSales / targetAmount) * 100, 100) : 0;
                     const isExpanded   = expandedTCs.has(tc.staffId);
                     const tcDeals      = activeDeals.filter(d => d.assigned_staff_id === tc.staffId);

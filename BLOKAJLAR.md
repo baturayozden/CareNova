@@ -72,35 +72,58 @@ doğrulamak.
 
 ---
 
-## B7 — CareNova'nın 7 klinik rolü (klinik_sahibi/operasyon_muduru/...) backend'de hiç yok
+## ✅ B7 — CareNova'nın 7 klinik rolü backend'de yoktu — Gece 3'te ÇÖZÜLDÜ (kod+test; DB'ye karşı doğrulanmadı)
 
-**Ne oldu:** Bölüm E'ye başlarken fark ettim: `klinik_sahibi`,
-`operasyon_muduru`, `hasta_danismani`, `doktor`, `koordinator`, `tercuman`,
-`muhasebe` — CARENOVA-STRATEJI.md'nin ve Bölüm C.10'un (admin konsolu
-Kullanıcılar sekmesi) tanımladığı 7 klinik rolü — backend'in HİÇBİR
-yerinde yok. `backend/src/routes/clinics.js`'teki `ROLE_IDS` hâlâ
-CareDental'ın eski rolleri (`director`, `clinic_admin`, `receptionist`,
-`dentist`, `treatment_coordinator`, `sales`). Bu 7 rol şu ana kadar SADECE
-frontend'de, admin konsolunun demo verisinde (`adminDemoData.ts`) var —
-gerçek bir backend karşılığı yok.
+**Neydi:** `klinik_sahibi`/`operasyon_muduru`/`hasta_danismani`/`doktor`/
+`koordinator`/`tercuman`/`muhasebe` sadece frontend demo verisinde vardı;
+backend hâlâ CareDental'ın eski rolleriyle (`director`, `clinic_admin`,
+`receptionist`, `dentist`, `treatment_coordinator`, `sales`) çalışıyordu.
 
-**Neden düzeltmedim:** Rol sistemini değiştirmek (yeni migration, `ROLE_IDS`
-haritası, ~20 route dosyasındaki `requireRole(...)` çağrılarının hepsinin
-güncellenmesi, mevcut kullanıcı verisinin taşınması) tek başına bir gecelik
-iş — Bölüm E'nin "vakit kalırsa" bütçesine sığdırmak yerine, `caseFiles.js`/
-`branchTemplates.js`'i tenant_id üzerinden (rol adından bağımsız) izole
-ettim; rol-özel yetkilendirme (örn. "sadece doktor uygunluk kararı verebilir")
-şu an HİÇBİR route'ta zorlanmıyor.
+**Ne yapıldı (GECE-3-BRIEFI.md Bölüm E, tam detay GECE-LOG.md'de):**
+- `backend/src/migrations/059_carenova_clinic_roles.sql` — 7 yeni rol +
+  eski→yeni kullanıcı taşıma. **Çalıştırılmadı** (DB yok, bkz. B2) — bu
+  yüzden başlıktaki ✅ SADECE kod/test seviyesinde, gerçek bir veritabanına
+  karşı henüz doğrulanmadı.
+- 18 backend + 17 frontend dosyasında (~45 referans) rol string'leri
+  mekanik olarak yeni isimlere taşındı; `treatment_coordinator`/`sales`
+  çakışması (ikisi de `hasta_danismani`'ye toplanıyor) her yerde DAHA
+  KISITLAYICI davranış uygulanarak çözüldü (gerekçe: M8'in "kendi
+  vakaları" tanımı + 'sales'in zaten hiç gerçek kullanıcısı olmadığının
+  keşfedilmesi — bkz. aşağıdaki yeni bulgu).
+- `routes/caseFiles.js`'e gerçek bir rol-yetkilendirme matrisi eklendi
+  (brief'in E.4 tablosu): tıbbi dosya okuma (tercümana kapalı), uygunluk
+  kararı (sadece doktor), `awaiting_doctor`'dan çıkış (sadece doktor),
+  seyahat/program düzenleme (koordinator/operasyon_muduru/klinik_sahibi).
+  "Teklif oluşturma" ve "Fatura/ödeme" satırları bağlanamadı — bu router'da
+  hiç teklif/fatura modeli yok, not düşüldü.
+- `routes/clinics.js`'e personel/rol yönetimini `requireClinicAdmin`'den
+  ayıran daha dar bir `requireKlinikSahibi` guard'ı eklendi (brief: "sadece
+  klinik_sahibi").
+- 6+ yeni birim test (`caseFiles.test.js`), toplam 128/128 yeşil.
+- Frontend: `DEMO_USER.role` gerçekten `operasyon_muduru`'ya çevrildi (yeni
+  sistemi bu gece bizzat sergiliyor), rol adları artık `roleLabel()` ile
+  çevriliyor ("klinik_sahibi" değil "Klinik Sahibi" görünüyor).
 
-**Ne gerekiyor:** Ayrı bir migration + `ROLE_IDS` güncellemesi + ilgili
-route'ların rol kontrollerinin CareNova'nın 7 rolüne taşınması. Şimdilik
-`req.user.tenantId` üzerinden izolasyon güvenli, ama rol-bazlı yetki
-(örn. sadece `doktor` case durumunu `awaiting_doctor`'dan ileri taşıyabilir)
-YOK.
+**Yeni bulgu — 'sales' rolü zaten kırıktı:** `ROLE_IDS.sales = 9` hiçbir
+migration/seed'de karşılığı olmayan bir id'ydi — gerçek bir 'sales'
+kullanıcısı oluşturma denemesi muhtemelen hep FK hatasıyla patlardı. Bu,
+Gece 3'ten önce vardı, migration 059 onu (sales kavramını kaldırarak)
+konu dışı bırakıyor.
 
-**Aciliyet:** Orta — tenant izolasyonu (asıl güvenlik sınırı) sağlam, ama
-rol-bazlı yetkilendirme backend'e gerçek endpoint'ler eklendikçe (Bölüm E'nin
-devamı) mutlaka gelmeli.
+**Hâlâ eksik / doğrulanmamış:**
+- Migration 059 gerçek bir Postgres'e karşı hiç çalıştırılmadı (B2).
+- `backend/src/db/seed-full.js` / `seed-demo-riverside.js` (dev seed
+  script'leri) hâlâ eski rol isimleri kullanıyor — request path dışında,
+  ayrı bir iş.
+- `commissions.js`'in bazı rol sabitlerine `muhasebe`'yi M8'in tanımına
+  dayanarak ekledim (mekanik rename'in ötesinde bir karar) — Baturay'ın
+  gözden geçirmesi iyi olur.
+- `appointments.js`'teki hayalet `'manager'` rolü (seed edilmemiş)
+  `operasyon_muduru`'ya katlandı — aynı şekilde bir karar, onay bekliyor.
+
+**Aciliyet:** Düşük-orta — kod ve testler hazır, gerçek DB bağlantısı
+kurulduğunda ilk iş `node migrate.js` + bu rol matrisini gerçek
+kullanıcılarla elle bir kez doğrulamak.
 
 ---
 

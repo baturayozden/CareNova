@@ -254,7 +254,7 @@ function IntegrationsSection() {
   const [keyLoading, setKeyLoading] = useState(false);
   const [keyError,   setKeyError]   = useState<string | null>(null);
 
-  const canAccessWebsite = ['director', 'clinic_admin'].includes(user?.role ?? '');
+  const canAccessWebsite = ['operasyon_muduru', 'klinik_sahibi'].includes(user?.role ?? '');
 
   function copy(text: string, label: string) {
     copyToClipboard(text);
@@ -747,7 +747,7 @@ function IntegrationsSection() {
 
 // ── Clinic Settings section ───────────────────────────────────────────────────
 
-const EDITOR_ROLES: string[] = ['clinic_admin', 'director'];
+const EDITOR_ROLES: string[] = ['klinik_sahibi', 'operasyon_muduru'];
 
 const TIMEZONES = [
   'Europe/London',
@@ -1390,7 +1390,7 @@ interface SettingsPageProps {
 export default function SettingsPage({ initialTab }: SettingsPageProps) {
   const { user } = useAuth();
   const isSuperAdmin = user?.role === 'super_admin';
-  const isAdmin = ['clinic_admin', 'super_admin'].includes(user?.role ?? '');
+  const isAdmin = ['klinik_sahibi', 'super_admin'].includes(user?.role ?? '');
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab || 'profile');
 
   const tabs: { value: SettingsTab; label: string; icon: IconComponent; superAdminOnly?: boolean; adminOnly?: boolean }[] = [

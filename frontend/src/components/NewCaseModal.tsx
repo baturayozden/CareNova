@@ -109,7 +109,7 @@ export default function NewCaseModal({
 }: NewCaseModalProps) {
   const { user } = useAuth();
   const isEdit = !!editCase;
-  const isAdminRole = ['super_admin', 'admin', 'director', 'clinic_admin'].includes(currentUserRole ?? '');
+  const isAdminRole = ['super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi'].includes(currentUserRole ?? '');
   // For non-platform-admin users effectiveTenantId is undefined — fall back to their own tenantId.
   const staffTenantId = effectiveTenantId ?? user?.tenantId ?? '';
 

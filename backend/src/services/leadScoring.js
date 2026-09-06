@@ -125,13 +125,13 @@ async function scoreLead(leadId, messages) {
         return { score, label, tags, reasoning };
       }
 
-      // Fetch director + clinic_admin + treatment_coordinator emails for this tenant
+      // Fetch operasyon_muduru + klinik_sahibi + hasta_danismani emails for this tenant
       const staff = await pool.query(
         `SELECT u.email FROM users u
          JOIN roles r ON r.id = u.role_id
          WHERE u.tenant_id = $1
            AND u.deleted_at IS NULL
-           AND r.name IN ('director','clinic_admin','treatment_coordinator')`,
+           AND r.name IN ('operasyon_muduru','klinik_sahibi','hasta_danismani')`,
         [tenantId],
       );
       const recipients = staff.rows.map(x => x.email).filter(Boolean);

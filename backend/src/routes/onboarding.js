@@ -43,7 +43,7 @@ function resolveTenant(req) {
 
 router.get(
   '/',
-  ...requireRole('director', 'clinic_admin', 'clinic_owner', 'super_admin', 'admin'),
+  ...requireRole('operasyon_muduru', 'klinik_sahibi', 'super_admin', 'admin'),
   async (req, res) => {
     const tenantId = resolveTenant(req);
     if (!tenantId) {
@@ -73,7 +73,7 @@ router.get(
 
 router.patch(
   '/',
-  ...requireRole('director', 'clinic_admin', 'clinic_owner', 'super_admin', 'admin'),
+  ...requireRole('operasyon_muduru', 'klinik_sahibi', 'super_admin', 'admin'),
   async (req, res) => {
     const tenantId = resolveTenant(req);
     if (!tenantId) {

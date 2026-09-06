@@ -167,15 +167,16 @@ router.post('/availability', async (req, res) => {
 router.get('/appointments', async (req, res) => {
   const { id } = req.params;
   const { date, status } = req.query;
-  const isSales = req.user?.role === 'sales';
+  const isConsultant = req.user?.role === 'hasta_danismani';
 
-  // Sales reps see only appointments whose linked lead is assigned to them.
-  // appointments.assigned_to is for dentist/nurse (clinical assignment) — not used here.
+  // hasta_danismani (patient consultant) sees only appointments whose linked
+  // lead is assigned to them. appointments.assigned_to is for doktor/nurse
+  // (clinical assignment) — not used here.
   let query, values, nextParam;
   const branchJoin = `LEFT JOIN clinic_branches b ON b.id = a.branch_id`;
   const apptCols   = `a.*, b.name AS branch_name, b.postcode AS branch_postcode`;
 
-  if (isSales) {
+  if (isConsultant) {
     query      = `SELECT ${apptCols} FROM appointments a
                   INNER JOIN leads l ON l.id = a.lead_id AND l.assigned_to = $2
                   ${branchJoin}
@@ -342,7 +343,7 @@ router.patch('/appointments/:apptId', async (req, res) => {
 
 router.patch('/appointments/:apptId/approve', async (req, res) => {
   const { id, apptId } = req.params;
-  const ALLOWED = ['super_admin', 'clinic_admin', 'director', 'manager'];
+  const ALLOWED = ['super_admin', 'admin', 'klinik_sahibi', 'operasyon_muduru'];
   if (!ALLOWED.includes(req.user?.role)) {
     return res.status(403).json({ error: 'Insufficient permissions.' });
   }
@@ -382,7 +383,7 @@ router.patch('/appointments/:apptId/approve', async (req, res) => {
 
 router.patch('/appointments/:apptId/reject', async (req, res) => {
   const { id, apptId } = req.params;
-  const ALLOWED = ['super_admin', 'clinic_admin', 'director', 'manager'];
+  const ALLOWED = ['super_admin', 'admin', 'klinik_sahibi', 'operasyon_muduru'];
   if (!ALLOWED.includes(req.user?.role)) {
     return res.status(403).json({ error: 'Insufficient permissions.' });
   }

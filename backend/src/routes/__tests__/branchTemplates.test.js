@@ -17,16 +17,16 @@ describe('branchTemplates — canEditTemplate', () => {
   });
 
   test('a clinic role may NOT edit a system template, even its own branch\'s', () => {
-    expect(canEditTemplate({ role: 'clinic_admin', tenantId: 'tenant-a' }, systemTemplate)).toBe(false);
-    expect(canEditTemplate({ role: 'director', tenantId: 'tenant-a' }, systemTemplate)).toBe(false);
+    expect(canEditTemplate({ role: 'klinik_sahibi', tenantId: 'tenant-a' }, systemTemplate)).toBe(false);
+    expect(canEditTemplate({ role: 'operasyon_muduru', tenantId: 'tenant-a' }, systemTemplate)).toBe(false);
   });
 
   test('a clinic may edit its OWN custom (non-system) template', () => {
-    expect(canEditTemplate({ role: 'clinic_admin', tenantId: 'tenant-a' }, tenantATemplate)).toBe(true);
+    expect(canEditTemplate({ role: 'klinik_sahibi', tenantId: 'tenant-a' }, tenantATemplate)).toBe(true);
   });
 
   test('a clinic may NOT edit another tenant\'s custom template', () => {
-    expect(canEditTemplate({ role: 'clinic_admin', tenantId: 'tenant-b' }, tenantATemplate)).toBe(false);
+    expect(canEditTemplate({ role: 'klinik_sahibi', tenantId: 'tenant-b' }, tenantATemplate)).toBe(false);
   });
 
   test('platform admin may edit any tenant\'s custom template too', () => {

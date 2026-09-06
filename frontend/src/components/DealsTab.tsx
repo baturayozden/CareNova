@@ -142,8 +142,8 @@ interface LeadOption { id: string; firstName: string; lastName: string; phone: s
 
 export function DealModal({ deal, tenantId, onClose, onSaved, fixedLeadId, fixedPatient, currentUserRole, currentUserId, currentUserName }: DealModalProps) {
   const isEdit = !!deal;
-  const isSelfAssignRole = ['treatment_coordinator', 'sales'].includes(currentUserRole ?? '');
-  const isAdminRole      = ['super_admin', 'admin', 'director', 'clinic_admin'].includes(currentUserRole ?? '');
+  const isSelfAssignRole = ['hasta_danismani'].includes(currentUserRole ?? '');
+  const isAdminRole      = ['super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi'].includes(currentUserRole ?? '');
 
   const [patientName,   setPatientName]   = useState(deal?.patient_name ?? fixedPatient?.name ?? '');
   const [patientEmail,  setPatientEmail]  = useState(deal?.patient_email ?? fixedPatient?.email ?? '');
@@ -697,8 +697,8 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
   const [menuPos,   setMenuPos]   = useState<{ top: number; right: number } | null>(null);
   const menuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const isTC         = userRole === 'treatment_coordinator';
-  const isAdminRole  = ['super_admin', 'admin', 'director', 'clinic_admin'].includes(userRole ?? '');
+  const isTC         = userRole === 'hasta_danismani';
+  const isAdminRole  = ['super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi'].includes(userRole ?? '');
   const showAdmin    = !isTC; // show TC column, filter, summary for all non-TC roles
 
   function canManage(deal: Deal): boolean {

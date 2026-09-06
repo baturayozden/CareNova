@@ -9,14 +9,13 @@ const { requireRole }            = require('../middleware/auth');
 const { parse: csvParse }        = require('csv-parse/sync');
 
 // Roles that can be the target of a lead assignment (used in validation + assign endpoint)
-const ASSIGNABLE_ROLES = ['treatment_coordinator', 'sales'];
+const ASSIGNABLE_ROLES = ['hasta_danismani'];
 
 // GET /api/leads/stats — aggregate stats for the dashboard cards
 router.get('/stats', async (req, res) => {
   try {
     const isPlatformAdmin = ['super_admin', 'admin'].includes(req.user.role);
-    const isTC            = req.user.role === 'treatment_coordinator';
-    const isSales         = req.user.role === 'sales';
+    const isConsultant    = req.user.role === 'hasta_danismani';
 
     // Tenant isolation: platform admins (tenantId = null) see all tenants;
     // every other role is scoped to their own tenant.
@@ -24,7 +23,7 @@ router.get('/stats', async (req, res) => {
     const tenantClause = isPlatformAdmin
       ? ''
       : (params.push(req.user.tenantId), `AND tenant_id = $${params.length}`);
-    const salesClause = isSales
+    const salesClause = isConsultant
       ? (params.push(req.user.sub), `AND assigned_to = $${params.length}`)
       : '';
 
@@ -44,13 +43,15 @@ router.get('/stats', async (req, res) => {
 
     const r = rows[0];
 
-    // Clinic-wide performance metrics are not exposed to treatment coordinators.
+    // Clinic-wide performance metrics are not exposed to hasta_danismani
+    // (patient consultants) — matches CARENOVA-STRATEJI.md M8's 'kendi
+    // vakaları' (own cases only) scoping.
     // Operational counts (total leads, AI messages) are always included.
     const response = {
       total:      parseInt(r.total, 10),
       aiMessages: parseInt(r.ai_messages, 10),
     };
-    if (!isTC) {
+    if (!isConsultant) {
       response.booked       = parseInt(r.booked, 10);
       response.recoveryRate = parseFloat(r.recovery_rate) || 0;
     }
@@ -63,7 +64,7 @@ router.get('/stats', async (req, res) => {
 });
 
 // POST /api/leads — manually create a lead (director / clinic_admin / TC / receptionist)
-router.post('/', ...requireRole('director', 'clinic_admin', 'treatment_coordinator', 'receptionist', 'sales'), async (req, res) => {
+router.post('/', ...requireRole('operasyon_muduru', 'klinik_sahibi', 'hasta_danismani', 'koordinator'), async (req, res) => {
   try {
     const isPlatformAdmin = ['super_admin', 'admin'].includes(req.user.role);
     // Platform admin must specify which clinic; everyone else is locked to their own tenant.
@@ -102,7 +103,7 @@ router.post('/', ...requireRole('director', 'clinic_admin', 'treatment_coordinat
 
 // POST /api/leads/bulk — bulk lead import from CSV
 // MUST be declared before /:id routes so Express doesn't treat 'bulk' as a dynamic ID.
-router.post('/bulk', ...requireRole('director', 'clinic_admin', 'treatment_coordinator', 'receptionist', 'sales'), async (req, res) => {
+router.post('/bulk', ...requireRole('operasyon_muduru', 'klinik_sahibi', 'hasta_danismani', 'koordinator'), async (req, res) => {
   try {
     const isPlatformAdmin = ['super_admin', 'admin'].includes(req.user.role);
     const tenantId = isPlatformAdmin ? req.body.tenantId : req.user.tenantId;
@@ -162,8 +163,8 @@ router.post('/bulk', ...requireRole('director', 'clinic_admin', 'treatment_coord
 router.get('/', async (req, res) => {
   try {
     const { page = '1', limit = '20' } = req.query;
-    const isSales    = req.user?.role === 'sales';
-    const assignedTo = isSales ? req.user.sub : null;
+    const isConsultant = req.user?.role === 'hasta_danismani';
+    const assignedTo = isConsultant ? req.user.sub : null;
     const result = await leadStore.getAllLeads(req.user?.tenantId, { page, limit, assignedTo });
     res.json(result);
   } catch (err) {
@@ -173,7 +174,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/leads/:id/cases — treatment cases linked to this lead
-router.get('/:id/cases', ...requireRole('director', 'clinic_admin', 'treatment_coordinator', 'receptionist', 'sales'), async (req, res) => {
+router.get('/:id/cases', ...requireRole('operasyon_muduru', 'klinik_sahibi', 'hasta_danismani', 'koordinator'), async (req, res) => {
   try {
     const isPlatformAdmin = ['super_admin', 'admin'].includes(req.user.role);
     const tenantId = isPlatformAdmin ? req.query.tenantId : req.user.tenantId;
@@ -368,7 +369,7 @@ router.patch('/:id/resolve', async (req, res) => {
 });
 
 // ─── PATCH /api/leads/:id/assign — reassign lead + cascade to cases ──────────
-router.patch('/:id/assign', ...requireRole('director', 'clinic_admin', 'super_admin', 'admin'), async (req, res) => {
+router.patch('/:id/assign', ...requireRole('operasyon_muduru', 'klinik_sahibi', 'super_admin', 'admin'), async (req, res) => {
   try {
     const isPlatformAdmin = ['super_admin', 'admin'].includes(req.user.role);
     const tenantId = isPlatformAdmin ? req.body.tenantId : req.user.tenantId;
@@ -415,7 +416,7 @@ router.patch('/:id/assign', ...requireRole('director', 'clinic_admin', 'super_ad
 
 // ─── PATCH /api/leads/:id — edit lead fields ─────────────────────────────────
 // Placed AFTER all /:id/verb routes so Express resolves those first.
-router.patch('/:id', ...requireRole('director', 'clinic_admin', 'treatment_coordinator', 'receptionist', 'sales'), async (req, res) => {
+router.patch('/:id', ...requireRole('operasyon_muduru', 'klinik_sahibi', 'hasta_danismani', 'koordinator'), async (req, res) => {
   try {
     const isPlatformAdmin = ['super_admin', 'admin'].includes(req.user.role);
     const tenantId = isPlatformAdmin ? req.body.tenantId : req.user.tenantId;

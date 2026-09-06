@@ -7,7 +7,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'super_admin' | 'admin' | 'clinic_owner' | 'clinic_admin' | 'receptionist' | 'doctor' | 'director' | 'dentist' | 'nurse' | 'treatment_coordinator';
+  role: 'super_admin' | 'admin' | 'klinik_sahibi' | 'operasyon_muduru' | 'hasta_danismani' | 'doktor' | 'koordinator' | 'tercuman' | 'muhasebe';
   tenantId: string | null;
   phone?:          string | null;
   avatarUrl?:      string | null;

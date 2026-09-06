@@ -5,6 +5,7 @@ const crypto   = require('crypto');
 const https    = require('https');
 const { pool } = require('../db/index');
 const { sendWelcomeEmail, sendPasswordResetEmail } = require('../utils/email');
+const { KOORDINATOR, KLINIK_SAHIBI, OPERASYON_MUDURU, HASTA_DANISMANI, ADMIN } = require('../utils/roles');
 
 // Generates a readable 14-char temporary password with at least one uppercase,
 // one lowercase, and one digit. Excludes ambiguous chars (0/O, 1/l/I).
@@ -32,18 +33,22 @@ function generateTempPassword() {
 // ---------------------------------------------------------------------------
 function isSuperAdmin(req)  { return req.user?.role === 'super_admin'; }
 function isClinicAdmin(req) {
-  return ['clinic_admin', 'director'].includes(req.user?.role) || isSuperAdmin(req);
+  return [KLINIK_SAHIBI, OPERASYON_MUDURU].includes(req.user?.role) || isSuperAdmin(req);
 }
 
-// Role name → DB id map (after migrate-roles.js)
-const ROLE_IDS = {
-  director:               2,
-  clinic_admin:           3,
-  receptionist:           4,
-  dentist:                5,
-  treatment_coordinator:  6,
-  sales:                  9,
-};
+// GECE-3-BRIEFI.md Bölüm E: previously a hardcoded name→id map assuming a
+// specific already-live roles table state (see migration
+// 059_carenova_clinic_roles.sql's header for how that assumption already
+// silently broke once — 'sales: 9' pointed at a role that was never
+// actually seeded anywhere). Migration 059 also can't predict the new
+// CareNova roles' auto-generated ids ahead of time. Resolving by name at
+// call time removes this whole class of bug.
+async function resolveRoleId(roleName) {
+  const { rows } = await pool.query('SELECT id FROM roles WHERE name = $1', [roleName]);
+  if (rows[0]) return rows[0].id;
+  const { rows: fallback } = await pool.query('SELECT id FROM roles WHERE name = $1', [KOORDINATOR]);
+  return fallback[0]?.id ?? null;
+}
 
 function requireSuperAdmin(req, res, next) {
   if (!isSuperAdmin(req)) return res.status(403).json({ error: 'Super admin only' });
@@ -51,6 +56,19 @@ function requireSuperAdmin(req, res, next) {
 }
 function requireClinicAdmin(req, res, next) {
   if (!isClinicAdmin(req)) return res.status(403).json({ error: 'Clinic admin or above required' });
+  next();
+}
+
+// GECE-3-BRIEFI.md Bölüm E.4's permission table: "Kullanıcı/rol yönetimi
+// | klinik_sahibi" — narrower than requireClinicAdmin (which also gates
+// clinic settings/WhatsApp/widget endpoints where operasyon_muduru's
+// "ekip" (team/operations) remit from M8 reasonably applies). Staff
+// creation, role changes, deactivation and password resets are literal
+// user/role management, so only klinik_sahibi (or platform) may do them.
+function requireKlinikSahibi(req, res, next) {
+  if (req.user?.role !== KLINIK_SAHIBI && !isSuperAdmin(req)) {
+    return res.status(403).json({ error: 'Clinic owner (klinik_sahibi) or above required' });
+  }
   next();
 }
 
@@ -520,7 +538,7 @@ router.get('/:id/staff', async (req, res) => {
 // (clinic_admin / director / admin) so a case can be assigned to the clinic's
 // admin account as a fallback owner and re-assigned later.
 // ---------------------------------------------------------------------------
-const ASSIGNABLE_ROLES = ['treatment_coordinator', 'sales', 'clinic_admin', 'director', 'admin'];
+const ASSIGNABLE_ROLES = [HASTA_DANISMANI, KLINIK_SAHIBI, OPERASYON_MUDURU, ADMIN];
 
 router.get('/:id/sales-users', async (req, res) => {
   const clinicId = req.params.id;
@@ -530,7 +548,7 @@ router.get('/:id/sales-users', async (req, res) => {
   }
   try {
     // Assignable users come from two membership models, so UNION both:
-    //  1. user_tenants — multi-tenant staff (TC / sales added via staff mgmt).
+    //  1. user_tenants — multi-tenant staff (hasta_danismani added via staff mgmt).
     //  2. users.tenant_id/role_id — the clinic's original admin, created at
     //     clinic-creation time with NO user_tenants row. Without this branch the
     //     clinic admin (e.g. info@vestadent) never appears in the dropdown.
@@ -568,17 +586,17 @@ router.get('/:id/sales-users', async (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/clinics/:id/staff  — add staff member
 // ---------------------------------------------------------------------------
-router.post('/:id/staff', requireClinicAdmin, async (req, res) => {
+router.post('/:id/staff', requireKlinikSahibi, async (req, res) => {
   const clinicId = req.params.id;
   if (!isSuperAdmin(req) && req.user.tenantId !== clinicId) {
     return res.status(403).json({ error: 'Access denied' });
   }
 
-  const { email, firstName, lastName, role = 'receptionist' } = req.body;
+  const { email, firstName, lastName, role = KOORDINATOR } = req.body;
   if (!email?.trim()) return res.status(400).json({ error: 'Email is required' });
   if (!firstName?.trim()) return res.status(400).json({ error: 'First name is required' });
 
-  const roleId = ROLE_IDS[role] || ROLE_IDS.receptionist;
+  const roleId = await resolveRoleId(role);
   const normalizedEmail = email.trim().toLowerCase();
 
   try {
@@ -697,14 +715,15 @@ router.post('/:id/staff', requireClinicAdmin, async (req, res) => {
 // ---------------------------------------------------------------------------
 // PUT /api/clinics/:id/staff/:uid  — update staff role
 // ---------------------------------------------------------------------------
-router.put('/:id/staff/:uid', requireClinicAdmin, async (req, res) => {
+router.put('/:id/staff/:uid', requireKlinikSahibi, async (req, res) => {
   const { id: clinicId, uid } = req.params;
   if (!isSuperAdmin(req) && req.user.tenantId !== clinicId) {
     return res.status(403).json({ error: 'Access denied' });
   }
 
   const { role } = req.body;
-  const roleId = ROLE_IDS[role];
+  const { rows: roleCheckRows } = await pool.query('SELECT id FROM roles WHERE name = $1', [role]);
+  const roleId = roleCheckRows[0]?.id;
   if (!roleId) return res.status(400).json({ error: 'Invalid role' });
 
   try {
@@ -733,7 +752,7 @@ router.put('/:id/staff/:uid', requireClinicAdmin, async (req, res) => {
 // ---------------------------------------------------------------------------
 // PATCH /api/clinics/:id/staff/:uid  — edit staff details (name, email, phone, role)
 // ---------------------------------------------------------------------------
-router.patch('/:id/staff/:uid', requireClinicAdmin, async (req, res) => {
+router.patch('/:id/staff/:uid', requireKlinikSahibi, async (req, res) => {
   const { id: clinicId, uid } = req.params;
   if (!isSuperAdmin(req) && req.user.tenantId !== clinicId) {
     return res.status(403).json({ error: 'Access denied' });
@@ -752,7 +771,8 @@ router.patch('/:id/staff/:uid', requireClinicAdmin, async (req, res) => {
   if (phone !== undefined) { sets.push(`phone = $${idx++}`);    params.push(phone?.trim() || null); }
 
   if (role) {
-    const roleId = ROLE_IDS[role];
+    const { rows: roleCheckRows } = await pool.query('SELECT id FROM roles WHERE name = $1', [role]);
+    const roleId = roleCheckRows[0]?.id;
     if (!roleId) return res.status(400).json({ error: 'Invalid role' });
     sets.push(`role_id = $${idx++}`);
     params.push(roleId);
@@ -797,7 +817,7 @@ router.patch('/:id/staff/:uid', requireClinicAdmin, async (req, res) => {
 // ---------------------------------------------------------------------------
 // DELETE /api/clinics/:id/staff/:uid  — remove staff member (soft delete)
 // ---------------------------------------------------------------------------
-router.delete('/:id/staff/:uid', requireClinicAdmin, async (req, res) => {
+router.delete('/:id/staff/:uid', requireKlinikSahibi, async (req, res) => {
   const { id: clinicId, uid } = req.params;
   if (!isSuperAdmin(req) && req.user.tenantId !== clinicId) {
     return res.status(403).json({ error: 'Access denied' });
@@ -822,7 +842,7 @@ router.delete('/:id/staff/:uid', requireClinicAdmin, async (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/clinics/:id/staff/:uid/reset-password  — generate + email new password
 // ---------------------------------------------------------------------------
-router.post('/:id/staff/:uid/reset-password', requireClinicAdmin, async (req, res) => {
+router.post('/:id/staff/:uid/reset-password', requireKlinikSahibi, async (req, res) => {
   const { id: clinicId, uid } = req.params;
   if (!isSuperAdmin(req) && req.user.tenantId !== clinicId) {
     return res.status(403).json({ error: 'Access denied' });
@@ -865,7 +885,7 @@ router.post('/:id/staff/:uid/reset-password', requireClinicAdmin, async (req, re
 // ---------------------------------------------------------------------------
 // PATCH /api/clinics/:id/staff/:uid/toggle-active  — block / unblock staff
 // ---------------------------------------------------------------------------
-router.patch('/:id/staff/:uid/toggle-active', requireClinicAdmin, async (req, res) => {
+router.patch('/:id/staff/:uid/toggle-active', requireKlinikSahibi, async (req, res) => {
   const { id: clinicId, uid } = req.params;
   if (!isSuperAdmin(req) && req.user.tenantId !== clinicId) {
     return res.status(403).json({ error: 'Access denied' });

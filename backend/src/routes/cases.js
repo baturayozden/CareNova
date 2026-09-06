@@ -4,7 +4,7 @@ const { pool }   = require('../db/index');
 const caseStore  = require('../services/caseStore');
 const linkStore  = require('../store/linkStore');
 const { requireRole } = require('../middleware/auth');
-const { isTC, isSales, validateAssignableStaff } = require('../utils/staff');
+const { isHastaDanismani, validateAssignableStaff } = require('../utils/staff');
 const { sendBankDetailsEmail, sendPaymentLinkEmail } = require('../utils/email');
 const { sendSms }              = require('../utils/sms');
 const { createPaymentLink }        = require('../utils/square');
@@ -12,8 +12,8 @@ const { createCheckoutSession }    = require('../utils/stripe');
 const { fillTemplate, createSignatureDocument, getDocumentDownloadUrl, toUKDate } = require('../utils/signwell');
 
 const CASE_ROLES = [
-  'director', 'clinic_admin', 'treatment_coordinator',
-  'receptionist', 'nurse', 'super_admin', 'admin', 'sales',
+  'operasyon_muduru', 'klinik_sahibi', 'hasta_danismani',
+  'koordinator', 'super_admin', 'admin',
 ];
 
 const VALID_METHODS = ['finance', 'bank_transfer', 'card', 'pay_by_bank', 'cash'];
@@ -76,7 +76,7 @@ router.get('/', ...requireRole(...CASE_ROLES), async (req, res) => {
     const tenantId = resolveTenant(req);
     if (!tenantId) return res.status(400).json({ error: 'tenantId is required.' });
     const { status } = req.query;
-    const assignedTo = req.user.role === 'sales' ? req.user.sub : null;
+    const assignedTo = req.user.role === 'hasta_danismani' ? req.user.sub : null;
     const cases = await caseStore.listCases(tenantId, { status, assignedTo });
     res.json({ cases });
   } catch (err) {
@@ -92,16 +92,16 @@ router.post('/', ...requireRole(...CASE_ROLES), async (req, res) => {
   if (!validateFields(req.body, res)) return;
   if (req.body.paymentMethod === 'finance' && !(await assertFinanceAllowed(tenantId, res))) return;
 
-  // Resolve assignedStaffId: TC/sales → self; admin/director → body field (required + validated)
+  // Resolve assignedStaffId: hasta_danismani → self; management roles → body field (required + validated)
   let assignedStaffId;
-  if (isTC(req.user) || isSales(req.user)) {
+  if (isHastaDanismani(req.user)) {
     assignedStaffId = req.user.sub;
   } else {
     if (!req.body.assignedStaffId)
-      return res.status(400).json({ error: 'Assigned staff is required — select which TC/sales this case belongs to.' });
+      return res.status(400).json({ error: 'Assigned staff is required — select which hasta_danismani this case belongs to.' });
     const valid = await validateAssignableStaff(req.body.assignedStaffId, tenantId);
     if (!valid)
-      return res.status(400).json({ error: 'assignedStaffId must be an active TC or sales user in this clinic.' });
+      return res.status(400).json({ error: 'assignedStaffId must be an active hasta_danismani in this clinic.' });
     assignedStaffId = req.body.assignedStaffId;
   }
 
@@ -166,7 +166,7 @@ router.get('/:id', ...requireRole(...CASE_ROLES), async (req, res) => {
     if (!tenantId) return res.status(400).json({ error: 'tenantId is required.' });
     const c = await caseStore.getCaseById(req.params.id, tenantId);
     if (!c) return res.status(404).json({ error: 'Case not found.' });
-    if (req.user.role === 'sales' && c.assigned_to !== req.user.sub) {
+    if (req.user.role === 'hasta_danismani' && c.assigned_to !== req.user.sub) {
       return res.status(403).json({ error: 'Forbidden.' });
     }
     res.json({ case: c });
@@ -189,7 +189,7 @@ router.patch('/:id', ...requireRole(...CASE_ROLES), async (req, res) => {
     if (req.body.status === 'paid') {
       const tc = await caseStore.getCaseById(req.params.id, tenantId);
       if (!tc) return res.status(404).json({ error: 'Case not found.' });
-      if (req.user.role === 'sales' && tc.assigned_to !== req.user.sub) {
+      if (req.user.role === 'hasta_danismani' && tc.assigned_to !== req.user.sub) {
         return res.status(403).json({ error: 'Forbidden.' });
       }
       if (['card', 'pay_by_bank'].includes(tc.payment_method)) {
@@ -203,7 +203,7 @@ router.patch('/:id', ...requireRole(...CASE_ROLES), async (req, res) => {
       return res.json({ case: c });
     }
 
-    if (req.user.role === 'sales') {
+    if (req.user.role === 'hasta_danismani') {
       const existing = await caseStore.getCaseById(req.params.id, tenantId);
       if (!existing) return res.status(404).json({ error: 'Case not found.' });
       if (existing.assigned_to !== req.user.sub) return res.status(403).json({ error: 'Forbidden.' });
@@ -231,7 +231,7 @@ router.post('/:id/send-bank-details', ...requireRole(...CASE_ROLES), async (req,
 
     const tc = await caseStore.getCaseById(req.params.id, tenantId);
     if (!tc) return res.status(404).json({ error: 'Case not found.' });
-    if (req.user.role === 'sales' && tc.assigned_to !== req.user.sub) {
+    if (req.user.role === 'hasta_danismani' && tc.assigned_to !== req.user.sub) {
       return res.status(403).json({ error: 'Forbidden.' });
     }
     if (tc.payment_method === 'cash') {
@@ -348,7 +348,7 @@ router.post('/:id/send-payment-link', ...requireRole(...CASE_ROLES), async (req,
 
     const tc = await caseStore.getCaseById(req.params.id, tenantId);
     if (!tc) return res.status(404).json({ error: 'Case not found.' });
-    if (req.user.role === 'sales' && tc.assigned_to !== req.user.sub) {
+    if (req.user.role === 'hasta_danismani' && tc.assigned_to !== req.user.sub) {
       return res.status(403).json({ error: 'Forbidden.' });
     }
 
@@ -522,7 +522,7 @@ router.post('/:id/send-agreement', ...requireRole(...CASE_ROLES), async (req, re
 
     const tc = await caseStore.getCaseById(req.params.id, tenantId);
     if (!tc) return res.status(404).json({ error: 'Case not found.' });
-    if (req.user.role === 'sales' && tc.assigned_to !== req.user.sub) {
+    if (req.user.role === 'hasta_danismani' && tc.assigned_to !== req.user.sub) {
       return res.status(403).json({ error: 'Forbidden.' });
     }
 
@@ -777,7 +777,7 @@ router.get('/:id/signed-doc', ...requireRole(...CASE_ROLES), async (req, res) =>
       [req.params.id, tenantId],
     );
     if (!rows.length) return res.status(404).json({ error: 'Case not found.' });
-    if (req.user.role === 'sales' && rows[0].assigned_to !== req.user.sub) {
+    if (req.user.role === 'hasta_danismani' && rows[0].assigned_to !== req.user.sub) {
       return res.status(403).json({ error: 'Forbidden.' });
     }
 

@@ -627,7 +627,7 @@ interface AddStaffFormProps {
 }
 
 function AddStaffForm({ clinicId, onAdded, onCancel }: AddStaffFormProps) {
-  const [form, setForm]       = useState({ email: '', firstName: '', lastName: '', role: 'receptionist' });
+  const [form, setForm]       = useState({ email: '', firstName: '', lastName: '', role: 'koordinator' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
 
@@ -1069,7 +1069,7 @@ export function AppointmentsTab({ clinicId }: { clinicId: string }) {
     api.get<{ clinic: { staff: { id: string; firstName: string; lastName: string; role: string }[] } }>(`/api/clinics/${clinicId}`)
       .then(res => {
         const clinical = (res.data.clinic.staff || [])
-          .filter(s => s.role === 'dentist' || s.role === 'nurse')
+          .filter(s => s.role === 'doktor')
           .map(s => ({ id: s.id, name: `${s.firstName} ${s.lastName}` }));
         setStaffList(clinical);
       }).catch(() => {});
@@ -1283,7 +1283,7 @@ export default function ClinicDetailPage() {
   const navigate     = useNavigate();
   const { user }     = useAuth();
   const isSuperAdmin = user?.role === 'super_admin';
-  const canEditStaff = isSuperAdmin || user?.role === 'director' || user?.role === 'clinic_admin';
+  const canEditStaff = isSuperAdmin || user?.role === 'operasyon_muduru' || user?.role === 'klinik_sahibi';
 
   const [clinic,     setClinic]     = useState<ClinicDetail | null>(null);
   const [isLoading,  setIsLoading]  = useState(true);

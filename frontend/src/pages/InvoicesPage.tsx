@@ -1420,7 +1420,7 @@ export default function InvoicesPage() {
     showToast(inv.payment_status === 'paid' ? 'Invoice marked as paid.' : 'Invoice marked as unpaid.');
   }
 
-  const canCreate = user && ['director', 'clinic_admin', 'treatment_coordinator', 'admin', 'super_admin'].includes(user.role);
+  const canCreate = user && ['operasyon_muduru', 'klinik_sahibi', 'hasta_danismani', 'admin', 'super_admin'].includes(user.role);
 
   return (
     <div className="min-h-screen bg-surface-page text-white">

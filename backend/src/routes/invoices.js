@@ -30,7 +30,7 @@ function parseIssuedAt(raw) {
 
 // All routes require at least one of these roles (plus authenticate on mount)
 const CAN_INVOICE = requireRole(
-  'super_admin', 'admin', 'director', 'clinic_admin', 'treatment_coordinator', 'sales',
+  'super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi', 'hasta_danismani', 'muhasebe',
 );
 
 // ── Resolve or create lead for manual invoices ───────────────────────────────

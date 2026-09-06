@@ -25,5 +25,24 @@
     "attended": "Geldi",
     "lost": "Kayıp",
     "archived": "Arşivlendi"
+  },
+  "roles": {
+    "klinik_sahibi": "Klinik Sahibi",
+    "operasyon_muduru": "Operasyon Müdürü",
+    "hasta_danismani": "Hasta Danışmanı",
+    "doktor": "Doktor",
+    "koordinator": "Koordinatör",
+    "tercuman": "Tercüman",
+    "muhasebe": "Muhasebe",
+    "super_admin": "Süper Admin",
+    "admin": "Admin",
+    "director": "Operasyon Müdürü",
+    "clinic_admin": "Klinik Sahibi",
+    "clinic_owner": "Klinik Sahibi",
+    "treatment_coordinator": "Hasta Danışmanı",
+    "dentist": "Doktor",
+    "receptionist": "Koordinatör",
+    "sales": "Hasta Danışmanı",
+    "nurse": "Hemşire"
   }
 }

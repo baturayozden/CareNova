@@ -205,8 +205,8 @@ const LANGUAGE_OPTIONS = [
 
 // ── component ────────────────────────────────────────────────────────────────
 
-const ADD_LEAD_ROLES   = ['director', 'clinic_admin', 'treatment_coordinator', 'receptionist'];
-const CAN_ASSIGN_ROLES = ['director', 'clinic_admin', 'super_admin', 'admin'];
+const ADD_LEAD_ROLES   = ['operasyon_muduru', 'klinik_sahibi', 'hasta_danismani', 'koordinator'];
+const CAN_ASSIGN_ROLES = ['operasyon_muduru', 'klinik_sahibi', 'super_admin', 'admin'];
 
 export default function LeadsPage() {
   const { user } = useAuth();
@@ -901,10 +901,8 @@ export default function LeadsPage() {
                           <span className="text-gray-400 text-[10px]">
                             {[d.staff_first_name, d.staff_last_name].filter(Boolean).join(' ')}
                           </span>
-                          {d.staff_role === 'treatment_coordinator' ? (
+                          {d.staff_role === 'hasta_danismani' ? (
                             <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-green-900/40 text-green-400 border border-green-700/40">In quota</span>
-                          ) : d.staff_role === 'sales' ? (
-                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-gray-700 text-gray-400 border border-gray-600">Not in quota</span>
                           ) : null}
                         </div>
                       )}

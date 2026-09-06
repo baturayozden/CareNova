@@ -1160,9 +1160,9 @@ function InsightsTab() {
 
 export default function AIActivityPage() {
   const { user } = useAuth();
-  const role = user?.role ?? 'receptionist';
+  const role = user?.role ?? 'koordinator';
   const isSuperAdmin  = role === 'super_admin';
-  const isReceptionist = role === 'receptionist';
+  const isReceptionist = role === 'koordinator';
 
   // Data state
   const [conversations,  setConversations]  = useState<ConversationSummary[]>([]);

@@ -2,13 +2,12 @@ import React, { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-type Role = 'clinic_owner' | 'clinic_admin' | 'receptionist' | 'doctor';
+type Role = 'klinik_sahibi' | 'koordinator' | 'doktor';
 
 const ROLE_LABELS: Record<Role, string> = {
-  clinic_owner: 'Clinic Owner',
-  clinic_admin: 'Clinic Admin',
-  receptionist: 'Receptionist',
-  doctor: 'Doctor',
+  klinik_sahibi: 'Clinic Owner',
+  koordinator: 'Coordinator',
+  doktor: 'Doctor',
 };
 
 function getPasswordStrength(password: string): { label: string; color: string } {
@@ -27,7 +26,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<Role>('clinic_admin');
+  const [role, setRole] = useState<Role>('klinik_sahibi');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 

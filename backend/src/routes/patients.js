@@ -143,7 +143,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/patients/:leadId/delete-preview — counts of linked active records (admin only)
-router.get('/:leadId/delete-preview', ...requireRole('clinic_admin', 'super_admin'), async (req, res) => {
+router.get('/:leadId/delete-preview', ...requireRole('klinik_sahibi', 'super_admin'), async (req, res) => {
   try {
     const tenantId = req.query.tenantId || req.user.tenantId;
     if (!tenantId) return res.status(400).json({ error: 'tenantId is required.' });
@@ -179,7 +179,7 @@ router.get('/:leadId/delete-preview', ...requireRole('clinic_admin', 'super_admi
 });
 
 // DELETE /api/patients/:leadId — soft-delete patient and all linked records (admin only)
-router.delete('/:leadId', ...requireRole('clinic_admin', 'super_admin'), async (req, res) => {
+router.delete('/:leadId', ...requireRole('klinik_sahibi', 'super_admin'), async (req, res) => {
   const client = await pool.connect();
   try {
     const tenantId = req.query.tenantId || req.user.tenantId;
@@ -252,7 +252,7 @@ router.delete('/:leadId', ...requireRole('clinic_admin', 'super_admin'), async (
 });
 
 // GET /api/patients/archived — list soft-deleted patients with linked record counts
-router.get('/archived', ...requireRole('clinic_admin', 'super_admin'), async (req, res) => {
+router.get('/archived', ...requireRole('klinik_sahibi', 'super_admin'), async (req, res) => {
   try {
     const tenantId = req.query.tenantId || req.user.tenantId;
     if (!tenantId) return res.status(400).json({ error: 'tenantId is required.' });
@@ -304,7 +304,7 @@ router.get('/archived', ...requireRole('clinic_admin', 'super_admin'), async (re
 
 // POST /api/patients/:leadId/restore — restore a soft-deleted patient
 // Only restores records archived at the SAME timestamp as the lead (same cascade batch).
-router.post('/:leadId/restore', ...requireRole('clinic_admin', 'super_admin'), async (req, res) => {
+router.post('/:leadId/restore', ...requireRole('klinik_sahibi', 'super_admin'), async (req, res) => {
   const client = await pool.connect();
   try {
     const tenantId = req.query.tenantId || req.user.tenantId;

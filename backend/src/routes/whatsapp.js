@@ -268,12 +268,12 @@ async function sendEscalationEmail({ lead, tenantId, message }) {
     const clinicName = tenantRows[0]?.name       || 'Clinic';
     const alertPhone = tenantRows[0]?.alert_phone || null;
 
-    // 2. Collect all director + clinic_admin emails for this tenant from PostgreSQL
+    // 2. Collect all operasyon_muduru + klinik_sahibi emails for this tenant from PostgreSQL
     const { rows: staffRows } = await pool.query(
       `SELECT u.email FROM users u
        JOIN roles r ON r.id = u.role_id
        WHERE u.tenant_id = $1 AND u.deleted_at IS NULL AND u.is_active = TRUE
-         AND r.name IN ('director', 'clinic_admin')`,
+         AND r.name IN ('operasyon_muduru', 'klinik_sahibi')`,
       [tenantId],
     ).catch(() => ({ rows: [] }));
 

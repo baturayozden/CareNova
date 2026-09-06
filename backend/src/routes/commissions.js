@@ -39,16 +39,16 @@ const { calculateCommission } = require('../services/commissionEngine');
 const { matchPayments }       = require('../services/paymentMatcher');
 const { parse: csvParse }     = require('csv-parse/sync');
 const caseStore  = require('../services/caseStore');
-const { isTC, isSales, validateAssignableStaff } = require('../utils/staff');
+const { isHastaDanismani, validateAssignableStaff } = require('../utils/staff');
 
 // ── Role constants ─────────────────────────────────────────────────────────────
 
 const PLATFORM_ROLES      = ['super_admin', 'admin'];
-const SCHEME_MGR_ROLES    = ['super_admin', 'admin', 'director', 'clinic_admin'];
-const DEAL_ROLES          = ['super_admin', 'admin', 'director', 'clinic_admin', 'treatment_coordinator', 'sales'];
-const PERIOD_CALC_ROLES   = ['super_admin', 'admin', 'director', 'clinic_admin'];
-const PERIOD_APPROVE_ROLES = ['super_admin', 'admin', 'director'];
-const PAYMENT_MGR_ROLES    = ['super_admin', 'admin', 'director', 'clinic_admin'];
+const SCHEME_MGR_ROLES    = ['super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi'];
+const DEAL_ROLES          = ['super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi', 'hasta_danismani', 'muhasebe'];
+const PERIOD_CALC_ROLES   = ['super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi', 'muhasebe'];
+const PERIOD_APPROVE_ROLES = ['super_admin', 'admin', 'operasyon_muduru'];
+const PAYMENT_MGR_ROLES    = ['super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi', 'muhasebe'];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -510,7 +510,7 @@ router.get('/deals', async (req, res) => {
     const conditions = ['td.tenant_id = $1', 'td.deleted_at IS NULL'];
 
     // TC: scoped to own deals only
-    if (isTC(req.user)) {
+    if (isHastaDanismani(req.user)) {
       params.push(req.user.sub);
       conditions.push(`td.assigned_staff_id = $${params.length}`);
     }
@@ -597,16 +597,16 @@ router.post('/deals', async (req, res) => {
         return res.status(400).json({ error: `payment_method must be one of: ${CASE_VALID_METHODS.join(', ')}` });
     }
 
-    // TC/sales self-assign; admins must supply assigned_staff_id (validated via user_tenants)
+    // hasta_danismani self-assign; admins must supply assigned_staff_id (validated via user_tenants)
     let assignedStaffId;
-    if (isTC(req.user) || isSales(req.user)) {
+    if (isHastaDanismani(req.user)) {
       assignedStaffId = req.user.sub;
     } else {
       if (!req.body.assigned_staff_id)
-        return res.status(400).json({ error: 'Assigned staff required — select which TC/sales this deal belongs to.' });
+        return res.status(400).json({ error: 'Assigned staff required — select which hasta_danismani this deal belongs to.' });
       const valid = await validateAssignableStaff(req.body.assigned_staff_id, tenantId);
       if (!valid)
-        return res.status(400).json({ error: 'assigned_staff_id must be an active TC or sales user in this tenant.' });
+        return res.status(400).json({ error: 'assigned_staff_id must be an active hasta_danismani in this tenant.' });
       assignedStaffId = req.body.assigned_staff_id;
     }
 
@@ -695,7 +695,7 @@ router.put('/deals/:id', async (req, res) => {
       return res.status(409).json({ error: 'Deal is locked in a finalised commission period and cannot be edited' });
 
     // TC can only edit their own deals
-    if (isTC(req.user) && deal.assigned_staff_id !== req.user.sub)
+    if (isHastaDanismani(req.user) && deal.assigned_staff_id !== req.user.sub)
       return res.status(403).json({ error: 'Treatment coordinators can only edit their own deals' });
 
     const {
@@ -712,15 +712,15 @@ router.put('/deals/:id', async (req, res) => {
       if (!beRows.length) return res.status(400).json({ error: 'Invalid billing_entity_id for this tenant.' });
     }
 
-    // TC/sales cannot reassign; admins validate new assignment via user_tenants
+    // hasta_danismani cannot reassign; admins validate new assignment via user_tenants
     let assignedStaffId;
-    if (isTC(req.user) || isSales(req.user)) {
+    if (isHastaDanismani(req.user)) {
       assignedStaffId = deal.assigned_staff_id;
     } else if (req.body.assigned_staff_id !== undefined) {
       if (req.body.assigned_staff_id) {
         const valid = await validateAssignableStaff(req.body.assigned_staff_id, tenantId);
         if (!valid)
-          return res.status(400).json({ error: 'assigned_staff_id must be an active TC or sales user in this tenant.' });
+          return res.status(400).json({ error: 'assigned_staff_id must be an active hasta_danismani in this tenant.' });
       }
       assignedStaffId = req.body.assigned_staff_id || null;
     } else {
@@ -777,7 +777,7 @@ router.delete('/deals/:id', async (req, res) => {
     if (found[0].commission_locked)
       return res.status(409).json({ error: 'Deal is locked in a finalised commission period and cannot be deleted' });
 
-    if (isTC(req.user) && found[0].assigned_staff_id !== req.user.sub)
+    if (isHastaDanismani(req.user) && found[0].assigned_staff_id !== req.user.sub)
       return res.status(403).json({ error: 'Treatment coordinators can only delete their own deals' });
 
     await pool.query(`DELETE FROM treatment_deals WHERE id = $1`, [req.params.id]);
@@ -841,7 +841,7 @@ router.get('/periods', async (req, res) => {
                   AND td.status IN ('accepted','in_progress','completed')
                   AND td.verification_status != 'rejected'
                   AND td.deleted_at IS NULL
-                  AND r.name = 'treatment_coordinator') AS quota_revenue,
+                  AND r.name = 'hasta_danismani') AS quota_revenue,
               (SELECT COALESCE(SUM(td.agreed_amount), 0)::numeric
                  FROM treatment_deals td
                 WHERE td.tenant_id = cp.tenant_id
@@ -861,7 +861,7 @@ router.get('/periods', async (req, res) => {
                     AND td.status IN ('accepted','in_progress','completed')
                     AND td.verification_status != 'rejected'
                     AND td.deleted_at IS NULL
-                    AND r.name = 'treatment_coordinator')) AS effective_quota_revenue,
+                    AND r.name = 'hasta_danismani')) AS effective_quota_revenue,
               (SELECT crt.target_amount
                  FROM clinic_revenue_targets crt
                 WHERE crt.tenant_id = cp.tenant_id
@@ -1055,7 +1055,7 @@ router.post('/periods/:id/calculate', async (req, res) => {
     // clinicActualRevenue drives attainment gates → must be TC-only quota revenue.
     // Manual override (period.clinic_revenue) takes precedence when set.
     const quotaComputedRevenue = deals
-      .filter(d => d.staff_role === 'treatment_coordinator')
+      .filter(d => d.staff_role === 'hasta_danismani')
       .reduce((sum, d) => sum + (Number(d.agreed_amount) || 0), 0);
     const totalComputedRevenue = deals.reduce((sum, d) => sum + (Number(d.agreed_amount) || 0), 0);
     const clinicActualRevenue = period.clinic_revenue != null
@@ -1401,7 +1401,7 @@ router.get('/periods/:id/report', async (req, res) => {
                   AND td.status IN ('accepted','in_progress','completed')
                   AND td.verification_status != 'rejected'
                   AND td.deleted_at IS NULL
-                  AND r.name = 'treatment_coordinator') AS quota_revenue,
+                  AND r.name = 'hasta_danismani') AS quota_revenue,
               (SELECT COALESCE(SUM(td.agreed_amount), 0)::numeric
                  FROM treatment_deals td
                 WHERE td.tenant_id = cp.tenant_id
@@ -1421,7 +1421,7 @@ router.get('/periods/:id/report', async (req, res) => {
                     AND td.status IN ('accepted','in_progress','completed')
                     AND td.verification_status != 'rejected'
                     AND td.deleted_at IS NULL
-                    AND r.name = 'treatment_coordinator')) AS effective_quota_revenue,
+                    AND r.name = 'hasta_danismani')) AS effective_quota_revenue,
               (SELECT crt.target_amount
                  FROM clinic_revenue_targets crt
                 WHERE crt.tenant_id = cp.tenant_id

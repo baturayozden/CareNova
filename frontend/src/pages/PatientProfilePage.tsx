@@ -195,12 +195,12 @@ export default function PatientProfilePage() {
   const { user } = useAuth();
 
   const canEdit = user?.role
-    ? ['director', 'clinic_admin', 'treatment_coordinator', 'receptionist', 'sales'].includes(user.role)
+    ? ['operasyon_muduru', 'klinik_sahibi', 'hasta_danismani', 'koordinator'].includes(user.role)
     : false;
   const canAssign = user?.role
-    ? ['director', 'clinic_admin', 'super_admin', 'admin'].includes(user.role)
+    ? ['operasyon_muduru', 'klinik_sahibi', 'super_admin', 'admin'].includes(user.role)
     : false;
-  const canDelete = user?.role === 'clinic_admin' || user?.role === 'super_admin';
+  const canDelete = user?.role === 'klinik_sahibi' || user?.role === 'super_admin';
   const currentUserName = user ? `${user.firstName} ${user.lastName}`.trim() : undefined;
 
   // ── Data state ───────────────────────────────────────────────────────────────
@@ -417,7 +417,7 @@ export default function PatientProfilePage() {
   const menuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // ── Deal edit/delete helpers ──────────────────────────────────────────────────
-  const isTC = user?.role === 'treatment_coordinator';
+  const isTC = user?.role === 'hasta_danismani';
   function canManage(deal: LeadDeal): boolean {
     if (deal.commission_locked) return false;
     if (isTC) return deal.assigned_staff_id === user?.id;

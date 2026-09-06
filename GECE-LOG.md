@@ -1589,4 +1589,118 @@ canlı doğrulandı. 390px'te galeri 3 sütuna düşüp okunaklı kalıyor.
 
 ---
 
+## BÖLÜM E — B7: CareNova rol sistemi (en büyük yapısal boşluk)
+
+**Sayım (değiştirmeden önce, brief'in istediği gibi):** `grep` ile tarandı —
+backend'de 11 route/service dosyasında (`clinics.js`, `cases.js`,
+`commissions.js`, `leads.js`, `invoices.js`, `patients.js`, `onboarding.js`,
+`appointments.js`, `whatsapp.js`, `leadScoring.js`, `caseStore.js`) ~25 ayrı
+eski-rol referansı (hem `requireRole(...)` çağrıları hem satır-içi
+`role === 'sales'` gibi karşılaştırmalar); frontend'de 12 dosyada
+(`Sidebar.tsx`, `LeadsPage.tsx`, `SettingsPage.tsx`, `DealsTab.tsx`,
+`NewCaseModal.tsx`, `RegisterPage.tsx`, `PatientProfilePage.tsx`,
+`CommissionPage.tsx`, `ClinicDetailPage.tsx`, `AIActivityPage.tsx`,
+`InvoicesPage.tsx`, `AuthContext.tsx`) ~20 ayrı referans. Toplam 35 dosya
+değişti (18 backend, 17 frontend — `docs/i18n-leak-report.md` hariç).
+
+**Gerçek DB şeması keşfi (önce varsayımı düzeltti):** CLAUDE.md'nin
+(caredental'dan miras) "kullanıcılar sadece in-memory Map" iddiası ARTIK
+YANLIŞ — `backend/src/routes/auth.js` gerçek `users`/`roles` Postgres
+tablolarını (`role_id` FK) sorguluyor, `store/users.js` (Map) dosyası
+projede yok. Bu, migration 059'un basit bir VARCHAR relabel değil, gerçek
+bir `roles` tablosu INSERT + `users.role_id` yeniden atama migration'ı
+olması gerektiği anlamına geliyor.
+
+**Yolda bulunan gerçek, önceden var olan hata:** `clinics.js`'in eski
+`ROLE_IDS` haritası `sales: 9` diyordu ama HİÇBİR migration/seed script
+`sales` adında bir rol satırı hiç eklememiş — id 9 ya boş ya da başka bir
+şeye ait. Gerçek bir 'sales' kullanıcı oluşturma denemesi FK ihlaliyle
+patlardı. Migration 059 bunu konu dışı bırakıyor (sales kavramı zaten
+kalkıyor); `ROLE_IDS` tamamen kaldırılıp isimle sorgulama (`SELECT id FROM
+roles WHERE name = $1`) ile değiştirildi — aynı hata sınıfının bir daha
+olmaması için (yeni rollerin id'leri de migration çalışmadan önce
+bilinemez).
+
+**Migration 059** (`backend/src/migrations/059_carenova_clinic_roles.sql`):
+7 yeni rol INSERT, eski→yeni eşleme tablosu (brief'in E.1'i birebir:
+director→operasyon_muduru, clinic_admin→klinik_sahibi, clinic_owner→
+klinik_sahibi, treatment_coordinator→hasta_danismani, dentist→doktor,
+receptionist→koordinator, sales→hasta_danismani — sonuncusu az önceki
+bulgu yüzünden no-op ama tabloda tutarlılık için duruyor), rollback notu
+(kullanıcıların ÖNCEKİ rolünü snapshot'lamıyor — geri almak gerekirse
+migration öncesi yedekten dönülmeli). `nurse` (id=8) bilerek eşlenmedi —
+M8'in 7 rolünde karşılığı yok, tahmin etmek yerine açık bırakıldı.
+**Çalıştırılmadı** (DB yok, B2).
+
+**Rol çakışması ve çözümü:** `treatment_coordinator` VE `sales` ikisi de
+`hasta_danismani`'ye toplanıyor, ama kodda ikisi ayrı davranıyordu —
+örn. `commissions.js`: "TC sadece KENDİ anlaşmalarını düzenleyebilir"
+kuralı SADECE TC'ye uygulanıyordu, sales'e değil; `leads.js`: klinik
+geneli performans metrikleri TC'den gizleniyordu, sales'ten değil.
+**Karar:** her yerde DAHA KISITLAYICI davranışı (TC'ninki) tüm
+`hasta_danismani`'ye uyguladım — hem CARENOVA-STRATEJI.md M8'in kendi
+"hasta_danismani | KENDİ vakaları" tanımıyla birebir örtüşüyor hem de
+'sales'in zaten hiç gerçek kullanıcısı olmadığı (yukarıdaki bulgu)
+göz önüne alınca kaybedilen bir şey yok. `utils/staff.js`'teki ayrı
+`isTC`/`isSales` fonksiyonları tek bir `isHastaDanismani`'ye birleştirildi.
+
+**Yeni: gerçek rol-yetkilendirme matrisi** (`routes/caseFiles.js`,
+Gece 2'de sadece tenant-scoping vardı, hiç rol kontrolü yoktu) — brief'in
+E.4 tablosu birebir: `GET /:id/medical-file` (YENİ endpoint — "tıbbi dosya
+okuma" iznine bağlanacak hiçbir şey yoktu, `caseFileStore.js`'e
+`listMedia`/`listAssessments` de eklendi) tercümana 403; `PATCH
+/:id/eligibility` (YENİ — migration 057'nin `medical_eligibility` kolonları
+şimdiye kadar hiç yazılamıyordu) sadece doktor; `PATCH /:id/status`
+sadece `awaiting_doctor`'dan AYRILIRKEN doktor şartı arıyor (diğer geçişler
+serbest, brief'in tablosu sadece bunu kısıtlıyor); `POST /:id/timeline`
+sadece koordinator/operasyon_muduru/klinik_sahibi. "Teklif oluşturma" ve
+"Fatura/ödeme" satırları NOT edildi ama bağlanamadı — bu router'da hiç
+teklif/fatura modeli yok (Bölüm H'nin teklifleri hâlâ sadece frontend demo
+verisi). "Kullanıcı/rol yönetimi" `clinics.js`'e yeni, DAHA DAR bir
+`requireKlinikSahibi` guard'ıyla bağlandı (`requireClinicAdmin`'den ayrı —
+o hâlâ WhatsApp/widget/klinik ayarları gibi operasyon_muduru'nun da
+"ekip" yetkisine giren şeyleri kapsıyor, sadece personel/rol uçları
+klinik_sahibi'ye daraltıldı).
+
+**Testler (DB olmadan, saf fonksiyonlar):** `routes/__tests__/
+caseFiles.test.js` — 6 test, brief'in tam istediği iki senaryo dahil:
+"doktor olmayan biri uygunluk kararı veremez" (`canDecideEligibility`,
+klinik_sahibi dahil hiçbir doktor-dışı rol geçemiyor) ve "tercüman tıbbi
+dosyayı okuyamaz" (`canReadMedicalFile`, sadece tercuman false).
+`branchTemplates.test.js`'in eski rol isimli test fixture'ları da
+(`clinic_admin`→`klinik_sahibi`, `director`→`operasyon_muduru`)
+güncellendi. **128/128 test yeşil** (`npx jest --testPathIgnorePatterns=
+invoiceNumber`), `node src/index.js` temiz ayağa kalkıyor.
+
+**Frontend:** `AuthContext.tsx`'in `User['role']` union'ı yeni 7 role
+güncellendi (eskiler kaldırıldı — temiz kesim, backend'le aynı felsefe).
+`data/demoData.ts`'teki `DEMO_USER.role` `'director'`'dan
+`'operasyon_muduru'`'ya değişti — bu gecenin demo'sunu YENİ sistemi
+gerçekten sergileyecek şekilde güncelledi (ekran görüntüsüyle doğrulandı:
+"Operasyon Müdürü" etiketi TR'de, "Operations Manager" EN'de, `/leads`'te
+"+ Add Lead" butonu hâlâ görünüyor, `/patients` durum rozetleri hâlâ
+doğru çevriliyor — hiçbir şey kırılmadı). `lib/roleLabels.ts` (YENİ) +
+`common.json`'a `roles.*` bloğu (TR+EN, hem yeni 7 rol hem eski
+CareDental rol string'leri için — ikisi için de gerçek bir etiket olsun
+diye) — `Sidebar.tsx`'in `user.role.replace(/_/g,' ')` (ham "director"
+gösteren) yerine artık `roleLabel()` kullanıyor.
+
+**Bilinçli bırakılanlar (yeni BLOKAJLAR maddeleri):**
+- `backend/src/db/seed-full.js` ve `seed-demo-riverside.js` (dev seed
+  script'leri) hâlâ eski rol isimleri kullanıyor — request path'in dışında,
+  gerçek riski yok, ama biri çalıştırırsa eski isimlerle kullanıcı
+  oluşturur. Ayrı bir iş.
+- `db/migrate-roles.js` (eski, tek seferlik script, muhtemelen zaten
+  çalıştırılmış) — tarihi kayıt olarak dokunulmadı.
+- `commissions.js`'in `SCHEME_MGR_ROLES`/`DEAL_ROLES`/vb. sabitlerine
+  `muhasebe`'yi M8'in "Ödeme, fatura, komisyon" tanımına dayanarak EKLEDİM
+  — mekanik rename'in ötesinde bir karar, gerekçesi net ama Baturay'ın
+  onaylaması iyi olur.
+- `appointments.js`'teki hayalet `'manager'` rolü (hiçbir migration'da
+  seed edilmemiş, `'sales'` gibi) `operasyon_muduru`'ya katlandı.
+
+**Commit:** (aşağıda)
+
+---
+
 

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, TenantChoice } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../lib/api';
+import { roleLabel } from '../lib/roleLabels';
 import carenovaLogoDark  from '../assets/carenova-logo-transparent-dark.svg';
 import carenovaLogoLight from '../assets/carenova-logo-transparent-light.svg';
 import {
@@ -51,7 +52,7 @@ const superAdminItems: NavItem[] = [
   { labelKey: 'demoRequests',  icon: ClipboardList, path: '/demo-requests'  },
 ];
 
-const COMMISSION_ROLES = ['director', 'clinic_admin'];
+const COMMISSION_ROLES = ['operasyon_muduru', 'klinik_sahibi'];
 
 const commissionItems: NavItem[] = [
   { labelKey: 'commission', icon: Wallet, path: '/commission' },
@@ -59,6 +60,7 @@ const commissionItems: NavItem[] = [
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { t, i18n } = useTranslation('nav');
+  const { t: tCommon } = useTranslation('common');
   const { user, logout, switchTenant } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const logoSrc = theme === 'light' ? carenovaLogoLight : carenovaLogoDark;
@@ -190,7 +192,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
     : 'DC';
   const displayName = user ? `${user.firstName} ${user.lastName}` : 'Demo Clinic';
-  const displayRole = user ? user.role.replace(/_/g, ' ') : 'Admin';
+  const displayRole = user ? roleLabel(tCommon, user.role) : 'Admin';
 
   return (
     <>

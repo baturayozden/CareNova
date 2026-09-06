@@ -106,6 +106,56 @@ async function addMedia(tenantId, caseId, input, uploadedBy) {
   return rows[0];
 }
 
+// GECE-3-BRIEFI.md Bölüm E.4: "Tıbbi dosya okuma" is a listed permission,
+// but until now there was no way to READ a case's medical file at all
+// (addMedia/upsertAssessment were write-only) — added alongside the role
+// guard in routes/caseFiles.js so the permission has something real to
+// gate.
+async function listMedia(tenantId, caseId) {
+  requireTenantId(tenantId);
+  const owned = await getCaseById(tenantId, caseId);
+  if (!owned) return undefined;
+  const { rows } = await pool.query(
+    `SELECT * FROM case_media WHERE case_id = $1 ORDER BY uploaded_at DESC`,
+    [caseId],
+  );
+  return rows;
+}
+
+async function listAssessments(tenantId, caseId) {
+  requireTenantId(tenantId);
+  const owned = await getCaseById(tenantId, caseId);
+  if (!owned) return undefined;
+  const { rows } = await pool.query(
+    `SELECT * FROM case_assessments WHERE case_id = $1 ORDER BY id DESC`,
+    [caseId],
+  );
+  return rows;
+}
+
+const ELIGIBILITY_VALUES = ['pending', 'eligible', 'conditional', 'ineligible'];
+
+// "Uygunluk kararı verme" (Bölüm E.4) — sadece doktor, enforced by the
+// route (this function itself doesn't know about roles, tenant-scoped
+// CRUD only, same separation as the rest of this file).
+async function setEligibility(tenantId, caseId, { medicalEligibility, eligibilityNote }, decidedBy) {
+  requireTenantId(tenantId);
+  if (!ELIGIBILITY_VALUES.includes(medicalEligibility)) {
+    throw new Error(`Invalid medicalEligibility: ${medicalEligibility}`);
+  }
+  const { rows } = await pool.query(
+    `UPDATE cases SET medical_eligibility = $1, eligibility_note = $2,
+       eligibility_decided_by = $3, eligibility_decided_at = now(), updated_at = now()
+     WHERE id = $4 AND tenant_id = $5 AND deleted_at IS NULL
+     RETURNING *`,
+    [medicalEligibility, eligibilityNote || null, decidedBy, caseId, tenantId],
+  );
+  const updated = rows[0];
+  if (!updated) return undefined;
+  await appendCaseEvent(tenantId, caseId, 'eligibility_decided', decidedBy, { medicalEligibility, eligibilityNote });
+  return updated;
+}
+
 async function upsertAssessment(tenantId, caseId, templateKey, answers, completed) {
   requireTenantId(tenantId);
   const owned = await getCaseById(tenantId, caseId);
@@ -156,8 +206,8 @@ async function listCaseEvents(tenantId, caseId) {
 }
 
 module.exports = {
-  VALID_STATUSES,
+  VALID_STATUSES, ELIGIBILITY_VALUES,
   createCase, getCaseById, listCases, updateCaseStatus,
-  addMedia, upsertAssessment, addTimelineEntry,
-  appendCaseEvent, listCaseEvents,
+  addMedia, listMedia, upsertAssessment, listAssessments, addTimelineEntry,
+  setEligibility, appendCaseEvent, listCaseEvents,
 };

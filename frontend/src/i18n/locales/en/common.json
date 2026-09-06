@@ -25,5 +25,24 @@
     "attended": "Attended",
     "lost": "Lost",
     "archived": "Archived"
+  },
+  "roles": {
+    "klinik_sahibi": "Clinic Owner",
+    "operasyon_muduru": "Operations Manager",
+    "hasta_danismani": "Patient Consultant",
+    "doktor": "Doctor",
+    "koordinator": "Coordinator",
+    "tercuman": "Interpreter",
+    "muhasebe": "Accounting",
+    "super_admin": "Super Admin",
+    "admin": "Admin",
+    "director": "Operations Manager",
+    "clinic_admin": "Clinic Owner",
+    "clinic_owner": "Clinic Owner",
+    "treatment_coordinator": "Patient Consultant",
+    "dentist": "Doctor",
+    "receptionist": "Coordinator",
+    "sales": "Patient Consultant",
+    "nurse": "Nurse"
   }
 }

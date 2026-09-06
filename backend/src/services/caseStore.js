@@ -225,7 +225,7 @@ const CASE_TO_DEAL_STATUS = {
   bounced:            'quoted',
 };
 
-const ADMIN_ROLES = new Set(['super_admin', 'admin', 'director', 'clinic_admin']);
+const ADMIN_ROLES = new Set(['super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi']);
 
 // actor: { actorId, actorRole, tenantId } — null actorRole means system/webhook.
 // Verification rules:
