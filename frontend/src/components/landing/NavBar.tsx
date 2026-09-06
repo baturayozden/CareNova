@@ -47,7 +47,7 @@ export default function NavBar() {
         <button
           onClick={() => setOpen(v => !v)}
           className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-ink"
-          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-label={i18n.language?.startsWith('tr') ? (open ? 'Menüyü kapat' : 'Menüyü aç') : (open ? 'Close menu' : 'Open menu')}
           aria-expanded={open}
         >
           {open ? <X size={22} strokeWidth={1.5} aria-hidden="true" /> : <Menu size={22} strokeWidth={1.5} aria-hidden="true" />}

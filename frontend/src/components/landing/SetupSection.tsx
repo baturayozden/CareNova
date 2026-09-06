@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Rocket } from 'lucide-react';
-import { setupHeading, setupSub, setupSteps } from '../../data/landingContent';
+import { setupEyebrow, setupHeading, setupSub, setupSteps } from '../../data/landingContent';
 import { fadeUp, stagger, sectionHeading, reveal } from './variants';
 
 export default function SetupSection() {
@@ -15,7 +15,7 @@ export default function SetupSection() {
         <motion.div {...reveal()} variants={stagger()} className="mb-10 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
             <Rocket size={20} strokeWidth={1.5} className="text-accent" aria-hidden="true" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-accent">Setup</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-accent">{setupEyebrow(i18n.language)}</span>
           </div>
           <motion.h2 id="setup-heading" variants={fadeUp} className={sectionHeading}>{setupHeading(i18n.language)}</motion.h2>
           <motion.p variants={fadeUp} className="text-ink-muted text-base mt-3 max-w-xl mx-auto">{setupSub(i18n.language)}</motion.p>

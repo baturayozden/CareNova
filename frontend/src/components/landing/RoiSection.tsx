@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { BarChart3 } from 'lucide-react';
-import { roiHeading, roiPanelLabel, roiSub, roiColumns, roiRows, roiFootnote } from '../../data/landingContent';
+import { roiEyebrow, roiHeading, roiPanelLabel, roiSub, roiColumns, roiRows, roiFootnote } from '../../data/landingContent';
 import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
 export default function RoiSection() {
@@ -16,7 +16,7 @@ export default function RoiSection() {
         <motion.div {...reveal()} variants={stagger()} className="max-w-2xl mb-6">
           <div className="flex items-center gap-2 mb-3">
             <BarChart3 size={20} strokeWidth={1.5} className="text-accent" aria-hidden="true" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-accent">ROI</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-accent">{roiEyebrow(i18n.language)}</span>
           </div>
           <motion.h2 id="roi-heading" variants={fadeUp} className={sectionHeading}>{roiHeading(i18n.language)}</motion.h2>
           <motion.p variants={fadeUp} className={`${sectionSubheading} mt-4`}>{roiSub(i18n.language)}</motion.p>

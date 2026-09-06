@@ -5,10 +5,11 @@ import { Check, X, Minus } from 'lucide-react';
 import { comparisonHeading, comparisonSub, comparisonColumns, comparisonRows, comparisonNote } from '../../data/landingContent';
 import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
-function Cell({ value }: { value: string }) {
-  if (value === 'yes') return <Check size={18} strokeWidth={2} className="text-success mx-auto" aria-label="yes" />;
-  if (value === 'no') return <X size={18} strokeWidth={2} className="text-ink-subtle mx-auto" aria-label="no" />;
-  if (value === 'partial') return <Minus size={18} strokeWidth={2} className="text-warning mx-auto" aria-label="partial" />;
+function Cell({ value, lang }: { value: string; lang: string }) {
+  const isTr = lang?.startsWith('tr');
+  if (value === 'yes') return <Check size={18} strokeWidth={2} className="text-success mx-auto" aria-label={isTr ? 'evet' : 'yes'} />;
+  if (value === 'no') return <X size={18} strokeWidth={2} className="text-ink-subtle mx-auto" aria-label={isTr ? 'hayır' : 'no'} />;
+  if (value === 'partial') return <Minus size={18} strokeWidth={2} className="text-warning mx-auto" aria-label={isTr ? 'kısmi' : 'partial'} />;
   if (value === 'na') return <span className="text-ink-subtle text-sm">—</span>;
   return <span className="text-ink-muted text-sm">{value}</span>;
 }
@@ -48,7 +49,7 @@ export default function ComparisonSection() {
                   <th scope="row" className="px-5 py-3.5 text-left font-medium text-ink border-t border-line whitespace-nowrap">{r.label}</th>
                   {r.cells.map((cell, ci) => (
                     <td key={ci} className={`px-5 py-3.5 text-center border-t border-line ${ci === r.cells.length - 1 ? 'bg-accent-soft/40' : ''}`}>
-                      <Cell value={cell} />
+                      <Cell value={cell} lang={i18n.language} />
                     </td>
                   ))}
                 </tr>

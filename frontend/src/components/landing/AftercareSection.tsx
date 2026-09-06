@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeartPulse } from 'lucide-react';
-import { aftercareHeading, aftercareSub, aftercareDays, aftercareExample } from '../../data/landingContent';
+import { aftercareEyebrow, aftercareHeading, aftercareSub, aftercareDays, aftercareExample } from '../../data/landingContent';
 import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
 export default function AftercareSection() {
@@ -17,7 +17,7 @@ export default function AftercareSection() {
         <motion.div {...reveal()} variants={stagger()} className="max-w-2xl mb-12">
           <div className="flex items-center gap-2 mb-3">
             <HeartPulse size={20} strokeWidth={1.5} className="text-accent" aria-hidden="true" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-accent">Aftercare</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-accent">{aftercareEyebrow(i18n.language)}</span>
           </div>
           <motion.h2 id="aftercare-heading" variants={fadeUp} className={sectionHeading}>{aftercareHeading(i18n.language)}</motion.h2>
           <motion.p variants={fadeUp} className={`${sectionSubheading} mt-4`}>{aftercareSub(i18n.language)}</motion.p>

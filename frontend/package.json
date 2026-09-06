@@ -33,6 +33,7 @@
     "generate-sitemap": "node scripts/generate-sitemap.js",
     "generate-og-cards": "node scripts/generate-og-cards.js",
     "check:placeholders": "node scripts/check-placeholders.js",
+    "check:i18n-leaks": "node scripts/check-i18n-leaks.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prerender": "node scripts/prerender.js"

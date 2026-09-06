@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ArrowRight, BadgeCheck, FileSignature, Clock3, ShieldCheck } from 'lucide-react';
-import { trustHeading, trustSub, trustRows } from '../../data/landingContent';
+import { trustEyebrow, trustHeading, trustSub, trustRows } from '../../data/landingContent';
 import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
 // Small, honest product mock-ups — no photos, no invented names beyond the
@@ -61,7 +61,7 @@ export default function TrustSection() {
         <motion.div {...reveal()} variants={stagger()} className="max-w-2xl mb-14 mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
             <ShieldCheck size={20} strokeWidth={1.5} className="text-accent" aria-hidden="true" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-accent">Trust</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-accent">{trustEyebrow(i18n.language)}</span>
           </div>
           <motion.h2 id="trust-heading" variants={fadeUp} className={sectionHeading}>{trustHeading(i18n.language)}</motion.h2>
           <motion.p variants={fadeUp} className={`${sectionSubheading} mt-4 mx-auto`}>{trustSub(i18n.language)}</motion.p>

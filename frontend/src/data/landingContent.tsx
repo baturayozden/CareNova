@@ -212,6 +212,7 @@ export const problemFunnel = (lang: string) => ({
 
 // ── Trust wounds (Bölüm 4.1 / 4.3) ───────────────────────────────────────
 
+export const trustEyebrow = (lang: string) => pick(lang, 'Güven', 'Trust');
 export const trustHeading = (lang: string) => pick(lang, 'Üç güven yarası, üç somut cevap.', 'Three trust wounds. Three concrete answers.');
 export const trustSub = (lang: string) => pick(lang,
   'Rakiplerin hiçbiri bu üçünü birden çözmüyor.',
@@ -319,6 +320,7 @@ export const branchesTable = (lang: string) => pick(lang,
 
 // ── Aftercare timeline (#bakim-hatti) ──────────────────────────────────────
 
+export const aftercareEyebrow = (lang: string) => pick(lang, 'Bakım Hattı', 'Aftercare');
 export const aftercareHeading = (lang: string) => pick(lang, 'Bakım hattı: hasta eve döndükten sonra', 'The aftercare line: after the patient goes home');
 export const aftercareSub = (lang: string) => pick(lang,
   "Şikayetlerin en yoğun kümesi \"ödeme sonrası kayboldular\". Bu bölüm o şikayetin panzehiri.",
@@ -394,6 +396,7 @@ export const comparisonNote = (lang: string) => pick(lang,
 
 // ── Channel ROI example (#roi) ─────────────────────────────────────────────
 
+export const roiEyebrow = (lang: string) => pick(lang, 'Yatırım Getirisi', 'ROI');
 export const roiHeading = (lang: string) => pick(lang, 'Kanal ROI örneği', 'Channel ROI example');
 export const roiPanelLabel = (lang: string) => pick(lang, 'Örnek panel görünümü — gerçek müşteri verisi değil', 'Example panel view — not real customer data');
 export const roiSub = (lang: string) => pick(lang,
@@ -445,6 +448,7 @@ export const complianceItems = (lang: string) => pick(lang,
 
 // ── Setup / onboarding (#kurulum) ──────────────────────────────────────────
 
+export const setupEyebrow = (lang: string) => pick(lang, 'Kurulum', 'Setup');
 export const setupHeading = (lang: string) => pick(lang, 'Kurulum süreci', 'Setup process');
 export const setupSub = (lang: string) => pick(lang,
   'Klinik 45 dakika · Solo 15 dakika. Numaranız değişmiyor. Teknik ekip gerekmiyor.',
