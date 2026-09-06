@@ -1585,7 +1585,7 @@ canlı doğrulandı. 390px'te galeri 3 sütuna düşüp okunaklı kalıyor.
 `node scripts/check-i18n-leaks.js` → 0/0. `npx tsc --noEmit` ve
 `CI=true npm run build` temiz.
 
-**Commit:** (aşağıda)
+**Commit:** `896d0e2` — "feat(doctor-queue): image gallery, red flags, approved scope and price band"
 
 ---
 
