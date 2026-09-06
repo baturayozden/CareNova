@@ -116,11 +116,11 @@
   },
   "audit": { "empty": "No entries" },
   "doctorQueue": {
-    "title": "Doctor Queue",
+    "title": "Doctor Approval Queue",
     "subtitle": "Cases with completed pre-assessment, awaiting doctor approval",
     "empty": "No cases awaiting approval",
     "waiting": "Waiting time",
-    "aiSummary": "AI structured summary — internal only",
+    "aiSummary": "AI structured summary — internal only, never shown to the patient",
     "preAssessment": "Pre-assessment answers",
     "images": "Uploaded images",
     "noImages": "No images",
@@ -130,13 +130,18 @@
     "ineligible": "Ineligible",
     "note": "Note",
     "notePlaceholder": "Add a decision note…",
+    "notePlaceholderRequired": "Add a decision note (required)…",
+    "noteRequiredError": "A note is required for an ineligible decision.",
     "approvedScope": "Approved scope",
     "graftCount": "Graft count",
     "implantCount": "Implant count",
+    "procedures": "Procedure list",
     "priceBand": "Approved price band",
     "priceBandPlaceholder": "e.g. €2,400–2,800",
+    "scopeRequiredError": "Scope and price band are required for an eligible/conditional decision.",
     "submit": "Save decision",
     "submitted": "Saved",
+    "readyForQuote": "Decision saved — quote can now be issued",
     "noQuoteWarning": "No quote may be issued to the patient without doctor approval."
   }
 }

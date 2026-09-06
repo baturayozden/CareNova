@@ -116,11 +116,11 @@
   },
   "audit": { "empty": "Kayıt yok" },
   "doctorQueue": {
-    "title": "Doktor Onayı",
+    "title": "Doktor Onay Kuyruğu",
     "subtitle": "Ön değerlendirmesi tamamlanan vakalar, doktor onayını bekliyor",
     "empty": "Onay bekleyen vaka yok",
     "waiting": "Bekleme süresi",
-    "aiSummary": "AI ön-veri özeti — sadece klinik içi",
+    "aiSummary": "AI ön-veri özeti — sadece klinik içi, hastaya gösterilmez",
     "preAssessment": "Ön değerlendirme yanıtları",
     "images": "Yüklenen görseller",
     "noImages": "Görsel yok",
@@ -130,13 +130,18 @@
     "ineligible": "Uygun değil",
     "note": "Not",
     "notePlaceholder": "Karar notu ekleyin…",
+    "notePlaceholderRequired": "Karar notu ekleyin (zorunlu)…",
+    "noteRequiredError": "Uygun değil kararı için not zorunludur.",
     "approvedScope": "Onaylanan kapsam",
     "graftCount": "Greft sayısı",
     "implantCount": "İmplant sayısı",
+    "procedures": "İşlem listesi",
     "priceBand": "Onaylanan fiyat aralığı",
     "priceBandPlaceholder": "örn. 2400–2800 €",
+    "scopeRequiredError": "Uygun/şartlı kararı için kapsam ve fiyat bandı zorunludur.",
     "submit": "Kararı kaydet",
     "submitted": "Kaydedildi",
+    "readyForQuote": "Karar kaydedildi — teklif oluşturulabilir",
     "noQuoteWarning": "Doktor onayı olmadan hiçbir teklif hastaya gönderilemez."
   }
 }

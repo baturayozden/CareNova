@@ -1517,4 +1517,76 @@ geçen bir demo kuralı eklenebilir, bu gece yapılmadı).
 
 ---
 
+## BÖLÜM D — Doktor Onay Kuyruğunu derinleştirme
+
+Bulgu 4: iskelet doğruydu ama sığdı — tek vaka, galeri yok, kırmızı bayrak
+yok, onaylanan kapsam alanı yok, isim tutarsız ("Doctor Approval" sidebar,
+"Doctor Queue" sayfa başlığı).
+
+**Demo veri:** 15 vakadan 1'i (`awaiting_doctor`) 5'e çıkarıldı.
+`case-3` (Lukas Weber, saç ekimi) `pre_assessment`'ten `awaiting_doctor`'a
+taşındı — zaten AI çıkarımı ve 3 görseli hazırdı, doğal bir sonraki adımdı.
+3 YENİ vaka eklendi: `case-16` (Isabella Conti, estetik cerrahi, **12 dk**
+bekleme), `case-17` (Emre Aydınoğlu, göz/LASIK, ~2 gün bekleme, kırmızı
+bayraklı: "İnce kornea"), `case-18` (Omar Haddad, diş, ~3 gün bekleme,
+kırmızı bayraklı: "Kontrolsüz diyabet"). Sonuç: 4 branşta (saç ekimi/diş x2/
+estetik/göz), 12 dakikadan 3 güne kadar dağılan 5 vakalık gerçekçi bir
+kuyruk.
+
+**Kırmızı bayraklar artık gerçek:** Önceki sürüm ön-değerlendirme
+sorularında kaba bir regex ("kronik|risk" geçiyor mu) çalıştırıp genel bir
+"dikkat gerektiren bir işaret var" mesajı gösteriyordu. `CaseFile.
+medicalFile.redFlags?: string[]` alanı eklendi — `adminBranchTemplates.ts`'in
+gerçek branş şablonu red flag metinleriyle (`'İnce kornea'`,
+`'Kontrolsüz diyabet'`) birebir eşleşen, doktorun GERÇEKTEN ne gördüğünü
+söyleyen metinler artık kartın üstünde ayrı ayrı satırlar halinde.
+
+**Görsel galerisi:** "1 görsel" yazısı yerine gerçek bir ızgara —
+`CaseFile.medicalFile.imageSlots?: string[]` (branş şablonunun
+`required_media` slot etiketleriyle aynı: "Ön görünüm", "Tepe", "Donör
+bölge", "Panoramik" vb.), her kare tıklanınca büyüyen bir modal açıyor.
+**Dürüstlük kararı:** bu ortamda gerçek hasta fotoğrafı dosyası yok —
+sahte "gerçekçi" bir görsel üretmek (ki mümkündü) gerçek olmayan bir şeyi
+gerçekmiş gibi göstermek olurdu, MUTLAK YASAK #9'un ruhuna aykırı. Bunun
+yerine placeholder kare üzerinde "(demo — gerçek görsel yok)" yazısıyla
+açıkça etiketlendi.
+
+**Onaylanan kapsam — artık zorunlu alan:** `Eligible` VEYA `Conditional`
+seçilince (önceki sürüm sadece `Eligible`'da gösteriyordu) branşa göre
+greft sayısı (saç ekimi) / implant sayısı (diş) / işlem listesi (estetik,
+YENİ alan) + fiyat bandı zorunlu; boş "Kararı kaydet"e basılırsa satır
+kırmızı çerçeveli olur ve hata metni çıkar, kaydedilmez. `Ineligible`
+seçilince not zorunlu, aynı şekilde doğrulanıyor. Kaydedilince form
+"Karar kaydedildi — teklif oluşturulabilir" başarı şeridine dönüşüyor
+(uygun/şartlı için) — Bölüm C.10'daki impersonation şeridiyle aynı
+görsel dil (yeşil, ikonlu).
+
+**İsim tutarlılığı:** `nav.json`'un `doctorQueue` değeri VE
+`cases.json`'un `doctorQueue.title`'ı ikisi de artık **"Doktor Onay
+Kuyruğu"** (TR) / **"Doctor Approval Queue"** (EN) — `docs/terminoloji.md`
+ile birebir aynı. AI özet uyarısı aynen kaldı, sadece i18n'e taşındı ve
+açıklama Türkçeleştirildi ("sadece klinik içi, hastaya gösterilmez").
+
+**`check-i18n-leaks.js`'te ikinci bir substring çakışması bulundu:** yeni
+"Doktor Onayı" (eski isim) regresyon-koruma girdisi eklenince EN modunda
+`/cases` sayfasında sahte bir ihlal çıktı — sebebi `CASE_STATUS_LABELS.
+awaiting_doctor = "Doktor Onayı Bekliyor"` (doğru, her zaman Türkçe kalması
+gereken bir VERİ etiketi) bu kelimeyi İÇERİYOR. Aynı "Panel" hatasının
+ikinci örneği — kaldırıldı, yorumla açıklandı. `"Doctor Queue"` (eski EN
+başlık) güvenli bir şekilde eklendi (yeni "Doctor Approval Queue"nün alt
+dizesi DEĞİL).
+
+**Doğrulama (ekran görüntüsü, masaüstü + 390px mobil):** `/doctor-queue`
+gezildi — galeri kutusuna tıklanıp modal açıldığı, "Eligible" seçilip
+boş kaydetmeye çalışınca kırmızı hata çıktığı, alanlar doldurulup
+kaydedilince yeşil "Decision saved — quote can now be issued" şeridinin
+göründüğü, "Ineligible" seçilip not boş bırakılınca ayrı hata çıktığı
+canlı doğrulandı. 390px'te galeri 3 sütuna düşüp okunaklı kalıyor.
+`node scripts/check-i18n-leaks.js` → 0/0. `npx tsc --noEmit` ve
+`CI=true npm run build` temiz.
+
+**Commit:** (aşağıda)
+
+---
+
 

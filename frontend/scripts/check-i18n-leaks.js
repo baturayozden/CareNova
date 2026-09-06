@@ -107,8 +107,10 @@ const APP_TR_MODE_LEAK_DENYLIST = [
   // kept here as a permanent regression guard even after they're gone.
   'Total Leads', 'AI Messages Sent', 'Recovery Rate', 'Hot Leads',
   'Get Your AI Ready', 'Finish setting up your AI',
-  // Bölüm D naming-consistency fix
-  'Cases with completed pre-assessment',
+  // Bölüm D naming-consistency fix (NOTE: NOT 'Doctor Approval' — that's a
+  // substring of the correct new label 'Doctor Approval Queue' and would
+  // false-positive against it, same collision class as 'Panel' above)
+  'Cases with completed pre-assessment', 'Doctor Queue',
 ];
 
 // Turkish chrome that must NOT appear once the page is in EN mode (values
@@ -126,6 +128,11 @@ const APP_EN_MODE_LEAK_DENYLIST = [
   'Onboarding Takibi', 'WhatsApp Hatları', 'AI Kullanım ve Kota',
   'Branş Şablonları', 'Uyum Paneli', 'Faturalama', 'Denetim Kaydı',
   'Platform Sağlığı', 'Platform Yöneticisi', 'Admin menüsü', 'Demo Modu',
+  // NOTE: 'Doktor Onayı' (the old label) is deliberately excluded — same
+  // collision class as 'Panel': it's a substring of the CASE_STATUS_LABELS
+  // data value "Doktor Onayı Bekliyor", which is correct, always-Turkish
+  // DATA (a case status), not chrome, and legitimately appears on /cases
+  // in EN mode too.
 ];
 // NOTE: this list is re-verified at the end of GECE-3-BRIEFI.md, after
 // Bölüm A/D's terminology renames (e.g. "Doktor Onayı" → "Doktor Onay

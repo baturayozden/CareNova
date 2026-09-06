@@ -43,6 +43,8 @@ export interface CaseFile {
   medicalFile: {
     preAssessment: { q: string; a: string }[];
     uploadedImages: number;
+    imageSlots?: string[]; // branch template required_media slot labels, one per uploaded image
+    redFlags?: string[]; // matched branch template red_flags — shown as a warning banner in the doctor queue
     doctorDecision: 'pending' | 'eligible' | 'conditional' | 'ineligible';
     doctorNote: string;
     aiExtraction: string; // doctor/admin-only — never shown to patient
@@ -117,16 +119,20 @@ export const cases: CaseFile[] = [
   },
   {
     id: 'case-3', caseNumber: 'CN-2026-0142', patientName: 'Lukas Weber', patientCountryFlag: '🇩🇪', patientCountry: 'Germany', patientLanguage: 'de', patientAge: 41,
-    companions: [], branch: 'hair_transplant', status: 'pre_assessment',
+    companions: [], branch: 'hair_transplant', status: 'awaiting_doctor',
     assignedConsultant: 'Jonas Fischer', assignedDoctor: null, assignedCoordinator: null, assignedInterpreter: null,
     estimatedValueEur: 2900, lastActivityAt: hoursAgo(5),
-    timeline: [{ status: 'new', at: daysAgo(3) }, { status: 'qualified', at: daysAgo(2) }, { status: 'pre_assessment', at: hoursAgo(5) }],
+    timeline: [{ status: 'new', at: daysAgo(3) }, { status: 'qualified', at: daysAgo(2) }, { status: 'pre_assessment', at: daysAgo(2) }, { status: 'awaiting_doctor', at: hoursAgo(5) }],
     messages: [
       { side: 'in', text: 'Hallo, ich interessiere mich für eine Haartransplantation. Können Sie mir einen Preis nennen?', translation: 'Merhaba, saç ekimi ile ilgileniyorum. Fiyat verebilir misiniz?', at: daysAgo(3) },
       { side: 'out', text: 'Hallo! 😊 Könnten Sie uns 3 Fotos schicken (Vorderansicht, Oberkopf, Spenderbereich)?', translation: 'Merhaba! 😊 3 fotoğraf gönderir misiniz (ön, tepe, donör bölge)?', at: hoursAgo(71.93) },
       { side: 'in', text: '[3 Fotos gesendet]', at: daysAgo(2), hasPhoto: true },
     ],
-    medicalFile: { preAssessment: [{ q: 'Norwood evresi (fotoğraftan)', a: '4' }, { q: 'Kronik hastalık', a: 'Yok' }], uploadedImages: 3, doctorDecision: 'pending', doctorNote: '', aiExtraction: 'Norwood 4, donör yoğunluk iyi, ~3200-3800 greft tahmini' },
+    medicalFile: {
+      preAssessment: [{ q: 'Norwood evresi (fotoğraftan)', a: '4' }, { q: 'Kronik hastalık', a: 'Yok' }],
+      uploadedImages: 3, imageSlots: ['Ön görünüm', 'Tepe', 'Donör bölge'],
+      doctorDecision: 'pending', doctorNote: '', aiExtraction: 'Norwood 4, donör yoğunluk iyi, ~3200-3800 greft tahmini',
+    },
     quotes: [], travel: null, aftercare: [],
     auditLog: [{ actor: 'AI', action: 'Fotoğraflar alındı, ön-değerlendirme tamamlandı', at: hoursAgo(5) }],
   },
@@ -140,7 +146,11 @@ export const cases: CaseFile[] = [
       { side: 'in', text: 'مرحباً، أحتاج زراعة أسنان في الفك السفلي', translation: 'Merhaba, alt çenede implant ihtiyacım var', at: daysAgo(4) },
       { side: 'in', text: '[بانوراما مرسلة]', translation: '[Panoramik gönderildi]', at: daysAgo(2), hasPhoto: true },
     ],
-    medicalFile: { preAssessment: [{ q: 'Eksik diş sayısı', a: '3' }], uploadedImages: 1, doctorDecision: 'pending', doctorNote: '', aiExtraction: 'Panoramikte kemik yoğunluğu yeterli görünüyor, implant adayı' },
+    medicalFile: {
+      preAssessment: [{ q: 'Eksik diş sayısı', a: '3' }],
+      uploadedImages: 1, imageSlots: ['Panoramik'],
+      doctorDecision: 'pending', doctorNote: '', aiExtraction: 'Panoramikte kemik yoğunluğu yeterli görünüyor, implant adayı',
+    },
     quotes: [], travel: null, aftercare: [],
     auditLog: [{ actor: 'Sistem', action: 'Doktor onay kuyruğuna eklendi', at: hoursAgo(8) }],
   },
@@ -276,6 +286,56 @@ export const cases: CaseFile[] = [
     medicalFile: { preAssessment: [{ q: 'Donör gamet ihtiyacı', a: 'Evet' }], uploadedImages: 0, doctorDecision: 'ineligible', doctorNote: 'Donör gamet Türkiye\'de yasal değil — branş şablonu kuralı gereği vaka kapatıldı.', aiExtraction: '' },
     quotes: [], travel: null, aftercare: [],
     auditLog: [{ actor: 'Dr. Kerem Ateş', action: 'Tıbben uygun değil — donör gamet yasağı', at: hoursAgo(10) }],
+  },
+  // 3 more awaiting_doctor cases (GECE-3-BRIEFI.md Bölüm D.1) — the queue
+  // needs to look genuinely busy, spanning branches and wait times from
+  // minutes to days, not a single lonely card.
+  {
+    id: 'case-16', caseNumber: 'CN-2026-0211', patientName: 'Isabella Conti', patientCountryFlag: '🇮🇹', patientCountry: 'Italy', patientLanguage: 'en', patientAge: 35,
+    companions: [], branch: 'aesthetic_surgery', status: 'awaiting_doctor',
+    assignedConsultant: 'Jonas Fischer', assignedDoctor: null, assignedCoordinator: null, assignedInterpreter: null,
+    estimatedValueEur: 4800, lastActivityAt: hoursAgo(0.2),
+    timeline: [{ status: 'new', at: daysAgo(1) }, { status: 'qualified', at: hoursAgo(6) }, { status: 'pre_assessment', at: hoursAgo(1) }, { status: 'awaiting_doctor', at: hoursAgo(0.2) }],
+    messages: [{ side: 'in', text: "Hi, I'd like a consultation for a mommy makeover.", at: daysAgo(1) }],
+    medicalFile: {
+      preAssessment: [{ q: 'İlgilenilen prosedür', a: 'Karın germe + liposuction' }, { q: 'Önceki ameliyat', a: 'Sezaryen (2021)' }],
+      uploadedImages: 4, imageSlots: ['Ön görünüm', 'Yan profil (sol)', 'Yan profil (sağ)', 'Karın bölgesi'],
+      doctorDecision: 'pending', doctorNote: '', aiExtraction: 'Karın duvarı gevşekliği orta derece, liposuction+abdominoplasti adayı',
+    },
+    quotes: [], travel: null, aftercare: [],
+    auditLog: [{ actor: 'AI', action: 'Ön-değerlendirme tamamlandı', at: hoursAgo(0.2) }],
+  },
+  {
+    id: 'case-17', caseNumber: 'CN-2026-0058', patientName: 'Emre Aydınoğlu', patientCountryFlag: '🇳🇱', patientCountry: 'Netherlands', patientLanguage: 'tr', patientAge: 26,
+    companions: [], branch: 'eye_lasik', status: 'awaiting_doctor',
+    assignedConsultant: 'Ayşe Demir', assignedDoctor: null, assignedCoordinator: null, assignedInterpreter: null,
+    estimatedValueEur: 2200, lastActivityAt: daysAgo(2),
+    timeline: [{ status: 'new', at: daysAgo(5) }, { status: 'qualified', at: daysAgo(4) }, { status: 'pre_assessment', at: daysAgo(3) }, { status: 'awaiting_doctor', at: daysAgo(2) }],
+    messages: [{ side: 'in', text: 'Merhaba, lazer göz ameliyatı için uygunluğumu öğrenebilir miyim?', at: daysAgo(5) }],
+    medicalFile: {
+      preAssessment: [{ q: 'Numara (sağ/sol)', a: '-4.5 / -4.0' }, { q: 'Kornea kalınlığı ölçümü', a: 'Yapılmadı' }],
+      uploadedImages: 2, imageSlots: ['Sağ göz', 'Sol göz'],
+      redFlags: ['İnce kornea'],
+      doctorDecision: 'pending', doctorNote: '', aiExtraction: 'Kornea topografisi yüklenmedi — netleştirilmeden nihai karar verilemez',
+    },
+    quotes: [], travel: null, aftercare: [],
+    auditLog: [{ actor: 'AI', action: 'Ön-değerlendirme tamamlandı, kornea ölçümü eksik uyarısı verildi', at: daysAgo(2) }],
+  },
+  {
+    id: 'case-18', caseNumber: 'CN-2026-0019', patientName: 'Omar Haddad', patientCountryFlag: '🇯🇴', patientCountry: 'Jordan', patientLanguage: 'ar', patientAge: 58,
+    companions: [{ name: 'Layla Haddad', relation: 'Eş' }], branch: 'dental', status: 'awaiting_doctor',
+    assignedConsultant: 'Layla Hassan', assignedDoctor: null, assignedCoordinator: null, assignedInterpreter: 'Reem Al-Sayed',
+    estimatedValueEur: 5200, lastActivityAt: daysAgo(3),
+    timeline: [{ status: 'new', at: daysAgo(8) }, { status: 'qualified', at: daysAgo(6) }, { status: 'pre_assessment', at: daysAgo(4) }, { status: 'awaiting_doctor', at: daysAgo(3) }],
+    messages: [{ side: 'in', text: 'مرحباً، أحتاج ابتسامة هوليوود كاملة', translation: 'Merhaba, tam bir hollywood gülüşü istiyorum', at: daysAgo(8) }],
+    medicalFile: {
+      preAssessment: [{ q: 'Eksik diş sayısı', a: '8' }, { q: 'Kronik hastalık', a: 'Tip 2 diyabet — kontrolsüz' }],
+      uploadedImages: 2, imageSlots: ['Panoramik', 'Ağız içi'],
+      redFlags: ['Kontrolsüz diyabet'],
+      doctorDecision: 'pending', doctorNote: '', aiExtraction: 'Panoramikte çoklu kemik kaybı, geniş kapsamlı implant + zirkonya planı gerekebilir',
+    },
+    quotes: [], travel: null, aftercare: [],
+    auditLog: [{ actor: 'AI', action: 'Ön-değerlendirme tamamlandı, kronik hastalık beyanı işaretlendi', at: daysAgo(3) }],
   },
 ];
 
