@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { TrendingDown, Users, GraduationCap } from 'lucide-react';
 import {
   problemHeading, problemSub, problemCards,
-  problemFunnelHeading, problemFunnel,
+  problemFunnelHeading, problemFunnel, sourceLabel,
 } from '../../data/landingContent';
 import { fadeUp, stagger, sectionHeading, sectionSubheading, reveal } from './variants';
 
@@ -34,7 +34,7 @@ export default function ProblemSection() {
                   <h3 className="font-semibold text-ink text-lg mb-2">{c.title}</h3>
                   <p className="text-ink-muted text-sm leading-relaxed">{c.body}</p>
                 </div>
-                <p className="text-ink-subtle text-xs mt-auto pt-2 border-t border-line">Kaynak: {c.source}</p>
+                <p className="text-ink-subtle text-xs mt-auto pt-2 border-t border-line">{sourceLabel(i18n.language)} {c.source}</p>
               </motion.div>
             );
           })}

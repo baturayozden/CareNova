@@ -9,12 +9,33 @@
 // presented as CareNova's own results. Industry statistics are allowed, but
 // every one carries its source inline. No competitor is named — categories
 // only. See CARENOVA-STRATEJI.md for the source data behind every number.
+//
+// Source-name policy (GECE-LOG.md, "Kaynak politikası"): no private
+// agency/vendor site (e.g. a specific marketing firm's domain) is ever named
+// on this page — only official sources (USHAŞ, TÜİK, T.C. Sağlık Bakanlığı,
+// KVKK, Resmî Gazete). Every number falls into exactly one of three buckets:
+//   A) Published by an official source → shown WITH that source's name via
+//      `sourceLabel()` + the `source` field (e.g. problemCards).
+//   B) Only available from industry/vendor sources → NEVER names the vendor;
+//      shown instead with `industryDataLabel()`, a standalone disclaimer
+//      that it's sector data, not a CareNova result (e.g. problemFunnel,
+//      roiPanelLabel, heroStatsFootnote).
+//   C) Not traceable to any source → does not appear on this page at all.
 
 export type Lang = 'tr' | 'en';
 
 function pick<T>(lang: string, tr: T, en: T): T {
   return lang?.startsWith('tr') ? tr : en;
 }
+
+// Category A prefix — pairs with a `source` field naming an official source.
+export const sourceLabel = (lang: string) => pick(lang, 'Kaynak:', 'Source:');
+// Category B — a standalone disclaimer with NO source name attached, for
+// figures that only exist in industry/vendor data.
+export const industryDataLabel = (lang: string) => pick(lang,
+  'Sektör verisi — CareNova\'nın kendi sonucu değildir.',
+  'Industry data — not a CareNova result.',
+);
 
 // ── Nav ───────────────────────────────────────────────────────────────────
 
@@ -76,10 +97,7 @@ export const heroStats = (lang: string) => pick(lang,
   ],
 );
 
-export const heroStatsFootnote = (lang: string) => pick(lang,
-  '* Sektör verisi, CareNova\'nın kendi sonucu değil. Kaynak: Peganom, sağlık turizmi sektör verisi, 2026.',
-  '* Industry data, not a CareNova result. Source: Peganom, health tourism industry data, 2026.',
-);
+export const heroStatsFootnote = (lang: string) => `* ${industryDataLabel(lang)}`;
 
 // WhatsApp mock conversation — hair transplant scenario, cycles TR → EN → AR → DE → RU
 type Msg = { side: 'in' | 'out'; text: string };
@@ -146,21 +164,28 @@ export const howItWorksSteps = (lang: string) => pick(lang,
 
 // ── Problem ───────────────────────────────────────────────────────────────
 
-export const problemHeading = (lang: string) => pick(lang, 'Kaybettiğiniz para, tam olarak burada.', "Here's exactly where you're losing money.");
-export const problemSub = (lang: string) => pick(lang,
-  'Aynı reklam bütçesi, cevap hızına göre 10-15 kat farklı sonuç veriyor.',
-  'The same ad budget produces a 10-15× different outcome, depending on reply speed.',
+export const problemHeading = (lang: string) => pick(lang,
+  'Hasta sayısı düşüyor, hasta başı değer yükseliyor.',
+  'Fewer patients. Higher value per patient.',
 );
+export const problemSub = (lang: string) => pick(lang,
+  'Artık daha az hastayı daha pahalıya satmak zorundasınız. Bu, gelen her mesajın değerini kalıcı olarak değiştirdi.',
+  "You now have to sell fewer patients at a higher price. That has permanently changed what every incoming message is worth.",
+);
+// Category A per the source policy: figures published by USHAŞ/TÜİK, shown
+// with the official source name attached (docs/CARENOVA-STRATEJI.md §2.1).
+// No private agency/vendor site is ever named on this page — see
+// GECE-LOG.md for the three-category source policy this section follows.
 export const problemCards = (lang: string) => pick(lang,
   [
-    { stat: '₺150–900', title: 'Lead başına ödüyorsunuz', body: "Ve gelen lead'lerin %85–95'i hiç hastaya dönüşmüyor.", source: 'onuroztr.com, sağlık sektörü lead maliyeti verisi' },
-    { stat: '10×', title: '5 dakikada yanıt = 10 kat dönüşüm', body: "1 saatte cevaplanan lead 7 kat, gece/hafta sonu gelen ~%35'i hiç yanıtlanmıyor.", source: 'Peganom / onuroztr.com sektör verisi' },
-    { stat: '%1–2 vs %15–20', title: 'Eğitim farkı, dönüşümü 10 kat değiştiriyor', body: 'Eğitimsiz ekip %1–2, eğitimli ekip %15–20 dönüşüm yapıyor — aynı lead havuzunda.', source: 'peganom.com sektör verisi' },
+    { stat: '1,54 mn → 1,40 mn', title: 'Hasta sayısı 2023\'ten beri %9 düştü', body: 'Türkiye\'ye gelen sağlık turisti sayısı 2023 zirvesinden bu yana geriliyor.', source: 'USHAŞ / TÜİK sağlık turizmi istatistikleri' },
+    { stat: '$1.597 → $2.805', title: 'Hasta başı gelir %76 arttı (2022 → 2026 Ç2)', body: 'Pazar hacimden değere kayıyor — kazanan, gelen her lead\'i daha yüksek oranda kapatan klinik.', source: 'USHAŞ / TÜİK sağlık turizmi istatistikleri' },
+    { stat: '$3,02 milyar', title: '2025 toplam sağlık turizmi geliri', body: 'Aynı toplam gelir artık daha az hastaya dağılıyor — hasta başı marj her zamankinden değerli.', source: 'USHAŞ / TÜİK sağlık turizmi istatistikleri' },
   ],
   [
-    { stat: '£120–720', title: 'You pay per lead', body: 'And 85–95% of incoming leads never convert to a patient.', source: 'onuroztr.com, health sector lead-cost data' },
-    { stat: '10×', title: 'Reply in 5 minutes = 10× conversion', body: 'A lead answered within 1 hour converts 7×; ~35% arriving at night/weekend never get answered at all.', source: 'Peganom / onuroztr.com industry data' },
-    { stat: '1–2% vs 15–20%', title: 'Training makes a 10× difference', body: 'An untrained team converts 1–2%; a trained team converts 15–20% — from the same lead pool.', source: 'peganom.com industry data' },
+    { stat: '1.54M → 1.40M', title: 'Patient volume down 9% since 2023', body: "The number of health tourists arriving in Turkey has been declining since its 2023 peak.", source: 'USHAŞ / TÜİK health tourism statistics' },
+    { stat: '$1,597 → $2,805', title: 'Revenue per patient up 76% (2022 → Q2 2026)', body: 'The market is shifting from volume to value — the winner is whoever closes a higher share of every incoming lead.', source: 'USHAŞ / TÜİK health tourism statistics' },
+    { stat: '$3.02B', title: 'Total health-tourism revenue, 2025', body: 'The same total revenue is now spread across fewer patients — margin per patient matters more than ever.', source: 'USHAŞ / TÜİK health tourism statistics' },
   ],
 );
 
@@ -169,20 +194,21 @@ export const problemFunnelHeading = (lang: string) => pick(lang,
   'Aynı bütçe, iki farklı sonuç',
   'Same budget, two different outcomes',
 );
-export const problemFunnel = (lang: string) => pick(lang,
-  {
-    budget: '₺40.000 reklam bütçesi → 100 lead',
-    slow: { label: 'Yavaş / eğitimsiz ekip', patients: '1–2 hasta', cpa: 'CPA ₺20.000–40.000' },
-    fast: { label: 'Hızlı / eğitimli ekip (CareNova ile)', patients: '15–20 hasta', cpa: 'CPA ₺2.000–2.700' },
-    source: 'Kaynak: onuroztr.com ve peganom.com sektör verisi, saç ekimi kampanyası örneği, orta CPL ₺400',
-  },
-  {
-    budget: '₺40,000 ad budget → 100 leads',
-    slow: { label: 'Slow / untrained team', patients: '1–2 patients', cpa: 'CPA ₺20,000–40,000' },
-    fast: { label: 'Fast / trained team (with CareNova)', patients: '15–20 patients', cpa: 'CPA ₺2,000–2,700' },
-    source: 'Source: onuroztr.com and peganom.com industry data, hair-transplant campaign example, mid-range CPL ₺400',
-  },
-);
+export const problemFunnel = (lang: string) => ({
+  ...pick(lang,
+    {
+      budget: '₺40.000 reklam bütçesi → 100 lead',
+      slow: { label: 'Yavaş / eğitimsiz ekip', patients: '1–2 hasta', cpa: 'CPA ₺20.000–40.000' },
+      fast: { label: 'Hızlı / eğitimli ekip (CareNova ile)', patients: '15–20 hasta', cpa: 'CPA ₺2.000–2.700' },
+    },
+    {
+      budget: '₺40,000 ad budget → 100 leads',
+      slow: { label: 'Slow / untrained team', patients: '1–2 patients', cpa: 'CPA ₺20,000–40,000' },
+      fast: { label: 'Fast / trained team (with CareNova)', patients: '15–20 patients', cpa: 'CPA ₺2,000–2,700' },
+    },
+  ),
+  source: industryDataLabel(lang),
+});
 
 // ── Trust wounds (Bölüm 4.1 / 4.3) ───────────────────────────────────────
 
