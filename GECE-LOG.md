@@ -779,6 +779,6 @@ payı bırak). `CLAUDE.md`'ye kısa bir uyarı + Bölüm 14'e pointer eklendi �
 ✅ Build temiz. ✅ Ekran görüntüsü kullanılmadı (brief'in isteği) — tamamen
 hesaplanmış WCAG matematiği ve rounded-value doğrulamasıyla ilerlendi.
 
-**Commit:** (push sonrası eklenecek)
+**Commit:** `30221d1` fix(theme): darken contrast-failing tokens at their actual usage size, not per-element
 
 ---
