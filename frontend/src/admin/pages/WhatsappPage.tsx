@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
-import { adminClinics } from '../../data/adminDemoData';
+import { adminClinics, DEMO_NOW_MS } from '../../data/adminDemoData';
 
 function timeAgo(iso: string | null): string {
   if (!iso) return '—';
-  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  const mins = Math.round((DEMO_NOW_MS - new Date(iso).getTime()) / 60000);
   if (mins < 60) return `${mins} dk önce`;
   const hours = Math.round(mins / 60);
   if (hours < 24) return `${hours} sa önce`;

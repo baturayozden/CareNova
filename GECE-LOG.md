@@ -1077,4 +1077,126 @@ içerikleri sadece TR — bilinçli, gerekçeli kapsam kararı.
 
 ---
 
+## BÖLÜM D — Klinik Paneli (2 farklılaştırıcı ekran)
+
+Brief'in kendi ifadesiyle: "en farklılaştırıcı iki ekranı gerçekten yap,
+gerisi dürüst placeholder kalsın." D.2 (Vakalar) ve D.3 (Doktor Onayı)
+gerçek derinlikle yapıldı; D.1 (Dashboard zenginleştirme) ve D.4 (diğer nav
+öğeleri) zaten Gece 1'den beri dürüst "Coming Soon" durumunda, dokunulmadı
+— zaman bütçesi E'ye (backend) de pay bırakmalı.
+
+**Ad çakışması bulundu ve önlendi:** `frontend/src/pages/` altında
+ZATEN bir `CaseDetailPage.tsx` vardı — ama bu CareDental'ın ödeme/sözleşme
+"TreatmentCase" kavramı (`/payments/:id`, SignWell belge akışı), D.2'nin
+sağlık turizmi "Vaka Dosyası" kavramıyla hiçbir ilgisi yok. Yeni dosyaları
+`CaseFileDetailPage.tsx` olarak adlandırdım ki mevcut ödeme akışına
+dokunulmasın.
+
+**Veri modeli (D.5):** `frontend/src/data/caseData.ts` — 15 vaka, D.2'nin
+verdiği 15 değerli status enum'ının HER BİRİNDEN en az bir örnek
+(`new`…`medically_ineligible`), 5 doktor, 4 danışman, 2 koordinatör, 3
+tercüman. `medically_ineligible` örneği bilinçli olarak IVF donör-gamet
+kuralını tetikliyor (Bölüm C.6'daki kilitli kuralla aynı hikaye — platformun
+iki farklı katmanında aynı iş kuralının tutarlı çalıştığını gösteriyor).
+Sohbet örnekleri DE/AR/RU/EN dillerinde, her biri hastanın orijinal diliyle
+YANINDA Türkçe çeviri taşıyor (D.2'nin kendi spesifikasyonu — bu bir i18n
+eksiği değil, tasarlanmış bir özellik).
+
+**Bulunan ve düzeltilen gerçek hata — "gelecekteki referans tarihi":**
+Hem `adminDemoData.ts` hem yeni `caseData.ts`, demo verilerini sabit bir
+referans tarihe göre üretiyor: `new Date('2026-09-07T08:00:00Z')` —
+bugünün (6 Eylül 2026) BİR GÜN İLERİSİ. `timeAgo`/`waitingSince` gibi
+sayfa-seviyesi yardımcı fonksiyonlar bunu `Date.now()` ile karşılaştırınca
+sonuç negatif çıkıyordu ("-646 dk önce" gibi anlamsız bir çıktı — canlı
+tarayıcıda `/cases` listesini `get_page_text` ile okurken yakalandı).
+Kök neden: veri üretimi ile "kaç dakika önce" gösterimi iki farklı zaman
+referansı kullanıyordu. **Düzeltme:** her iki veri dosyası artık
+`DEMO_NOW_MS` sabitini dışa aktarıyor; tüketen TÜM sayfalar (yeni
+`CasesPage`/`DoctorQueuePage` + zaten commit'lenmiş `ClinicsPage`,
+`WhatsappPage`, `OnboardingPage`, `CompliancePage`) `Date.now()` yerine bu
+sabitle karşılaştırıyor. `CompliancePage`'in 31.12.2026 sigorta geri sayımı
+da aynı hatayı taşıyordu — bu sadece kozmetik değil, platformun "en
+farklılaştırıcı" özelliğinin (Uyum Paneli) kendi sayısı yanlış çıkıyordu,
+bu yüzden B4/B5 gibi ayrı bir blokaj olarak bırakmadım, hemen düzelttim.
+Canlı doğrulama: `/admin/compliance` artık "5 gün geçti" / "20 gün kaldı"
+gibi tutarlı, pozitif/negatif anlamlı değerler veriyor.
+
+**D.2 — Vakalar:** `pages/CasesPage.tsx` (arama + durum/branş filtresi,
+tablo) → `pages/CaseFileDetailPage.tsx` (7 sekme: Özet/Sohbet/Tıbbi
+dosya/Teklif/Seyahat/Bakım hattı/Denetim, brief'te istenen sırayla
+birebir). Sohbet sekmesi hastanın orijinal mesajını ve Türkçe çeviriyi
+üst-alt gösteriyor, sesli not/fotoğraf rozetleri var. Tıbbi dosya
+sekmesinde AI'ın yapılandırılmış özeti ayrı, sarı-çerçeveli bir kutuda ve
+"sadece klinik personeli görür, hastaya gösterilmez" etiketiyle — hastaya
+asla sızmayacağı netleştirildi.
+
+**D.3 — Doktor Onayı:** `pages/DoctorQueuePage.tsx`, mobil-öncelikli kart
+listesi, sadece `awaiting_doctor` durumundaki vakalar (demo veride 1 örnek
+— Ahmed Al-Rashid). Her kart: ülke/yaş/branş, bekleme süresi, yüklenen
+görsel sayısı, AI'ın yapılandırılmış özeti (sarı kutu, "sadece klinik içi"
+etiketi), ön-değerlendirme yanıtları, kronik/risk anahtar kelimesi
+yakalarsa kırmızı uyarı şeridi. Karar: uygun/şartlı/uygun değil + not +
+(branşa göre) greft veya implant sayısı + fiyat aralığı + "Doktor onayı
+olmadan hiçbir teklif hastaya gönderilemez" uyarısı + kaydet. Onaylanmadan
+kaydet butonu devre dışı — AI'ın görsel çıkarımı (Norwood tahmini vb.)
+SADECE bu sayfada ve vaka dosyasının Tıbbi dosya sekmesinde görünüyor,
+hiçbir hasta yüzeyinde değil (kod arandı, ikisinin dışında `aiExtraction`
+render eden başka bir yer yok).
+
+**i18n kapsam kararı:** Admin'in aksine, app.carenova.ai gerçek bir
+ürün yüzeyi ve projenin geri kalanı (Dashboard, Sidebar, vb.) zaten tam
+TR+EN i18n'li. Bu yüzden admin'deki "tek kullanıcı, TR yeter" istisnasını
+BURAYA uygulamadım: `cases` namespace'i (önceden boş `{}`) hem TR hem EN
+dolduruldu, yeni sayfaların KABUĞU (başlıklar, sekme adları, buton
+metinleri, form etiketleri) `useTranslation('cases')` üzerinden geçiyor.
+Sadece durum/branş ETİKETLERİ (`CASE_STATUS_LABELS`, branş isimleri) ve
+demo veri İÇERİĞİ (hasta mesajları, doktor notları) sabit Türkçe —
+bunlar admin'in `BRANCH_LABELS`/`PLAN_LABELS`'ıyla aynı gerekçeyle
+i18n'siz: demo verinin kendisi zaten yerelleştirilmiş bir kurgu değil.
+`npm run check:i18n-leaks` → TR 0 / EN 0 ihlal.
+
+**Neredeyse-kaza — caredental'a YANLIŞLIKLA dokunma riski:** Bu bölümü
+doğrularken `preview_start({name:"carenova-frontend"})` çağrısı beklenmedik
+şekilde `caredental-frontend` adıyla, port 3000'de BAŞKA bir sunucu
+başlattı — `get_page_text` ile içeriği okuyunca bunun gerçekten
+`/Users/baturayozden/projects/caredental`'ın (SALT OKUNUR proje) kendi dev
+server'ı olduğu anlaşıldı ("WhatsApp AI for UK Dental Clinics | CareDental"
+başlığı). HİÇBİR dosya okunmadı/değiştirilmedi, sadece anasayfa GET edildi
+— ama MUTLAK YASAK #1'e ("caredental'a asla dokunma") en ufak bir
+yaklaşımı bile kabul edilemez bulduğum için sunucuyu aynı saniye
+`preview_stop` ile durdurdum ve doğrulamaya `/Users/baturayozden/projects/
+CareNova/frontend`'de zaten çalışan (bu oturumdan önceki bir adımdan kalma)
+port 3002'deki gerçek CareNova sunucusuna `navigate` ederek devam ettim.
+Kök neden netleşmedi (muhtemelen önizleme aracının proje-kökü eşleşmesi
+bu oturumun orijinal dizinine — caredental'a — bağlı, benim `cd
+frontend`'ime değil) ama sonucu etkilemedi. Baturay'a açıkça bildiriyorum:
+caredental'a yazma/silme YÖNÜNDE hiçbir işlem OLMADI, sadece bir GET isteği
++ anında durdurma.
+
+**Doğrulama (ekran görüntüsü değil, `getComputedStyle`/DOM-metin):** Canlı
+sunucuda (`?host=app` + demo oturumu) `/cases` (15/15 vaka, filtreler),
+`/cases/:id` (7 sekmenin hepsi JS ile tıklanıp `innerText` okundu — Özet/
+Sohbet/Tıbbi dosya/Teklif/Seyahat hepsi doğru veriyle render oluyor) ve
+`/doctor-queue` (uygun seçilince implant+fiyat alanları doğru koşullu
+render oluyor, kaydet önce devre dışı sonra "Saved" gösteriyor) gezildi.
+Ayrıca tüm sayfadaki metin/arkaplan çiftlerini tarayan bir betik (WCAG AA
+eşiğine göre) `/doctor-queue`'da SIFIR ihlal buldu; tek bulduğu ihlal
+(`Sidebar`'daki "Management" bölüm başlığı, `text-gray-600`, 10px, 2.56:1)
+bu gecenin kapsamı DIŞINDA, önceden var olan bir hata — BLOKAJLAR.md'ye
+B6 olarak eklendi, düzeltmedim (kapsam dışı + "aynı hataya 3+ deneme"
+kuralına girmeden önce not düşüp geçme kararı).
+
+**Kabul kriteri:** ✅ `npm run build` temiz. ✅ `tsc --noEmit` sıfır hata.
+✅ `check:i18n-leaks` 0/0. ✅ 7 sekmenin hepsi gerçek veriyle çalışıyor.
+✅ AI görsel çıkarımı sadece 2 klinik-içi yüzeyde. ✅ Doktor onayı olmadan
+teklif çıkışı engelleniyor (UI seviyesinde — gerçek zorlama Bölüm E'nin
+backend'i geldiğinde, tıpkı B5'teki impersonation kuralı gibi). ⚠️
+Görsel/animasyon davranışı (hover, geçiş) `getComputedStyle`/tıklama ile
+doğrulandı ama insan gözüyle "güzel görünüyor mu" DOĞRULANMADI —
+Baturay'ın gözüyle bakması gerekiyor.
+
+**Commit:** (aşağıda)
+
+---
+
 

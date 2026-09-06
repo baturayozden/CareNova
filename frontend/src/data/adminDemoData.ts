@@ -65,6 +65,13 @@ export interface AdminClinic {
 }
 
 const now = new Date('2026-09-07T08:00:00Z');
+// Exported so page-level "X gün önce" / countdown helpers (ClinicsPage,
+// CompliancePage, OnboardingPage, WhatsappPage) diff against this fixed
+// reference instead of the real Date.now() — the two drift (this demo
+// dataset's reference date is fixed slightly ahead of real time), which
+// otherwise renders as a negative, nonsensical "-11 gün önce" or an
+// inflated compliance countdown.
+export const DEMO_NOW_MS = now.getTime();
 const daysAgo = (n: number) => new Date(now.getTime() - n * 86400000).toISOString();
 const daysFromNow = (n: number) => new Date(now.getTime() + n * 86400000).toISOString();
 const hoursAgo = (n: number) => new Date(now.getTime() - n * 3600000).toISOString();

@@ -2,11 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import AppMeta from '../../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
-import { adminClinics } from '../../data/adminDemoData';
+import { adminClinics, DEMO_NOW_MS } from '../../data/adminDemoData';
 
 function daysUntil(iso: string | null): number | null {
   if (!iso) return null;
-  return Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000);
+  return Math.ceil((new Date(iso).getTime() - DEMO_NOW_MS) / 86400000);
 }
 
 function Check({ ok }: { ok: boolean }) {

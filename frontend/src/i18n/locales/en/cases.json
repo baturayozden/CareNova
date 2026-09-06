@@ -1,1 +1,102 @@
-{}
+{
+  "listTitle": "Cases",
+  "listSubtitle": "cases shown",
+  "searchPlaceholder": "Search patient name or case no…",
+  "filterStatus": "Status",
+  "filterBranch": "Branch",
+  "allStatuses": "All statuses",
+  "allBranches": "All branches",
+  "columns": {
+    "patient": "Patient",
+    "branch": "Branch",
+    "status": "Status",
+    "consultant": "Consultant",
+    "value": "Estimated value",
+    "lastActivity": "Last activity"
+  },
+  "noResults": "No matching cases found",
+  "backToList": "Back to cases",
+  "notAssigned": "Unassigned",
+  "tabs": {
+    "summary": "Summary",
+    "chat": "Chat",
+    "medical": "Medical file",
+    "quote": "Quote",
+    "travel": "Travel",
+    "aftercare": "Aftercare",
+    "audit": "Audit"
+  },
+  "summary": {
+    "patient": "Patient",
+    "companions": "Companions",
+    "noCompanions": "No companions",
+    "assigned": "Assigned",
+    "consultant": "Consultant",
+    "doctor": "Doctor",
+    "coordinator": "Coordinator",
+    "interpreter": "Interpreter",
+    "timeline": "Status timeline",
+    "estimatedValue": "Estimated value"
+  },
+  "chat": {
+    "translation": "Turkish translation",
+    "voiceNote": "Voice note",
+    "photo": "Photo",
+    "empty": "No messages yet"
+  },
+  "medical": {
+    "preAssessment": "Pre-assessment answers",
+    "images": "Uploaded images",
+    "noImages": "No images uploaded",
+    "doctorDecision": "Doctor decision",
+    "doctorNote": "Doctor note",
+    "aiNote": "AI analysis note — internal only, never shown to the patient",
+    "decision": { "pending": "Pending", "eligible": "Eligible", "conditional": "Conditional", "ineligible": "Ineligible" }
+  },
+  "quote": {
+    "version": "Version",
+    "locked": "Locked",
+    "changeReason": "Change reason",
+    "empty": "No quote created yet",
+    "items": "Items"
+  },
+  "travel": {
+    "flight": "Flight",
+    "hotel": "Hotel",
+    "transfer": "Transfer",
+    "itinerary": "Day-by-day itinerary",
+    "empty": "Travel plan not created yet"
+  },
+  "aftercare": {
+    "contacted": "Contacted",
+    "notContacted": "Not contacted yet",
+    "response": "Response",
+    "photo": "Photo uploaded",
+    "empty": "Aftercare line hasn't started yet"
+  },
+  "audit": { "empty": "No entries" },
+  "doctorQueue": {
+    "title": "Doctor Queue",
+    "subtitle": "Cases with completed pre-assessment, awaiting doctor approval",
+    "empty": "No cases awaiting approval",
+    "waiting": "Waiting time",
+    "aiSummary": "AI structured summary — internal only",
+    "preAssessment": "Pre-assessment answers",
+    "images": "Uploaded images",
+    "noImages": "No images",
+    "decision": "Decision",
+    "eligible": "Eligible",
+    "conditional": "Conditional",
+    "ineligible": "Ineligible",
+    "note": "Note",
+    "notePlaceholder": "Add a decision note…",
+    "approvedScope": "Approved scope",
+    "graftCount": "Graft count",
+    "implantCount": "Implant count",
+    "priceBand": "Approved price band",
+    "priceBandPlaceholder": "e.g. €2,400–2,800",
+    "submit": "Save decision",
+    "submitted": "Saved",
+    "noQuoteWarning": "No quote may be issued to the patient without doctor approval."
+  }
+}

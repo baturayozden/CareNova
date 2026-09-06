@@ -1,1 +1,102 @@
-{}
+{
+  "listTitle": "Vakalar",
+  "listSubtitle": "vaka gösteriliyor",
+  "searchPlaceholder": "Hasta adı veya vaka no ara…",
+  "filterStatus": "Durum",
+  "filterBranch": "Branş",
+  "allStatuses": "Tüm durumlar",
+  "allBranches": "Tüm branşlar",
+  "columns": {
+    "patient": "Hasta",
+    "branch": "Branş",
+    "status": "Durum",
+    "consultant": "Danışman",
+    "value": "Tahmini değer",
+    "lastActivity": "Son hareket"
+  },
+  "noResults": "Eşleşen vaka bulunamadı",
+  "backToList": "Vakalara dön",
+  "notAssigned": "Atanmadı",
+  "tabs": {
+    "summary": "Özet",
+    "chat": "Sohbet",
+    "medical": "Tıbbi dosya",
+    "quote": "Teklif",
+    "travel": "Seyahat",
+    "aftercare": "Bakım hattı",
+    "audit": "Denetim"
+  },
+  "summary": {
+    "patient": "Hasta",
+    "companions": "Refakatçiler",
+    "noCompanions": "Refakatçi yok",
+    "assigned": "Atananlar",
+    "consultant": "Danışman",
+    "doctor": "Doktor",
+    "coordinator": "Koordinatör",
+    "interpreter": "Tercüman",
+    "timeline": "Durum geçmişi",
+    "estimatedValue": "Tahmini değer"
+  },
+  "chat": {
+    "translation": "Türkçe çeviri",
+    "voiceNote": "Sesli not",
+    "photo": "Fotoğraf",
+    "empty": "Henüz mesaj yok"
+  },
+  "medical": {
+    "preAssessment": "Ön değerlendirme yanıtları",
+    "images": "Yüklenen görseller",
+    "noImages": "Görsel yüklenmedi",
+    "doctorDecision": "Doktor kararı",
+    "doctorNote": "Doktor notu",
+    "aiNote": "AI analiz notu — sadece klinik personeli görür, hastaya gösterilmez",
+    "decision": { "pending": "Bekliyor", "eligible": "Uygun", "conditional": "Şartlı uygun", "ineligible": "Uygun değil" }
+  },
+  "quote": {
+    "version": "Versiyon",
+    "locked": "Kilitli",
+    "changeReason": "Değişiklik nedeni",
+    "empty": "Henüz teklif oluşturulmadı",
+    "items": "Kalemler"
+  },
+  "travel": {
+    "flight": "Uçuş",
+    "hotel": "Otel",
+    "transfer": "Transfer",
+    "itinerary": "Gün gün program",
+    "empty": "Seyahat planı henüz oluşturulmadı"
+  },
+  "aftercare": {
+    "contacted": "İletişim kuruldu",
+    "notContacted": "Henüz iletişime geçilmedi",
+    "response": "Yanıt",
+    "photo": "Fotoğraf yüklendi",
+    "empty": "Bakım hattı henüz başlamadı"
+  },
+  "audit": { "empty": "Kayıt yok" },
+  "doctorQueue": {
+    "title": "Doktor Onayı",
+    "subtitle": "Ön değerlendirmesi tamamlanan vakalar, doktor onayını bekliyor",
+    "empty": "Onay bekleyen vaka yok",
+    "waiting": "Bekleme süresi",
+    "aiSummary": "AI ön-veri özeti — sadece klinik içi",
+    "preAssessment": "Ön değerlendirme yanıtları",
+    "images": "Yüklenen görseller",
+    "noImages": "Görsel yok",
+    "decision": "Karar",
+    "eligible": "Uygun",
+    "conditional": "Şartlı",
+    "ineligible": "Uygun değil",
+    "note": "Not",
+    "notePlaceholder": "Karar notu ekleyin…",
+    "approvedScope": "Onaylanan kapsam",
+    "graftCount": "Greft sayısı",
+    "implantCount": "İmplant sayısı",
+    "priceBand": "Onaylanan fiyat aralığı",
+    "priceBandPlaceholder": "örn. 2400–2800 €",
+    "submit": "Kararı kaydet",
+    "submitted": "Kaydedildi",
+    "noQuoteWarning": "Doktor onayı olmadan hiçbir teklif hastaya gönderilemez."
+  }
+}

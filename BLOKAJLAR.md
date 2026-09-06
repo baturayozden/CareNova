@@ -107,3 +107,29 @@ uçlarını 403 ile reddet, sadece GET'e izin ver.
 
 **Aciliyet:** Orta — backend olmadan test edilemez, ama backend geldiğinde
 gerçek bir güvenlik kuralı, atlanmamalı.
+
+---
+
+## B6 — Sidebar "Management" bölüm başlığı WCAG AA'yı geçemiyor (kozmetik, düşük öncelik, kapsam dışı)
+
+**Ne oldu:** Bölüm D doğrulaması sırasında çalıştırdığım genel bir
+kontrast taraması (`getComputedStyle` tabanlı, ekran görüntüsü değil),
+`/doctor-queue` sayfasında SIFIR ihlal buldu ama Sidebar'ın kendisinde
+1 ihlal yakaladı: `src/components/Sidebar.tsx:322`'deki "Management"
+bölüm başlığı `text-gray-600` (token sistemine değil, ham Tailwind gri
+paletine bağlı) kullanıyor, 10px punto, koyu sidebar zeminine karşı
+2.56:1 — gereken 4.5:1'in çok altında.
+
+**Neden düzeltmedim:** Bu, Gece 2'nin kapsamındaki (nav/host/admin/vaka)
+hiçbir dosyaya ait değil — muhtemelen Gece 1 öncesinden kalma bir hata,
+`docs/contrast-report.md`'in 35 bulgusuna da dahil değildi çünkü o rapor
+sadece landing sayfasını tarıyor, Sidebar'ı değil. Kapsam dışı bir hatayı
+düzeltmeye başlamak yerine not düşüp devam ettim (MUTLAK YASAK #10'un
+ruhu: bilinmeyen bir hataya dalıp zaman kaybetme).
+
+**Ne gerekiyor:** `text-gray-600`'ü token sistemine (`text-ink-subtle`
+veya benzeri, sidebar'ın koyu zeminine göre ayrıca ölçülmeli) çevirmek —
+tek satırlık bir düzeltme, muhtemelen 10-15 dakika sürer.
+
+**Aciliyet:** Düşük — kozmetik, tek bir bölüm başlığı, okunabilirlik
+tamamen imkansız değil (sadece AA eşiğinin altında).

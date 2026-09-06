@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
-import { adminClinics, BRANCH_LABELS, PLAN_LABELS, ClinicStatus, PlanKey } from '../../data/adminDemoData';
+import { adminClinics, BRANCH_LABELS, PLAN_LABELS, ClinicStatus, PlanKey, DEMO_NOW_MS } from '../../data/adminDemoData';
 
 const STATUS_TONE: Record<ClinicStatus, 'success' | 'warning' | 'danger' | 'neutral'> = {
   active: 'success', trial: 'warning', onboarding: 'neutral', suspended: 'danger',
@@ -13,7 +13,7 @@ const STATUS_LABEL: Record<ClinicStatus, string> = {
 };
 
 function timeAgo(iso: string): string {
-  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  const mins = Math.round((DEMO_NOW_MS - new Date(iso).getTime()) / 60000);
   if (mins < 60) return `${mins} dk önce`;
   const hours = Math.round(mins / 60);
   if (hours < 24) return `${hours} sa önce`;

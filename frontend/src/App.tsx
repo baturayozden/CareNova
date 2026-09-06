@@ -29,6 +29,9 @@ import CommissionPage from './pages/CommissionPage';
 import PaymentsPage from './pages/PaymentsPage';
 import InvoicesPage from './pages/InvoicesPage';
 import CaseDetailPage from './pages/CaseDetailPage';
+import CasesPage from './pages/CasesPage';
+import CaseFileDetailPage from './pages/CaseFileDetailPage';
+import DoctorQueuePage from './pages/DoctorQueuePage';
 import PatientProfilePage from './pages/PatientProfilePage';
 import PatientsListPage  from './pages/PatientsListPage';
 import PaymentSuccessPage  from './pages/PaymentSuccessPage';
@@ -124,8 +127,9 @@ function AppRoutes() {
           <Route path="/payments/:id"          element={<CaseDetailPage />} />
           <Route path="/invoices"              element={<InvoicesPage />} />
           <Route path="/demo-requests"         element={<DemoRequestsPage />} />
-          <Route path="/cases"          element={<ComingSoonPage title="Vakalar" />} />
-          <Route path="/doctor-queue"   element={<ComingSoonPage title="Doktor Onayı" />} />
+          <Route path="/cases"          element={<CasesPage />} />
+          <Route path="/cases/:id"      element={<CaseFileDetailPage />} />
+          <Route path="/doctor-queue"   element={<DoctorQueuePage />} />
           <Route path="/quotes"         element={<ComingSoonPage title="Teklifler" />} />
           <Route path="/travel"         element={<ComingSoonPage title="Seyahat" />} />
           <Route path="/aftercare"      element={<ComingSoonPage title="Bakım Hattı" />} />

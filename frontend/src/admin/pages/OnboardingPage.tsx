@@ -2,10 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import AppMeta from '../../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
-import { adminClinics, ONBOARDING_STEPS } from '../../data/adminDemoData';
+import { adminClinics, ONBOARDING_STEPS, DEMO_NOW_MS } from '../../data/adminDemoData';
 
 function daysSince(iso: string): number {
-  return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  return Math.floor((DEMO_NOW_MS - new Date(iso).getTime()) / 86400000);
 }
 
 export default function OnboardingPage() {
