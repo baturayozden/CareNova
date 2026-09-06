@@ -1,5 +1,20 @@
 # SABAH RAPORU
 
+> ⏳ **Gece 2 devam ediyor** — aşağıdaki üç link Bölüm B'nin çıktısı, GECE-2-BRIEFI.md'nin
+> B.4 maddesi gereği buraya erken yazıldı. Tam sabah raporu (bu oturumun kapanışında)
+> bu bölümün TAMAMINI güncelleyecek — şimdilik sadece test linkleri güncel.
+
+## 🔗 Gece 2 test linkleri (Bölüm B — üç-host mimarisi)
+- **Landing:** `https://carenova-baturay-ozden-s-projects.vercel.app`
+- **Klinik paneli:** `https://carenova-baturay-ozden-s-projects.vercel.app/?host=app`
+  (domain eklenince → `carenova-app.vercel.app`, kurulum: `docs/host-setup.md`)
+- **Admin konsolu:** `https://carenova-baturay-ozden-s-projects.vercel.app/?host=admin`
+  (domain eklenince → `carenova-admin.vercel.app`, kurulum: `docs/host-setup.md`)
+
+Not: `?host=` fallback'i sadece `REACT_APP_DEMO_MODE=true` iken çalışır — canlı
+deploy'da bu env değişkeni zaten `true` (Vercel ayarı), yerel dev'de `.env.local`'a
+elle eklenmesi gerekir (varsayılan `false`).
+
 ## 🔗 Canlı URL — herkese açık, doğrulandı (HTTP 200)
 https://carenova-3ozfxp9b1-baturay-ozden-s-projects.vercel.app (reveal-hatası düzeltmesi sonrası son deploy)
 (veya kalıcı: https://carenova-baturay-ozden-s-projects.vercel.app)
@@ -851,5 +866,96 @@ koyup gerçekten test ederken yakaladım (ilk denemede eski dev server process'i
 PID'yi elle bulup `kill -9` ile öldürdüm). Düzeltme: `urlFor(mode, path)`
 yardımcı fonksiyonu — path'i HER ZAMAN query'den önce koyuyor
 (`${origin}${path}?host=${mode}`). `NavBar.tsx` buna geçirildi.
+
+**Route ağacı bölünmesi (`App.tsx`):** Üç ayrı `<Routes>` fonksiyonu
+(`MarketingRoutes`/`AppRoutes`) + admin için `React.lazy(() =>
+import('./admin/AdminApp'))`. `hostMode` (hosts.ts) hangisinin render
+edileceğine karar veriyor. **Doğrulandı (build çıktısı + network sekmesi):**
+production build'de admin AYRI bir chunk (`160.355b14da.chunk.js`, 4.72kB)
+olarak çıkıyor; `?host=app` ile dev server'da network isteklerini izledim,
+admin chunk'ı HİÇ istenmiyor — brief'in "app bundle'ında hiç mount
+edilmesin" kuralı (B.3 #3) gerçekten sağlanıyor, sadece kod satırında değil.
+
+**Auth mimarisi — beklenenden çok daha olgun çıktı:** `ProtectedRoute.tsx`
+ve `LoginPage.tsx`'te `PLATFORM_ROLES`/subdomain-redirect mantığı ZATEN
+vardı (muhtemelen CareDental'dan miras, ya da önceki bir oturumda
+eklenmiş — GECE-LOG'da hiç bahsi geçmiyor). Sıfırdan yazmak yerine:
+- Ortak `lib/roles.ts` eklendi (`PLATFORM_ROLES`, `isPlatformAdmin()`) —
+  ~20 dosyada bağımsız kopyaları olduğu tespit edildi (ProtectedRoute,
+  LoginPage, Sidebar, Dashboard, CommissionPage, SettingsPage, vb.).
+  **Mevcut 20 dosyayı refactor ETMEDİM** — bu gecenin kapsamı dışında, riski
+  faydasından fazla; sadece YENİ admin kodu ortak helper'ı kullanıyor.
+- `ProtectedRoute.tsx` ve `LoginPage.tsx`, ham `process.env.REACT_APP_*_URL`
+  yerine `hosts.ts`'in `hostUrls`'ini kullanacak şekilde güncellendi —
+  böylece subdomain-enforcement mantığı `?host=` ile yerel olarak da test
+  edilebiliyor (öncesinde SADECE gerçek env değişkenleri varken çalışıyordu).
+
+**Admin konsolu iskeleti (Bölüm C'nin gerçek ekranları DEĞİL — sadece B'nin
+gerektirdiği mimari):**
+- `admin/AdminLoginPage.tsx` — ayrı giriş formu (klinik LoginPage'i
+  paylaşmadım — ikisinin kural seti kökten farklı: admin'de tenant seçimi
+  yok, rol reddi VAR).
+- `admin/components/AdminProtectedRoute.tsx` — brief'in 🔴 "hiçbir koşulda
+  render edilmez" kuralının GERÇEK uygulama noktası (AdminLoginPage'in
+  kendi reddi sadece UX inceliği — biri doğrudan bir admin URL'sine
+  bookmark'lanmış/yabancı bir session'la gelirse asıl güvenlik sınırı bu
+  route guard).
+- `admin/AdminLayout.tsx` — sol sidebar (12 modül, Bölüm C'nin tam haritası)
+  + üst breadcrumb + tema/dil/çıkış.
+- `admin/pages/OverviewPage.tsx` — SADECE placeholder, Bölüm C.1 bunu
+  gerçek KPI panosuyla değiştirecek (ayrı commit).
+- Diğer 11 modül `AdminComingSoon` ile placeholder — Bölüm C ilerledikçe
+  tek tek gerçek sayfalarla değişecek.
+
+**Demo modunda admin rol testi — gerçek bir tasarım kararı:** Demo modunda
+`/auth/login` HER ZAMAN başarılı oluyor (herhangi bilgiyle), bu yüzden admin
+red ekranını (brief'in güvenlik kuralı #1) test etmenin doğal bir yolu
+yoktu. Çözüm: `demoData.ts`'e `DEMO_SUPER_ADMIN` eklendi;
+`demoAdapter.ts`'te admin host'ta giriş e-postası "clinic" içeriyorsa
+(örn. `clinic-owner@test.com`) klinik demo kullanıcısı döner, yoksa
+süper-admin döner. Bu SADECE demo-modu kolaylığı, gerçek backend'de ayrım
+`role` alanına göre olacak. `docs/host-setup.md`'ye not düşüldü.
+**Uçtan uca test edildi (JS ile form doldurup submit ederek):** normal
+e-posta → `/admin/overview`'a başarılı giriş, sidebar 12 modülü doğru
+gösteriyor; "clinic" içeren e-posta → red ekranı + "app.carenova.ai'ye git"
+linki doğru çalışıyor.
+
+**Bulunan ama tam çözülemeyen küçük hata (3-deneme kuralı gereği bırakıldı):**
+App host/admin host'ta kendi `AppMeta` render ETMEYEN sayfalar (Dashboard,
+vb.) için host-bazlı varsayılan sekme başlığı ("CareNova | Klinik Paneli")
+ayarlamaya çalıştım — `document.title = ...` ve sonra daha açık bir
+`setDefaultTitle()` yardımcı fonksiyonu (mevcut `<title>` elemanını bulup
+güncelleme, fazlalıkları silme) denedim, ikisinde de `<head>`'de İKİ
+`<title>` elemanı oluşuyor ve `document.title` getter'ı (spec gereği) İLK
+olanı döndürüyor — ki o boş "CareNova" kalıyor. Kök nedeni bulamadım
+(React 19'un native head-yönetimi ile ilgili bir etkileşim olabilir).
+**Etkisi sadece kozmetik** (tarayıcı sekmesi başlığı) — güvenlik/işlevsellik
+etkilenmiyor, `AppMeta` kullanan sayfalarda (Login, ComingSoon, vb.) sorun
+yok, sadece kullanmayan sayfalarda (Dashboard) varsayılan başlık
+göstermiyor. `BLOKAJLAR.md`'ye küçük/kozmetik olarak not düşüldü, 3.
+denemeden sonra bırakıldı, ilerlendi.
+
+**Ayrıca (fırsat buldukça düzeltilen, Bölüm B kapsamı dışı ama ilgili):**
+`ComingSoonPage.tsx` emoji (🚧) + ham `text-white`/`text-gray-400`
+kullanıyordu (muhtemelen Part A'nın token migrasyonu bu dosyayı atlamış) —
+`lucide-react`'in `Construction` ikonu + `text-ink`/`text-ink-muted`'a
+çevrildi, admin'in kendi `AdminComingSoon`'u zaten baştan doğru yazıldı.
+
+**Doğrulama:** `npm run build` temiz (yeni admin chunk'ı doğrulandı).
+`check:i18n-leaks` → TR:0 EN:0. `check:contrast` → TR:0 EN:0 (bu iki script
+sadece landing'i kontrol ediyor, kapsamları zaten bu — admin/app için ayrı
+bir otomatik kontrol YOK, elle `getComputedStyle`/JS ile doğrulandı yukarıda
+anlatıldığı gibi).
+
+**Kabul kriteri:** ✅ Build temiz, admin ayrı chunk. ✅ Marketing/app/admin
+üçü de `?host=` ile doğru render oluyor. ✅ ConsentBanner sadece marketing'de.
+✅ Admin red ekranı hem AdminLoginPage hem AdminProtectedRoute seviyesinde
+çalışıyor, ikisi de test edildi. ✅ i18n: yeni `admin` namespace TR+EN dolu.
+⚠️ Host-bazlı varsayılan sekme başlığı kozmetik olarak eksik kaldı (yukarıda
+detaylı).
+
+**Commit:** `feat(routing): three-host architecture with marketing/app/admin route trees`
+
+---
 
 

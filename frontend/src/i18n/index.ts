@@ -10,6 +10,7 @@ import trCases    from './locales/tr/cases.json';
 import trPatients from './locales/tr/patients.json';
 import trSettings from './locales/tr/settings.json';
 import trBilling  from './locales/tr/billing.json';
+import trAdmin    from './locales/tr/admin.json';
 
 import enCommon   from './locales/en/common.json';
 import enAuth     from './locales/en/auth.json';
@@ -19,6 +20,7 @@ import enCases    from './locales/en/cases.json';
 import enPatients from './locales/en/patients.json';
 import enSettings from './locales/en/settings.json';
 import enBilling  from './locales/en/billing.json';
+import enAdmin    from './locales/en/admin.json';
 
 export const defaultNS = 'common';
 
@@ -31,13 +33,13 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      tr: { common: trCommon, auth: trAuth, nav: trNav, landing: trLanding, cases: trCases, patients: trPatients, settings: trSettings, billing: trBilling },
-      en: { common: enCommon, auth: enAuth, nav: enNav, landing: enLanding, cases: enCases, patients: enPatients, settings: enSettings, billing: enBilling },
+      tr: { common: trCommon, auth: trAuth, nav: trNav, landing: trLanding, cases: trCases, patients: trPatients, settings: trSettings, billing: trBilling, admin: trAdmin },
+      en: { common: enCommon, auth: enAuth, nav: enNav, landing: enLanding, cases: enCases, patients: enPatients, settings: enSettings, billing: enBilling, admin: enAdmin },
     },
     fallbackLng: 'tr',
     supportedLngs: ['tr', 'en'],
     defaultNS,
-    ns: ['common', 'auth', 'nav', 'landing', 'cases', 'patients', 'settings', 'billing'],
+    ns: ['common', 'auth', 'nav', 'landing', 'cases', 'patients', 'settings', 'billing', 'admin'],
     interpolation: { escapeValue: false }, // React already escapes
     detection: {
       order: ['localStorage', 'navigator'],

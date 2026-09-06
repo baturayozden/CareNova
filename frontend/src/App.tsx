@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -38,21 +38,104 @@ import TermsPage from './pages/legal/TermsPage';
 import CookiePage from './pages/legal/CookiePage';
 import GdprPage from './pages/legal/GdprPage';
 import ComingSoonPage from './pages/ComingSoonPage';
+import { hostMode } from './config/hosts';
+import { setDefaultTitle } from './lib/setDefaultTitle';
 
-// Determine at runtime whether we're on an app/admin subdomain.
-// Two independent signals, either one is enough:
-//   1. REACT_APP_APP_URL / REACT_APP_ADMIN_URL env vars (set on Vercel, baked
-//      in at BUILD time — see docs/domain-setup.md) matched exactly.
-//   2. A plain "app." / "admin." hostname prefix, so routing still works
-//      correctly even if the env vars are never configured or a deploy
-//      forgets to set them — CRA env vars are easy to lose track of since
-//      they're build-time, not runtime.
-const hostname  = window.location.hostname;
-const appHost   = process.env.REACT_APP_APP_URL   ? new URL(process.env.REACT_APP_APP_URL).hostname   : null;
-const adminHost = process.env.REACT_APP_ADMIN_URL ? new URL(process.env.REACT_APP_ADMIN_URL).hostname : null;
-const isAppOrAdminSubdomain =
-  hostname.startsWith('app.') || hostname.startsWith('admin.') ||
-  (appHost && hostname === appHost) || (adminHost && hostname === adminHost);
+// The admin console is a real, separate route tree (GECE-2-BRIEFI.md Bölüm
+// B.3, güvenlik kuralı #3: "Admin route'ları app bundle'ında hiç mount
+// edilmesin"). React.lazy is what actually enforces that — it puts
+// AdminApp and everything it imports in its own webpack chunk, and that
+// chunk is only ever requested when the code path that imports it (the
+// hostMode==='admin' branch below) actually runs. A marketing or app-host
+// visitor's browser never fetches it, not even in the background.
+const AdminApp = React.lazy(() => import('./admin/AdminApp'));
+
+function AdminLoadingFallback() {
+  return (
+    <div className="flex h-screen items-center justify-center bg-surface-page">
+      <div className="w-10 h-10 border-4 border-line border-t-accent rounded-full animate-spin" />
+    </div>
+  );
+}
+
+// ── Marketing host (carenova.ai) ────────────────────────────────────────────
+function MarketingRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/blog" element={<BlogPage />} />
+      <Route path="/blog/:slug" element={<BlogPostPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/careers" element={<CareersPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/cookies" element={<CookiePage />} />
+      <Route path="/gdpr" element={<GdprPage />} />
+      <Route path="/payment-success" element={<PaymentSuccessPage />} />
+      <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />
+      {/* Anything else on the marketing host (including a stray /login or
+          /dashboard link) falls back to the landing page, not a 404 — this
+          host has no auth concept of its own. */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+// ── App host (app.carenova.ai) — clinic users ───────────────────────────────
+function AppRoutes() {
+  // Default tab title for routes that don't render their own <AppMeta> (most
+  // of the dashboard doesn't yet). Set imperatively (document.title, not a
+  // JSX <title>) specifically so it never competes with a page that DOES
+  // render its own AppMeta — React 19 hoists JSX <title> elements and the
+  // first one it finds wins (see AppMeta.tsx's own warning about mounting
+  // two at once); a plain imperative assignment sits outside that mechanism
+  // entirely, so a page's own AppMeta always overrides it on navigation,
+  // and it re-takes effect as the fallback the moment that page unmounts.
+  useEffect(() => { setDefaultTitle('CareNova | Klinik Paneli'); }, []);
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+      {/* ProtectedRoute (no roles= restriction here) still enforces the
+          platform-vs-clinic subdomain split: a super_admin/admin session
+          reaching this tree is hard-redirected to the admin host rather
+          than rendered a clinic dashboard (brief B.3 güvenlik kuralı #2 —
+          "sadece impersonation akışıyla, normal kullanıcı gibi değil";
+          the impersonation bypass itself is Bölüm C.10, not built yet). */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Layout />}>
+          <Route path="/dashboard"   element={<Dashboard />} />
+          <Route path="/leads"       element={<LeadsPage />} />
+          <Route path="/ai-activity" element={<AIActivityPage />} />
+          <Route path="/appointments"  element={<AppointmentsPage />} />
+          <Route path="/clinics"        element={<ClinicsPage />} />
+          <Route path="/clinics/:id"   element={<ClinicDetailPage />} />
+          <Route path="/settings"              element={<SettingsPage />} />
+          <Route path="/settings/integrations" element={<SettingsPage initialTab="integrations" />} />
+          <Route path="/commission"             element={<CommissionPage />} />
+          <Route path="/patients"              element={<PatientsListPage />} />
+          <Route path="/patients/:leadId"     element={<PatientProfilePage />} />
+          <Route path="/payments"              element={<PaymentsPage />} />
+          <Route path="/payments/:id"          element={<CaseDetailPage />} />
+          <Route path="/invoices"              element={<InvoicesPage />} />
+          <Route path="/demo-requests"         element={<DemoRequestsPage />} />
+          <Route path="/cases"          element={<ComingSoonPage title="Vakalar" />} />
+          <Route path="/doctor-queue"   element={<ComingSoonPage title="Doktor Onayı" />} />
+          <Route path="/quotes"         element={<ComingSoonPage title="Teklifler" />} />
+          <Route path="/travel"         element={<ComingSoonPage title="Seyahat" />} />
+          <Route path="/aftercare"      element={<ComingSoonPage title="Bakım Hattı" />} />
+          <Route path="/reports"        element={<ComingSoonPage title="Raporlar" />} />
+        </Route>
+      </Route>
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  );
+}
 
 export default function App() {
   // Safety net for scroll-reveal (Framer Motion whileInView/animate) content:
@@ -116,55 +199,17 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <ScrollToHash />
-      {/* Cookie consent — landing host only; not shown on app/admin subdomains */}
-      {!isAppOrAdminSubdomain && <ConsentBanner />}
+      {/* Cookie consent — marketing host only. app/admin have no anonymous
+          visitors and no analytics/marketing cookies to ask consent for. */}
+      {hostMode === 'marketing' && <ConsentBanner />}
       <AuthProvider>
-        <Routes>
-          {/* Public */}
-          <Route path="/"             element={isAppOrAdminSubdomain ? <Navigate to="/login" replace /> : <LandingPage />} />
-          <Route path="/login"            element={<LoginPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password"  element={<ResetPasswordPage />} />
-          <Route path="/unauthorized"    element={<UnauthorizedPage />} />
-          <Route path="/privacy"  element={<PrivacyPage />} />
-          <Route path="/terms"    element={<TermsPage />} />
-          <Route path="/cookies"  element={<CookiePage />} />
-          <Route path="/gdpr"     element={<GdprPage />} />
-          <Route path="/about"    element={<AboutPage />} />
-          <Route path="/contact"  element={<ContactPage />} />
-          <Route path="/blog"          element={isAppOrAdminSubdomain ? <Navigate to="/login" replace /> : <BlogPage />} />
-          <Route path="/blog/:slug"    element={isAppOrAdminSubdomain ? <Navigate to="/login" replace /> : <BlogPostPage />} />
-          <Route path="/careers"          element={<CareersPage />} />
-          <Route path="/payment-success"  element={<PaymentSuccessPage />} />
-          <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />
-
-          {/* Protected — all wrapped in shared Layout */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<Layout />}>
-              <Route path="/dashboard"   element={<Dashboard />} />
-              <Route path="/leads"       element={<LeadsPage />} />
-              <Route path="/ai-activity" element={<AIActivityPage />} />
-              <Route path="/appointments"  element={<AppointmentsPage />} />
-              <Route path="/clinics"        element={<ClinicsPage />} />
-              <Route path="/clinics/:id"   element={<ClinicDetailPage />} />
-              <Route path="/settings"              element={<SettingsPage />} />
-              <Route path="/settings/integrations" element={<SettingsPage initialTab="integrations" />} />
-              <Route path="/commission"             element={<CommissionPage />} />
-              <Route path="/patients"              element={<PatientsListPage />} />
-              <Route path="/patients/:leadId"     element={<PatientProfilePage />} />
-              <Route path="/payments"              element={<PaymentsPage />} />
-              <Route path="/payments/:id"          element={<CaseDetailPage />} />
-              <Route path="/invoices"              element={<InvoicesPage />} />
-              <Route path="/demo-requests"         element={<DemoRequestsPage />} />
-              <Route path="/cases"          element={<ComingSoonPage title="Vakalar" />} />
-              <Route path="/doctor-queue"   element={<ComingSoonPage title="Doktor Onayı" />} />
-              <Route path="/quotes"         element={<ComingSoonPage title="Teklifler" />} />
-              <Route path="/travel"         element={<ComingSoonPage title="Seyahat" />} />
-              <Route path="/aftercare"      element={<ComingSoonPage title="Bakım Hattı" />} />
-              <Route path="/reports"        element={<ComingSoonPage title="Raporlar" />} />
-            </Route>
-          </Route>
-        </Routes>
+        {hostMode === 'marketing' && <MarketingRoutes />}
+        {hostMode === 'app' && <AppRoutes />}
+        {hostMode === 'admin' && (
+          <Suspense fallback={<AdminLoadingFallback />}>
+            <AdminApp />
+          </Suspense>
+        )}
       </AuthProvider>
     </BrowserRouter>
     </ThemeProvider>

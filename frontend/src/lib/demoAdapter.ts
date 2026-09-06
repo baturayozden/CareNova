@@ -1,8 +1,21 @@
 import type { AxiosAdapter, AxiosResponse } from 'axios';
 import {
-  DEMO_USER, DEMO_TENANT_ID, DEMO_TENANT_NAME,
+  DEMO_USER, DEMO_SUPER_ADMIN, DEMO_TENANT_ID, DEMO_TENANT_NAME,
   demoLeads, demoMessages, demoConversations, demoActivityEvents, demoStats,
 } from '../data/demoData';
+import { hostMode } from '../config/hosts';
+
+// Which demo user "is logged in" on this host. On the admin host this is
+// the platform super-admin — UNLESS the login form was given an email
+// containing "clinic", which deliberately returns the clinic demo user
+// instead so the admin-host role-rejection screen is reachable without a
+// real backend (see DEMO_SUPER_ADMIN's comment in data/demoData.ts).
+function currentDemoUser(loginEmail?: string) {
+  if (hostMode === 'admin') {
+    return loginEmail?.toLowerCase().includes('clinic') ? DEMO_USER : DEMO_SUPER_ADMIN;
+  }
+  return DEMO_USER;
+}
 
 // REACT_APP_DEMO_MODE adapter — intercepts every request Axios would otherwise
 // send over the network and returns realistic seed data instead, with a
@@ -38,14 +51,25 @@ const demoAdapter: AxiosAdapter = async (config) => {
 
   // ── Auth ───────────────────────────────────────────────────────────────
   if (url === '/auth/login' && method === 'post') {
+    const user = currentDemoUser(body.email);
+    // /auth/me has no email to go on (page-reload session rehydration, not
+    // a fresh login) — remember which demo user this was so a reload on
+    // the admin host doesn't silently flip a "clinic" test login back to
+    // the default super-admin.
+    try { window.localStorage.setItem('carenova_demo_user_id', user.id); } catch { /* ignore */ }
     return ok({
-      user: DEMO_USER,
+      user,
       accessToken: 'demo-access-token',
       refreshToken: 'demo-refresh-token',
     }) as AxiosResponse;
   }
   if (url === '/auth/me' && method === 'get') {
-    return ok({ user: DEMO_USER }) as AxiosResponse;
+    let storedId: string | null = null;
+    try { storedId = window.localStorage.getItem('carenova_demo_user_id'); } catch { /* ignore */ }
+    const user = storedId === DEMO_USER.id ? DEMO_USER
+      : storedId === DEMO_SUPER_ADMIN.id ? DEMO_SUPER_ADMIN
+      : currentDemoUser();
+    return ok({ user }) as AxiosResponse;
   }
   if (url === '/auth/my-tenants' && method === 'get') {
     return ok({ tenants: [{ tenantId: DEMO_TENANT_ID, tenantName: DEMO_TENANT_NAME, role: DEMO_USER.role }] }) as AxiosResponse;

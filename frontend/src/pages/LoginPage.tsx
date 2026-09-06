@@ -5,34 +5,36 @@ import { useAuth, User, TenantChoice } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import AppMeta from '../components/AppMeta';
 import { DEMO_MODE } from '../lib/api';
+import { isPlatformAdmin } from '../lib/roles';
+import { hostUrls } from '../config/hosts';
 import carenovaLogoDark  from '../assets/carenova-logo-transparent-dark.svg';
 import carenovaLogoLight from '../assets/carenova-logo-transparent-light.svg';
 
-const PLATFORM_ROLES: User['role'][] = ['super_admin', 'admin'];
-
-const APP_URL   = process.env.REACT_APP_APP_URL   || '';
-const ADMIN_URL = process.env.REACT_APP_ADMIN_URL  || '';
-
 /**
- * After login, send the user to the correct subdomain.
+ * After login, send the user to the correct subdomain. This LoginPage only
+ * mounts in the app-host route tree (App.tsx) — a platform role reaching it
+ * means they mistakenly used app.carenova.ai/login instead of the admin
+ * host, so they're bounced to admin's dashboard rather than shown a normal
+ * clinic dashboard (brief requirement: "Süper admin app host'una girerse:
+ * sadece impersonation akışıyla, normal kullanıcı gibi değil").
  *
  * Rules:
  *   super_admin / admin  →  admin.carenova.ai/dashboard
  *   everyone else        →  app.carenova.ai/dashboard
  *
- * In local dev (env vars blank) falls back to React Router navigate('/dashboard')
- * so nothing breaks without extra env setup.
+ * Uses hosts.ts (not raw env vars) so this is exercisable locally via
+ * ?host=app, not only with a real app.carenova.ai domain.
  */
 function redirectAfterLogin(user: User, navigate: ReturnType<typeof useNavigate>): void {
-  const isPlatformAdmin = PLATFORM_ROLES.includes(user.role);
-  const targetBase = isPlatformAdmin ? ADMIN_URL : APP_URL;
+  const targetBase = isPlatformAdmin(user.role) ? hostUrls.admin : hostUrls.app;
 
-  if (targetBase && !window.location.href.startsWith(targetBase)) {
-    // Cross-subdomain redirect — token is already in localStorage, will be read on the other side
-    window.location.href = `${targetBase}/dashboard`;
-  } else {
+  if (hostUrls.app === hostUrls.admin) {
+    // Same origin (local dev, no domains/env vars yet) — plain SPA nav.
     navigate('/dashboard');
+    return;
   }
+  // Cross-subdomain redirect — token is already in localStorage, will be read on the other side.
+  window.location.href = `${targetBase}/dashboard`;
 }
 
 // ── Shared card wrapper ───────────────────────────────────────────────────────

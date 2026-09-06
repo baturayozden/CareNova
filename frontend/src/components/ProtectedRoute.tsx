@@ -1,23 +1,24 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth, User } from '../context/AuthContext';
+import { PLATFORM_ROLES } from '../lib/roles';
+import { hostUrls } from '../config/hosts';
 
 interface ProtectedRouteProps {
   roles?: string[];
 }
 
-const PLATFORM_ROLES: User['role'][] = ['super_admin', 'admin'];
-
-const APP_URL   = process.env.REACT_APP_APP_URL   || '';
-const ADMIN_URL = process.env.REACT_APP_ADMIN_URL || '';
-
 /**
- * Returns the correct home base URL for a given role, or null in local dev
- * (env vars not set) where subdomain enforcement is skipped.
+ * Returns the correct home base URL for a given role, or null when the app
+ * and admin hosts resolve to the SAME origin (local dev with no env vars
+ * and demo mode off) — enforcement would just redirect to itself in a loop.
+ * Uses hosts.ts (not raw env vars) so this is exercisable locally via
+ * ?host=app / ?host=admin, not only with real app.carenova.ai/admin.carenova.ai
+ * domains — see docs/host-setup.md.
  */
 function correctBaseForRole(role: User['role']): string | null {
-  if (!APP_URL || !ADMIN_URL) return null; // local dev — no enforcement
-  return PLATFORM_ROLES.includes(role) ? ADMIN_URL : APP_URL;
+  if (hostUrls.app === hostUrls.admin) return null;
+  return PLATFORM_ROLES.includes(role) ? hostUrls.admin : hostUrls.app;
 }
 
 export default function ProtectedRoute({ roles }: ProtectedRouteProps) {

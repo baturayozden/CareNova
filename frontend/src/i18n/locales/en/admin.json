@@ -1,0 +1,22 @@
+{
+  "platformLabel": "Platform",
+  "navLabel": "Admin menu",
+  "roleLabel": "Platform Administrator",
+  "lightMode": "Light",
+  "darkMode": "Dark",
+  "signOut": "Sign out",
+  "nav": {
+    "overview": "Overview",
+    "clinics": "Clinics",
+    "onboarding": "Onboarding Tracker",
+    "whatsapp": "WhatsApp Lines",
+    "aiUsage": "AI Usage & Quota",
+    "branches": "Branch Templates",
+    "compliance": "Compliance Panel",
+    "demoRequests": "Demo Requests",
+    "billing": "Billing",
+    "users": "Users",
+    "audit": "Audit Log",
+    "health": "Platform Health"
+  }
+}

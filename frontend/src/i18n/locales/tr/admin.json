@@ -1,0 +1,22 @@
+{
+  "platformLabel": "Platform",
+  "navLabel": "Admin menüsü",
+  "roleLabel": "Platform Yöneticisi",
+  "lightMode": "Açık",
+  "darkMode": "Koyu",
+  "signOut": "Çıkış yap",
+  "nav": {
+    "overview": "Genel Bakış",
+    "clinics": "Klinikler",
+    "onboarding": "Onboarding Takibi",
+    "whatsapp": "WhatsApp Hatları",
+    "aiUsage": "AI Kullanım ve Kota",
+    "branches": "Branş Şablonları",
+    "compliance": "Uyum Paneli",
+    "demoRequests": "Demo Talepleri",
+    "billing": "Faturalama",
+    "users": "Kullanıcılar",
+    "audit": "Denetim Kaydı",
+    "health": "Platform Sağlığı"
+  }
+}

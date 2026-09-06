@@ -26,6 +26,25 @@ export const DEMO_USER = {
   financeEnabled: true,
 };
 
+// Platform-role demo user for the admin host (admin.carenova.ai). demoAdapter
+// returns this instead of DEMO_USER when hostMode==='admin' — see
+// lib/demoAdapter.ts. Typing an email containing "clinic" on the admin
+// login form returns DEMO_USER instead, specifically so the "wrong role"
+// rejection screen (GECE-2-BRIEFI.md Bölüm B.3 güvenlik kuralı #1) has a
+// way to be exercised in demo mode, since a real backend would otherwise be
+// needed to produce a non-platform user on that host.
+export const DEMO_SUPER_ADMIN = {
+  id: 'demo-super-admin-1',
+  email: 'admin@carenova.ai',
+  firstName: 'Baturay',
+  lastName: 'Özden',
+  role: 'super_admin' as const,
+  tenantId: null,
+  phone: null,
+  avatarUrl: null,
+  financeEnabled: true,
+};
+
 export const demoLeads: ApiLead[] = [
   {
     id: 'lead-1', tenantId: DEMO_TENANT_ID, tenantName: DEMO_TENANT_NAME,

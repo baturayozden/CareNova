@@ -56,3 +56,35 @@ eklenenler, hata verirlerse önce onlara bak.
 çıkarabilir.
 
 **Aciliyet:** Orta — backend deploy edilene kadar acil değil.
+
+---
+
+## B4 — Kendi AppMeta'sını render etmeyen sayfalarda host-bazlı varsayılan sekme başlığı çalışmıyor (kozmetik, düşük öncelik)
+
+**Ne oldu:** GECE-2-BRIEFI.md Bölüm B.3 madde 5, her host'un kendi varsayılan
+`<title>`'ına sahip olmasını istiyor ("CareNova | Klinik Paneli" app için,
+"CareNova | Platform" admin için). `AppMeta` render eden sayfalarda (Login,
+ComingSoon, vb.) sorun yok. Ama Dashboard gibi hiç `AppMeta` render etmeyen
+sayfalarda, host-bazlı varsayılanı ayarlamak için `document.title = ...`
+sonra daha açık bir `setDefaultTitle()` yardımcı fonksiyonu (mevcut
+`<title>` elemanını bulup güncelleme, fazlalıkları temizleme) denedim — her
+ikisinde de `<head>`'de İKİ `<title>` elemanı oluşuyor
+(`frontend/src/lib/setDefaultTitle.ts`'te tam açıklama var), ve
+`document.title` getter'ı (spec gereği ilk elemanı döndürür) boş kalan
+"CareNova" değerini gösteriyor.
+
+**Kök neden bulunamadı** — React 19'un native head-yönetimi (title/meta/link
+hoisting) ile ilgili bir etkileşim olabilir ama tam izini süremedim. 3
+deneme kuralı gereği bıraktım.
+
+**Etkisi:** SADECE kozmetik — tarayıcı sekmesi/geçmişinde host'a özel bir
+varsayılan başlık yerine boş "CareNova" görünüyor, kendi AppMeta'sı olan
+sayfalarda (çoğu kritik ekran) hiçbir etkisi yok. Güvenlik/işlevsellik
+etkilenmiyor.
+
+**Ne gerekiyor:** React 19'un `<title>`/head-hoisting mekanizmasının bu
+projedeki (CRA + react-router + iki ayrı `useEffect` kaynağı) tam
+davranışının araştırılması, ya da her app/admin sayfasına kendi `AppMeta`'sını
+eklemek (daha kesin ama daha çok dosya değişikliği gerektirir).
+
+**Aciliyet:** Düşük — kozmetik, işlevsel hiçbir şeyi engellemiyor.
