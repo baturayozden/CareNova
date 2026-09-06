@@ -1783,7 +1783,7 @@ ekran görüntüsü kullanılmadan doğrulandı (rehber DEĞİL ama bu ölçüml
 için gerek yoktu). `npx tsc --noEmit`, `CI=true npm run build`,
 `node scripts/check-i18n-leaks.js` (0/0) hepsi temiz.
 
-**Commit:** (aşağıda)
+**Commit:** `66f60bd` — "fix(theme): dark theme --ink-subtle contrast, stray title tag (B4/B6)"
 
 ---
 
