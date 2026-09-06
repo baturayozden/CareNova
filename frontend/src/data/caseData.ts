@@ -47,7 +47,7 @@ export interface CaseFile {
     doctorNote: string;
     aiExtraction: string; // doctor/admin-only — never shown to patient
   };
-  quotes: { version: number; amountEur: number; items: string[]; locked: boolean; changeReason?: string }[];
+  quotes: { version: number; amountEur: number; items: string[]; locked: boolean; changeReason?: string; validUntil?: string }[];
   travel: { flight: string; hotel: string; transfer: string; itinerary: { day: string; plan: string }[] } | null;
   aftercare: { day: string; contactedAt: string | null; response: string | null; photoUploaded: boolean }[];
   auditLog: { actor: string; action: string; at: string }[];
@@ -60,6 +60,7 @@ const now = new Date('2026-09-07T08:00:00Z');
 // otherwise renders as a negative, nonsensical "-646 dk önce".
 export const DEMO_NOW_MS = now.getTime();
 const daysAgo = (n: number) => new Date(now.getTime() - n * 86400000).toISOString();
+const daysFromNow = (n: number) => new Date(now.getTime() + n * 86400000).toISOString();
 const hoursAgo = (n: number) => new Date(now.getTime() - n * 3600000).toISOString();
 
 export const caseDoctors = [
@@ -108,7 +109,7 @@ export const cases: CaseFile[] = [
     timeline: [{ status: 'new', at: daysAgo(2) }, { status: 'qualified', at: hoursAgo(2) }],
     messages: [
       { side: 'in', text: 'مرحباً، أحتاج زراعة أسنان', translation: 'Merhaba, diş implantına ihtiyacım var', at: daysAgo(2) },
-      { side: 'out', text: 'أهلاً! هل يمكنك إرسال صورة بانورامية إن وجدت؟', translation: 'Merhaba! Varsa panoramik fotoğraf gönderebilir misiniz?', at: daysAgo(2) },
+      { side: 'out', text: 'أهلاً! هل يمكنك إرسال صورة بانورامية إن وجدت؟', translation: 'Merhaba! Varsa panoramik fotoğraf gönderebilir misiniz?', at: hoursAgo(47.9) },
     ],
     medicalFile: { preAssessment: [{ q: 'Eksik diş sayısı', a: '4' }], uploadedImages: 2, doctorDecision: 'pending', doctorNote: '', aiExtraction: '' },
     quotes: [], travel: null, aftercare: [],
@@ -122,7 +123,7 @@ export const cases: CaseFile[] = [
     timeline: [{ status: 'new', at: daysAgo(3) }, { status: 'qualified', at: daysAgo(2) }, { status: 'pre_assessment', at: hoursAgo(5) }],
     messages: [
       { side: 'in', text: 'Hallo, ich interessiere mich für eine Haartransplantation. Können Sie mir einen Preis nennen?', translation: 'Merhaba, saç ekimi ile ilgileniyorum. Fiyat verebilir misiniz?', at: daysAgo(3) },
-      { side: 'out', text: 'Hallo! 😊 Könnten Sie uns 3 Fotos schicken (Vorderansicht, Oberkopf, Spenderbereich)?', translation: 'Merhaba! 😊 3 fotoğraf gönderir misiniz (ön, tepe, donör bölge)?', at: daysAgo(3) },
+      { side: 'out', text: 'Hallo! 😊 Könnten Sie uns 3 Fotos schicken (Vorderansicht, Oberkopf, Spenderbereich)?', translation: 'Merhaba! 😊 3 fotoğraf gönderir misiniz (ön, tepe, donör bölge)?', at: hoursAgo(71.93) },
       { side: 'in', text: '[3 Fotos gesendet]', at: daysAgo(2), hasPhoto: true },
     ],
     medicalFile: { preAssessment: [{ q: 'Norwood evresi (fotoğraftan)', a: '4' }, { q: 'Kronik hastalık', a: 'Yok' }], uploadedImages: 3, doctorDecision: 'pending', doctorNote: '', aiExtraction: 'Norwood 4, donör yoğunluk iyi, ~3200-3800 greft tahmini' },
@@ -151,7 +152,7 @@ export const cases: CaseFile[] = [
     timeline: [{ status: 'new', at: daysAgo(6) }, { status: 'qualified', at: daysAgo(5) }, { status: 'pre_assessment', at: daysAgo(4) }, { status: 'awaiting_doctor', at: daysAgo(2) }, { status: 'quoted', at: hoursAgo(12) }],
     messages: [{ side: 'in', text: "Hi! I'm interested in a rhinoplasty consultation.", at: daysAgo(6) }],
     medicalFile: { preAssessment: [{ q: 'İlgilenilen prosedür', a: 'Rinoplasti' }], uploadedImages: 4, doctorDecision: 'eligible', doctorNote: 'Uygun, standart rinoplasti planı.', aiExtraction: '' },
-    quotes: [{ version: 1, amountEur: 5200, items: ['Rinoplasti', '2 gece hastane', 'Transfer'], locked: true }],
+    quotes: [{ version: 1, amountEur: 5200, items: ['Rinoplasti', '2 gece hastane', 'Transfer'], locked: true, validUntil: daysFromNow(2) }],
     travel: null, aftercare: [],
     auditLog: [{ actor: 'Dr. Selin Kaya', action: 'Uygun olarak onaylandı', at: daysAgo(1) }, { actor: 'Sistem', action: 'Kilitli teklif gönderildi', at: hoursAgo(12) }],
   },
@@ -163,7 +164,7 @@ export const cases: CaseFile[] = [
     timeline: [{ status: 'new', at: daysAgo(10) }, { status: 'quoted', at: daysAgo(3) }, { status: 'awaiting_deposit', at: daysAgo(1) }],
     messages: [{ side: 'in', text: 'Здравствуйте! Интересует лазерная коррекция зрения.', translation: 'Merhaba! Lazer göz ameliyatı ile ilgileniyorum.', at: daysAgo(10) }],
     medicalFile: { preAssessment: [], uploadedImages: 2, doctorDecision: 'eligible', doctorNote: 'Uygun.', aiExtraction: '' },
-    quotes: [{ version: 1, amountEur: 2100, items: ['Bilateral LASIK', 'Kontrol muayeneleri'], locked: true }],
+    quotes: [{ version: 1, amountEur: 2100, items: ['Bilateral LASIK', 'Kontrol muayeneleri'], locked: true, validUntil: daysFromNow(0.5) }],
     travel: null, aftercare: [],
     auditLog: [{ actor: 'Sistem', action: 'Depozito linki gönderildi', at: daysAgo(1) }],
   },
@@ -236,7 +237,7 @@ export const cases: CaseFile[] = [
       { day: 'D+7', contactedAt: daysAgo(23), response: 'Kabuklanma normal seyrediyor', photoUploaded: true },
       { day: 'D+14', contactedAt: daysAgo(16), response: 'Kaşıntı var, normal denildi', photoUploaded: true },
       { day: 'D+30', contactedAt: daysAgo(7), response: 'Yeni çıkışlar görülüyor', photoUploaded: true },
-      { day: 'D+90', contactedAt: null, response: null, photoUploaded: false },
+      { day: 'D+90', contactedAt: hoursAgo(14), response: null, photoUploaded: false },
     ],
     auditLog: [{ actor: 'AI', action: 'D+30 bakım mesajı gönderildi', at: daysAgo(7) }],
   },
@@ -271,9 +272,30 @@ export const cases: CaseFile[] = [
     estimatedValueEur: 0, lastActivityAt: hoursAgo(10),
     timeline: [{ status: 'pre_assessment', at: daysAgo(1) }, { status: 'medically_ineligible', at: hoursAgo(10) }],
     messages: [{ side: 'in', text: 'Здравствуйте, нам нужна донорская яйцеклетка.', translation: 'Merhaba, donör yumurtaya ihtiyacımız var.', at: daysAgo(1) },
-      { side: 'out', text: 'Донорские яйцеклетки и сперма не разрешены в Турции по закону.', translation: 'Donör yumurta ve sperm Türkiye\'de yasal olarak izin verilmiyor.', at: daysAgo(1) }],
+      { side: 'out', text: 'Донорские яйцеклетки и сперма не разрешены в Турции по закону.', translation: 'Donör yumurta ve sperm Türkiye\'de yasal olarak izin verilmiyor.', at: hoursAgo(23.967) }],
     medicalFile: { preAssessment: [{ q: 'Donör gamet ihtiyacı', a: 'Evet' }], uploadedImages: 0, doctorDecision: 'ineligible', doctorNote: 'Donör gamet Türkiye\'de yasal değil — branş şablonu kuralı gereği vaka kapatıldı.', aiExtraction: '' },
     quotes: [], travel: null, aftercare: [],
     auditLog: [{ actor: 'Dr. Kerem Ateş', action: 'Tıbben uygun değil — donör gamet yasağı', at: hoursAgo(10) }],
   },
+];
+
+// "Bugünün programı" (GECE-3-BRIEFI.md Bölüm C) — demo-only, hand-picked
+// same-day schedule. The real backend models this per-case as
+// `case_timeline` (day_offset/starts_at/ends_at/type — migration 057), but
+// no case in `cases` above carries clock-time-scheduled events, only
+// day-label travel itineraries. Rather than bolt clock times onto that
+// loosely-typed field, this is a small standalone illustrative list —
+// clearly demo, consistent with the "never present fabricated data as if
+// real" rule already applied elsewhere (adminDemoData's trend line, etc.).
+export type ScheduleEntry = {
+  time: string;
+  caseId: string;
+  patientName: string;
+  type: 'arrival' | 'consultation' | 'procedure' | 'checkup' | 'departure';
+};
+export const todaysSchedule: ScheduleEntry[] = [
+  { time: '09:00', caseId: 'case-9', patientName: 'Hassan Baig', type: 'consultation' },
+  { time: '11:30', caseId: 'case-10', patientName: 'Marco Rossi', type: 'checkup' },
+  { time: '14:00', caseId: 'case-8', patientName: 'David Kim', type: 'arrival' },
+  { time: '16:00', caseId: 'case-7', patientName: 'Fatima Zohra', type: 'procedure' },
 ];

@@ -1,212 +1,289 @@
-import React, { useState } from 'react';
-import StatsCards from './StatsCards';
-import LeadsTable from './LeadsTable';
-import ActivityFeed from './ActivityFeed';
-import { useDashboard } from '../hooks/useDashboard';
-import { Lead } from '../types';
-import { useNavigate } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { Link, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import {
+  Clock3, MessageCircleMore, Stethoscope, Wallet, CheckCircle2,
+  ArrowRight, X, Stethoscope as ProcedureIcon, ClipboardCheck,
+  PlaneLanding, PlaneTakeoff,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import api from '../lib/api';
-import MyCommissionCard from './MyCommissionCard';
-import { Flame, Thermometer, Snowflake, Ghost, Target } from 'lucide-react';
+import AppMeta from './AppMeta';
+import { cases, CaseFile, DEMO_NOW_MS, todaysSchedule, ScheduleEntry } from '../data/caseData';
 
-type IconComponent = React.ComponentType<{ size?: number; className?: string }>;
+// GECE-3-BRIEFI.md Bölüm C — replaces CareDental's inherited lead board
+// (Bulgu 3: "Total Leads 4" while /cases showed 15 cases — two screens
+// contradicting each other, plus a meaningless single-tenant "Clinic"
+// column and no first-response-time anywhere). This dashboard is built
+// entirely on the same case demo data as /cases and /doctor-queue — there
+// is no per-tenant lead concept left to show here.
 
-const SCORE_STYLES: Record<string, { badge: string; icon: IconComponent }> = {
-  'Hot':        { badge: 'bg-red-900/50 text-red-300 border-red-700/60',         icon: Flame       },
-  'Warm':       { badge: 'bg-yellow-900/50 text-yellow-300 border-yellow-700/60', icon: Thermometer },
-  'Cool':       { badge: 'bg-blue-900/50 text-blue-300 border-blue-700/60',       icon: Snowflake   },
-  'Ghost Risk': { badge: 'bg-gray-800 text-gray-500 border-gray-600',             icon: Ghost       },
+// ── Role → dashboard variant ────────────────────────────────────────────
+// CareNova's 7 roles (klinik_sahibi/operasyon_muduru/hasta_danismani/
+// doktor/koordinator/tercuman/muhasebe) don't exist in the backend yet —
+// that's Bölüm E, later tonight. Mapped here against BOTH the target
+// names and today's live CareDental role strings, using Bölüm E.1's own
+// eşleme tablosu (director→operasyon_muduru, clinic_admin→klinik_sahibi,
+// treatment_coordinator→hasta_danismani, dentist→doktor,
+// receptionist→koordinator, sales→hasta_danismani), so this keeps working
+// unchanged once Bölüm E's migration actually renames the roles tonight —
+// today's demo user (role: 'director') already resolves correctly.
+type Variant = 'doctor' | 'coordinator' | 'accounting' | 'consultant' | 'full';
+const ROLE_VARIANT: Record<string, Variant> = {
+  doktor: 'doctor', dentist: 'doctor', doctor: 'doctor',
+  koordinator: 'coordinator', receptionist: 'coordinator',
+  muhasebe: 'accounting',
+  hasta_danismani: 'consultant', treatment_coordinator: 'consultant', sales: 'consultant',
+  klinik_sahibi: 'full', operasyon_muduru: 'full', clinic_admin: 'full', director: 'full',
+};
+function resolveVariant(role?: string): Variant {
+  return (role && ROLE_VARIANT[role]) || 'full';
+}
+
+// ── KPI computations (from the same case demo data /cases uses) ────────
+function lastMessageSide(c: CaseFile): 'in' | 'out' | null {
+  if (c.messages.length === 0) return null;
+  return c.messages[c.messages.length - 1].side;
+}
+
+function averageFirstResponseMinutes(): number | null {
+  const deltas: number[] = [];
+  for (const c of cases) {
+    for (let i = 0; i < c.messages.length - 1; i++) {
+      if (c.messages[i].side === 'in' && c.messages[i + 1].side === 'out') {
+        const mins = (new Date(c.messages[i + 1].at).getTime() - new Date(c.messages[i].at).getTime()) / 60000;
+        if (mins >= 0) deltas.push(mins);
+      }
+    }
+  }
+  if (deltas.length === 0) return null;
+  return Math.round(deltas.reduce((a, b) => a + b, 0) / deltas.length);
+}
+
+function isToday(iso: string): boolean {
+  const d = new Date(iso), n = new Date(DEMO_NOW_MS);
+  return d.getUTCFullYear() === n.getUTCFullYear() && d.getUTCMonth() === n.getUTCMonth() && d.getUTCDate() === n.getUTCDate();
+}
+function isThisMonth(iso: string): boolean {
+  const d = new Date(iso), n = new Date(DEMO_NOW_MS);
+  return d.getUTCFullYear() === n.getUTCFullYear() && d.getUTCMonth() === n.getUTCMonth();
+}
+
+const SCHEDULE_ICON: Record<ScheduleEntry['type'], typeof PlaneLanding> = {
+  arrival: PlaneLanding, departure: PlaneTakeoff, consultation: Stethoscope,
+  procedure: ProcedureIcon, checkup: ClipboardCheck,
 };
 
-function HotLeadsCard({ leads }: { leads: Lead[] }) {
-  const navigate  = useNavigate();
-  const hotLeads  = leads
-    .filter(l => l.leadScore !== null && l.leadScore >= 75)
-    .sort((a, b) => (b.leadScore ?? 0) - (a.leadScore ?? 0))
-    .slice(0, 5);
-
+function KpiCard({ Icon, label, value, tone, big }: { Icon: typeof Clock3; label: string; value: string; tone?: 'accent' | 'warning' | 'danger'; big?: boolean }) {
+  const toneCls = tone === 'accent' ? 'text-accent' : tone === 'warning' ? 'text-warning' : tone === 'danger' ? 'text-danger' : 'text-ink';
   return (
-    <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
-      <div className="px-5 py-4 border-b border-surface-sunken flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Flame size={16} className="text-red-300" />
-          <h3 className="text-white font-semibold text-sm">Hot Leads</h3>
-          {hotLeads.length > 0 && (
-            <span className="bg-red-900/50 text-red-300 border border-red-700/60 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-              {hotLeads.length}
-            </span>
-          )}
-        </div>
-        <button
-          onClick={() => navigate('/leads')}
-          className="text-xs text-accent hover:text-accent-hover transition-colors"
-        >
-          View all →
-        </button>
+    <div className="rounded-xl border border-line bg-surface p-4">
+      <div className="flex items-center gap-2 text-ink-subtle mb-2">
+        <Icon size={16} strokeWidth={1.75} aria-hidden="true" />
+        <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
       </div>
+      <p className={`font-display ${big ? 'text-3xl' : 'text-2xl'} ${toneCls}`}>{value}</p>
+    </div>
+  );
+}
 
-      {hotLeads.length === 0 ? (
-        <div className="px-5 py-8 text-center text-gray-500 text-sm">
-          No hot leads yet.<br />
-          <span className="text-xs text-gray-600">Score 75+ required</span>
+const ONBOARDING_DISMISS_KEY = 'carenova_onboarding_card_dismissed';
+// Demo-only static progress — CareNova's own 7-step wizard (M11) isn't
+// built tonight (see docs/onboarding-wizard-status.md), so there's no
+// real progress to read yet.
+const ONBOARDING_STEPS_DONE = 3;
+const ONBOARDING_STEPS_TOTAL = 7;
+
+function OnboardingCard({ t }: { t: (k: string, o?: any) => any }) {
+  const [dismissed, setDismissed] = useState(() => {
+    try { return localStorage.getItem(ONBOARDING_DISMISS_KEY) === '1'; } catch { return false; }
+  });
+  if (dismissed) return null;
+  const pct = Math.round((ONBOARDING_STEPS_DONE / ONBOARDING_STEPS_TOTAL) * 100);
+  return (
+    <div className="rounded-xl border border-accent/30 bg-accent-soft p-4 flex items-center gap-4">
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-ink">{t('dashboard.onboarding.title', { done: ONBOARDING_STEPS_DONE, total: ONBOARDING_STEPS_TOTAL })}</p>
+        <div className="mt-2 h-1.5 rounded-full bg-surface-sunken overflow-hidden max-w-xs">
+          <div className="h-full bg-accent rounded-full" style={{ width: `${pct}%` }} />
         </div>
+      </div>
+      <Link to="/settings/onboarding" className="shrink-0 inline-flex items-center gap-1 text-sm font-medium text-accent hover:text-accent-hover">
+        {t('dashboard.onboarding.continue')} <ArrowRight size={14} strokeWidth={1.75} aria-hidden="true" />
+      </Link>
+      <button
+        onClick={() => { try { localStorage.setItem(ONBOARDING_DISMISS_KEY, '1'); } catch {} setDismissed(true); }}
+        className="shrink-0 text-ink-subtle hover:text-ink"
+        aria-label={t('dashboard.onboarding.dismiss') ?? undefined}
+      >
+        <X size={16} strokeWidth={1.75} aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
+
+export default function Dashboard() {
+  const { user } = useAuth();
+  const { t } = useTranslation('cases');
+  const variant = resolveVariant(user?.role);
+
+  const kpis = useMemo(() => {
+    const avgFirstResponse = averageFirstResponseMinutes();
+    const todayInbound = cases.reduce((sum, c) => sum + c.messages.filter(m => m.side === 'in' && isToday(m.at)).length, 0);
+    const awaitingReply = cases.filter(c => lastMessageSide(c) === 'in').length;
+    const awaitingDoctor = cases.filter(c => c.status === 'awaiting_doctor').length;
+    const awaitingDeposit = cases.filter(c => c.status === 'awaiting_deposit').length;
+    const completedThisMonth = cases.filter(c => c.status === 'completed' && isThisMonth(c.lastActivityAt)).length;
+    return { avgFirstResponse, todayInbound, awaitingReply, awaitingDoctor, awaitingDeposit, completedThisMonth };
+  }, []);
+
+  const actionItems = useMemo(() => {
+    type Item = { caseId: string; patientName: string; reason: string; at: string };
+    const items: Item[] = [];
+    for (const c of cases) {
+      if (lastMessageSide(c) === 'in') {
+        items.push({ caseId: c.id, patientName: c.patientName, reason: t('dashboard.action.unanswered'), at: c.messages[c.messages.length - 1].at });
+      }
+      if (c.status === 'awaiting_doctor') {
+        items.push({ caseId: c.id, patientName: c.patientName, reason: t('dashboard.action.doctorQueue'), at: c.lastActivityAt });
+      }
+      for (const q of c.quotes) {
+        if (q.validUntil && new Date(q.validUntil).getTime() - DEMO_NOW_MS < 3 * 86400000 && new Date(q.validUntil).getTime() > DEMO_NOW_MS) {
+          items.push({ caseId: c.id, patientName: c.patientName, reason: t('dashboard.action.quoteExpiring'), at: q.validUntil });
+        }
+      }
+      for (const tp of c.aftercare) {
+        if (tp.contactedAt && !tp.response) {
+          items.push({ caseId: c.id, patientName: c.patientName, reason: t('dashboard.action.aftercareSilent'), at: tp.contactedAt });
+        }
+      }
+    }
+    return items.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()).slice(0, 8);
+  }, [t]);
+
+  const recentAiActivity = useMemo(() => {
+    type Item = { caseId: string; patientName: string; flag: string; text: string; translation?: string; at: string };
+    const items: Item[] = [];
+    for (const c of cases) {
+      for (const m of c.messages) {
+        if (m.side === 'in') items.push({ caseId: c.id, patientName: c.patientName, flag: c.patientCountryFlag, text: m.text, translation: m.translation, at: m.at });
+      }
+    }
+    return items.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()).slice(0, 5);
+  }, []);
+
+  // Brief: "doktor → doğrudan /doctor-queue'ya yönlendir, dashboard'a hiç
+  // uğramasın" — a doctor's queue IS their dashboard. Checked after every
+  // hook above (not as an early return before them) so hook call order
+  // stays identical across renders regardless of variant.
+  if (variant === 'doctor') return <Navigate to="/doctor-queue" replace />;
+
+  function fmtTime(iso: string): string {
+    return new Date(iso).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
+  const kpiRow = (
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+      <KpiCard Icon={Clock3} label={t('dashboard.kpi.firstResponse')} value={kpis.avgFirstResponse !== null ? `${kpis.avgFirstResponse}dk` : '—'} tone="accent" big />
+      <KpiCard Icon={MessageCircleMore} label={t('dashboard.kpi.todayInbound')} value={String(kpis.todayInbound)} />
+      <KpiCard Icon={MessageCircleMore} label={t('dashboard.kpi.awaitingReply')} value={String(kpis.awaitingReply)} tone={kpis.awaitingReply > 0 ? 'warning' : undefined} />
+      <KpiCard Icon={Stethoscope} label={t('dashboard.kpi.awaitingDoctor')} value={String(kpis.awaitingDoctor)} tone={kpis.awaitingDoctor > 0 ? 'warning' : undefined} />
+      <KpiCard Icon={Wallet} label={t('dashboard.kpi.awaitingDeposit')} value={String(kpis.awaitingDeposit)} />
+      <KpiCard Icon={CheckCircle2} label={t('dashboard.kpi.completedThisMonth')} value={String(kpis.completedThisMonth)} />
+    </div>
+  );
+
+  const actionColumn = (
+    <div className="rounded-xl border border-line bg-surface overflow-hidden">
+      <div className="px-4 py-3 border-b border-line"><h2 className="text-sm font-semibold text-ink">{t('dashboard.action.title')}</h2></div>
+      {actionItems.length === 0 ? (
+        <p className="px-4 py-6 text-sm text-ink-subtle">{t('dashboard.action.empty')}</p>
       ) : (
-        <div className="divide-y divide-surface-sunken">
-          {hotLeads.map(lead => {
-            const style = lead.scoreLabel ? (SCORE_STYLES[lead.scoreLabel] ?? SCORE_STYLES['Cool']) : SCORE_STYLES['Cool'];
+        <div className="divide-y divide-line">
+          {actionItems.map((item, i) => (
+            <Link key={i} to={`/cases/${item.caseId}`} className="block px-4 py-3 hover:bg-surface-sunken transition-colors">
+              <p className="text-sm text-ink font-medium">{item.patientName}</p>
+              <p className="text-xs text-ink-muted">{item.reason}</p>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const scheduleColumn = (
+    <div className="rounded-xl border border-line bg-surface overflow-hidden">
+      <div className="px-4 py-3 border-b border-line"><h2 className="text-sm font-semibold text-ink">{t('dashboard.schedule.title')}</h2></div>
+      {todaysSchedule.length === 0 ? (
+        <p className="px-4 py-6 text-sm text-ink-subtle">{t('dashboard.schedule.empty')}</p>
+      ) : (
+        <div className="divide-y divide-line">
+          {todaysSchedule.map((entry, i) => {
+            const Icon = SCHEDULE_ICON[entry.type];
             return (
-              <div
-                key={lead.id}
-                onClick={() => navigate(`/leads?lead=${lead.id}`)}
-                className="px-5 py-3 flex items-center gap-3 hover:bg-surface-sunken cursor-pointer transition-colors"
-              >
-                <div className="w-8 h-8 rounded-full bg-surface-sunken flex items-center justify-center text-accent text-xs font-bold shrink-0">
-                  {lead.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium truncate">{lead.name}</p>
-                  {lead.scoreReasoning && (
-                    <p className="text-gray-500 text-xs truncate">{lead.scoreReasoning}</p>
-                  )}
-                </div>
-                <div className="text-right shrink-0">
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${style.badge}`}>
-                    {(() => { const Icon = style.icon; return <Icon size={12} />; })()} {lead.leadScore}
-                  </span>
-                  {lead.treatment && (
-                    <p className="text-gray-500 text-[10px] mt-0.5 truncate max-w-[80px]">{lead.treatment}</p>
-                  )}
-                </div>
-              </div>
+              <Link key={i} to={`/cases/${entry.caseId}`} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-sunken transition-colors">
+                <span className="text-xs text-ink-subtle w-12 shrink-0">{entry.time}</span>
+                <Icon size={15} strokeWidth={1.75} className="text-ink-subtle shrink-0" aria-hidden="true" />
+                <span className="text-sm text-ink truncate">{entry.patientName}</span>
+                <span className="text-xs text-ink-subtle ml-auto shrink-0">{t(`dashboard.schedule.type.${entry.type}`)}</span>
+              </Link>
             );
           })}
         </div>
       )}
     </div>
   );
-}
 
-type ScoreAllState = 'idle' | 'running' | 'done' | 'error';
+  const aiActivityColumn = (
+    <div className="rounded-xl border border-line bg-surface overflow-hidden">
+      <div className="px-4 py-3 border-b border-line"><h2 className="text-sm font-semibold text-ink">{t('dashboard.aiActivity.title')}</h2></div>
+      {recentAiActivity.length === 0 ? (
+        <p className="px-4 py-6 text-sm text-ink-subtle">{t('dashboard.aiActivity.empty')}</p>
+      ) : (
+        <div className="divide-y divide-line">
+          {recentAiActivity.map((item, i) => (
+            <Link key={i} to={`/cases/${item.caseId}`} className="block px-4 py-3 hover:bg-surface-sunken transition-colors">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span aria-hidden="true">{item.flag}</span>
+                <span className="text-sm font-medium text-ink">{item.patientName}</span>
+                <span className="text-[11px] text-ink-subtle ml-auto">{fmtTime(item.at)}</span>
+              </div>
+              <p className="text-xs text-ink-muted truncate">{item.text}</p>
+              {item.translation && <p className="text-xs text-ink-subtle truncate">{item.translation}</p>}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
-export default function Dashboard() {
-  const { leads, stats, activity, isLoading, error, lastUpdated, refresh } = useDashboard();
-  const { user } = useAuth();
-  const navigate        = useNavigate();
-  const isPlatformAdmin = user?.role === 'super_admin' || user?.role === 'admin';
-  const isTC            = user?.role === 'treatment_coordinator';
-
-  const [scoreState,  setScoreState]  = useState<ScoreAllState>('idle');
-  const [, setScoreTotal]  = useState<number | null>(null);
-  const [scoreMsg,    setScoreMsg]    = useState('');
-
-  async function handleScoreAll() {
-    if (scoreState === 'running') return;
-    setScoreState('running');
-    setScoreMsg('');
-    try {
-      const res = await api.post<{ started: boolean; total: number }>('/api/leads/score-all');
-      const total = res.data.total;
-      setScoreTotal(total);
-      setScoreMsg(`Scoring ${total} lead${total !== 1 ? 's' : ''} in the background…`);
-      setScoreState('done');
-      // Refresh leads after a delay to show updated scores
-      setTimeout(() => { refresh(); setScoreState('idle'); setScoreMsg(''); }, 8000);
-    } catch (err: any) {
-      setScoreState('error');
-      setScoreMsg(err?.response?.data?.error || 'Failed to start scoring.');
-      setTimeout(() => { setScoreState('idle'); setScoreMsg(''); }, 4000);
-    }
-  }
+  // Bölüm C: "koordinator → Bugünün programı en üstte", "muhasebe → teklif/
+  // ödeme kartları öne", "hasta_danismani → Aksiyon gerektirenler en üstte",
+  // "klinik_sahibi/operasyon_muduru → tam görünüm" (order below == "full").
+  const columnOrder: [string, React.ReactNode][] =
+    variant === 'coordinator' ? [['schedule', scheduleColumn], ['action', actionColumn], ['ai', aiActivityColumn]]
+    : variant === 'consultant' ? [['action', actionColumn], ['ai', aiActivityColumn], ['schedule', scheduleColumn]]
+    : [['action', actionColumn], ['schedule', scheduleColumn], ['ai', aiActivityColumn]];
+  // 'accounting' shares the consultant ordering (action items already
+  // surface awaiting-deposit quotes first via the KPI row) — the brief
+  // doesn't ask for a 4th distinct column set, just KPI emphasis, which
+  // the KPI row already gives equal prominence to for every variant.
 
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
-
-        <div className="mb-8 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-3xl text-white">Dashboard</h1>
-            <p className="text-gray-400 text-sm mt-1">
-              Welcome back — here's what's happening today
-            </p>
-          </div>
-          <div className="flex items-center gap-3 pt-1">
-            {lastUpdated && (
-              <span className="text-xs text-gray-600">
-                Updated {lastUpdated.toLocaleTimeString()}
-              </span>
-            )}
-
-            {/* Score All Leads — platform admin only */}
-            {isPlatformAdmin && (
-              <div className="flex flex-col items-end gap-1">
-                <button
-                  onClick={handleScoreAll}
-                  disabled={scoreState === 'running'}
-                  className={`flex items-center gap-2 text-xs px-3 py-1 border rounded-lg transition-colors ${
-                    scoreState === 'running'
-                      ? 'border-accent/40 text-accent/40 cursor-not-allowed'
-                      : scoreState === 'done'
-                      ? 'border-green-700 text-green-400 hover:text-green-300'
-                      : scoreState === 'error'
-                      ? 'border-red-700 text-red-400'
-                      : 'border-line text-accent hover:text-accent-hover hover:border-accent/40'
-                  }`}
-                >
-                  {scoreState === 'running' && (
-                    <span className="w-3 h-3 border border-accent/40 border-t-accent rounded-full animate-spin" />
-                  )}
-                  {scoreState === 'done'    ? '✓ Scoring started' :
-                   scoreState === 'error'   ? '✕ Failed' :
-                   scoreState === 'running' ? 'Scoring…' :
-                   <><Target size={12} /> Score All Leads</>}
-                </button>
-                {scoreMsg && (
-                  <span className={`text-[10px] ${scoreState === 'error' ? 'text-red-400' : 'text-gray-500'}`}>
-                    {scoreMsg}
-                  </span>
-                )}
-              </div>
-            )}
-
-            <button
-              onClick={refresh}
-              className="text-xs text-accent hover:text-accent-hover transition-colors px-3 py-1 border border-line rounded-lg"
-            >
-              ↻ Refresh
-            </button>
-          </div>
+        <AppMeta title={`${t('dashboard.title')} | CareNova`} />
+        <div>
+          <h1 className="text-xl font-semibold text-ink">{t('dashboard.title')}</h1>
+          <p className="text-ink-muted text-sm mt-0.5">{t('dashboard.subtitle')}</p>
         </div>
 
-        {error && (
-          <div className="bg-red-950 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">
-            ⚠ {error}
-          </div>
-        )}
+        <OnboardingCard t={t} />
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-24">
-            <div className="text-center space-y-3">
-              <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-gray-500 text-sm">Loading dashboard…</p>
-            </div>
-          </div>
-        ) : (
-          <>
-            <StatsCards stats={stats} hideClinicMetrics={isTC} />
+        {kpiRow}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <LeadsTable leads={leads} onRowClick={(id) => navigate(`/leads?lead=${id}`)} />
-              </div>
-              <div className="lg:col-span-1 space-y-6">
-                {user?.role === 'treatment_coordinator' && <MyCommissionCard />}
-                <HotLeadsCard leads={leads} />
-                <ActivityFeed events={activity} />
-              </div>
-            </div>
-          </>
-        )}
+        <div className="grid lg:grid-cols-3 gap-4">
+          {columnOrder.map(([key, node]) => <React.Fragment key={key}>{node}</React.Fragment>)}
+        </div>
       </div>
     </div>
   );

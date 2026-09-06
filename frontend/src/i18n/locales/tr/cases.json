@@ -1,4 +1,44 @@
 {
+  "dashboard": {
+    "title": "Panel",
+    "subtitle": "Bugün klinikte neler oluyor",
+    "onboarding": {
+      "title": "Kurulumu tamamla · 7 adımın {{done}}'ü bitti",
+      "continue": "Devam et",
+      "dismiss": "Kapat"
+    },
+    "kpi": {
+      "firstResponse": "Ortalama İlk Yanıt Süresi",
+      "todayInbound": "Bugün Gelen Mesaj",
+      "awaitingReply": "Yanıt Bekleyen",
+      "awaitingDoctor": "Doktor Onayı Bekleyen",
+      "awaitingDeposit": "Depozito Bekleyen Teklif",
+      "completedThisMonth": "Bu Ay Tamamlanan Vaka"
+    },
+    "action": {
+      "title": "Aksiyon gerektirenler",
+      "empty": "Şu an aksiyon gerektiren vaka yok.",
+      "unanswered": "Yanıtlanmamış mesaj",
+      "doctorQueue": "Doktor kuyruğunda bekliyor",
+      "quoteExpiring": "Teklifin süresi dolmak üzere",
+      "aftercareSilent": "Bakım hattında yanıt vermedi"
+    },
+    "schedule": {
+      "title": "Bugünün programı",
+      "empty": "Bugün için planlanmış bir şey yok.",
+      "type": {
+        "arrival": "Varış",
+        "departure": "Dönüş",
+        "consultation": "Konsültasyon",
+        "procedure": "İşlem",
+        "checkup": "Kontrol"
+      }
+    },
+    "aiActivity": {
+      "title": "Son AI etkinliği",
+      "empty": "Henüz mesaj yok."
+    }
+  },
   "listTitle": "Vakalar",
   "listSubtitle": "vaka gösteriliyor",
   "searchPlaceholder": "Hasta adı veya vaka no ara…",

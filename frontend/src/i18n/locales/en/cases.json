@@ -1,4 +1,44 @@
 {
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "What's happening at the clinic today",
+    "onboarding": {
+      "title": "Finish setup · {{done}} of 7 steps done",
+      "continue": "Continue",
+      "dismiss": "Dismiss"
+    },
+    "kpi": {
+      "firstResponse": "Avg. First Response Time",
+      "todayInbound": "Messages Today",
+      "awaitingReply": "Awaiting Reply",
+      "awaitingDoctor": "Awaiting Doctor Approval",
+      "awaitingDeposit": "Quotes Awaiting Deposit",
+      "completedThisMonth": "Completed This Month"
+    },
+    "action": {
+      "title": "Needs attention",
+      "empty": "Nothing needs attention right now.",
+      "unanswered": "Unanswered message",
+      "doctorQueue": "Waiting in doctor queue",
+      "quoteExpiring": "Quote expiring soon",
+      "aftercareSilent": "No response on aftercare check-in"
+    },
+    "schedule": {
+      "title": "Today's schedule",
+      "empty": "Nothing scheduled for today.",
+      "type": {
+        "arrival": "Arrival",
+        "departure": "Departure",
+        "consultation": "Consultation",
+        "procedure": "Procedure",
+        "checkup": "Checkup"
+      }
+    },
+    "aiActivity": {
+      "title": "Recent AI activity",
+      "empty": "No messages yet."
+    }
+  },
   "listTitle": "Cases",
   "listSubtitle": "cases shown",
   "searchPlaceholder": "Search patient name or case no…",
