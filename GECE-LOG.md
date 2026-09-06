@@ -1699,7 +1699,7 @@ gösteren) yerine artık `roleLabel()` kullanıyor.
 - `appointments.js`'teki hayalet `'manager'` rolü (hiçbir migration'da
   seed edilmemiş, `'sales'` gibi) `operasyon_muduru`'ya katlandı.
 
-**Commit:** (aşağıda)
+**Commit:** `be6a4d0` — "feat(auth): CareNova clinic roles and role-based authorisation"
 
 ---
 
