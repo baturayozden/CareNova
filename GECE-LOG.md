@@ -1195,7 +1195,7 @@ Görsel/animasyon davranışı (hover, geçiş) `getComputedStyle`/tıklama ile
 doğrulandı ama insan gözüyle "güzel görünüyor mu" DOĞRULANMADI —
 Baturay'ın gözüyle bakması gerekiyor.
 
-**Commit:** (aşağıda)
+**Commit:** `6f84936` — "feat(cases): Case File and Doctor Queue screens with real depth"
 
 ---
 
