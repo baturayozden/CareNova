@@ -1703,4 +1703,40 @@ gösteren) yerine artık `roleLabel()` kullanıyor.
 
 ---
 
+## BÖLÜM F — B5: Impersonation salt-okunur zorlaması
+
+Bölüm E'nin auth middleware'i üzerine, artık gerçekten uygulanabilir hale
+geldi.
+
+**`middleware/auth.js`'e `blockWritesDuringImpersonation` eklendi:**
+JWT claim'i değil, düz bir header konvansiyonu (`X-Impersonation-Session`)
+seçildi — gerekçesi: impersonation başlatmak/bitirmek için token
+yeniden imzalamak/döndürmek gerekmesin. `index.js`'de TÜM route'lardan
+önce, hatta `authenticate`'ten bile önce global middleware olarak takıldı
+— impersonation kontrolü kimlik doğrulamadan bağımsız en dış katman
+(header varsa ve method GET/HEAD/OPTIONS değilse, kullanıcı kim olursa
+olsun 403).
+
+**Canlı doğrulama (gerçek `node src/index.js` + `curl`, mock değil):**
+- `X-Impersonation-Session: 1` header'lı `POST /api/case-files` → **403**
+- Aynı header'lı `GET /api/case-files` → 401 (auth'a kadar geçti, normal akış)
+- Header'sız `POST /api/case-files` → 401 (403 DEĞİL — sadece impersonation
+  varken engelleniyor, genel olarak değil)
+
+**8 birim test** (`middleware/__tests__/auth.test.js`, mock req/res, DB
+gerekmiyor): POST/PUT/PATCH/DELETE'in hepsi impersonation varken
+engelleniyor, GET her zaman geçiyor, header yokken hiçbir şey
+engellenmiyor, boş string header "impersonating" sayılmıyor.
+**136/136 test yeşil.**
+
+**Dürüstlük notu:** Kural artık kodda VE gerçek bir sunucuya karşı
+doğrulandı, ama UÇTAN UCA değil — frontend'in `ImpersonationContext.tsx`'i
+bu header'ı hiçbir isteğe eklemiyor, çünkü admin konsolu hâlâ tamamen
+demo veri üzerinde çalışıyor, gerçek bir API istemcisi yok. `BLOKAJLAR.md`
+B5 ✅ olarak kapatıldı ama bu sınırla birlikte not düşüldü.
+
+**Commit:** (aşağıda)
+
+---
+
 

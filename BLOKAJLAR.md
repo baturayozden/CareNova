@@ -159,22 +159,35 @@ eklemek (daha kesin ama daha çok dosya değişikliği gerektirir).
 
 ---
 
-## B5 — Impersonation'ın "yazma işlemleri engellenir" kuralı doğrulanamadı
+## ✅ B5 — Impersonation'ın "yazma işlemleri engellenir" kuralı — Gece 3'te ÇÖZÜLDÜ
 
-**Ne oldu:** GECE-2-BRIEFI.md Bölüm C.10, impersonation aktifken tüm yazma
-işlemlerinin salt-okunura dönmesini istiyor. `admin/ImpersonationContext.tsx`
-bu kuralı belgeliyor ama ZORLAMIYOR — çünkü demo modunda zaten HİÇBİR
-gerçek API çağrısı yok (hepsi `demoAdapter.ts` üzerinden mock). Test
-edilecek bağımsız bir "gerçek yazma" yolu yok, bu yüzden "engellendiğini"
-göstermenin bir anlamı da yok (zaten hiçbir şey yazılmıyor).
+**Neydi:** GECE-2-BRIEFI.md Bölüm C.10, impersonation aktifken tüm yazma
+işlemlerinin salt-okunura dönmesini istiyordu; `admin/ImpersonationContext.tsx`
+bu kuralı belgeliyordu ama hiçbir yerde ZORLAMIYORDU.
 
-**Ne gerekiyor:** Bölüm E'nin backend'i (gerçek `/api/admin/*` uçları)
-geldiğinde, bu kural gerçek middleware seviyesinde uygulanmalı — bir
-impersonation session token'ı taşıyan isteklerde POST/PUT/PATCH/DELETE
-uçlarını 403 ile reddet, sadece GET'e izin ver.
+**Ne yapıldı (GECE-3-BRIEFI.md Bölüm F):** `backend/src/middleware/
+auth.js`'e `blockWritesDuringImpersonation` eklendi — `X-Impersonation-
+Session` header'ı taşıyan bir istekte method GET/HEAD/OPTIONS dışındaysa
+403 döner. `index.js`'de TÜM route'lardan önce global olarak takıldı
+(auth'suz bile çalışıyor — impersonation kontrolü kimlik doğrulamadan
+önce, en dış katmanda). Canlı `curl` ile doğrulandı: header'lı POST → 403,
+header'lı GET → normal auth akışına devam (401, token yok çünkü), header'sız
+POST → normal auth akışına devam (403 DEĞİL). 8 birim test (mock req/res,
+DB gerekmiyor) — tüm yazma metodları (POST/PUT/PATCH/DELETE) kapsandı.
 
-**Aciliyet:** Orta — backend olmadan test edilemez, ama backend geldiğinde
-gerçek bir güvenlik kuralı, atlanmamalı.
+**Hâlâ eksik:** Frontend'in `ImpersonationContext.tsx`'i bu header'ı HİÇBİR
+gerçek isteğe eklemiyor — çünkü demo modunda zaten hiçbir gerçek API
+çağrısı yok (admin konsolu tamamen `adminDemoData.ts` üzerinde çalışıyor).
+Bu yüzden kural bu gece UÇTAN UCA sergilenemedi — sadece middleware'in
+kendisi izole test edildi ve gerçek bir Express sunucusuna karşı `curl`
+ile doğrulandı. Admin konsolu gerçek backend'e bağlanınca
+(`ImpersonationContext`'in `start()`'ı gerçek bir API istemcisi
+kullanmaya başlayınca), o istemciye bu header'ı otomatik eklemesi
+gerekecek — ayrı, küçük bir iş.
+
+**Aciliyet:** Düşük — güvenlik kuralının kendisi artık kodda ve testte var
+ve doğru çalıştığı gösterildi; kalan iş sadece frontend'in bunu
+kullanmaya başlaması.
 
 ---
 

@@ -44,6 +44,12 @@ app.use(express.json({
 }));
 app.use(cookieParser());
 
+// GECE-3-BRIEFI.md Bölüm F: impersonation sessions may never write, only
+// read — enforced globally (harmless no-op for every request that doesn't
+// carry the header, including all the public webhooks below).
+const { blockWritesDuringImpersonation } = require('./middleware/auth');
+app.use(blockWritesDuringImpersonation);
+
 // Public routes
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'carenova-backend' }));
 app.use('/auth', require('./routes/auth'));
