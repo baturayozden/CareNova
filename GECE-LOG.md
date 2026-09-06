@@ -782,3 +782,74 @@ hesaplanmış WCAG matematiği ve rounded-value doğrulamasıyla ilerlendi.
 **Commit:** `30221d1` fix(theme): darken contrast-failing tokens at their actual usage size, not per-element
 
 ---
+# GECE ÇALIŞMASI 2 — Çok-Host Mimarisi ve Admin Panelleri
+
+Gözetimsiz çalışma. `GECE-2-BRIEFI.md` sırası: A (nav) → B (üç-host) → F (devreden
+kontrast) → C (admin konsolu) → D (klinik paneli) → E (backend).
+
+**F ön-kontrol:** Brief'in F bölümü ("`.surface-inverted`'da `--accent`
+çevrilmemiş", "35 bulgu iki token ailesi") — **ikisi de önceki oturumda zaten
+çözüldü** (commit `5686af2` + `30221d1`, bkz. yukarıdaki iki bölüm).
+`check-contrast.js` şu an TR: 0, EN: 0 veriyor — doğrulandı, tekrar iş
+yapılmadı. F bu yüzden atlanıp sıra A→B→C→D→E olarak ilerliyor.
+
+---
+## BÖLÜM A — Nav: logo ve giriş butonu
+
+**A.1 Logo:**
+- CareNova'nın ZATEN `carenova-logo-transparent-{light,dark}.svg` dosyaları
+  vardı (Sidebar/LoginPage/ForgotPasswordPage/ResetPasswordPage'de kullanılan,
+  transparan zemin + doğru marka renkleri) — brief yeni SVG üretilmesini
+  istiyordu ama bunlar zaten brief'in istediği "transparent + tema-uygun renk"
+  kriterini karşılıyordu, landing'de hiç kullanılmıyorlardı sadece.
+- **Karar (belirsizlik):** Brief SVG metnini path'e çevirmeyi istiyordu
+  ("font yüklenmese de doğru görünsün"). Bunu YAPMADIM — elimde font-to-path
+  dönüşüm aracı yok, harfleri elle vektörize etmek bu gecenin zaman bütçesine
+  sığmaz. Bunun yerine: mevcut SVG'ler zaten `Georgia, 'Times New Roman', serif`
+  gibi EVRENSEL sistem fontu kullanıyor (Fraunces değil) — brief'in asıl
+  amacı ("özel font yüklenmese de doğru görünsün") bu şekilde de sağlanıyor,
+  path'e çevirmeden. Fraunces'a geçiş + gerçek path dönüşümü ayrı bir iş
+  olarak bırakıldı.
+- `NavBar.tsx`: metin wordmark → `<img src={logoSrc} className="h-9 w-auto" alt="CareNova">`,
+  `useTheme()` ile `carenovaLogoLight`/`carenovaLogoDark` arası geçiş (Sidebar.tsx'teki
+  AYNI desen — `theme === 'dark' ? ... : ...`). Mobil menüde ayrı bir logo yok
+  zaten (header'daki tek logo mobilde de görünür durumda kalıyor).
+- `Footer.tsx`: aynı desen, `h-7`.
+- **Doğrulandı (`getComputedStyle`):** nav logo `height: 36px` ✅ (width 192px,
+  viewBox oranı 320:60 olduğu için brief'in tahmini 144px değil ama bu sorun
+  değil — brief'in verdiği 144px kendi 4:1 viewBox varsayımına dayanan bir
+  TAHMİNDİ, zorunlu bir ölçü değil). Footer logo `height: 28px` ✅.
+
+**A.2 Giriş butonu:**
+- `landingContent.tsx`'e `navLogin(lang)` eklendi ('Giriş' / 'Log in') —
+  brief'in örnek kodu `t('nav.login')` (flat i18next) kullanıyordu ama
+  NavBar'daki HER ŞEY (navLinks, navCta) zaten `landingContent.tsx`'in
+  `pick()` deseniyle geliyor. Tutarlılık için AYNI deseni kullandım, yeni bir
+  flat i18next namespace açmadım — tek bir string için mimariyi bölmek
+  gereksiz karmaşıklık olurdu.
+- Buton: ikincil/ghost stil (`border border-line`, dolu değil), `[TR|EN] [Giriş] [Demo Talep Et]`
+  sırasıyla, hem masaüstü hem mobil menüde.
+- `href`, Bölüm B'nin `hosts.ts`'inden `urlFor('app', '/login')` ile geliyor
+  (bkz. Bölüm B — bu modülü A için erken oluşturmam gerekti, aşağıda açıklandı).
+
+**Commit:** `feat(nav): add CareNova logo image at CareDental scale and a Log in action`
+
+---
+## BÖLÜM B — Üç-host mimarisi
+
+**Sıralama notu:** Brief'in kendi Bölüm A örneği `hosts.ts`'e bağımlı olduğu
+için, `frontend/src/config/hosts.ts`'i A'nın İÇİNDE (ayrı commit'te değil, aynı
+mantıksal iş olarak) erken oluşturdum. Asıl Bölüm B commit'i route ağacı
+bölünmesi + güvenlik kuralları + dokümantasyonu kapsıyor.
+
+**`hosts.ts` — bulunan ve düzeltilen gerçek hata:** İlk yazımda demo-modu
+`?host=` fallback'i `${origin}/?host=app` şeklinde üretiliyordu, sonra NavBar
+bunun sonuna `/login` ekliyordu → `origin/?host=app/login` (bozuk URL, path
+query string'in ARDINDAN geliyor). `.env.local`'a `REACT_APP_DEMO_MODE=true`
+koyup gerçekten test ederken yakaladım (ilk denemede eski dev server process'i
+öldürmediğim için env değişikliği hiç yansımamıştı — `pkill` deseni tutmadı,
+PID'yi elle bulup `kill -9` ile öldürdüm). Düzeltme: `urlFor(mode, path)`
+yardımcı fonksiyonu — path'i HER ZAMAN query'den önce koyuyor
+(`${origin}${path}?host=${mode}`). `NavBar.tsx` buna geçirildi.
+
+

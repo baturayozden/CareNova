@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { footerColumns, footerBlurb } from '../../data/landingContent';
 import { BUSINESS } from '../../lib/businessDetails';
+import { useTheme } from '../../context/ThemeContext';
+import carenovaLogoDark from '../../assets/carenova-logo-transparent-dark.svg';
+import carenovaLogoLight from '../../assets/carenova-logo-transparent-light.svg';
 
 function isExternal(href: string) {
   return href.startsWith('#') || href.startsWith('http');
@@ -17,16 +20,16 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 
 export default function Footer() {
   const { i18n } = useTranslation();
+  const { theme } = useTheme();
   const columns = footerColumns(i18n.language);
+  const logoSrc = theme === 'dark' ? carenovaLogoDark : carenovaLogoLight;
 
   return (
     <footer className="border-t border-line bg-surface-page">
       <div className="mx-auto max-w-6xl px-6 py-14">
         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-10">
           <div className="lg:col-span-1">
-            <div className="font-display text-lg text-ink mb-3">
-              Care<span className="text-accent">Nova</span>
-            </div>
+            <img src={logoSrc} alt="CareNova" className="h-7 w-auto mb-3" />
             <p className="text-ink-muted text-sm leading-relaxed">{footerBlurb(i18n.language)}</p>
           </div>
 

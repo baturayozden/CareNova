@@ -57,6 +57,7 @@ export const navLinks = (lang: string) => pick(lang,
 );
 
 export const navCta = (lang: string) => pick(lang, 'Demo Talep Et', 'Request a Demo');
+export const navLogin = (lang: string) => pick(lang, 'Giriş', 'Log in');
 
 // ── Hero ──────────────────────────────────────────────────────────────────
 
