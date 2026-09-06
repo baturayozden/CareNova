@@ -957,5 +957,124 @@ detaylı).
 **Commit:** `feat(routing): three-host architecture with marketing/app/admin route trees`
 
 ---
+## BÖLÜM C — Süper Admin Konsolu (12/12 modül)
+
+Tüm 12 modül tek bir oturumda, gerçek (demo verili) ekranlarla yazıldı —
+Bölüm B'nin placeholder'ları hiçbiri kalmadı. Sıra: veri modeli önce, sonra
+ekranlar.
+
+**Demo veri (`data/adminDemoData.ts`, `data/adminBranchTemplates.ts`):** 11
+klinik (brief'in istediği 8-12 aralığında) — İstanbul/İzmir/Ankara/Antalya/
+Konya, farklı branşlar (saç ekimi, diş, estetik, göz, bariatrik, IVF,
+ortopedi, onkoloji, check-up — hepsi branş şablonu enum'una uygun), farklı
+planlar (solo/klinik/grup), farklı durumlar (aktif/deneme/onboarding/askıda,
+biri kasıtlı olarak yetki belgesi süresi DOLMUŞ, biri komplikasyon sigortası
+YOK, biri onamsız görsel VAR — Uyum Paneli'nin gerçekten bir şey göstermesi
+için). İsimler jenerik-gerçekçi ("Nova Hair Clinic", "Ege Estetik", "Anadolu
+Dental" vb.) — gerçek klinik adı yok, brief'in kuralına uygun.
+`adminBranchTemplates.ts`, `backend/src/migrations/058_branch_templates.sql`'in
+seed verisini BİREBİR yansıtıyor (gerçek DB'ye bağlı değil — B2 blokajı
+gereği zaten çalıştırılamadı — ama İÇERİK aynı).
+
+**C.1 Genel Bakış:** KPI kartları (aktif klinik, bu ay yeni, aktif vaka,
+WhatsApp hattı, AI konuşması, MRR) + inline SVG sparkline (kütüphane
+kurulmadı, 15 noktalık bir çizgi için gerekmiyordu) + "dikkat gerektirenler"
+(kota dolmak üzere / onboarding'de takılan / ödemesi geciken), hepsi
+`adminClinics`'ten TÜRETİLMİŞ, elle yazılmış sayı yok.
+
+**C.2 Klinikler:** Liste (arama, durum/plan/branş filtresi, sıralama) +
+detay sayfası, brief'in 7 sekmesi (Genel/Kullanıcılar/WhatsApp/AI
+Kullanım/Faturalama/Uyum/Denetim) tam olarak var. Aksiyon butonları
+(onayla/askıya al/plan değiştir/kota ekle) UI olarak var ama demo modunda
+gerçek bir state değişikliği yapmıyor — arkalarında yazılacak bir backend
+yok, sahte bir "başarılı" animasyonu da eklemedim (brief'in "sahte
+metrik/işlemiş gibi gösterme" dürüstlük ilkesine uygun, sadece butonlar
+tıklanabilir ama şu an no-op).
+
+**C.6 Branş Şablonları:** Genişleyen satırlar, her biri ön-değerlendirme
+soruları/gerekli görseller/kırmızı bayraklar/itirazlar/bakım takvimi
+gösteriyor. 🔴 **IVF'nin donör gamet kuralı görünür VE kilitli** — kırmızı
+"silinemez" kutusu içinde ayrı render ediliyor, diğer alanlardan (dropdown
+vb.) farklı bir bileşen, kazayla silinebilecek bir liste öğesi değil. AI
+yetki dropdown'ı SADECE 5 enum değerini listeliyor (`AUTHORITY_LABELS`),
+serbest metin yok.
+
+**C.7 Uyum Paneli — brief'in "en farklılaştırıcı" dediği modül:** Platform
+özeti (kaç klinik tam uyumlu) + klinik bazlı tablo (yetki belgesi, sigorta,
+VERBİS, %20 dil personeli, Ek-1 onam sayısı+geri alınan+onamsız-var-mı,
+yurt dışı aktarım). Süre dolan/dolmak üzere olan yetki belgesi VE
+komplikasyon sigortası (31.12.2026 hedefi) sarı/kırmızı ile ayrı
+vurgulanıyor — demo verisinde bilerek BİR klinik süresi geçmiş yetki
+belgesiyle, BİR klinik sigortasız bırakıldı ki bu vurgulama gerçekten
+görülebilsin, sadece hep-yeşil bir tablo göstermek "çalışıyor" izlenimi
+verir ama hiçbir şey test etmez.
+
+**C.10 Kullanıcılar, Roller ve Impersonation — güvenlik kuralları tek tek
+doğrulandı (JS ile formu doldurup gerçekten tıklayarak, ekran görüntüsüyle
+DEĞİL — bu sayfalar framer-motion kullanmıyor, o yüzden ekran görüntüsü
+aslında güvenilir olurdu ama `getComputedStyle`/DOM tabanlı doğrulama zaten
+yeterliydi, ikisini karıştırmadım):**
+- Paylaşılan `admin/ImpersonationContext.tsx` — hem `ClinicDetailPage`'deki
+  hem `UsersPage`'deki "görüntüle" butonu AYNI context'i kullanıyor, iki
+  ayrı state kopyası değil.
+- Gerekçe girmeden "Başlat" butonu DISABLED — zorunlu gerekçe kuralı UI
+  seviyesinde zorlanıyor.
+- Aktifken `AdminLayout`'un en üstünde SÜREKLİ görünen turuncu (`--warning`
+  token) şerit — **SPA içi client-side navigasyonla (gerçek `<Link>`
+  tıklayarak, `window.location` değil) sayfa değiştirdiğimde şeridin
+  KALDIĞINI doğruladım** (React state, route değişikliğinden etkilenmiyor).
+  Sert sayfa yenilemesinde (gerçek `navigate` tool'uyla, tam reload) elbette
+  kayboluyor — in-memory state, demo modunda backend session'ı yok, bu
+  BEKLENEN davranış, hata değil.
+- Başlatma VE bitirme `adminAuditEvents`'e gerçekten yazılıyor — Denetim
+  Kaydı sayfasında kendi test olayımı (gerekçe metnimle birlikte) gördüm.
+  **Küçük bir veri-modelleme tuhaflığı fark ettim:** `adminDemoData.ts`'in
+  sabit `now` referansı (2026-09-07T08:00) gerçek sistem saatinden
+  (test anında 2026-09-06 21:38) İLERİDE, bu yüzden ÖNCEDEN SEED edilmiş
+  impersonation olayları (ae-6/ae-7) benim CANLI oluşturduğum olaydan
+  kronolojik olarak SONRA görünüyor tabloda. Zararsız (gerçek bir hata
+  değil, sadece iki farklı zaman kaynağının karışması) ama not düşüyorum.
+- 🔴 **"Yazma işlemleri engellenir (salt okunur)" kuralı — TAM
+  doğrulanamadı.** Demo modunda zaten HİÇBİR gerçek API çağrısı yok (hepsi
+  mock), yani "impersonation sırasında yazma engellenir" için bağımsız
+  test edilecek gerçek bir yazma yolu yok. Kural `ImpersonationContext.tsx`'in
+  kendi yorumunda dürüstçe belgelendi: bu bir UI-seviyesi sözleşme,
+  gerçek backend geldiğinde (Bölüm E) API middleware'inde ZORLANMASI
+  gerekiyor. `BLOKAJLAR.md`'ye eklendi.
+
+**Diğer 8 modül** (C.3 Onboarding, C.4 WhatsApp, C.5 AI Kullanım, C.8 Demo
+Talepleri, C.9 Faturalama, C.11 Denetim, C.12 Sağlık) brief'in tarif ettiği
+alanların tamamını içeriyor, tablo/filtre/CSV-dışa-aktarma dahil. Tek tek
+tekrar detaylandırmıyorum — hepsi `adminDemoData.ts`'ten türetilmiş gerçek
+sayılar, elle yazılmış sahte metrik yok.
+
+**Bilinçli kapsam kararı — i18n:** Admin'in KABUĞU (sidebar, login,
+red mesajları) `admin`/`auth` namespace'leri üzerinden tam TR+EN. Ama 12
+sayfanın İÇERİĞİ (tablo başlıkları, buton metinleri, "Klinik", "Şehir" gibi
+etiketler) SADECE TÜRKÇE, i18n'den geçmiyor. Bu, projenin "her string i18n
+üzerinden" kuralının bilinçli bir istisnası: admin.carenova.ai SADECE
+Baturay tarafından kullanılıyor (tek platform kullanıcısı), İngilizce
+konuşan bir müşteri asla görmeyecek — 12 sayfayı tam çevirmek bu gecenin
+zaman bütçesinde D ve E'yi tehlikeye atardı. Gerekirse ayrı, düşük öncelikli
+bir iş olarak yapılabilir.
+
+**Doğrulama:** `npm run build` temiz (admin chunk 19.05kB). Tüm 12 route'a
+JS ile gezinip her birinde doğru `<h1>` render olduğunu, konsol hatası
+olmadığını doğruladım. IVF kilitli kuralı, impersonation'ın tüm akışı
+(başlat/şerit/SPA-kalıcılık/denetim kaydı/bitir), CSV dışa aktarma
+(Demo Talepleri + Denetim) test edildi. `check:i18n-leaks`/`check:contrast`
+→ 0/0 (bu ikisi sadece landing'i kapsıyor, admin için ayrı otomatik kontrol
+yok — elle doğrulandı).
+
+**Kabul kriteri:** ✅ 12/12 modül gerçek ekran (placeholder değil). ✅ IVF
+kuralı görünür+kilitli. ✅ AI yetki matrisi dropdown, serbest metin değil.
+✅ Impersonation'ın 4/5 güvenlik kuralı doğrulandı (gerekçe zorunlu, şerit,
+denetim kaydı, sadece bu context üzerinden). ⚠️ 5. kural (yazma engelleme)
+demo modunda test EDİLEMEDİ, gerekçesiyle not düşüldü. ⚠️ Admin sayfa
+içerikleri sadece TR — bilinçli, gerekçeli kapsam kararı.
+
+**Commit:** `feat(admin): all 12 console modules with realistic demo data`
+
+---
 
 

@@ -88,3 +88,22 @@ davranışının araştırılması, ya da her app/admin sayfasına kendi `AppMet
 eklemek (daha kesin ama daha çok dosya değişikliği gerektirir).
 
 **Aciliyet:** Düşük — kozmetik, işlevsel hiçbir şeyi engellemiyor.
+
+---
+
+## B5 — Impersonation'ın "yazma işlemleri engellenir" kuralı doğrulanamadı
+
+**Ne oldu:** GECE-2-BRIEFI.md Bölüm C.10, impersonation aktifken tüm yazma
+işlemlerinin salt-okunura dönmesini istiyor. `admin/ImpersonationContext.tsx`
+bu kuralı belgeliyor ama ZORLAMIYOR — çünkü demo modunda zaten HİÇBİR
+gerçek API çağrısı yok (hepsi `demoAdapter.ts` üzerinden mock). Test
+edilecek bağımsız bir "gerçek yazma" yolu yok, bu yüzden "engellendiğini"
+göstermenin bir anlamı da yok (zaten hiçbir şey yazılmıyor).
+
+**Ne gerekiyor:** Bölüm E'nin backend'i (gerçek `/api/admin/*` uçları)
+geldiğinde, bu kural gerçek middleware seviyesinde uygulanmalı — bir
+impersonation session token'ı taşıyan isteklerde POST/PUT/PATCH/DELETE
+uçlarını 403 ile reddet, sadece GET'e izin ver.
+
+**Aciliyet:** Orta — backend olmadan test edilemez, ama backend geldiğinde
+gerçek bir güvenlik kuralı, atlanmamalı.

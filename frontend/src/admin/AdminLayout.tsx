@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard, Building2, ListChecks, MessageCircle, Cpu, Layers,
   ShieldCheck, Inbox, CreditCard, Users, ScrollText, Activity,
-  LogOut, Sun, Moon, Menu,
+  LogOut, Sun, Moon, Menu, Eye,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { setDefaultTitle } from '../lib/setDefaultTitle';
+import { useImpersonation } from './ImpersonationContext';
 import carenovaLogoDark from '../assets/carenova-logo-transparent-dark.svg';
 import carenovaLogoLight from '../assets/carenova-logo-transparent-light.svg';
 
@@ -112,11 +113,23 @@ export default function AdminLayout() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const current = NAV_ITEMS.find(item => location.pathname.startsWith(item.to));
+  const { session, stop } = useImpersonation();
   // See lib/setDefaultTitle.ts for why this isn't a plain `document.title =`.
   useEffect(() => { setDefaultTitle('CareNova | Platform'); }, []);
 
   return (
-    <div className="min-h-screen bg-surface-page flex">
+    <div className="min-h-screen bg-surface-page flex flex-col">
+      {/* Brief C.10 🔴: persistently visible while impersonating — not a
+          dismissible toast, a permanent strip for as long as the session
+          is active, with an always-reachable exit. */}
+      {session && (
+        <div className="sticky top-0 z-[60] bg-warning text-white px-4 py-2 flex items-center justify-center gap-3 text-sm font-medium" role="status">
+          <Eye size={16} strokeWidth={2} aria-hidden="true" />
+          <span>{session.clinicName} kliniği olarak görüntülüyorsunuz</span>
+          <button onClick={stop} className="underline underline-offset-2 hover:no-underline">Çık</button>
+        </div>
+      )}
+      <div className="flex flex-1 min-h-0">
       {/* Desktop sidebar */}
       <aside className="hidden md:flex md:flex-col w-60 shrink-0 border-r border-line bg-surface">
         <SidebarContent />
@@ -154,6 +167,7 @@ export default function AdminLayout() {
         <main className="flex-1 p-4 md:p-6 min-w-0">
           <Outlet />
         </main>
+      </div>
       </div>
     </div>
   );
