@@ -15,6 +15,35 @@ CareNova is forked from CareDental (`/Users/baturayozden/projects/caredental`), 
 3. **The AI pricing-authority matrix is never bypassed.** Each branch template defines what the AI may say about price: `full` / `range_from_photo` / `range_after_imaging` / `qualification_only` / `logistics_only` (CARENOVA-STRATEJI.md Bölüm 7/M2). A `qualification_only` branch (e.g. aesthetic surgery, bariatric, IVF) must never be made to quote a price, regardless of prompt changes elsewhere.
 4. **Patient data is never used for model training or CareNova's own analytics under any circumstance.** This is a contractual commitment (KVKK data-processor position, Bölüm 7/M7.3) — do not add telemetry, logging, or fine-tuning pipelines that consume patient content.
 
+## Görsel doğrulama
+
+Animasyona bağlı hiçbir görsel sorun, otomasyon tarayıcısıyla (Claude in Chrome,
+Playwright, headless) teşhis EDİLEMEZ. Bu sekmelerde requestAnimationFrame
+tamamen askıya alınır — ölçüldü: 1 saniyede sıfır tick, çağrı 45 sn sonra
+zaman aşımına uğradı. Framer Motion animasyonları başlangıç durumunda donar ve
+sayfa boş görünür. Bu bir HATA DEĞİL, ölçüm artefaktıdır.
+
+Kural: opacity/transform kaynaklı "içerik görünmüyor" bulgusunu otomasyon
+tarayıcısında gördüysen HATA OLARAK RAPORLAMA. Bunun yerine, doğrulanamadığını
+söyle ve kullanıcıdan normal bir ön plan sekmesinde kontrol etmesini iste.
+Statik CSS sorunları (kontrast, renk, layout, overflow) bu kısıttan etkilenmez,
+onlar otomasyonla doğrulanabilir.
+
+Bu kuralın kaynağı: 5-6 Eylül 2026'da bu yüzden var olmayan bir hata kovalandı.
+
+## Renk token'ları
+
+`frontend/src/index.css`'teki `--ink-subtle`, `--accent`, `--success`,
+`--warning` (açık tema) ve `.surface-inverted`'daki `--accent-hover` WCAG
+AA 4.5:1'i **iki kez** ıskaladı — önce 3:1 "büyük metin" eşiğine göre
+kalibre edildiler, sonra sayfadaki gerçek kullanımın (11-12px rozet/altyazı
+metni) 4.5:1 gerektirdiği ortaya çıktı (Eylül 2026, `docs/contrast-report.md`
+geçmişi). Bu değerleri "daha canlı görünsün" diye eski/textbook tonlarına
+geri ÇEVİRME — tam gerekçe ve hesaplanan değerler CARENOVA-STRATEJI.md
+Bölüm 14'te. Bir token'ı değiştirmeden önce `node
+frontend/scripts/check-contrast.js` çalıştır (canlı render edilmiş DOM'u
+ölçer, teorik çiftleri değil) ve 0 ihlal olduğunu doğrula.
+
 ## Workspaces
 
 | Directory | Tech | Port |

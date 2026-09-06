@@ -715,3 +715,70 @@ yukarıda dürüstçe listelendi.
 **Commit:** `5686af2` fix(landing): fix dark-on-dark contrast bug, rewrite contrast checker for live DOM
 
 ---
+### Kontrast — token seviyesinde tam düzeltme (35 bulgu → 0)
+
+Baturay önceki bölümün iki eksiğini işaret etti: (1) `.surface-inverted`
+`--ink` ailesini çeviriyordu ama `--accent`'i çevirmemişti — Mevzuat Kalkanı/
+Fiyatlandırma eyebrow'ları hâlâ 3.80:1'de kalıyordu; (2) 35 kalan bulguyu
+tek tek yamamak yerine, bunların aslında SADECE İKİ token değerinin
+(ink-subtle, accent/accent-soft) sonucu olduğunu, kaynağında düzeltmemi
+istedi.
+
+**Yöntem:** Ekran görüntüsü yerine (kullanıcının da belirttiği gibi
+otomasyon sekmesinde animasyon donması güvenilmez) matematiksel çözüm —
+Node'da WCAG luminance/contrast formülleri + HSL lightness ikili arama:
+her token için, GERÇEKTE kullanıldığı EN ZOR zemin/punto kombinasyonuna
+karşı ≥4.5:1 verecek en yakın ton bulundu (ton/doygunluk korunarak, sadece
+açıklık değiştirilerek — marka rengi kimliği bozulmadı).
+
+**Bulunan gerçek karmaşıklık — tek yönlü "koyulaştır/aydınlat" yetmedi:**
+`.surface-inverted` içinde `--accent`, İKİ FARKLI ROLDE kullanılıyor:
+Fiyatlandırma'nın CTA butonunda ZEMİN (üstünde beyaz metin, zaten 5.17:1),
+ama eyebrow'larda hiç kullanılmıyor — sadece `--accent-hover` METİN olarak
+kullanılıyor. `--accent`'i aydınlatmak butonun beyaz metnini bozardı
+(~4.0:1'e düşüyor, doğruladım) ve HİÇBİR ŞEYİ düzeltmezdi (zaten metin
+olarak kullanılmıyor). **Doğru düzeltme: sadece `--accent-hover`'ı aydınlat,
+`--accent`'e dokunma.** Bu, brief'in "tek tek eleman yamama" talebinin asıl
+gerekçesini doğruluyor — kör bir "hepsini aydınlat" yaklaşımı yeni bir hata
+açardı.
+
+**Yuvarlama tuzağı:** İlk çözümde tam 4.50 hedeflendi, ama HSL→tamsayı-RGB
+yuvarlaması sonucu gerçek oranı 4.49'a düşürdü (35→22 bulguya indi ama hiçbiri
+tam kapanmadı). Tüm hedefler 4.55'e çekilerek (yuvarlama payı) yeniden
+çözüldü.
+
+**Genişletilen kapsam:** Rapor incelenince "accent-on-accent-soft" ailesinin
+aslında ÜÇ aile olduğu görüldü — `success`/`success-soft` (TrustSection
+"Onaylı" rozeti, BranchesSection "Hazır şablon" — 2.85:1, raporun en kötü
+bulgusu) ve `warning`/`warning-soft` (RoiSection'ın "gerçek veri değil"
+rozeti — 3.07:1) AYNI yapısal desen, farklı ton. Brief'in "gerçekten ayrı
+olanları tek tek ele al" ilkesine göre bunlar AYRI değil — aynı kök nedenin
+üç tekrarı — o yüzden aynı yöntemle (HSL koyulaştırma) düzeltildi, tek tek
+elle değil.
+
+**Değişen token'lar (`index.css`):**
+- `:root` (açık tema): `--ink-subtle` `#64748B`→`#5F6E84`, `--accent`
+  `#1B6FEA`→`#1567E0`, `--success` `#0EA47A`→`#0B7E5D`, `--warning`
+  `#C77A0A`→`#9F6108`. `--accent-hover` DEĞİŞMEDİ (zaten 5.66-6.45:1).
+- `.surface-inverted`: `--accent-hover` `#2E6EE0`→`#447DE3`. `--accent`
+  DEĞİŞMEDİ (yukarıdaki gerekçeyle).
+
+**Sonuç:** `node scripts/check-contrast.js` → **TR: 0 ihlal, EN: 0 ihlal**
+(35'ten sıfıra — brief'in "Hedef: 0 ihlal" kriteri artık tam karşılanıyor).
+`check-i18n-leaks.js` de sıfır (renk değişikliği i18n'i etkilemez ama yine de
+koştu). Build temiz.
+
+**Dokümantasyon:** `CARENOVA-STRATEJI.md`'ye yeni Bölüm 14 ("Tasarım sistemi
+— renk token'ları") eklendi — tam hex tablosu, hangi token'ın hangi ROLDE
+(metin mi zemin mi) kullanıldığı, ve "bir sonraki değişiklikte ne yap"
+kuralı (check-contrast.js çalıştır, rol çakışmasına dikkat et, yuvarlama
+payı bırak). `CLAUDE.md`'ye kısa bir uyarı + Bölüm 14'e pointer eklendi —
+"daha canlı görünsün" diye eski tonlara geri dönülmesin diye.
+
+**Kabul kriteri:** ✅ `check:contrast` → 0/0. ✅ `check:i18n-leaks` → 0/0.
+✅ Build temiz. ✅ Ekran görüntüsü kullanılmadı (brief'in isteği) — tamamen
+hesaplanmış WCAG matematiği ve rounded-value doğrulamasıyla ilerlendi.
+
+**Commit:** (push sonrası eklenecek)
+
+---

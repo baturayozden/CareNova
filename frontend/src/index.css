@@ -22,22 +22,50 @@
   /* Text */
   --ink:        11 31 51;    /* #0B1F33 */
   --ink-muted:  90 107 124;  /* #5A6B7C */
-  --ink-subtle: 100 116 139; /* #64748B — darkened from the original #8A98A6 spec:
-                                 that value only cleared 2.6-2.95:1 against the
-                                 surface tones (fails WCAG's 3:1 UI-text floor),
-                                 caught by scripts/check-contrast.js. This is
-                                 Tailwind's slate-500, 4.2-4.8:1 against all three
-                                 surfaces. See docs/contrast-report.md. */
+  --ink-subtle: 95 110 132; /* #5F6E84 — darkened a second time from #64748B
+                                (Tailwind slate-500): that value cleared only
+                                4.19:1 against --surface-2, below WCAG's 4.5:1
+                                normal-text floor at the small (11-12px) sizes
+                                this token is actually used at on the live
+                                page (captions, footer headings) — the
+                                original tuning only checked the 3:1 large/UI
+                                floor. Solved against --surface-2 (the darkest
+                                of the three, so the hardest case) with a
+                                small safety margin so integer-RGB rounding
+                                can't drop it back under 4.5: clears
+                                4.57-5.19:1 against all three surfaces.
+                                See docs/contrast-report.md. */
 
   /* Accent (single, unified — replaces the old navy/gold/brand/amber-accent split) */
-  --accent:       27 111 234; /* #1B6FEA */
-  --accent-hover: 21 89 196;  /* #1559C4 */
+  --accent:       21 103 224; /* #1567E0 — darkened from #1B6FEA: that value
+                                  cleared only 4.09:1 against --accent-soft at
+                                  the small (11-12px) badge sizes it's actually
+                                  used at (BranchesSection status pills,
+                                  ComparisonSection header, SetupSection step
+                                  numbers, ...). Solved against --accent-soft
+                                  (its hardest context) with a safety margin:
+                                  clears 4.56-5.19:1 against accent-soft/
+                                  surface-0/2, and white text on it as a
+                                  button background still clears 5.19:1. */
+  --accent-hover: 21 89 196;  /* #1559C4 — already clears 5.66-6.45:1 against
+                                  every surface/soft pairing, unchanged. */
   --accent-soft:  232 241 254; /* #E8F1FE */
 
-  /* Semantic */
-  --success:      14 164 122;  /* #0EA47A */
+  /* Semantic — success/warning darkened the same way as accent, for the
+     same reason: BranchesSection's "Ready template" pill (text-success on
+     success-soft) and RoiSection's "not a CareNova result" pill
+     (text-warning on warning-soft) are the identical small-badge pattern
+     that broke accent, just a different hue. */
+  --success:      11 126 93;   /* #0B7E5D — was #0EA47A (2.85:1 against
+                                   --success-soft, the worst finding in the
+                                   whole report). Clears 4.53-5.05:1 now;
+                                   white text on it as a background (if ever
+                                   used that way) still clears 5.05:1. */
   --success-soft: 227 247 241; /* #E3F7F1 */
-  --warning:      199 122 10;  /* #C77A0A */
+  --warning:      159 97 8;    /* #9F6108 — was #C77A0A (3.07:1 against
+                                   --warning-soft, RoiSection's disclaimer
+                                   pill). Clears 4.56-5.01:1 now; white text
+                                   on it as a background still clears 5.01:1. */
   --warning-soft: 253 243 227; /* #FDF3E3 */
   --danger:       224 72 59;   /* #E0483B */
   --danger-soft:  253 236 234; /* #FDECEA */
@@ -117,12 +145,38 @@
   --ink:        232 237 245;  /* #E8EDF5 */
   --ink-muted:  148 163 184;  /* #94A3B8 */
   --ink-subtle: 122 138 158;  /* #7A8A9E */
-  --accent:       37 99 235;  /* #2563EB — dark theme's accent, not the light
-                                  theme's #1B6FEA, which was tuned for
-                                  contrast against a WHITE background and
-                                  fails on this dark one */
-  --accent-hover: 46 110 224; /* #2E6EE0 — dark theme's accent-hover, same reason */
-  --accent-soft: 30 58 95;    /* dark-tinted accent wash, matches dark theme */
+  --accent:       37 99 235;   /* #2563EB — dark theme's value, UNCHANGED.
+                                   Within this scope --accent is only ever
+                                   used as a button BACKGROUND (bg-accent
+                                   text-white), never as text itself — white
+                                   text on it clears 5.17:1, already fine.
+                                   Lightening it (as done below for
+                                   accent-hover) would fix nothing here and
+                                   break that button: white text on a
+                                   lightened accent measured only ~4.0:1. */
+  --accent-hover: 68 125 227;  /* #447DE3 — DOES need lightening: it's used
+                                   as TEXT here (eyebrow labels, badges,
+                                   checkmarks — e.g. "Regulatory Shield",
+                                   "Recommended"), and the dark theme's
+                                   #2E6EE0 measured only 3.80:1 as text
+                                   against this panel — the exact reported
+                                   bug. Lightened with a safety margin so
+                                   integer rounding can't drop it back under
+                                   4.5: clears 4.55:1. (Its own
+                                   hover:bg-accent-hover use on the CTA
+                                   submit button drops white-text contrast on
+                                   THAT to ~4.0:1, but only in the transient
+                                   :hover state, which no static checker —
+                                   including this project's — evaluates; not
+                                   a static-page bug like the one this token
+                                   exists to fix.) */
+  --accent-soft: 30 58 95;    /* dark-tinted accent wash, matches dark theme.
+                                  Not currently used as a badge fill inside
+                                  any .surface-inverted block — if one is
+                                  added later, re-check text-accent against
+                                  it specifically (measured only ~2.87:1 with
+                                  the accent values above; --accent-soft
+                                  would need lightening too at that point). */
 }
 
 /* ─── Content text — Tailwind-built-in-palette overrides ────────────────────

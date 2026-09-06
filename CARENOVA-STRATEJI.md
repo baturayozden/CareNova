@@ -853,4 +853,45 @@ Bunlar bilinçli olarak çözülmemiş bıraktığım noktalar — varsayımla i
 
 ---
 
+## 14. Tasarım sistemi — renk token'ları (WCAG AA)
+
+Bu bölüm bir kere eklendi (Eylül 2026) çünkü aynı token'lar art arda iki kez
+WCAG AA'nın altına düştü: önce "3:1 UI-metin" eşiğine göre kalibre edildi,
+sonra sayfadaki gerçek kullanım (11-12px rozet/altyazı metni) 4.5:1
+gerektirdiği ortaya çıktı. **`frontend/src/index.css` her zaman tek gerçek
+kaynaktır** — buradaki değerler referans içindir, index.css'i günceller ama
+bu belgeyi unutursan, bir sonraki kişi (ya da sen) eski/düşük-kontrastlı
+değerlere geri dönebilir.
+
+**Açık tema (`:root`, varsayılan):**
+| Token | Hex | Not |
+|---|---|---|
+| `--ink-subtle` | `#5F6E84` | ≥4.57:1, en zor durum (`--surface-2`) için çözüldü |
+| `--accent` | `#1567E0` | ≥4.56:1, en zor durum (`--accent-soft` zemin, küçük rozet) için çözüldü |
+| `--accent-hover` | `#1559C4` | değişmedi, zaten ≥5.66:1 |
+| `--success` | `#0B7E5D` | ≥4.53:1, `--success-soft` zemin için çözüldü |
+| `--warning` | `#9F6108` | ≥4.56:1, `--warning-soft` zemin için çözüldü |
+
+**`.surface-inverted` (her zaman koyu blok — Mevzuat Kalkanı, Fiyatlandırma
+"Önerilen" kartı, CTA):**
+| Token | Hex | Not |
+|---|---|---|
+| `--accent-hover` | `#447DE3` | ≥4.55:1, metin olarak kullanıldığında (`--surface-0` #0F1626 zemin) |
+| `--accent` | `#2563EB` | **DEĞİŞMEDİ** — bu blokta sadece buton zemini olarak kullanılıyor (üstünde beyaz metin), asla metin rengi olarak değil. Aydınlatılırsa beyaz metnin kendi kontrastı bozulur (~4.0:1'e düşer) — bkz. index.css'teki yorum. |
+
+**Kural — bir dahaki sefer bu token'lardan biri değişecekse:**
+1. `frontend/scripts/check-contrast.js`'i (canlı render edilmiş DOM üzerinde
+   çalışır, teorik token çiftlerini değil) çalıştır — `npm start` + `node
+   scripts/check-contrast.js`.
+2. Bir token'ın SADECE metin renginin mi yoksa SADECE buton zemininin mi
+   (ya da her ikisinin mi) olduğunu kontrol et — `.surface-inverted`'daki
+   `--accent` örneğinde olduğu gibi, aynı token iki farklı rolde
+   kullanılıyorsa "aydınlat/koyulaştır" tek yönlü çözüm olmayabilir.
+3. Yuvarlama payı bırak — tam 4.50 hedeflemek yerine 4.55+ hedefle, HSL→RGB
+   tamsayı yuvarlaması oranı 4.50'nin altına düşürebilir (bu oturumda
+   gerçekten oldu: 4.50 hedefiyle çözülen `accent-hover` yuvarlama sonrası
+   4.49 çıktı).
+
+---
+
 *Bu belgedeki tüm rakamlar Eylül 2026 itibarıyla erişilebilir kamuya açık kaynaklardan derlenmiştir. Hukuki değerlendirmeler bilgilendirme amaçlıdır ve hukuki tavsiye yerine geçmez.*
