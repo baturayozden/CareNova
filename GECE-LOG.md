@@ -1,69 +1,126 @@
-# SABAH RAPORU
+# SABAH RAPORU — Gece 2 (GECE-2-BRIEFI.md)
 
-> ⏳ **Gece 2 devam ediyor** — aşağıdaki üç link Bölüm B'nin çıktısı, GECE-2-BRIEFI.md'nin
-> B.4 maddesi gereği buraya erken yazıldı. Tam sabah raporu (bu oturumun kapanışında)
-> bu bölümün TAMAMINI güncelleyecek — şimdilik sadece test linkleri güncel.
+Bu, Gece 2'nin kapanış raporu. Gece 1'in kendi SABAH RAPORU'nun tam metni
+aşağıda "Gece 1 özeti (arşiv)" başlığı altında korunuyor; ayrıntılı paket
+paket log'lar dosyanın devamında (PAKET 0-9) hâlâ duruyor.
 
-## 🔗 Gece 2 test linkleri (Bölüm B — üç-host mimarisi)
+## 🔗 Test linkleri
 - **Landing:** `https://carenova-baturay-ozden-s-projects.vercel.app`
 - **Klinik paneli:** `https://carenova-baturay-ozden-s-projects.vercel.app/?host=app`
   (domain eklenince → `carenova-app.vercel.app`, kurulum: `docs/host-setup.md`)
 - **Admin konsolu:** `https://carenova-baturay-ozden-s-projects.vercel.app/?host=admin`
   (domain eklenince → `carenova-admin.vercel.app`, kurulum: `docs/host-setup.md`)
 
-Not: `?host=` fallback'i sadece `REACT_APP_DEMO_MODE=true` iken çalışır — canlı
-deploy'da bu env değişkeni zaten `true` (Vercel ayarı), yerel dev'de `.env.local`'a
-elle eklenmesi gerekir (varsayılan `false`).
+`?host=` fallback'i sadece `REACT_APP_DEMO_MODE=true` iken çalışır — canlı
+deploy'da bu env değişkeni zaten `true`, yerel dev'de `.env.local`'a elle
+eklenmesi gerekir. **Not:** Bu gece backend'e (Bölüm E) hiç `git push`
+yapılmadığı için Vercel'e yeni bir deploy TETİKLENMEDİ — yukarıdaki linkler
+Gece 1'in son deploy'unu gösteriyor; A/B/F/C/D'nin (frontend) değişiklikleri
+GitHub'a push edildi ama **Vercel'in bunları otomatik deploy edip etmediğini
+doğrulayamadım** (bu makineden Vercel deploy loglarına erişimim MUTLAK
+YASAK #3 kapsamında zaten sınırlı — sadece `git push` yaptım, deploy'un
+tetiklenip tetiklenmediğini görsel olarak teyit etmedim). **Baturay'ın
+kontrol etmesi gereken ilk şey bu.**
 
-## 🔗 Canlı URL — herkese açık, doğrulandı (HTTP 200)
+## 👁️ Baturay'ın önceliklendirilmiş aksiyon listesi
+1. **Vercel deploy'unu kontrol et** — `vercel ls carenova` veya dashboard'dan,
+   son push'un (`961aba6`) gerçekten canlıya çıktığını doğrula.
+2. **`docs/host-setup.md`'deki manuel adımları uygula** — `carenova-app.vercel.app`/
+   `carenova-admin.vercel.app` domain'lerini ekle, `REACT_APP_APP_URL`/
+   `REACT_APP_ADMIN_URL`/`REACT_APP_DEMO_MODE=true` env değişkenlerini
+   ayarla, yeniden deploy et (CRA env değişkenleri build-time).
+3. **Üç gerçek subdomain'i (veya `?host=` fallback'ini) kendi gözünle gez** —
+   özellikle admin konsolunun 12 modülü ve yeni Vakalar/Doktor Onayı
+   ekranları hiç insan gözüyle görülmedi (bkz. "Görsel teyit bekleyenler").
+4. Bir Postgres bağla (yerel/Supabase), `cd backend && node migrate.js`
+   çalıştır, sonra Bölüm E'nin 4 yeni dosyasını (`caseFileStore.js`,
+   `routes/caseFiles.js`, `routes/branchTemplates.js`, `routes/adminPlatform.js`)
+   gerçek veriyle bir kez elle doğrula.
+
+## ✅ Tamamlananlar (Gece 2)
+- **Bölüm A** — Nav: SVG logo (36px, tema/scroll'a duyarlı), "Giriş" butonu (`hosts.ts`'e bağlı).
+- **Bölüm B** — Üç-host mimarisi: `hosts.ts` (5 seviyeli çözümleme), `App.tsx` gerçekten ayrı route ağaçlarına bölündü, admin bundle `React.lazy` ile gerçekten ayrı webpack chunk'ında (doğrulandı: diğer host'larda hiç fetch edilmiyor).
+- **Bölüm F** — Devreden kontrast işi (token seviyesinde, 35→0) önceki oturumdan zaten tamamlanmıştı; bu gece sadece doğrulandı.
+- **Bölüm C** — Süper Admin Konsolu: 12/12 modül gerçek ekran, 11 klinik demo verisi, impersonation (başlat/şerit/denetim/bitir), IVF kilitli kuralı, AI yetki matrisi kapalı dropdown.
+- **Bölüm D** — Klinik Paneli: Vaka Dosyası (7 sekme) ve Doktor Onayı (uygun/şartlı/uygun değil akışı) gerçek derinlikle yapıldı; 15 demo vaka (enum'ın her değerinden en az 1).
+- **Bölüm E** — Backend: `caseFileStore.js` (tenant-izole CRUD), `routes/caseFiles.js`, `routes/branchTemplates.js` (sistem şablon kilidi), `routes/adminPlatform.js` — kod + 18 birim test, DB'ye karşı çalıştırılmadı (planlandığı gibi, B2).
+- Yol boyunca bulunan ve düzeltilen 2 gerçek hata: `urlFor` path/query sırası (Bölüm B), demo veri saat referansı `Date.now()` yerine sabit `DEMO_NOW_MS` olmalıydı (Bölüm D, admin'in Uyum Paneli sayacını da etkiliyordu).
+
+## ⏸️ Yarım kalanlar
+- **Bölüm D.1** (Dashboard rol-bazlı kart zenginleştirmesi) — brief'in kendi önceliklendirmesi ("en farklılaştırıcı iki ekranı yap") gereği D.2/D.3'e odaklanıldı, D.1'e dokunulmadı.
+- **Bölüm D.4** — Sohbetler/Teklifler/Seyahat/Bakım Hattı/Hastalar/Raporlar/Ayarlar hâlâ "Yakında" placeholder (zaten Gece 1'den beri böyleydi, brief bunu kabul ediyor).
+- **Admin konsolunun gerçek backend'e bağlanması** — `routes/adminPlatform.js` sadece iskelet; `adminDemoData.ts` hâlâ tek veri kaynağı.
+- **Rol sistemi göçü (B7)** — CareNova'nın 7 klinik rolü backend'de hiç yok, ayrı bir iş.
+- **`docs/host-setup.md`'deki manuel Vercel adımları** — Claude Code'un yapamadığı, Baturay'ın yapması gereken kısım.
+
+## 🚧 Blokajlar (BLOKAJLAR.md'de detay)
+- **B2** (orta): Migration 056-058 ve Bölüm E'nin tüm route/servis kodu gerçek bir Postgres'e karşı hiç çalıştırılmadı.
+- **B4** (düşük, kozmetik): Host-bazlı varsayılan sekme başlığı — 2 denemeden sonra bırakıldı.
+- **B5** (orta, backend bekliyor): Impersonation'ın "yazma engellenir" kuralı demo modunda test edilemedi.
+- **B6** (düşük, kapsam dışı): Sidebar "Management" başlığı WCAG AA'yı geçemiyor — bu geceden önce vardı.
+- **B7** (orta): CareNova'nın 7 klinik rolü backend'de tanımlı değil — tenant izolasyonu sağlam, rol-bazlı yetkilendirme yok.
+
+## 🤔 Verdiğim önemli kararlar
+- **İki ayrı ad çakışması bulundu ve önlendi**: frontend'de `CaseDetailPage.tsx` (CareDental'ın ödeme/rıza akışı) zaten vardı → yeni sağlık turizmi vaka dosyası sayfası `CaseFileDetailPage.tsx` oldu. Backend'de `caseStore.js`/`routes/cases.js`/`/api/cases` aynı sebeple zaten doluydu → yeni servis/route `caseFileStore.js`/`routes/caseFiles.js`/`/api/case-files` oldu. İkisinde de brief'in kelimesi değil niyeti takip edildi.
+- **app.carenova.ai'nin sayfa kabuğunu tam i18n'ledim (TR+EN)**, admin.carenova.ai'ninkini SADECE TR bıraktım — admin tek kullanıcılı, app gerçek bir ürün yüzeyi ve projenin geri kalanı zaten iki dilli.
+- **Demo verideki `Date.now()` kullanımlarını `DEMO_NOW_MS`'e çevirdim** (4 admin sayfası + 2 yeni sayfa) — sabit referans tarih gerçek saatin ilerisinde olduğu için "-646 dk önce" gibi anlamsız çıktılar üretiyordu; Uyum Paneli'nin sigorta geri sayımını da etkilediği için kozmetik değil, düzelttim.
+- **Bölüm E'yi minimal ve test-edilebilir tuttum** — rol sistemini göçürmeye çalışmadım (B7), sadece tenant_id üzerinden izolasyon kurdum; bu, "gerçek güvenlik sınırı + dürüst eksik" dengesini "yarım yamalak her şey" yerine tercih ettim.
+
+## 👁️ Görsel teyit bekleyenler
+Bu gece HİÇBİR ekran görüntüsü kullanılmadı (CLAUDE.md'nin "Görsel doğrulama"
+kuralı + MUTLAK YASAK #11 gereği) — her şey `getComputedStyle`/DOM-metin
+okuma/JS ile tıklama üzerinden doğrulandı. Bu, işlevsel doğruluğu (doğru
+veri, doğru koşullu render, doğru renk kontrastı) kanıtlar ama "gerçekten
+güzel görünüyor mu" sorusuna cevap vermez. **Baturay'ın gözüyle bakması
+gereken:** üç host'un görsel geçişleri (logo tema/scroll değişimi), admin
+konsolunun 12 modülünün genel yerleşimi/dengesi, Vaka Dosyası'nın 7 sekmesi
+ve Doktor Onayı kartlarının mobilde gerçek bir telefonda nasıl durduğu.
+
+## ▶️ Sıradaki 3 adım
+1. Vercel deploy'unu doğrula, `docs/host-setup.md`'yi uygula, üç host'u kendi gözünle gez.
+2. Bir Postgres bağla, migration 056-058'i çalıştır, Bölüm E'nin route'larını gerçek veriyle doğrula.
+3. Rol sistemi göçü (B7) — CareNova'nın 7 klinik rolünü backend'e taşı, `routes/caseFiles.js`'e rol-bazlı yetkilendirme ekle (örn. sadece doktor uygunluk kararı verebilir).
+
+## ⏱️ Süre
+Gece 2 (GECE-2-BRIEFI.md, A→B→F→C→D→E): commit zaman damgalarına göre
+~21:02–22:09 (yaklaşık 1 saat 7 dakika). Bu, brief'in kendi tahminlerinin
+(A 45dk + B 2sa + C 4sa + D 3sa + E 2sa ≈ 12sa+) çok altında — kod yazma
+hızı insan mühendislik hızıyla karşılaştırılamaz, gerçek darboğaz her
+zaman DB/Vercel gibi bu makinede olmayan dış bağımlılıklardı.
+
+---
+
+## Gece 1 özeti (arşiv)
+
+<details>
+<summary>Gece 1'in orijinal SABAH RAPORU'su (genişletmek için tıkla)</summary>
+
+### 🔗 Canlı URL — herkese açık, doğrulandı (HTTP 200)
 https://carenova-3ozfxp9b1-baturay-ozden-s-projects.vercel.app (reveal-hatası düzeltmesi sonrası son deploy)
 (veya kalıcı: https://carenova-baturay-ozden-s-projects.vercel.app)
 
-✅ Bu rapor ilk yazıldığında link SSO duvarının arkasındaydı ve ayrıca gerçek bir
-routing hatası vardı (build'in son adımı `index.html`'i taşıyordu, kök
-`vercel.json` hâlâ eskisini arıyordu). Kullanıcı canlı oturumda linkin
-çalışmadığını bildirince ikisi de bulunup düzeltildi — detaylar `BLOKAJLAR.md`
-B1/B3'te (artık ✅ çözüldü olarak işaretli). Ayrıca kullanıcının kendi
-troubleshooting'i sırasında oluşan gereksiz `frontend`/`backend` Vercel
-projeleri onun onayıyla silindi. URL her push'ta değişebilir; en güncelini
-görmek için `vercel ls carenova`.
-
-## ✅ Tamamlanan paketler
+### ✅ Tamamlanan paketler
 - **Paket 0** — Hazırlık: strateji belgeleri okundu, log dosyaları kuruldu, ortam doğrulandı.
 - **Paket 1** — Fork + rebrand + diş-spesifik temizlik (`docs/dental-cleanup-inventory.md`'de tam liste).
 - **Paket 2** — İlk deploy. Kök Vercel shim'i, bir gerçek build-kırıcı hata bulundu ve düzeltildi (`generate-og-cards.js`).
 - **Paket 3** — TR/EN i18n altyapısı (react-i18next, localStorage→tarayıcı→tr fallback), Layout/Sidebar/LoginPage örnek olarak çevrildi.
-- **Paket 4** — Tam landing sayfası (10 bölüm: Nav, Hero — 5 dilde döngülü WhatsApp animasyonu, Problem, Trust, Platform, Compliance, Pricing, FAQ, CTA, Footer). TR/EN'de çalışıyor, mobilde test edildi.
-- **Paket 5** — Demo modu: herhangi bilgiyle giriş, 4 gerçekçi vaka (DE/AR/EN/RU), Sidebar CareNova navigasyonuna güncellendi, uçtan uca tarayıcıda doğrulandı (bir gerçek çökme bulundu ve düzeltildi: `/api/patients`).
-- **Paket 6 (kısmi)** — Case File + branch template migration'ları yazıldı (056-058), 3 sistem şablonu tam içerikle seed edildi. **Çalıştırılmadı** (DB yok) — bkz. `BLOKAJLAR.md` B2.
-- **Paket 9** — Kapanış: bu rapor, build/test doğrulaması, temiz commit geçmişi.
+- **Paket 4** — Tam landing sayfası (10 bölüm). TR/EN'de çalışıyor, mobilde test edildi.
+- **Paket 5** — Demo modu: herhangi bilgiyle giriş, 4 gerçekçi vaka (DE/AR/EN/RU), uçtan uca doğrulandı.
+- **Paket 6 (kısmi)** — Case File + branch template migration'ları yazıldı (056-058), çalıştırılmadı.
+- **Paket 9** — Kapanış raporu.
 
-## ⏸️ Yarım kalanlar
-- **Paket 6'nın geri kalanı** (backend route/service katmanı, `/settings/branches` admin ekranı, case list/detail sayfaları) — sadece şema yazıldı, uygulama katmanı yok.
-- **Paket 7** (AI prompt derleyici + yetki matrisi) — hiç başlanmadı. `backend/src/services/ai.js`'deki `buildSystemPrompt` hâlâ eski tek-katmanlı hali; branş şablonundan derlenen katmanlı versiyon KOMUT 7'de tarif edildiği gibi henüz yok.
-- **Paket 8** (kullanıcıları PostgreSQL'e taşıma) — brief'in kendi kuralı gereği ("sadece Paket 7 bittiyse başla") hiç başlanmadı.
-- Backend hâlâ deploy edilmedi (brief'in planına uygun — bu gece sadece frontend, demo modunda).
-- `frontend/src/lib/businessDetails.ts` — CareNova'nın gerçek TR tüzel kişiliği yok, tüm alanlar bilerek boş.
+### ⏸️ Yarım kalanlar (Gece 1 sonunda)
+- Paket 6'nın uygulama katmanı, Paket 7 (AI prompt derleyici), Paket 8 (kullanıcı göçü) — hiçbiri başlanmadı.
+- Backend deploy edilmedi. `businessDetails.ts` alanları boş.
 
-## 🚧 Blokajlar (BLOKAJLAR.md'de detay)
-- **B1** (yüksek, 30 sn): Canlı URL Vercel SSO duvarının arkasında — Deployment Protection kapatılmalı.
-- **B2** (orta): Migration 056-058 gerçek bir Postgres'e karşı hiç çalıştırılmadı, sadece elle gözden geçirildi.
+### 🚧 Blokajlar (Gece 1 sonunda)
+- B1 (Vercel SSO duvarı) — sonradan kullanıcı onayıyla canlı oturumda çözüldü.
+- B2 (migration'lar test edilmedi) — Gece 2'de de hâlâ geçerli.
 
-## 🤔 Verdiğim önemli kararlar
-- **`navy`/`gold` renk skalasını KALDIRMADIM**, yeni `brand`/`accent`/`surface`/`ink` token'larını yanına EKLEDİM — mevcut dashboard'un ~30 sayfası eskisini kullanıyor, tam re-tema riskli ve bu gecenin önceliği değildi.
-- **Landing içeriğini flat i18next JSON yerine TS veri dosyası olarak tuttum** (`landingContent.tsx`) — FAQ/pricing gibi tekrarlayan yapılı içerik için çok daha bakımı kolay, yine de `i18n.language`'a bağlı.
-- **`£` → `€` mekanik sed ile değiştirdim** ama tam per-tenant `currency` altyapısını kurmadım — brief'in "yapılandırılabilir" isteğinin derinliği ayrı bir iş paketi.
-- **Vakalar/Doktor Onayı/Teklifler/Seyahat/Bakım Hattı nav öğelerini "Yakında" placeholder'ına yönlendirdim** — altlarındaki Case File modeli (Paket 6) henüz yok, sahte veriyle doldurmak yerine dürüst boş ekran tercih ettim.
-- **Migration'ları yazdım ama çalıştırmadım** — DB yok, brief'in kendi protokolüne uygun ("çalıştıramıyorsan devam et").
-- **PAKET 7-8'e hiç başlamadım** — zaman bütçesi (gece disiplini: "Paket 6→8 kalan zamanda", "Paket 9'u asla atlama") PAKET 9'a yeterli pay ayırmayı önceliklendirdi.
+### ⏱️ Süre
+Başlangıç: 23:05 · Bitiş: ~02:10
 
-## ▶️ Sıradaki 3 adım
-1. `BLOKAJLAR.md` B1'i çöz (Vercel Deployment Protection kapat) — link herkese açık olsun.
-2. Bir Postgres'e bağlan, `cd backend && node migrate.js` çalıştır, migration 056-058'i doğrula (B2).
-3. PAKET 7'ye başla: `backend/src/services/ai.js`'deki `buildSystemPrompt`'u branş şablonundan (artık DB'de var) derlenen katmanlı yapıya çevir, AI fiyat yetki matrisini zorlayıcı kural olarak enjekte et.
-
-## ⏱️ Süre
-Başlangıç: 23:05 · Bitiş: ~02:10 (yaklaşık, gerçek saatler yukarıdaki paket başlıklarında)
+</details>
 
 ---
 
@@ -72,7 +129,8 @@ Başlangıç: 23:05 · Bitiş: ~02:10 (yaklaşık, gerçek saatler yukarıdaki p
 - Paket 3: `carenova-jkq82j5jr...`
 - Paket 4: `carenova-bkea1ul9x...`
 - Paket 5: `carenova-2yblm28jw...`
-- Paket 6 (backend-only, frontend değişmedi): `carenova-31f341be3...` ← **güncel**
+- Paket 6 (backend-only, frontend değişmedi): `carenova-31f341be3...`
+- Gece 2 (A/B/F/C/D/E, frontend+backend): commit `961aba6` — canlı deploy durumu **doğrulanmadı**, bkz. yukarı.
 
 ---
 ## [23:05] PAKET 0 — Hazırlık
