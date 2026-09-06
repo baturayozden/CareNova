@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 import MyCommissionCard from './MyCommissionCard';
-import OnboardingWizard from './OnboardingWizard';
 import { Flame, Thermometer, Snowflake, Ghost, Target } from 'lucide-react';
 
 type IconComponent = React.ComponentType<{ size?: number; className?: string }>;
@@ -209,7 +208,6 @@ export default function Dashboard() {
           </>
         )}
       </div>
-      <OnboardingWizard />
     </div>
   );
 }

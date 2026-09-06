@@ -120,6 +120,7 @@ function AppRoutes() {
           <Route path="/clinics/:id"   element={<ClinicDetailPage />} />
           <Route path="/settings"              element={<SettingsPage />} />
           <Route path="/settings/integrations" element={<SettingsPage initialTab="integrations" />} />
+          <Route path="/settings/onboarding"   element={<ComingSoonPage title="Kurulum Sihirbazı" />} />
           <Route path="/commission"             element={<CommissionPage />} />
           <Route path="/patients"              element={<PatientsListPage />} />
           <Route path="/patients/:leadId"     element={<PatientProfilePage />} />
