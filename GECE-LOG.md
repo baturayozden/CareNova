@@ -1282,7 +1282,7 @@ sistem şablon kilidi kodda VE testte kanıtlı. ✅ `node --check` + canlı
 boot temiz. ⚠️ Gerçek Postgres'e karşı hiç çalıştırılmadı (B2/B7). ⚠️
 Rol-bazlı yetkilendirme henüz yok (B7).
 
-**Commit:** (aşağıda)
+**Commit:** `91d5dd5` — "feat(backend): Case File CRUD, branch templates, admin read endpoints"
 
 ---
 
