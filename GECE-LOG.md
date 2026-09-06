@@ -524,3 +524,93 @@ doğrulandı. ⚠️ Gerçek görünür sekmede elle doğrulama kullanıcıya b�
 **Commit:** `41f4e44` fix(landing): stop scroll-reveal animations getting stuck at opacity:0
 
 ---
+### Gözden geçirme — `index.tsx`'teki `container.innerHTML = ''` neyi bozuyor mu?
+
+**Soru:** Prerender edilmiş snapshot neden vardı (SEO mu, ilk boyama mı, başka
+bir şey mi), `createRoot` öncesi `#root`'u temizlemek bu amacı bozuyor mu, ve
+eğer bozuyorsa hydration (ya da "sadece gerçekten bayatsa temizle") daha iyi
+bir çözüm mü?
+
+**Snapshot'ın gerçek amacı — kaynağa bakarak (`scripts/prerender.js`, kendi
+dosya başlığı ve satır içi yorumları):**
+Snapshot **SAF SEO/tarayıcı amaçlı** — insan ziyaretçi için ilk boyama hızı
+DEĞİL. Kanıt, script'in kendi sözleriyle:
+- `readinessCheck` şunları BEKLİYOR: `canonical` link, gerçek `<title>`, `<h1>`,
+  `body.innerText.length > 500`, blog sayfaları için ek içerik şartları
+  (`postLinks >= 10`, makale metni > 500 karakter) — bunların hepsi arama
+  motoru/crawler indexleme sinyalleri, insan gözüne yönelik bir "performans"
+  metriği değil.
+- `sanitize()` GTM/analytics script'lerini ve consent banner'ını SİLİYOR önce
+  yazmadan — bir insan ziyaretçiye gösterilecek olsa bu temizlik gereksiz
+  olurdu (asıl istemci zaten kendi banner'ını doğru gösterir); bu, çıktının
+  "crawler'ın okuyacağı statik metin" olarak tasarlandığının doğrudan kanıtı.
+- Dosyanın kendi başlık yorumu: "FAIL-SAFE DIRECTION: vercel.json routes
+  apex(carenova.ai) → prerendered marketing, and EVERYTHING ELSE → the app
+  shell." — amaç host-bazlı YANLIŞ İÇERİK SIZINTISINI önlemek (app.carenova.ai
+  yanlışlıkla landing göstermesin / carenova.ai yanlışlıkla login ekranı
+  göstermesin), performans değil.
+- `injectNoindex` fonksiyonunun yorumu: statik (JS'siz) `curl`'ün bile doğru
+  `noindex`/gerçek içerik görmesini bekliyor — klasik SEO/crawler kaygısı.
+- Hiçbir yerde "hydration", "TTI", "first paint optimization" gibi bir amaç
+  ifade edilmiyor; `index.tsx`'te de `window.__PRELOADED_STATE__` benzeri bir
+  hydration-veri-aktarım deseni YOK (`grep` ile doğrulandı) — snapshot'ın
+  DOM'undan istemci tarafının okuduğu hiçbir şey yok.
+
+**Peki `container.innerHTML = ''` bu SEO amacını bozuyor mu? Hayır — üç ayrı
+gerekçeyle:**
+1. **JS çalıştırmayan crawler'lar** (çoğu sosyal önizleme botu, basit
+   crawler'lar) zaten HİÇBİR JS çalıştırmıyor — `index.tsx` onlar için hiç
+   devreye girmiyor, benim değişikliğim onları hiç etkilemiyor. SEO değeri
+   ham HTML'den geliyor, JS'in `#root`'a ne yaptığından değil.
+2. **JS çalıştıran crawler'lar** (Googlebot'un evergreen renderer'ı) için:
+   DEĞİŞİKLİKTEN ÖNCE `createRoot().render()` zaten `#root`'un statik
+   markup'ını temizlemiyordu (React 18'in bilinen davranışı — sadece kendi
+   oluşturduğu düğümleri yönetir) — yani JS çalıştıktan sonra Googlebot'un
+   gördüğü DOM zaten statik snapshot + canlı ağaç YAN YANA (potansiyel
+   çakışma/duplikasyon) idi, benim "düzelttiğimi düşündüğüm" DUPLIKASYON
+   TEORİSİ önceki oturumda YANLIŞ çıkmıştı (gerçek DOM'u inceledim, tekilleme
+   yoktu — bkz. bir önceki bölüm) ama `innerHTML=''` YİNE DE zararsız bir
+   savunma: temizleme sonrası DOM tek, temiz bir ağaç — bu SEO için AYNI ya da
+   DAHA İYİ (belirsiz/çakışan içerik crawler'ın metin çıkarımını karıştırabilir,
+   temiz tek ağaç karıştırmaz).
+3. **Snapshot'ın "görünmeyen" (whileInView henüz tetiklenmemiş) alt-katman
+   içeriği zaten hem snapshot'ta HEM de taze istemci mount'unda AYNI durumda**
+   (`opacity:0`) — çünkü Puppeteer sayfayı hiç scroll etmiyor, `whileInView`
+   sadece görünüme giren elemanlarda tetikleniyor. Yani temizleme, "korunması
+   gereken görsel bir kazanımı" YOK ETMİYOR — snapshot'ın kendisi zaten
+   ekranın altındaki her şeyi "hidden" olarak yakalıyor, tıpkı taze mount'un
+   yapacağı gibi. Kaybedilecek bir şey yok.
+
+**Hydration (`hydrateRoot`) neden DAHA İYİ bir çözüm DEĞİL — somut, koddan
+doğrulanmış risk:**
+`frontend/src/pages/BlogPostPage.tsx` incelendi: bileşen `useState(null)` /
+`loading:true` ile başlıyor, gerçek makale verisini bir `useEffect` içinde
+`fetch(...)` ile ÇEKİYOR. Yani `/blog/:slug` rotasında istemcinin İLK render'ı
+bir YÜKLENIYOR İSKELETİ — snapshot'ın (Puppeteer'ın API'den gerçek veriyle
+doldurup yakaladığı) TAM MAKALE İÇERİĞİYLE YAPISAL OLARAK UYUŞMUYOR. React 18
+`hydrateRoot` bunu bir hydration mismatch olarak algılar, sunucu ağacını atıp
+tam istemci-taraflı yeniden render'a düşer — yani sonuç olarak YİNE "temizle
+ve yeniden kur" ile aynı NET etkiye ulaşır, ama üstüne (a) konsola hydration
+uyarıları basar, (b) React'ın önce eşleştirmeyi DENEYİP sonra vazgeçmesi
+yüzünden ekstra iş yapar, (c) blog dışı (statik TS veri modülünden gelen,
+API'siz) sayfalarda risksiz olsa da kod tabanında TEK BİR mount stratejisi
+varken rotaya göre "bazen hydrate, bazen createRoot" ayrımı yapmak ekstra
+karmaşıklık ve bakım yükü getirir — kazandırdığı hiçbir şey yokken.
+
+**"Sadece gerçekten bayatsa temizle" (koşullu/hibrit) fikri değerlendirildi,
+reddedildi:** Bunun anlamlı olması için snapshot'ın CANLI TUTULMASI gereken
+bir değeri olması gerekirdi (ör. gerçek bir performans kazanımı — "tazeyse
+snapshot'ı koru, tekrar render etme"). Ama snapshot'ın DEĞERİ zaten crawler'a
+ulaştığı andan (statik HTML parse edildiği andan) itibaren TESLIM EDİLMİŞ
+durumda — `index.tsx` çalışana kadar geçen sürede snapshot zaten görevini
+yaptı. "Tazelik" kontrolü eklemek (ör. bir `<meta name="prerendered-at">`
+zaman damgası okuyup karar vermek) sadece KARMAŞIKLIK ekler, hiçbir gerçek
+kazanım sağlamaz — çünkü korunacak bir şey yok.
+
+**Sonuç:** `container.innerHTML = ''` snapshot'ın SEO/host-routing amacını
+BOZMUYOR — o amaç zaten JS çalışmadan önce, ham HTML seviyesinde teslim
+edilmiş durumda. Hydration'a geçmek gerçek bir mismatch riski (blog sayfaları)
+karşılığında hiçbir kazanım sunmuyor. Mevcut yaklaşım (temizle + taze
+`createRoot`) doğru, basit ve tek-strateji — değişiklik gerekmiyor.
+
+---
