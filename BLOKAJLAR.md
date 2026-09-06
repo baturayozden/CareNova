@@ -57,6 +57,51 @@ eklenenler, hata verirlerse önce onlara bak.
 
 **Aciliyet:** Orta — backend deploy edilene kadar acil değil.
 
+**Güncelleme (Bölüm E):** Bölüm E'de bu 3 migration'ın üzerine gerçek
+servis/route kodu yazıldı (`caseFileStore.js`, `routes/caseFiles.js`,
+`routes/branchTemplates.js`, `routes/adminPlatform.js`) — hepsi mock
+`pool.query` ile birim testlerle doğrulandı (13+5 test, hepsi geçti),
+ama HİÇBİRİ gerçek bir Postgres'e karşı çalıştırılmadı. `npm test` ayrıca
+DB'ye gerçekten bağlanmaya çalışan (`ECONNREFUSED`) önceden var olan
+`invoiceNumber.test.js`'i içeriyor — bu benim eklediğim bir şey değil,
+ama "npm test temiz geçti" derken bunu atladığımı açıkça belirtiyorum:
+`npx jest --testPathIgnorePatterns=invoiceNumber` → 4 suite, 122 test,
+hepsi yeşil. Migration'lar çalıştırıldığında ilk iş bu 4 yeni dosyayı
+gerçek verilerle (özellikle tenant izolasyonunu) elle bir kez daha
+doğrulamak.
+
+---
+
+## B7 — CareNova'nın 7 klinik rolü (klinik_sahibi/operasyon_muduru/...) backend'de hiç yok
+
+**Ne oldu:** Bölüm E'ye başlarken fark ettim: `klinik_sahibi`,
+`operasyon_muduru`, `hasta_danismani`, `doktor`, `koordinator`, `tercuman`,
+`muhasebe` — CARENOVA-STRATEJI.md'nin ve Bölüm C.10'un (admin konsolu
+Kullanıcılar sekmesi) tanımladığı 7 klinik rolü — backend'in HİÇBİR
+yerinde yok. `backend/src/routes/clinics.js`'teki `ROLE_IDS` hâlâ
+CareDental'ın eski rolleri (`director`, `clinic_admin`, `receptionist`,
+`dentist`, `treatment_coordinator`, `sales`). Bu 7 rol şu ana kadar SADECE
+frontend'de, admin konsolunun demo verisinde (`adminDemoData.ts`) var —
+gerçek bir backend karşılığı yok.
+
+**Neden düzeltmedim:** Rol sistemini değiştirmek (yeni migration, `ROLE_IDS`
+haritası, ~20 route dosyasındaki `requireRole(...)` çağrılarının hepsinin
+güncellenmesi, mevcut kullanıcı verisinin taşınması) tek başına bir gecelik
+iş — Bölüm E'nin "vakit kalırsa" bütçesine sığdırmak yerine, `caseFiles.js`/
+`branchTemplates.js`'i tenant_id üzerinden (rol adından bağımsız) izole
+ettim; rol-özel yetkilendirme (örn. "sadece doktor uygunluk kararı verebilir")
+şu an HİÇBİR route'ta zorlanmıyor.
+
+**Ne gerekiyor:** Ayrı bir migration + `ROLE_IDS` güncellemesi + ilgili
+route'ların rol kontrollerinin CareNova'nın 7 rolüne taşınması. Şimdilik
+`req.user.tenantId` üzerinden izolasyon güvenli, ama rol-bazlı yetki
+(örn. sadece `doktor` case durumunu `awaiting_doctor`'dan ileri taşıyabilir)
+YOK.
+
+**Aciliyet:** Orta — tenant izolasyonu (asıl güvenlik sınırı) sağlam, ama
+rol-bazlı yetkilendirme backend'e gerçek endpoint'ler eklendikçe (Bölüm E'nin
+devamı) mutlaka gelmeli.
+
 ---
 
 ## B4 — Kendi AppMeta'sını render etmeyen sayfalarda host-bazlı varsayılan sekme başlığı çalışmıyor (kozmetik, düşük öncelik)

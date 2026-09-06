@@ -109,8 +109,21 @@ app.use('/api/notification-preferences', authenticate, require('./routes/notific
 // All other endpoints in the router enforce authenticate internally.
 app.use('/api/calendar', require('./routes/calendar'));
 
-// Treatment cases / payments
+// Treatment cases / payments (CareDental-inherited consent+payment flow —
+// NOT the health-tourism Case File model below, despite the similar name)
 app.use('/api/cases', authenticate, require('./routes/cases'));
+
+// Health-tourism Case File model (GECE-2-BRIEFI.md Bölüm E). Deliberately
+// /api/case-files, not /api/cases — see routes/caseFiles.js's header.
+app.use('/api/case-files', authenticate, require('./routes/caseFiles'));
+
+// Branch templates (pre-assessment questions, AI pricing authority, IVF
+// donor-gamete rule, etc. — CARENOVA-STRATEJI.md Bölüm 7/M2)
+app.use('/api/branch-templates', authenticate, require('./routes/branchTemplates'));
+
+// Super Admin Console read endpoints (platform-only; requireRole inside the
+// router already includes authenticate — mirrors routes/admin.js's own mount)
+app.use('/api/admin/platform', require('./routes/adminPlatform'));
 
 // Billing entities (legal entity list per tenant)
 app.use('/api/billing-entities', authenticate, require('./routes/billingEntities'));

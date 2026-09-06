@@ -1199,4 +1199,91 @@ Baturay'ın gözüyle bakması gerekiyor.
 
 ---
 
+## BÖLÜM E — Backend (⚪ vakit kalırsa)
+
+Brief'in kendi önceliklendirmesiyle en düşük öncelikli bölüm; DB yokluğu
+zaten "kod + birim test yaz, DB'ye karşı doğrulanmadığını yaz" şeklinde
+önceden kabul edilmiş bir kısıt (BLOKAJLAR.md B2).
+
+**İkinci bir ad çakışması bulundu ve önlendi:** Brief "caseStore.js'i
+genişlet" ve "routes/cases.js yaz" diyor — ama ikisi de ZATEN VAR ve
+tamamen FARKLI bir kavrama ait: CareDental'dan miras kalan
+"treatment_cases" (rıza formu + ödeme tahsilatı) akışı, `/api/cases`
+altında mount edilmiş, frontend'in `/payments/:id` sayfasının kullandığı
+gerçek, çalışan bir özellik. Sağlık turizmi "Vaka Dosyası" kavramı
+(migration 057/058) bunun üzerine yazılırsa mevcut ödeme akışı kırılırdı.
+Frontend'de aynı çakışmayı `CaseFileDetailPage.tsx` adıyla çözmüştüm
+(Bölüm D notlarına bak); backend'de aynı mantıkla yeni dosyalar
+`caseFileStore.js` / `routes/caseFiles.js` (mount: `/api/case-files`,
+`/api/cases` DEĞİL) olarak adlandırıldı. Bu, brief'in kelimesi kelimesine
+takip edilemeyeceği, ama niyetinin (yeni vaka modeli için CRUD + route)
+korunduğu bir örnek — GECE-LOG'a gerekçesiyle yazıp devam ettim.
+
+**`caseFileStore.js`:** `cases`/`case_media`/`case_assessments`/
+`case_timeline`/`case_events` (migration 057) üzerine CRUD. Tasarım
+kararı: HER okuma/yazma fonksiyonu `tenantId`'yi zorunlu ilk parametre
+olarak alıyor ve SQL'in WHERE koşuluna dahil ediyor — "bir tenant
+başkasının vakasını GÖREMEMELİ" kuralı opsiyonel bir filtre değil,
+fonksiyonun imzasının bir parçası. `getCaseById`/`updateCaseStatus`
+başka bir tenant'ın vakasına rastlarsa `undefined` döner (404'e denk
+düşer) — 403 değil, çünkü 403 "bu id var ama senin değil" bilgisini
+sızdırır, 404 sızdırmaz.
+
+**`routes/caseFiles.js`** (`/api/case-files`): liste (durum/branş
+filtresi), detay, durum güncelleme, medya/ön-değerlendirme/seyahat-takvimi
+ekleme. `resolveTenant()` deseni `routes/cases.js`'teki ile aynı: platform
+rolü (`super_admin`/`admin`) `?tenantId=` geçebilir, klinik kullanıcısının
+tenant'ı HER ZAMAN kendi token'ından gelir, query'den asla.
+
+**`routes/branchTemplates.js`** (`/api/branch-templates`): liste (sistem +
+kendi tenant'ının şablonları), detay, güncelleme. 🔴 güvenlik kuralı Bölüm
+C.6 ile birebir: `canEditTemplate()` — sistem şablonunu (IVF dahil) sadece
+`super_admin`/`admin` düzenleyebilir, bir klinik sadece KENDİ özel
+şablonunu. Bu fonksiyon saf mantık olduğu için DB olmadan tam test edildi.
+
+**`routes/adminPlatform.js`** (`/api/admin/platform`): Bölüm C'nin admin
+konsolu şu an TAMAMEN `adminDemoData.ts`'e bağlı, hiçbir backend'e
+bağlanmıyor — bu iki salt-okunur endpoint (`/overview`, `/clinics`) o
+bağlamanın hedefleyeceği bir sözleşme olsun diye şimdiden yazıldı, bu
+gece BAĞLANMADI (kapsam dışı, ayrı bir iş).
+
+**Birim testler (DB olmadan, mock `pool.query`):**
+`services/__tests__/caseFileStore.test.js` — 13 test: her fonksiyonun
+eksik `tenantId`'yi reddettiği, `getCaseById`/`updateCaseStatus`'ın gerçek
+iki-tenant'lı sahte bir tabloda (SQL string'ini ayrıştırıp gerçekten
+`tenant_id` ile filtreleyen bir mock) tenant A'nın tenant B'nin vakasını
+NE okuyabildiğini NE yazabildiğini, ve başarısız bir cross-tenant
+güncellemenin denetim kaydı (`case_events`) YARATMADIĞINI doğruluyor.
+`routes/__tests__/branchTemplates.test.js` — 5 test, `canEditTemplate`'in
+4 rol/sahiplik kombinasyonunu doğruluyor. **Hepsi geçti** (`npx jest
+--testPathIgnorePatterns=invoiceNumber` → 4 suite, 122 test, 0 başarısız
+— `invoiceNumber.test.js` hariç tutuldu çünkü gerçek bir Postgres'e
+bağlanmaya çalışıyor ve bu makinede yok; bu benim eklediğim bir test
+değil, önceden var).
+
+**Yeni bulunan, kapsam dışı bırakılan gerçek boşluk (BLOKAJLAR B7):**
+CareNova'nın 7 klinik rolü (`klinik_sahibi`/`doktor`/`koordinator`/vb.)
+backend'in HİÇBİR yerinde tanımlı değil — sadece admin konsolunun demo
+verisinde var. Yeni route'lar tenant_id üzerinden izole (asıl güvenlik
+sınırı sağlam) ama rol-bazlı yetkilendirme (örn. "sadece doktor uygunluk
+kararı verebilir") şu an HİÇBİR yerde zorlanmıyor. Rol sistemini gerçekten
+taşımak (~20 dosyadaki `requireRole` çağrıları) tek başına ayrı bir iş —
+detay BLOKAJLAR.md B7'de.
+
+**Doğrulama:** `node --check` her yeni dosyada temiz. `node src/index.js`
+gerçekten ayağa kalktı (2 saniye canlı tutup log kontrol edildi, hata
+yok), sonra 3 yeni route grubuna auth'suz `curl` atıp üçünün de 401
+döndüğünü (yani gerçekten mount olduklarını ve auth arkasında olduklarını)
+doğruladım. **DB'ye karşı doğrulanmadı** — B2/B7'nin güncellemesinde
+açıkça yazıldı.
+
+**Kabul kriteri:** ✅ Tenant izolasyonu kodda VE testte kanıtlı. ✅ IVF/
+sistem şablon kilidi kodda VE testte kanıtlı. ✅ `node --check` + canlı
+boot temiz. ⚠️ Gerçek Postgres'e karşı hiç çalıştırılmadı (B2/B7). ⚠️
+Rol-bazlı yetkilendirme henüz yok (B7).
+
+**Commit:** (aşağıda)
+
+---
+
 
