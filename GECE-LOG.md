@@ -1735,7 +1735,7 @@ bu header'ı hiçbir isteğe eklemiyor, çünkü admin konsolu hâlâ tamamen
 demo veri üzerinde çalışıyor, gerçek bir API istemcisi yok. `BLOKAJLAR.md`
 B5 ✅ olarak kapatıldı ama bu sınırla birlikte not düşüldü.
 
-**Commit:** (aşağıda)
+**Commit:** `1325636` — "feat(auth): block writes during impersonation sessions"
 
 ---
 
