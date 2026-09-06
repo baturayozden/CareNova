@@ -34,7 +34,7 @@ alanı bu temizlikten sonra doğru şekilde `carenova-baturay-ozden-s-projects.v
 
 ---
 
-## B2 — Yeni migration'lar (056-058) gerçek bir veritabanına karşı hiç çalıştırılmadı (aciliyet: orta)
+## B2 — Yeni migration'lar (056-059) gerçek bir veritabanına karşı hiç çalıştırılmadı (aciliyet: orta)
 
 **Ne oldu:** PAKET 6'da `cases`/`case_*`/`branch_templates` tabloları için 3 yeni
 migration yazıldı (`backend/src/migrations/056-058`). Bu makinede `psql` veya
@@ -57,18 +57,26 @@ eklenenler, hata verirlerse önce onlara bak.
 
 **Aciliyet:** Orta — backend deploy edilene kadar acil değil.
 
-**Güncelleme (Bölüm E):** Bölüm E'de bu 3 migration'ın üzerine gerçek
+**Güncelleme (Gece 2 Bölüm E):** Bu 3 migration'ın üzerine gerçek
 servis/route kodu yazıldı (`caseFileStore.js`, `routes/caseFiles.js`,
 `routes/branchTemplates.js`, `routes/adminPlatform.js`) — hepsi mock
-`pool.query` ile birim testlerle doğrulandı (13+5 test, hepsi geçti),
-ama HİÇBİRİ gerçek bir Postgres'e karşı çalıştırılmadı. `npm test` ayrıca
-DB'ye gerçekten bağlanmaya çalışan (`ECONNREFUSED`) önceden var olan
+`pool.query` ile birim testlerle doğrulandı, ama HİÇBİRİ gerçek bir
+Postgres'e karşı çalıştırılmadı.
+
+**Güncelleme (Gece 3 Bölüm E):** Dördüncü bir migration eklendi —
+`059_carenova_clinic_roles.sql` (CareNova'nın 7 rolü + kullanıcı taşıma,
+bkz. B7). O da aynı durumda: yazıldı, gözden geçirildi, test edildi
+(mock DB), ama çalıştırılmadı. `npm test` ayrıca DB'ye gerçekten
+bağlanmaya çalışan (`ECONNREFUSED`) önceden var olan
 `invoiceNumber.test.js`'i içeriyor — bu benim eklediğim bir şey değil,
 ama "npm test temiz geçti" derken bunu atladığımı açıkça belirtiyorum:
-`npx jest --testPathIgnorePatterns=invoiceNumber` → 4 suite, 122 test,
-hepsi yeşil. Migration'lar çalıştırıldığında ilk iş bu 4 yeni dosyayı
-gerçek verilerle (özellikle tenant izolasyonunu) elle bir kez daha
-doğrulamak.
+`npx jest --testPathIgnorePatterns=invoiceNumber` → **6 suite, 136 test,
+hepsi yeşil** (Gece 3 sonu itibarıyla).
+
+**Ne gerekiyor:** Bir Postgres'e bağlandığında sırayla `056 → 057 → 058
+→ 059` çalıştır, sonra Bölüm E'nin (Gece 2+3) tüm route'larını
+(`caseFiles.js`'in rol matrisi dahil) gerçek verilerle bir kez elle
+doğrula.
 
 ---
 
