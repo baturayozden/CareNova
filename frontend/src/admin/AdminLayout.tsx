@@ -125,8 +125,8 @@ export default function AdminLayout() {
       {session && (
         <div className="sticky top-0 z-[60] bg-warning text-white px-4 py-2 flex items-center justify-center gap-3 text-sm font-medium" role="status">
           <Eye size={16} strokeWidth={2} aria-hidden="true" />
-          <span>{session.clinicName} kliniği olarak görüntülüyorsunuz</span>
-          <button onClick={stop} className="underline underline-offset-2 hover:no-underline">Çık</button>
+          <span>{t('impersonation.viewingAs', { name: session.clinicName })}</span>
+          <button onClick={stop} className="underline underline-offset-2 hover:no-underline">{t('impersonation.exit')}</button>
         </div>
       )}
       <div className="flex flex-1 min-h-0">

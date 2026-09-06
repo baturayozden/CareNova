@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Activity, Clock3, AlertOctagon } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
 import { adminHealth } from '../../data/adminDemoData';
@@ -16,22 +17,23 @@ function KpiCard({ Icon, label, value, tone }: { Icon: typeof Activity; label: s
 }
 
 export default function HealthPage() {
+  const { t } = useTranslation('admin');
   return (
     <div className="space-y-5">
-      <AppMeta title="Platform Sağlığı | CareNova Platform" />
+      <AppMeta title={`${t('health.title')} | CareNova Platform`} />
       <div>
-        <h1 className="text-xl font-semibold text-ink">Platform Sağlığı</h1>
-        <p className="text-ink-muted text-sm mt-0.5">Demo verisiyle — yapı gerçek metriklere bağlanmaya hazır.</p>
+        <h1 className="text-xl font-semibold text-ink">{t('health.title')}</h1>
+        <p className="text-ink-muted text-sm mt-0.5">{t('health.subtitle')}</p>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-3">
-        <KpiCard Icon={Activity} label="Webhook Başarı Oranı" value={`%${adminHealth.webhookSuccessRate}`} tone={adminHealth.webhookSuccessRate >= 95 ? 'success' : 'warning'} />
-        <KpiCard Icon={Clock3} label="Ort. İlk Yanıt Süresi" value={`${adminHealth.avgFirstReplySeconds}sn`} tone="success" />
-        <KpiCard Icon={AlertOctagon} label="AI Hata Oranı" value={`%${adminHealth.aiErrorRate}`} tone={adminHealth.aiErrorRate <= 2 ? 'success' : 'warning'} />
+        <KpiCard Icon={Activity} label={t('health.webhookSuccessRate')} value={`%${adminHealth.webhookSuccessRate}`} tone={adminHealth.webhookSuccessRate >= 95 ? 'success' : 'warning'} />
+        <KpiCard Icon={Clock3} label={t('health.avgFirstReply')} value={t('health.avgFirstReplyValue', { value: adminHealth.avgFirstReplySeconds })} tone="success" />
+        <KpiCard Icon={AlertOctagon} label={t('health.aiErrorRate')} value={`%${adminHealth.aiErrorRate}`} tone={adminHealth.aiErrorRate <= 2 ? 'success' : 'warning'} />
       </div>
 
       <div>
-        <h2 className="text-sm font-semibold text-ink mb-3">Son hatalar</h2>
+        <h2 className="text-sm font-semibold text-ink mb-3">{t('health.recentErrors')}</h2>
         <div className="rounded-xl border border-line bg-surface divide-y divide-line">
           {adminHealth.recentErrors.map(err => (
             <div key={err.id} className="px-4 py-3 flex items-center justify-between gap-3">

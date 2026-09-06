@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { Search, UserSquare2, ChevronRight, User, ArrowUp, ArrowDown } from 'lucide-react';
@@ -145,6 +146,7 @@ function SortTh({ label, colSort, sort, onSort, className }: {
 export default function PatientsListPage() {
   const navigate   = useNavigate();
   const { user }   = useAuth();
+  const { t }      = useTranslation('common');
 
   const [patients,   setPatients]   = useState<Patient[]>([]);
   const [search,     setSearch]     = useState('');
@@ -328,7 +330,7 @@ export default function PatientsListPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     <JourneyBadge p={p} />
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[p.status] ?? 'bg-gray-800 text-gray-400'}`}>
-                      {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+                      {t(`leadStatus.${p.status}`, p.status)}
                     </span>
                     <ChevronRight size={14} className="text-gray-600" />
                   </div>
@@ -373,7 +375,7 @@ export default function PatientsListPage() {
 
                   <div>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[p.status] ?? 'bg-gray-800 text-gray-400'}`}>
-                      {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+                      {t(`leadStatus.${p.status}`, p.status)}
                     </span>
                   </div>
 

@@ -15,5 +15,15 @@
   "error": "Something went wrong",
   "retry": "Retry",
   "language": "Language",
-  "comingSoon": "This section will be here soon."
+  "comingSoon": "This section will be here soon.",
+  "leadStatus": {
+    "new": "New",
+    "contacted": "Contacted",
+    "responded": "Responded",
+    "qualified": "Qualified",
+    "booked": "Booked",
+    "attended": "Attended",
+    "lost": "Lost",
+    "archived": "Archived"
+  }
 }

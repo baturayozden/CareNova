@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
@@ -19,6 +20,7 @@ function toCsv(rows: typeof adminDemoRequests): string {
 }
 
 export default function AdminDemoRequestsPage() {
+  const { t } = useTranslation('admin');
   const [requests] = useState(adminDemoRequests);
 
   const exportCsv = () => {
@@ -32,14 +34,14 @@ export default function AdminDemoRequestsPage() {
 
   return (
     <div className="space-y-4">
-      <AppMeta title="Demo Talepleri | CareNova Platform" />
+      <AppMeta title={`${t('demoRequests.title')} | CareNova Platform`} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-ink">Demo Talepleri</h1>
-          <p className="text-ink-muted text-sm mt-0.5">{requests.length} talep — landing formundan.</p>
+          <h1 className="text-xl font-semibold text-ink">{t('demoRequests.title')}</h1>
+          <p className="text-ink-muted text-sm mt-0.5">{t('demoRequests.subtitle', { count: requests.length })}</p>
         </div>
         <button onClick={exportCsv} className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-surface-sunken transition-colors">
-          <Download size={14} strokeWidth={1.75} aria-hidden="true" /> CSV dışa aktar
+          <Download size={14} strokeWidth={1.75} aria-hidden="true" /> {t('demoRequests.exportCsv')}
         </button>
       </div>
 
@@ -47,14 +49,14 @@ export default function AdminDemoRequestsPage() {
         <table className="w-full text-sm min-w-[860px]">
           <thead>
             <tr className="border-b border-line text-left">
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Ad</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Klinik</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Şehir</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Branş</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Telefon</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Tarih</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Durum</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Not</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.name')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.clinic')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.city')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.branch')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.phone')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.date')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.status')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.note')}</th>
             </tr>
           </thead>
           <tbody>

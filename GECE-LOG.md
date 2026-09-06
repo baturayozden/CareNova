@@ -1344,4 +1344,177 @@ Rol-bazlı yetkilendirme henüz yok (B7).
 
 ---
 
+# GECE ÇALIŞMASI 3 — Görsel İnceleme Bulgularının Düzeltilmesi
+
+Baturay'ın Cowork oturumunda canlı sitede kendi gözüyle bulduğu 5 gerçek
+hata üzerine (GECE-3-BRIEFI.md). Bu gece için KURAL #11 düzeltildi: landing
+DIŞINDA (admin + klinik paneli) ekran görüntüsü artık GEÇERLİ bir doğrulama
+yöntemi — rAF sadece landing'in reveal animasyonlarını donduruyor, bu
+ekranlarda hiç Framer Motion yok. Bu gece boyunca değiştirilen her admin/app
+ekranı gerçekten ekran görüntüsüyle görüldü (aşağıda her bölümde not edildi).
+
+## BÖLÜM A — i18n tutarlılığı
+
+**A.1 — Varsayılan dil düzeltmesi (kök neden bulundu):** `i18n/index.ts`'te
+`detection.order: ['localStorage', 'navigator']` idi. `fallbackLng: 'tr'`
+sadece i18next algılanan dili `supportedLngs` İÇİNDE BULAMAZSA devreye
+giriyor — `navigator` tarayıcı dilini (bu ortamda `en`) döndürünce ve `en`
+zaten desteklenen bir dil olduğu için fallback'e hiç sıra gelmiyordu.
+**Düzeltme:** `navigator` tamamen kaldırıldı, sıra artık sadece
+`['localStorage']` — boş profil her zaman `fallbackLng: 'tr'`'ye düşüyor.
+Kullanıcının kendi seçimi (dil değiştirici) hâlâ `localStorage`'a
+yazılıp kalıcı oluyor, sadece BOŞ profilin varsayılanı değişti.
+**Canlı doğrulandı (ekran görüntüsü):** `localStorage` temizlenip
+`/dashboard?host=app` açıldığında sidebar artık tamamen Türkçe
+("Panel, Vakalar, Sohbetler, Doktor Onayı, Teklifler, Seyahat, Bakım
+Hattı, Hastalar, Raporlar", "Karanlık mod", "Çıkış yap") — daha önce
+İngilizce açılan tam olarak bu ekrandı.
+
+**A.2 — Durum rozetleri:** `PatientsListPage.tsx` ve `LeadsPage.tsx`,
+`Lead['status']` değerini (`new/contacted/responded/qualified/booked/
+attended/lost/archived`) `.charAt(0).toUpperCase()+...` ile İngilizce ham
+haliyle basıyordu (Bulgu 1'in "Qualified/Contacted/Booked/Attended" örneği
+tam burası). `common.json`'a `leadStatus.*` bloğu eklendi (TR+EN, 8 değer),
+her iki dosyada da `useTranslation('common')` ile `t(\`leadStatus.${status}\`,
+status)}` şeklinde değiştirildi — üçüncü parametre olan `status` fallback,
+yeni bir durum değeri eklenip çeviri unutulursa sessizce boş göstermek
+yerine en azından ham değeri gösterir.
+
+**Bilinçli kapsam kararı:** Bu iki sayfanın GERİ KALANI (arama, filtre,
+sıralama, boş durumlar — yüzlerce satır) hiç i18n'lenmedi. Brief'in kendi
+doğrulama listesi (`/dashboard, /cases, /doctor-queue, /admin/overview`)
+bu sayfaları içermiyor; Bulgu 1 sadece durum rozetlerini örnek gösteriyor.
+`/leads` ve `/patients`'ı uçtan uca çevirmek bu gecenin 🔴 bütçesini (B-E)
+tehlikeye atardı — ayrı bir iş olarak bırakıldı.
+
+**A.3 — Admin konsolu kabuğu TR+EN'e çevrildi:** Gece 2'nin "admin tek
+kullanıcılı, TR yeter" kararı brief tarafından tersine çevrildi (tutarsız
+sonuç: sidebar İngilizce açılıyordu — ki bu da A.1'in aynı kök nedeniydi —
+içerik hep Türkçeydi). 12 admin sayfasının İÇERİĞİ (başlıklar, KPI kart
+etiketleri, tablo kolonları, filtre/buton metinleri, boş durumlar) bir
+alt-ajanla `admin.json`'a (TR+EN) taşındı; veri-etiket haritaları
+(`BRANCH_LABELS`, `PLAN_LABELS`, `STATUS_LABEL`, `CLINIC_ROLE_LABELS`,
+`AUTHORITY_LABELS`, demo verinin kendisi) bilinçli olarak Türkçe kaldı —
+bunlar kabuk değil, demo İÇERİK. [Alt-ajanın tam sonucu aşağıda ayrı not
+olarak eklenecek.]
+
+**A.4 — Terminoloji sözlüğü:** `docs/terminoloji.md` oluşturuldu — CareNova
+kavramlarının TR/EN sabit karşılıkları (vaka/lead/teklif/doktor onay
+kuyruğu/bakım hattı/...) ve "sidebar'daki isim = sayfa başlığındaki isim"
+kuralı. Bu sırada bir isim tutarsızlığı bulundu: `nav.json`'da
+`doctorQueue: "Doktor Onayı"` iken Bulgu 4/D.6 sayfanın kendisinin
+"Doktor Onay Kuyruğu" olmasını istiyor — Bölüm D'de düzeltildi (aşağıya
+bak), sözlük buna göre yazıldı.
+
+**A.5 — `check-i18n-leaks.js` genişletildi:** Önceden sadece landing'i
+tarıyordu. `?host=app`/`?host=admin` demo-mode sorgu parametreleriyle
+(gerçek login gerekmiyor — `demoAdapter.ts`'in `/auth/me`'si token'ı hiç
+doğrulamıyor) `/dashboard`, `/cases`, `/doctor-queue`, `/admin/overview`
+eklendi. Landing'in "eyebrow diff" yöntemi bu sayfalara UYGULANAMAZ —
+sebebi kodda uzun bir yorumla açıklandı: bu ekranlar bol miktarda
+BİLE İSTE Türkçe DEMO VERİSİ gösteriyor (hasta cevapları, AI notları),
+EN modunda genel bir Türkçe-karakter taraması bunları yanlışlıkla "sızıntı"
+sayardı. Bunun yerine iki yönlü, elle küratörlüğü yapılmış bir "yasak
+liste" (TR modunda görülmemesi gereken İngilizce kabuk kelimeleri, EN
+modunda görülmemesi gereken Türkçe kabuk kelimeleri) kullanılıyor —
+bugünün TAM OLARAK bulduğu hataları regresyona karşı koruyor.
+**Not:** Bu liste Bölüm D'nin isim değişikliğinden (Doktor Onayı → Doktor
+Onay Kuyruğu) sonra elle yeniden doğrulanacak (kapanışta).
+
+**Doğrulama (canlı, ekran görüntüsüyle):** boş profilde `/dashboard?host=app`
+artık Türkçe sidebar gösteriyor (yukarıda). Admin alt-ajanının işi bittikten
+sonra `node scripts/check-i18n-leaks.js` → **0 TR ihlali, 0 EN ihlali**
+(Bölüm C bitince). Ekran görüntüsüyle doğrulananlar: `/admin/clinics/:id`
+(7 sekme, breadcrumb, aksiyon butonları tam İngilizce; klinik verisi —
+isim/şehir/onboarding adımı — Türkçe kalıyor, doğru), `/admin/branches`
+(IVF satırı genişletildi: "Locked rule — cannot be deleted" çevrildi,
+donör-gamet kural metni bilerek Türkçe kaldı, "AI PRICING AUTHORITY" gibi
+alan etiketleri çevrildi, değerleri kalmış).
+
+**Bir gerçek çakışma bulundu (kendi kontrol scriptimde):** İlk
+`check-i18n-leaks.js` çalıştırmasında EN modunda `/admin/overview`'da
+sahte bir "Panel" ihlali çıktı — araştırınca bunun `APP_EN_MODE_LEAK_
+DENYLIST`'teki kaba "Panel" girdisinin, doğru İngilizce metin olan
+"Compliance Panel" içindeki "Panel" kelimesiyle çakıştığı ortaya çıktı
+(Türkçe "Panel" ile İngilizce "Panel" kelimesi aynı yazılıyor — alt-string
+eşleşmesiyle ayırt edilemez). Denylist'ten kaldırıldı, yorumla açıklandı;
+daha spesifik "Uyum Paneli" ifadesi zaten ayrı bir girdi olarak duruyor ve
+bu çakışmayı yaşamıyor.
+
+**Commit:** `fix(i18n): Turkish default and full shell localisation for app and admin`
+
+---
+
+## BÖLÜM C — Dashboard'u vaka-merkezli yeniden kurma
+
+Gece 2'de bilinçli atlanan D.1; Bulgu 3'ün ("Total Leads 4" derken /cases'te
+15 vaka var, "Clinic" kolonu tek-klinikli panelde anlamsız, ürünün ana
+vaadi olan ilk yanıt süresi hiçbir yerde yok) tam karşılığı.
+
+**Silindi:** `StatsCards.tsx`, `LeadsTable.tsx`, `ActivityFeed.tsx`,
+`MyCommissionCard.tsx`, `hooks/useDashboard.ts` — hepsi eski lead panosunun
+parçasıydı, Dashboard.tsx'ten çıkarılınca projede başka hiçbir yerden
+import edilmediği doğrulandı (`grep`), silindi (proje kuralı: kullanılmayan
+kodu bırakma).
+
+**Yeni:** `components/Dashboard.tsx` sıfırdan, `data/caseData.ts`'in aynı
+demo verisi üzerine (`/cases`, `/doctor-queue` ile aynı kaynak — artık üç
+ekran birbirini yalanlamıyor). KPI şeridi (Ortalama İlk Yanıt Süresi —
+solda, en büyük — Bugün Gelen Mesaj, Yanıt Bekleyen, Doktor Onayı
+Bekleyen, Depozito Bekleyen Teklif, Bu Ay Tamamlanan Vaka), 3 kolon
+(Aksiyon gerektirenler / Bugünün programı / Son AI etkinliği), rol-bazlı
+kolon sırası ve doktor için `/doctor-queue`'ya otomatik yönlendirme.
+
+**Gerçek KPI hesaplaması, sabit sayı değil:** "Ortalama İlk Yanıt Süresi"
+`cases` içindeki gerçek `in→out` mesaj çiftlerinden hesaplanıyor
+(`averageFirstResponseMinutes()`), admin konsolunun `avgFirstReply = 4.2`
+sabit demo değeri gibi değil — ilk denemede sonuç **0dk** çıktı çünkü 3
+mesaj çiftinin senkron zaman damgaları (aynı `daysAgo(N)` hem gelen hem
+giden mesaj için) dakika farkını yutuyordu; bu 3 çiftin yanıt zaman
+damgaları birkaç dakika sonrasına kaydırıldı (gerçek veri kalitesi
+düzeltmesi, sahte bir sayı uydurmak değil) — sonuç artık **4dk**.
+
+**Rol-bazlı kolon sırası ve gelecekteki Bölüm E'ye köprü:** CareNova'nın 7
+rolü (doktor/koordinator/muhasebe/hasta_danismani/klinik_sahibi/
+operasyon_muduru) backend'de henüz yok (Bölüm E bu gece daha sonra). Rol→
+varyant haritası HEM yeni rol adlarını HEM bugün canlı olan CareDental
+rollerini (`director`, `dentist`, vb.) Bölüm E.1'in kendi eşleme tablosuna
+göre aynı varyanta bağlıyor — böylece bugünkü demo kullanıcı (`role:
+'director'` → `full` görünüm) doğru çalışıyor VE Bölüm E'nin migration'ı
+rolleri yeniden adlandırdığında kod değişikliği gerekmeden doğru çalışmaya
+devam edecek. Doktor yönlendirmesi (`if (variant === 'doctor') return
+<Navigate .../>`) tüm `useMemo` çağrılarından SONRA konuldu — önce
+denenen "erken return" React'ın hooks kuralını kırıp build'i kırdı
+(`react-hooks/rules-of-hooks`), ESLint bunu build sırasında yakaladı.
+
+**Bölüm B.2'nin kartı burada:** "Kurulumu tamamla · 7 adımın 3'ü bitti" +
+ilerleme çubuğu + "Devam et" (→ `/settings/onboarding`) + kapatma (✕,
+`localStorage`'a yazıp kalıcı kapanıyor) — Bölüm B'nin kendi commit'i
+yerine burada, çünkü Bölüm B zaten bu dosyayı (`Dashboard.tsx`) tamamen
+değiştireceğini biliyordu; B'nin commit'ine yazmak sonra silinecek kod
+olurdu. `docs/onboarding-wizard-status.md`'de bu sıralama kararı da yazılı.
+
+**Yeni demo veri (caseData.ts):** `todaysSchedule` — "Bugünün programı"
+için 4 satırlık, saat+hasta+tip içeren ayrı, açıkça demo bir liste
+(gerçek backend `case_timeline` tablosunu modelliyor ama bu gece hiçbir
+vakada saat-damgalı gerçek bir program yok, uydurmak yerine ayrı ve
+belirtilmiş bir demo listesi tercih edildi). Bir teklife `validUntil`
+eklendi ("teklifin süresi dolmak üzere" aksiyon kartı için gerçek veri
+olsun diye) ve bir bakım hattı kaydına `contactedAt` dolduruldu
+(`response: null` kalarak) — "bakım hattında yanıt vermeyen hasta" aksiyon
+tipinin demo veride en az bir gerçek örneği olsun diye.
+
+**Doğrulama (ekran görüntüsü, TR ve EN):** `/dashboard?host=app` her iki
+dilde de gezildi — TR: "Panel", KPI'lar, 3 kolon, kurulum kartı hepsi
+doğru. EN: "Dashboard", tüm kartlar/kolonlar çevrilmiş. `npx tsc --noEmit`
+ve `CI=true npm run build` temiz. Doktor rolüne otomatik yönlendirme KOD
+İNCELEMESİYLE doğrulandı, CANLI DENENMEDİ — demo modunda `/dashboard`'a
+giren tek kullanıcı her zaman `director`/`super_admin`, doktor rolüne
+geçecek bir demo girişi yok (Bölüm E'den sonra `?email=` içinde "doktor"
+geçen bir demo kuralı eklenebilir, bu gece yapılmadı).
+
+**Commit:** (aşağıda)
+
+---
+
 

@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
 import { adminClinics, DEMO_NOW_MS } from '../../data/adminDemoData';
 
-function timeAgo(iso: string | null): string {
-  if (!iso) return '—';
-  const mins = Math.round((DEMO_NOW_MS - new Date(iso).getTime()) / 60000);
-  if (mins < 60) return `${mins} dk önce`;
-  const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours} sa önce`;
-  return `${Math.round(hours / 24)} gün önce`;
-}
-
 export default function WhatsappPage() {
+  const { t } = useTranslation('admin');
+  const timeAgo = (iso: string | null): string => {
+    if (!iso) return '—';
+    const mins = Math.round((DEMO_NOW_MS - new Date(iso).getTime()) / 60000);
+    if (mins < 60) return t('whatsapp.minutesAgo', { count: mins });
+    const hours = Math.round(mins / 60);
+    if (hours < 24) return t('whatsapp.hoursAgo', { count: hours });
+    return t('whatsapp.daysAgo', { count: Math.round(hours / 24) });
+  };
   const [testedId, setTestedId] = useState<string | null>(null);
   const rows = [...adminClinics].sort((a, b) => {
     const aProblem = !a.whatsapp.connected || a.whatsapp.errorsLast24h > 0;
@@ -24,22 +25,22 @@ export default function WhatsappPage() {
 
   return (
     <div className="space-y-4">
-      <AppMeta title="WhatsApp Hatları | CareNova Platform" />
+      <AppMeta title={`${t('whatsapp.title')} | CareNova Platform`} />
       <div>
-        <h1 className="text-xl font-semibold text-ink">WhatsApp Hatları</h1>
-        <p className="text-ink-muted text-sm mt-0.5">Sorunlu hatlar üstte listelenir.</p>
+        <h1 className="text-xl font-semibold text-ink">{t('whatsapp.title')}</h1>
+        <p className="text-ink-muted text-sm mt-0.5">{t('whatsapp.subtitle')}</p>
       </div>
 
       <div className="rounded-xl border border-line bg-surface overflow-x-auto">
         <table className="w-full text-sm min-w-[760px]">
           <thead>
             <tr className="border-b border-line text-left">
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Klinik</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Görünen Numara</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Durum</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Son Webhook Başarısı</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle text-right">Son 24s Mesaj</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle text-right">Son 24s Hata</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('whatsapp.columns.clinic')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('whatsapp.columns.displayNumber')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('whatsapp.columns.status')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('whatsapp.columns.lastWebhookSuccess')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle text-right">{t('whatsapp.columns.messages24h')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle text-right">{t('whatsapp.columns.errors24h')}</th>
               <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle"></th>
             </tr>
           </thead>
@@ -48,7 +49,7 @@ export default function WhatsappPage() {
               <tr key={c.id} className={`border-b border-line last:border-0 ${i % 2 === 1 ? 'bg-surface-page/40' : ''}`}>
                 <td className="px-4 py-2.5"><Link to={`/admin/clinics/${c.id}`} className="font-medium text-ink hover:text-accent transition-colors">{c.name}</Link></td>
                 <td className="px-4 py-2.5 text-ink-muted">{c.whatsapp.displayNumber || '—'}</td>
-                <td className="px-4 py-2.5">{c.whatsapp.connected ? <StatusBadge tone="success">Bağlı</StatusBadge> : <StatusBadge tone="danger">Bağlı değil</StatusBadge>}</td>
+                <td className="px-4 py-2.5">{c.whatsapp.connected ? <StatusBadge tone="success">{t('whatsapp.connected')}</StatusBadge> : <StatusBadge tone="danger">{t('whatsapp.notConnected')}</StatusBadge>}</td>
                 <td className="px-4 py-2.5 text-ink-subtle text-xs">{timeAgo(c.whatsapp.lastWebhookSuccessAt)}</td>
                 <td className="px-4 py-2.5 text-right text-ink">{c.whatsapp.messagesLast24h}</td>
                 <td className="px-4 py-2.5 text-right">
@@ -60,7 +61,7 @@ export default function WhatsappPage() {
                     className="inline-flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1 text-xs font-medium text-ink hover:bg-surface-sunken transition-colors"
                   >
                     {testedId === c.id && <Check size={12} strokeWidth={2.5} className="text-success" aria-hidden="true" />}
-                    {testedId === c.id ? 'Test başarılı (demo)' : 'Webhook testi'}
+                    {testedId === c.id ? t('whatsapp.testSuccess') : t('whatsapp.testWebhook')}
                   </button>
                 </td>
               </tr>

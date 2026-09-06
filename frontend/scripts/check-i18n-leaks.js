@@ -2,7 +2,8 @@
 'use strict';
 
 /**
- * Scans the rendered landing page in BOTH languages for i18n leaks:
+ * Scans the rendered landing page, AND (GECE-3-BRIEFI.md Bölüm A.5) four
+ * demo-mode clinic-panel/admin routes, in BOTH languages, for i18n leaks:
  *   - TR mode: a UI label that's still in English (e.g. an eyebrow/kicker
  *     span with a hardcoded literal instead of a `pick()`-driven function).
  *   - EN mode: leftover Turkish text (e.g. a hardcoded "Kaynak:" prefix that
@@ -63,6 +64,73 @@ const path = require('path');
 
 const URL = process.env.I18N_CHECK_URL || 'http://localhost:3002';
 const REPORT_PATH = path.join(__dirname, '..', '..', 'docs', 'i18n-leak-report.md');
+
+// ── GECE-3-BRIEFI.md Bölüm A.5 — extend beyond the landing page ────────────
+//
+// The clinic panel and admin console are demo-mode routes: navigating there
+// directly with a ?host= override auto-authenticates as the demo user (see
+// lib/demoAdapter.ts's /auth/me handler, which never actually checks a
+// token) — no login form automation needed.
+//
+// These routes are checked with a NARROWER method than the landing page's
+// eyebrow-diff: a curated denylist of exact chrome strings per language,
+// not a broad "does this look like the wrong language" scan. Reason: unlike
+// the landing page (100% UI copy), these screens render a lot of Turkish-
+// only DEMO DATA by design (patient answers, AI extraction notes, clinic
+// names — see GECE-LOG.md's Part A/C/D decisions on why data labels stay
+// Turkish-only even though the chrome is bilingual). A blanket Turkish-
+// character scan in EN mode would flag that legitimate data as a false
+// "leak" on every single run. The denylist instead targets the SPECIFIC
+// chrome vocabulary (sidebar labels, page headings, buttons) that must
+// flip with the language switch — a real regression guard for the exact
+// bugs GECE-3-BRIEFI.md Bölüm 2 found, without false positives on data.
+const APP_ADMIN_ROUTES = [
+  { path: '/dashboard?host=app', label: 'clinic dashboard' },
+  { path: '/cases?host=app', label: 'cases list' },
+  { path: '/doctor-queue?host=app', label: 'doctor queue' },
+  { path: '/admin/overview?host=admin', label: 'admin overview' },
+];
+
+// English chrome that must NOT appear once the page is in TR mode.
+const APP_TR_MODE_LEAK_DENYLIST = [
+  // Sidebar (nav.json en) + admin sidebar (admin.json en nav.*)
+  'Dashboard', 'Conversations', 'Doctor Approval', 'Quotes', 'Travel',
+  'Patients', 'Reports', 'AI Activity', 'Appointments', 'Invoices',
+  'Settings', 'Commission', 'Demo Requests', 'Management', 'Super Admin',
+  'Sign out', 'Switch clinic', 'Overview', 'Onboarding Tracker',
+  'WhatsApp Lines', 'AI Usage & Quota', 'Branch Templates',
+  'Compliance Panel', 'Billing', 'Audit Log', 'Platform Health',
+  'Platform Administrator', 'Admin menu',
+  // Auth/demo chrome
+  'Demo Mode', 'Log in',
+  // CareDental-inherited artifacts this brief's Part B/C explicitly remove —
+  // kept here as a permanent regression guard even after they're gone.
+  'Total Leads', 'AI Messages Sent', 'Recovery Rate', 'Hot Leads',
+  'Get Your AI Ready', 'Finish setting up your AI',
+  // Bölüm D naming-consistency fix
+  'Cases with completed pre-assessment',
+];
+
+// Turkish chrome that must NOT appear once the page is in EN mode (values
+// pulled from the tr/*.json files these keys resolve to — kept in sync by
+// hand; a rename on either side needs a matching edit here).
+const APP_EN_MODE_LEAK_DENYLIST = [
+  // NOTE: bare 'Panel' is deliberately excluded — it's the Turkish word
+  // for "Dashboard" AND a legitimate English word that appears inside
+  // correct EN copy ("Compliance Panel"), so a plain substring match
+  // false-positives on the very page it's meant to guard. "Uyum Paneli"
+  // below (the full Turkish phrase) has no such collision.
+  'Vakalar', 'Sohbetler', 'Talepler', 'Hastalar', 'Raporlar',
+  'Randevular', 'Faturalar', 'Ayarlar', 'Komisyon', 'Demo Talepleri',
+  'Yönetim', 'Süper Admin', 'Çıkış yap', 'Klinik değiştir', 'Genel Bakış',
+  'Onboarding Takibi', 'WhatsApp Hatları', 'AI Kullanım ve Kota',
+  'Branş Şablonları', 'Uyum Paneli', 'Faturalama', 'Denetim Kaydı',
+  'Platform Sağlığı', 'Platform Yöneticisi', 'Admin menüsü', 'Demo Modu',
+];
+// NOTE: this list is re-verified at the end of GECE-3-BRIEFI.md, after
+// Bölüm A/D's terminology renames (e.g. "Doktor Onayı" → "Doktor Onay
+// Kuyruğu") land — a stale entry here would either miss a real leak or
+// false-positive on the new correct label. See GECE-LOG.md Bölüm A.
 
 const TURKISH_CHARS = /[ğşıöüçİĞŞÖÜÇ]/;
 
@@ -182,6 +250,40 @@ async function loadInLanguage(page, lang) {
   return page.evaluate(extractFromPage, '#hero .relative.bg-surface-raised');
 }
 
+// Demo-mode app/admin routes don't have the landing's eyebrow convention —
+// just the full rendered text, in the given language, at the given path.
+// ?host= is demo-mode-only (see config/hosts.ts) and works alongside the
+// language override since both are read from independent mechanisms
+// (localStorage vs. query string).
+async function loadRouteInLanguage(page, routePath, lang) {
+  await page.evaluateOnNewDocument((l) => {
+    try { window.localStorage.setItem('carenova_language', l); } catch {}
+  }, lang);
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  await page.goto(`${URL}${routePath}`, { waitUntil: 'networkidle0', timeout: 30000 });
+  const actualLang = await page.evaluate(() => document.documentElement.lang);
+  if (!actualLang.startsWith(lang)) {
+    throw new Error(`[i18n-leaks] "${routePath}": asked for lang="${lang}" but document.documentElement.lang="${actualLang}"`);
+  }
+  return page.evaluate(() => document.body.innerText || '');
+}
+
+async function checkAppAdminRoutes(page) {
+  const trViolations = [];
+  const enViolations = [];
+  for (const route of APP_ADMIN_ROUTES) {
+    const trText = await loadRouteInLanguage(page, route.path, 'tr');
+    const enText = await loadRouteInLanguage(page, route.path, 'en');
+    for (const v of checkDenylist(trText, APP_TR_MODE_LEAK_DENYLIST, `TR, ${route.label}`)) {
+      trViolations.push({ ...v, reason: `[${route.path}] ${v.reason}` });
+    }
+    for (const v of checkDenylist(enText, APP_EN_MODE_LEAK_DENYLIST, `EN, ${route.label}`)) {
+      enViolations.push({ ...v, reason: `[${route.path}] ${v.reason}` });
+    }
+  }
+  return { trViolations, enViolations };
+}
+
 async function run() {
   const puppeteer = await loadPuppeteer();
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
@@ -198,6 +300,10 @@ async function run() {
     const eyebrowViolations = checkEyebrowsDiffer(tr.eyebrows, en.eyebrows);
     trViolations = [...eyebrowViolations, ...checkDenylist(tr.fullText, TR_MODE_LEAK_DENYLIST, 'TR')];
     enViolations = [...checkEnTurkishChars(en.fullText), ...checkDenylist(en.fullText, EN_MODE_LEAK_DENYLIST, 'EN')];
+
+    const appAdmin = await checkAppAdminRoutes(page);
+    trViolations = [...trViolations, ...appAdmin.trViolations];
+    enViolations = [...enViolations, ...appAdmin.enViolations];
   } catch (err) {
     error = err;
   } finally {

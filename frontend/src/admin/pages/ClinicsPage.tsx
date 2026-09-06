@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
@@ -12,15 +13,15 @@ const STATUS_LABEL: Record<ClinicStatus, string> = {
   active: 'Aktif', trial: 'Deneme', onboarding: 'Onboarding', suspended: 'Askıda',
 };
 
-function timeAgo(iso: string): string {
-  const mins = Math.round((DEMO_NOW_MS - new Date(iso).getTime()) / 60000);
-  if (mins < 60) return `${mins} dk önce`;
-  const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours} sa önce`;
-  return `${Math.round(hours / 24)} gün önce`;
-}
-
 export default function ClinicsPage() {
+  const { t } = useTranslation('admin');
+  const timeAgo = (iso: string): string => {
+    const mins = Math.round((DEMO_NOW_MS - new Date(iso).getTime()) / 60000);
+    if (mins < 60) return t('clinics.minutesAgo', { count: mins });
+    const hours = Math.round(mins / 60);
+    if (hours < 24) return t('clinics.hoursAgo', { count: hours });
+    return t('clinics.daysAgo', { count: Math.round(hours / 24) });
+  };
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ClinicStatus | 'all'>('all');
   const [planFilter, setPlanFilter] = useState<PlanKey | 'all'>('all');
@@ -45,18 +46,18 @@ export default function ClinicsPage() {
 
   return (
     <div className="space-y-4">
-      <AppMeta title="Klinikler | CareNova Platform" />
+      <AppMeta title={`${t('clinics.title')} | CareNova Platform`} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-ink">Klinikler</h1>
-          <p className="text-ink-muted text-sm mt-0.5">{filtered.length} / {adminClinics.length} klinik gösteriliyor.</p>
+          <h1 className="text-xl font-semibold text-ink">{t('clinics.title')}</h1>
+          <p className="text-ink-muted text-sm mt-0.5">{t('clinics.subtitle', { filtered: filtered.length, total: adminClinics.length })}</p>
         </div>
         <div className="relative">
           <Search size={16} strokeWidth={1.75} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-subtle" aria-hidden="true" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Klinik veya şehir ara…"
+            placeholder={t('clinics.searchPlaceholder')}
             className="pl-9 pr-3 py-2 rounded-lg border border-line bg-surface text-sm text-ink w-64 focus:outline-none focus:border-accent"
           />
         </div>
@@ -64,21 +65,21 @@ export default function ClinicsPage() {
 
       <div className="flex flex-wrap gap-2">
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as ClinicStatus | 'all')} className="rounded-lg border border-line bg-surface text-sm text-ink px-3 py-1.5">
-          <option value="all">Tüm durumlar</option>
+          <option value="all">{t('clinics.filterAllStatuses')}</option>
           {(['active', 'trial', 'onboarding', 'suspended'] as const).map(s => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
         </select>
         <select value={planFilter} onChange={(e) => setPlanFilter(e.target.value as PlanKey | 'all')} className="rounded-lg border border-line bg-surface text-sm text-ink px-3 py-1.5">
-          <option value="all">Tüm planlar</option>
+          <option value="all">{t('clinics.filterAllPlans')}</option>
           {(['solo', 'klinik', 'grup'] as const).map(p => <option key={p} value={p}>{PLAN_LABELS[p]}</option>)}
         </select>
         <select value={branchFilter} onChange={(e) => setBranchFilter(e.target.value)} className="rounded-lg border border-line bg-surface text-sm text-ink px-3 py-1.5">
-          <option value="all">Tüm branşlar</option>
+          <option value="all">{t('clinics.filterAllBranches')}</option>
           {Object.entries(BRANCH_LABELS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
         </select>
         <select value={sortKey} onChange={(e) => setSortKey(e.target.value as typeof sortKey)} className="rounded-lg border border-line bg-surface text-sm text-ink px-3 py-1.5">
-          <option value="lastActivity">Son aktivite</option>
-          <option value="name">İsim (A-Z)</option>
-          <option value="cases">Aktif vaka</option>
+          <option value="lastActivity">{t('clinics.sortLastActivity')}</option>
+          <option value="name">{t('clinics.sortName')}</option>
+          <option value="cases">{t('clinics.sortCases')}</option>
         </select>
       </div>
 
@@ -86,14 +87,14 @@ export default function ClinicsPage() {
         <table className="w-full text-sm min-w-[720px]">
           <thead>
             <tr className="border-b border-line text-left">
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Klinik</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Şehir</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Branşlar</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Plan</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Durum</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle text-right">Kullanıcı</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle text-right">Aktif Vaka</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Son Aktivite</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('clinics.columns.clinic')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('clinics.columns.city')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('clinics.columns.branches')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('clinics.columns.plan')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('clinics.columns.status')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle text-right">{t('clinics.columns.users')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle text-right">{t('clinics.columns.activeCases')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('clinics.columns.lastActivity')}</th>
             </tr>
           </thead>
           <tbody>
@@ -112,7 +113,7 @@ export default function ClinicsPage() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={8} className="px-4 py-8 text-center text-ink-muted text-sm">Filtrelere uyan klinik yok.</td></tr>
+              <tr><td colSpan={8} className="px-4 py-8 text-center text-ink-muted text-sm">{t('clinics.emptyFiltered')}</td></tr>
             )}
           </tbody>
         </table>

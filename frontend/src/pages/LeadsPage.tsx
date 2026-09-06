@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
 import { ApiLead, Lead, Message, PaginatedLeadsResponse } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -210,6 +211,7 @@ const CAN_ASSIGN_ROLES = ['director', 'clinic_admin', 'super_admin', 'admin'];
 export default function LeadsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const canAddLead  = user ? ADD_LEAD_ROLES.includes(user.role)   : false;
   const canAssign   = user ? CAN_ASSIGN_ROLES.includes(user.role) : false;
   const [searchParams, setSearchParams] = useSearchParams();
@@ -554,7 +556,7 @@ export default function LeadsPage() {
                       <td className="px-4 py-3 text-gray-300 text-xs">{lead.clinic}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[lead.status]}`}>
-                          {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
+                          {t(`leadStatus.${lead.status}`, lead.status)}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -681,7 +683,7 @@ export default function LeadsPage() {
             <div className="flex items-center justify-between">
               <span className="text-gray-500 text-xs">Status</span>
               <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[selectedLead.status]}`}>
-                {selectedLead.status.charAt(0).toUpperCase() + selectedLead.status.slice(1)}
+                {t(`leadStatus.${selectedLead.status}`, selectedLead.status)}
               </span>
             </div>
             {selectedLead.createdAt && (

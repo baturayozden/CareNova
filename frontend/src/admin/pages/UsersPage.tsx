@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Eye } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
 import { adminPlatformUsers, adminClinicUsers, CLINIC_ROLE_LABELS } from '../../data/adminDemoData';
 import { useImpersonation } from '../ImpersonationContext';
 
 export default function UsersPage() {
+  const { t } = useTranslation('admin');
   const [tab, setTab] = useState<'platform' | 'clinic'>('platform');
   const { session, start } = useImpersonation();
   const [reasonFor, setReasonFor] = useState<string | null>(null);
@@ -13,20 +15,20 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-4">
-      <AppMeta title="Kullanıcılar | CareNova Platform" />
+      <AppMeta title={`${t('users.title')} | CareNova Platform`} />
       <div>
-        <h1 className="text-xl font-semibold text-ink">Kullanıcılar, Roller ve Görüntüleme</h1>
-        <p className="text-ink-muted text-sm mt-0.5">Platform kullanıcıları ve klinik kullanıcıları ayrı listelenir.</p>
+        <h1 className="text-xl font-semibold text-ink">{t('users.title')}</h1>
+        <p className="text-ink-muted text-sm mt-0.5">{t('users.subtitle')}</p>
       </div>
 
       <div className="flex gap-1 border-b border-line">
-        {(['platform', 'clinic'] as const).map(t => (
+        {(['platform', 'clinic'] as const).map(tabKey => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-3.5 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === t ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'}`}
+            key={tabKey}
+            onClick={() => setTab(tabKey)}
+            className={`px-3.5 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === tabKey ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'}`}
           >
-            {t === 'platform' ? 'Platform Kullanıcıları' : 'Klinik Kullanıcıları'}
+            {tabKey === 'platform' ? t('users.tabPlatform') : t('users.tabClinic')}
           </button>
         ))}
       </div>
@@ -36,10 +38,10 @@ export default function UsersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-line text-left">
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Ad</th>
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">E-posta</th>
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Rol</th>
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Son Giriş</th>
+                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('users.columnsPlatform.name')}</th>
+                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('users.columnsPlatform.email')}</th>
+                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('users.columnsPlatform.role')}</th>
+                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('users.columnsPlatform.lastLogin')}</th>
               </tr>
             </thead>
             <tbody>
@@ -59,10 +61,10 @@ export default function UsersPage() {
           <table className="w-full text-sm min-w-[760px]">
             <thead>
               <tr className="border-b border-line text-left">
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Ad</th>
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Klinik</th>
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Rol</th>
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Son Giriş</th>
+                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('users.columnsClinic.name')}</th>
+                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('users.columnsClinic.clinic')}</th>
+                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('users.columnsClinic.role')}</th>
+                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('users.columnsClinic.lastLogin')}</th>
                 <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle"></th>
               </tr>
             </thead>
@@ -78,13 +80,13 @@ export default function UsersPage() {
                   <td className="px-4 py-2.5 text-ink-subtle text-xs">{new Date(u.lastLoginAt).toLocaleString('tr-TR')}</td>
                   <td className="px-4 py-2.5">
                     {session?.clinicId === u.clinicId ? (
-                      <span className="text-xs text-warning font-medium">Görüntüleniyor</span>
+                      <span className="text-xs text-warning font-medium">{t('users.viewing')}</span>
                     ) : reasonFor === u.clinicId ? (
                       <div className="flex items-center gap-1.5">
                         <input
                           value={reason}
                           onChange={(e) => setReason(e.target.value)}
-                          placeholder="Gerekçe (zorunlu)"
+                          placeholder={t('users.reasonPlaceholder')}
                           className="w-40 rounded-lg border border-line bg-surface px-2 py-1 text-xs text-ink focus:outline-none focus:border-accent"
                         />
                         <button
@@ -92,7 +94,7 @@ export default function UsersPage() {
                           onClick={() => { start(u.clinicId, reason); setReasonFor(null); setReason(''); }}
                           className="rounded-lg bg-accent px-2 py-1 text-xs font-semibold text-white hover:bg-accent-hover disabled:opacity-50 transition-colors"
                         >
-                          Başlat
+                          {t('users.start')}
                         </button>
                       </div>
                     ) : (
@@ -100,7 +102,7 @@ export default function UsersPage() {
                         onClick={() => setReasonFor(u.clinicId)}
                         className="inline-flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-xs font-medium text-ink hover:bg-surface-sunken transition-colors"
                       >
-                        <Eye size={12} strokeWidth={1.75} aria-hidden="true" /> Görüntüle
+                        <Eye size={12} strokeWidth={1.75} aria-hidden="true" /> {t('users.view')}
                       </button>
                     )}
                   </td>

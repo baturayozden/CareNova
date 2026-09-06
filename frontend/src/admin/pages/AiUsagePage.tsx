@@ -1,23 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import AppMeta from '../../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
 import { adminClinics } from '../../data/adminDemoData';
 
 export default function AiUsagePage() {
+  const { t } = useTranslation('admin');
   const totalCost = adminClinics.reduce((sum, c) => sum + c.aiUsage.estimatedCostEur, 0);
   const rows = [...adminClinics].sort((a, b) => (b.aiUsage.usedThisMonth / b.aiUsage.monthlyQuota) - (a.aiUsage.usedThisMonth / a.aiUsage.monthlyQuota));
 
   return (
     <div className="space-y-4">
-      <AppMeta title="AI Kullanım ve Kota | CareNova Platform" />
+      <AppMeta title={`${t('aiUsage.title')} | CareNova Platform`} />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-ink">AI Kullanım ve Kota</h1>
-          <p className="text-ink-muted text-sm mt-0.5">Klinik bazında bu ayki kullanım.</p>
+          <h1 className="text-xl font-semibold text-ink">{t('aiUsage.title')}</h1>
+          <p className="text-ink-muted text-sm mt-0.5">{t('aiUsage.subtitle')}</p>
         </div>
         <div className="rounded-xl border border-line bg-surface px-4 py-2.5">
-          <p className="text-xs text-ink-subtle">Toplam Platform Maliyeti (bu ay, demo)</p>
+          <p className="text-xs text-ink-subtle">{t('aiUsage.totalCostLabel')}</p>
           <p className="font-display text-xl text-ink">€{totalCost.toLocaleString('tr-TR')}</p>
         </div>
       </div>
@@ -26,11 +28,11 @@ export default function AiUsagePage() {
         <table className="w-full text-sm min-w-[760px]">
           <thead>
             <tr className="border-b border-line text-left">
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Klinik</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Kota</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Kullanım</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">Aşım Politikası</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle text-right">Tahmini Maliyet</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('aiUsage.columns.clinic')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('aiUsage.columns.quota')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('aiUsage.columns.usage')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('aiUsage.columns.overagePolicy')}</th>
+              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle text-right">{t('aiUsage.columns.estimatedCost')}</th>
             </tr>
           </thead>
           <tbody>
@@ -51,7 +53,7 @@ export default function AiUsagePage() {
                   </td>
                   <td className="px-4 py-2.5">
                     <StatusBadge tone={c.aiUsage.overagePolicy === 'block' ? 'neutral' : 'accent'}>
-                      {c.aiUsage.overagePolicy === 'block' ? 'Durdur' : 'İzin ver'}
+                      {c.aiUsage.overagePolicy === 'block' ? t('aiUsage.block') : t('aiUsage.allow')}
                     </StatusBadge>
                   </td>
                   <td className="px-4 py-2.5 text-right text-ink">€{c.aiUsage.estimatedCostEur}</td>

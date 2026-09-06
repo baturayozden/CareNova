@@ -15,5 +15,15 @@
   "error": "Bir hata oluştu",
   "retry": "Tekrar dene",
   "language": "Dil",
-  "comingSoon": "Bu bölüm yakında burada olacak."
+  "comingSoon": "Bu bölüm yakında burada olacak.",
+  "leadStatus": {
+    "new": "Yeni",
+    "contacted": "İletişime geçildi",
+    "responded": "Yanıtladı",
+    "qualified": "Nitelendi",
+    "booked": "Rezerve",
+    "attended": "Geldi",
+    "lost": "Kayıp",
+    "archived": "Arşivlendi"
+  }
 }

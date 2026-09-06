@@ -18,5 +18,304 @@
     "users": "Kullanıcılar",
     "audit": "Denetim Kaydı",
     "health": "Platform Sağlığı"
+  },
+  "impersonation": {
+    "viewingAs": "{{name}} kliniği olarak görüntülüyorsunuz",
+    "exit": "Çık"
+  },
+  "overview": {
+    "title": "Genel Bakış",
+    "subtitle": "Platform genelinde özet — demo verisiyle, {{count}} klinik.",
+    "kpi": {
+      "activeClinic": "Aktif Klinik",
+      "activeClinicSub": "{{count}} toplam",
+      "newThisMonth": "Bu Ay Yeni",
+      "activeCases": "Aktif Vaka",
+      "activeWhatsapp": "Aktif WhatsApp Hattı",
+      "aiConversations": "Bu Ay AI Konuşması",
+      "mrr": "MRR (demo)"
+    },
+    "avgFirstReplyLabel": "Ortalama İlk Yanıt Süresi (platform geneli)",
+    "avgFirstReplyValue": "{{value}}sn",
+    "trendLabel": "Son 30 gün — aktif vaka trendi (örnek veri)",
+    "sparklineAriaLabel": "Son 30 gün trend",
+    "attentionNeeded": "Dikkat gerektirenler",
+    "quotaWarning": "Kotası dolmak üzere ({{count}})",
+    "onboardingStuck": "Onboarding'de takılan ({{count}})",
+    "billingOverdue": "Ödemesi geciken ({{count}})",
+    "empty": "Yok."
+  },
+  "clinics": {
+    "title": "Klinikler",
+    "subtitle": "{{filtered}} / {{total}} klinik gösteriliyor.",
+    "searchPlaceholder": "Klinik veya şehir ara…",
+    "filterAllStatuses": "Tüm durumlar",
+    "filterAllPlans": "Tüm planlar",
+    "filterAllBranches": "Tüm branşlar",
+    "sortLastActivity": "Son aktivite",
+    "sortName": "İsim (A-Z)",
+    "sortCases": "Aktif vaka",
+    "columns": {
+      "clinic": "Klinik",
+      "city": "Şehir",
+      "branches": "Branşlar",
+      "plan": "Plan",
+      "status": "Durum",
+      "users": "Kullanıcı",
+      "activeCases": "Aktif Vaka",
+      "lastActivity": "Son Aktivite"
+    },
+    "emptyFiltered": "Filtrelere uyan klinik yok.",
+    "minutesAgo": "{{count}} dk önce",
+    "hoursAgo": "{{count}} sa önce",
+    "daysAgo": "{{count}} gün önce"
+  },
+  "clinicDetail": {
+    "notFound": "Klinik bulunamadı.",
+    "backToList": "← Klinik listesine dön",
+    "backLink": "← Klinikler",
+    "actions": {
+      "approve": "Onayla",
+      "suspend": "Askıya al",
+      "changePlan": "Plan değiştir",
+      "addQuota": "Kota ekle",
+      "viewingNow": "Şu an görüntülüyorsunuz",
+      "viewAsClinic": "Klinik olarak görüntüle"
+    },
+    "impersonateForm": {
+      "reasonLabel": "Görüntüleme gerekçesi (zorunlu)",
+      "reasonPlaceholder": "Örn: Destek talebi #4821 — WhatsApp bağlantı sorunu inceleniyor",
+      "start": "Başlat",
+      "note": "Aktifken tüm yazma işlemleri salt-okunura döner ve denetim kaydına düşer."
+    },
+    "tabs": {
+      "general": "Genel",
+      "users": "Kullanıcılar",
+      "whatsapp": "WhatsApp",
+      "aiUsage": "AI Kullanım",
+      "billing": "Faturalama",
+      "compliance": "Uyum",
+      "audit": "Denetim"
+    },
+    "fields": {
+      "title": "Unvan",
+      "licenseNumber": "Yetki Belgesi No",
+      "city": "Şehir",
+      "branches": "Branşlar",
+      "plan": "Plan",
+      "contact": "İletişim",
+      "timezone": "Saat Dilimi",
+      "currency": "Para Birimi",
+      "onboardingStep": "Onboarding Adımı"
+    },
+    "onboardingLive": "Canlı",
+    "usersTabPrefix": "{{count}} kullanıcı. Detaylı kullanıcı listesi ve rol yönetimi için bkz. ",
+    "usersTabSuffix": ".",
+    "whatsappTab": {
+      "displayNumber": "Görünen Numara",
+      "connectionStatus": "Bağlantı Durumu",
+      "connected": "Bağlı",
+      "notConnected": "Bağlı değil",
+      "messages24h": "Son 24s Mesaj",
+      "errors24h": "Son 24s Hata"
+    },
+    "aiUsageTab": {
+      "monthlyQuota": "Aylık Kota",
+      "used": "Kullanılan",
+      "overagePolicy": "Aşım Politikası",
+      "block": "Durdur",
+      "allow": "İzin ver",
+      "estimatedCost": "Tahmini Maliyet (bu ay)"
+    },
+    "billingTab": {
+      "period": "Dönem",
+      "annual": "Yıllık",
+      "monthly": "Aylık",
+      "amount": "Tutar",
+      "status": "Durum",
+      "current": "Güncel",
+      "overdue": "Gecikmiş",
+      "trial": "Deneme",
+      "nextCharge": "Sonraki Tahsilat"
+    },
+    "complianceTab": {
+      "license": "Yetki Belgesi",
+      "complicationInsurance": "Komplikasyon Sigortası",
+      "verbis": "VERBİS Kaydı",
+      "foreignLangRatio": "Yabancı Dil Personel Oranı",
+      "ek1Consents": "Ek-1 Onam (toplam / geri alınan)",
+      "unconsentedMedia": "Onamsız Görsel",
+      "crossBorder": "Yurt Dışı Aktarım Bildirimi",
+      "yes": "Var",
+      "no": "Yok",
+      "done": "Yapıldı",
+      "notDone": "Yapılmadı"
+    },
+    "auditTab": {
+      "who": "Kim",
+      "what": "Ne yaptı",
+      "when": "Ne zaman",
+      "empty": "Bu klinik için kayıt yok."
+    }
+  },
+  "demoRequests": {
+    "title": "Demo Talepleri",
+    "subtitle": "{{count}} talep — landing formundan.",
+    "exportCsv": "CSV dışa aktar",
+    "columns": {
+      "name": "Ad",
+      "clinic": "Klinik",
+      "city": "Şehir",
+      "branch": "Branş",
+      "phone": "Telefon",
+      "date": "Tarih",
+      "status": "Durum",
+      "note": "Not"
+    }
+  },
+  "aiUsage": {
+    "title": "AI Kullanım ve Kota",
+    "subtitle": "Klinik bazında bu ayki kullanım.",
+    "totalCostLabel": "Toplam Platform Maliyeti (bu ay, demo)",
+    "columns": {
+      "clinic": "Klinik",
+      "quota": "Kota",
+      "usage": "Kullanım",
+      "overagePolicy": "Aşım Politikası",
+      "estimatedCost": "Tahmini Maliyet"
+    },
+    "block": "Durdur",
+    "allow": "İzin ver"
+  },
+  "audit": {
+    "title": "Denetim Kaydı",
+    "appendOnlyNote": "Append-only — bu kayıtlar silinemez (KVKK denetim izi).",
+    "exportCsv": "CSV dışa aktar",
+    "filterAllClinics": "Tüm klinikler",
+    "columns": {
+      "who": "Kim",
+      "what": "Ne yaptı",
+      "clinic": "Klinik",
+      "when": "Ne zaman"
+    }
+  },
+  "billing": {
+    "title": "Faturalama",
+    "subtitle": "Gecikenler üstte listelenir.",
+    "mrr": "MRR (demo)",
+    "arr": "ARR (demo)",
+    "columns": {
+      "clinic": "Klinik",
+      "period": "Dönem",
+      "amount": "Tutar",
+      "status": "Durum",
+      "nextCharge": "Sonraki Tahsilat"
+    },
+    "annual": "Yıllık",
+    "monthly": "Aylık",
+    "current": "Güncel",
+    "overdue": "Gecikmiş",
+    "trial": "Deneme"
+  },
+  "branches": {
+    "title": "Branş Şablonları",
+    "subtitleBefore": "Sistem şablonları — AI fiyat yetki matrisi burada değiştirilebilir ama",
+    "subtitleAfter": "enum'unun dışına çıkamaz (dropdown, serbest metin değil).",
+    "readyTemplate": "Hazır şablon",
+    "configurable": "Yapılandırılabilir",
+    "usageCount": "{{count}} klinik kullanıyor",
+    "lockedRuleTitle": "Kilitli kural — silinemez",
+    "aiPricingAuthorityLabel": "AI Fiyat Yetkisi",
+    "preAssessmentQuestionsLabel": "Ön-değerlendirme Soruları",
+    "requiredMediaLabel": "Gerekli Görseller",
+    "redFlagsLabel": "Kırmızı Bayraklar",
+    "branchObjectionsLabel": "Branş İtirazları",
+    "aftercareScheduleLabel": "Bakım Hattı Takvimi"
+  },
+  "compliance": {
+    "title": "Uyum Paneli",
+    "subtitle": "2025 Sağlık Turizmi Yönetmeliği ve KVKK yükümlülükleri, klinik bazında.",
+    "fullyCompliant": "Tam Uyumlu",
+    "withGaps": "Eksiği Olan",
+    "columns": {
+      "clinic": "Klinik",
+      "license": "Yetki Belgesi",
+      "insurance": "Komp. Sigortası",
+      "verbis": "VERBİS",
+      "langStaff": "%20 Dil Personeli",
+      "ek1Consent": "Ek-1 Onam",
+      "crossBorder": "Yurt Dışı Aktarım"
+    },
+    "yes": "Var",
+    "no": "Yok",
+    "daysOverdue": "{{count}} gün geçti",
+    "daysLeft": "{{count}} gün kaldı",
+    "revokedSuffix": "geri alınan",
+    "unconsentedMedia": "Onamsız görsel",
+    "footerNote": "Komplikasyon sigortası için 31.12.2026 son tarih — yaklaşanlar (≤60 gün) sarı ile işaretlenir. Yetki belgesi süresi dolan veya dolmak üzere olan klinikler de aynı şekilde vurgulanır."
+  },
+  "health": {
+    "title": "Platform Sağlığı",
+    "subtitle": "Demo verisiyle — yapı gerçek metriklere bağlanmaya hazır.",
+    "webhookSuccessRate": "Webhook Başarı Oranı",
+    "avgFirstReply": "Ort. İlk Yanıt Süresi",
+    "avgFirstReplyValue": "{{value}}sn",
+    "aiErrorRate": "AI Hata Oranı",
+    "recentErrors": "Son hatalar"
+  },
+  "onboarding": {
+    "title": "Onboarding Takibi",
+    "subtitle": "Hedef: klinik 45 dk, solo 15 dk. {{live}} klinik canlıda, {{inProgress}} klinik hunide.",
+    "columns": {
+      "clinic": "Klinik",
+      "step": "Adım",
+      "timeInStep": "Bu Adımda Geçen Süre",
+      "status": "Durum"
+    },
+    "emptyFunnel": "Hunide bekleyen klinik yok — hepsi canlıda.",
+    "daysInStep": "{{count}} gün",
+    "stuck": "Takıldı",
+    "inProgress": "Devam ediyor"
+  },
+  "users": {
+    "title": "Kullanıcılar, Roller ve Görüntüleme",
+    "subtitle": "Platform kullanıcıları ve klinik kullanıcıları ayrı listelenir.",
+    "tabPlatform": "Platform Kullanıcıları",
+    "tabClinic": "Klinik Kullanıcıları",
+    "columnsPlatform": {
+      "name": "Ad",
+      "email": "E-posta",
+      "role": "Rol",
+      "lastLogin": "Son Giriş"
+    },
+    "columnsClinic": {
+      "name": "Ad",
+      "clinic": "Klinik",
+      "role": "Rol",
+      "lastLogin": "Son Giriş"
+    },
+    "viewing": "Görüntüleniyor",
+    "reasonPlaceholder": "Gerekçe (zorunlu)",
+    "start": "Başlat",
+    "view": "Görüntüle"
+  },
+  "whatsapp": {
+    "title": "WhatsApp Hatları",
+    "subtitle": "Sorunlu hatlar üstte listelenir.",
+    "columns": {
+      "clinic": "Klinik",
+      "displayNumber": "Görünen Numara",
+      "status": "Durum",
+      "lastWebhookSuccess": "Son Webhook Başarısı",
+      "messages24h": "Son 24s Mesaj",
+      "errors24h": "Son 24s Hata"
+    },
+    "connected": "Bağlı",
+    "notConnected": "Bağlı değil",
+    "testSuccess": "Test başarılı (demo)",
+    "testWebhook": "Webhook testi",
+    "minutesAgo": "{{count}} dk önce",
+    "hoursAgo": "{{count}} sa önce",
+    "daysAgo": "{{count}} gün önce"
   }
 }
