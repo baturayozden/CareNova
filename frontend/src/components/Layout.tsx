@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Sidebar from './Sidebar';
-import AppMeta from './AppMeta';
 
 export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -10,18 +9,30 @@ export default function Layout() {
 
   return (
     <div className="flex h-screen bg-surface-page">
-      <AppMeta title="CareNova" />
+      {/* GECE-3-BRIEFI.md Bölüm G (B4): this used to unconditionally render
+          <AppMeta title="CareNova">. Since Layout mounts before any page
+          content, that made it the first <title> in <head> on every
+          single app-host page — and since React 19 manages it as a
+          declarative, reconciled node, AppRoutes' setDefaultTitle()
+          imperatively rewriting that same DOM node's textContent got
+          fought back on the next render, leaving `document.title` stuck
+          on "CareNova" for any page without its own AppMeta (see
+          docs/ — this is the actual root cause, not something further
+          setDefaultTitle tinkering could have fixed). Removing it
+          entirely gives setDefaultTitle's plain, non-React-managed
+          <title> a clear field, and pages that DO render their own
+          AppMeta (Dashboard, admin pages, ...) are unaffected either way. */}
       {/* ── Mobile top-bar (hidden on md+) ───────────────────────────────── */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 h-14 bg-surface border-b border-line flex items-center px-4 gap-3 shrink-0">
         {/* eslint-disable i18next/no-literal-string -- ☰ is a symbol; "CareNova" is the brand name, not translatable */}
         <button
           onClick={() => setIsSidebarOpen(true)}
-          className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors text-xl"
+          className="w-9 h-9 flex items-center justify-center rounded-lg text-ink-muted hover:text-ink hover:bg-surface-sunken transition-colors text-xl"
           aria-label={t('openMenu')}
         >
           ☰
         </button>
-        <span className="text-white font-semibold text-sm tracking-tight">
+        <span className="text-ink font-semibold text-sm tracking-tight">
           Care<span className="text-accent">Nova</span> AI
         </span>
         {/* eslint-enable i18next/no-literal-string */}

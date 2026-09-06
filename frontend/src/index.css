@@ -90,7 +90,23 @@
 
   --ink:        232 237 245; /* #E8EDF5 */
   --ink-muted:  148 163 184; /* #94A3B8 */
-  --ink-subtle: 100 116 139; /* slate-500 */
+  --ink-subtle: 123 142 167; /* #7B8EA7 — GECE-3-BRIEFI.md Bölüm G (B6):
+                                 the old slate-500 (100 116 139) only cleared
+                                 3.79:1 against --surface-0, failing 4.5:1 —
+                                 this is the ROOT token behind Sidebar.tsx's
+                                 "Management"/"Super Admin" section labels
+                                 (which used a hardcoded text-gray-600
+                                 instead of this token, but switching them
+                                 to text-ink-subtle wouldn't have actually
+                                 fixed anything since the token itself was
+                                 under-contrast). Solved against --surface-2
+                                 (26 36 55), the lightest/hardest of the
+                                 three dark-theme surfaces this token is
+                                 used on top of: 4.64:1 there, 5.39:1 against
+                                 --surface-0, 5.88:1 against --surface-1 —
+                                 all with the same ~4.55+ safety margin as
+                                 the rest of this file's tokens (see
+                                 CARENOVA-STRATEJI.md §14). */
 
   --accent:       37 99 235;   /* #2563EB — darker than the light theme's accent so
                                   white button/badge text keeps 4.5:1 on dark

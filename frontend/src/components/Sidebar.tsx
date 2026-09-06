@@ -234,7 +234,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="ml-auto">
               <button
                 onClick={() => setBellOpen(v => !v)}
-                className="relative w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors"
+                className="relative w-8 h-8 flex items-center justify-center rounded-lg text-ink-muted hover:text-ink hover:bg-surface-sunken transition-colors"
               >
                 <Bell size={18} />
                 {unreadCount > 0 && (
@@ -249,7 +249,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             {/* eslint-disable i18next/no-literal-string -- ✕ is a symbol, not translatable text */}
             <button
               onClick={onClose}
-              className="md:hidden ml-2 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors text-base"
+              className="md:hidden ml-2 w-8 h-8 flex items-center justify-center rounded-lg text-ink-muted hover:text-ink hover:bg-surface-sunken transition-colors text-base"
               aria-label={t('closeMenu')}
             >
               ✕
@@ -261,7 +261,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {bellOpen && (
             <div className="absolute left-3 right-3 top-full bg-surface-sunken border border-line rounded-xl shadow-2xl z-50 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-surface-sunken">
-                <p className="text-white text-sm font-semibold">{t('notifications')}</p>
+                <p className="text-ink text-sm font-semibold">{t('notifications')}</p>
                 {unreadCount > 0 && (
                   <button onClick={markAllRead}
                     className="text-xs text-accent hover:text-accent-hover transition-colors">
@@ -271,7 +271,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </div>
               <div className="max-h-80 overflow-y-auto divide-y divide-surface-sunken">
                 {notifications.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center py-8">{t('noNotifications')}</p>
+                  <p className="text-ink-muted text-sm text-center py-8">{t('noNotifications')}</p>
                 ) : notifications.map(n => (
                   <div
                     key={n.id}
@@ -281,9 +281,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     <div className="flex items-start gap-2">
                       {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />}
                       <div className={!n.read ? '' : 'ml-3.5'}>
-                        <p className={`text-sm font-medium ${n.read ? 'text-gray-300' : 'text-white'}`}>{n.title}</p>
-                        <p className="text-gray-500 text-xs mt-0.5 line-clamp-2">{n.message}</p>
-                        <p className="text-gray-600 text-[10px] mt-1">{timeAgo(n.createdAt)}</p>
+                        <p className={`text-sm font-medium ${n.read ? 'text-ink-muted' : 'text-ink'}`}>{n.title}</p>
+                        <p className="text-ink-muted text-xs mt-0.5 line-clamp-2">{n.message}</p>
+                        <p className="text-ink-subtle text-[10px] mt-1">{timeAgo(n.createdAt)}</p>
                       </div>
                     </div>
                   </div>
@@ -304,7 +304,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
                     ? 'border-l-2 border-accent text-accent bg-surface-sunken pl-[10px]'
-                    : 'text-gray-400 hover:text-white hover:bg-surface-sunken'
+                    : 'text-ink-muted hover:text-ink hover:bg-surface-sunken'
                 }`
               }
             >
@@ -321,7 +321,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {user?.role && COMMISSION_ROLES.includes(user.role) && (
             <>
               <div className="pt-4 pb-1 px-3">
-                <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">{t('management')}</p>
+                <p className="text-[10px] font-semibold text-ink-subtle uppercase tracking-widest">{t('management')}</p>
               </div>
               {commissionItems.map((item) => (
                 <NavLink
@@ -332,7 +332,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isActive
                         ? 'border-l-2 border-accent text-accent bg-surface-sunken pl-[10px]'
-                        : 'text-gray-400 hover:text-white hover:bg-surface-sunken'
+                        : 'text-ink-muted hover:text-ink hover:bg-surface-sunken'
                     }`
                   }
                 >
@@ -346,7 +346,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {user?.role === 'super_admin' && (
             <>
               <div className="pt-4 pb-1 px-3">
-                <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">{t('superAdmin')}</p>
+                <p className="text-[10px] font-semibold text-ink-subtle uppercase tracking-widest">{t('superAdmin')}</p>
               </div>
               {superAdminItems.map((item) => (
                 <NavLink
@@ -357,7 +357,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isActive
                         ? 'border-l-2 border-accent text-accent bg-surface-sunken pl-[10px]'
-                        : 'text-gray-400 hover:text-white hover:bg-surface-sunken'
+                        : 'text-ink-muted hover:text-ink hover:bg-surface-sunken'
                     }`
                   }
                 >
@@ -376,8 +376,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               {initials}
             </div>
             <div className="min-w-0">
-              <p className="text-white text-sm font-medium truncate capitalize">{displayName}</p>
-              <p className="text-gray-500 text-xs truncate capitalize">{displayRole}</p>
+              <p className="text-ink text-sm font-medium truncate capitalize">{displayName}</p>
+              <p className="text-ink-muted text-xs truncate capitalize">{displayRole}</p>
             </div>
           </div>
 
@@ -387,7 +387,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <button
                 onClick={() => setSwitcherOpen(v => !v)}
                 disabled={switching}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors disabled:opacity-50"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-ink-muted hover:text-ink hover:bg-surface-sunken transition-colors disabled:opacity-50"
               >
                 <Building2 size={16} className="shrink-0" />
                 <span className="flex-1 text-left truncate">
@@ -415,10 +415,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             : 'hover:bg-surface-sunken',
                         ].join(' ')}
                       >
-                        <span className={`block font-medium ${isActive ? 'text-white' : 'text-gray-200'}`}>
+                        <span className={`block font-medium ${isActive ? 'text-ink' : 'text-ink-muted'}`}>
                           {tenant.tenantName}
                         </span>
-                        <span className="block text-xs text-gray-500 mt-0.5 capitalize">
+                        <span className="block text-xs text-ink-muted mt-0.5 capitalize">
                           {tenant.role.replace(/_/g, ' ')}
                         </span>
                         {isActive && (
@@ -441,7 +441,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 className={`flex-1 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide transition-colors ${
                   i18n.language?.startsWith(lng)
                     ? 'bg-surface-sunken text-accent'
-                    : 'text-gray-500 hover:text-white hover:bg-surface-sunken'
+                    : 'text-ink-muted hover:text-ink hover:bg-surface-sunken'
                 }`}
               >
                 {lng}
@@ -451,7 +451,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           <button
             onClick={toggleTheme}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-sunken transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-ink-muted hover:text-ink hover:bg-surface-sunken transition-colors"
             title={theme === 'dark' ? t('switchToLight') : t('switchToDark')}
           >
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}

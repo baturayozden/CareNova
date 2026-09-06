@@ -1739,4 +1739,52 @@ B5 ✅ olarak kapatıldı ama bu sınırla birlikte not düşüldü.
 
 ---
 
+## BÖLÜM G — Küçük açıklar
+
+**G.1/Bulgu 5 — B6 kökten çözüldü:** `Sidebar.tsx:322`'nin `text-gray-600`
+kullanımını `text-ink-subtle`'a çevirmek yetmedi — token'ın KENDİSİ
+`[data-theme="dark"]`'da hâlâ eski, düşük-kontrast bir değer taşıyordu
+(`100 116 139`, `--surface-2`'ye karşı 3.79:1 — Gece 2'nin kontrast
+düzeltmesi `:root` ve `.surface-inverted`'ı düzeltmiş ama gerçek koyu
+temanın kendi `--ink-subtle`'ını atlamıştı). `index.css`'te
+`123 142 167`'ye çıkarıldı (üç koyu-tema yüzeyinin hepsine karşı 4.64-5.88:1).
+Bu, admin sidebar'ın "PLATFORM" etiketini (Bulgu 5, zaten `text-ink-subtle`
+kullanıyordu) de bedavaya düzeltti — canlı doğrulandı, ikisi de artık
+5.39:1 koyu temada. `Sidebar.tsx`'in geri kalanındaki TÜM ham gri/beyaz
+sınıfları (`text-gray-400/500/600`, `hover:text-white`, üç ayrı ternary)
+da token karşılıklarına taşındı — sadece sabit-renkli chip'ler (bildirim
+rozeti, kullanıcı avatarı) üzerindeki beyaz metin dokunulmadı, onlar zaten
+her temada doğru.
+
+**G.3 — Uygulama geneli ham gri taraması:** `grep -rln "text-gray-\|
+bg-gray-\|border-gray-" frontend/src` → **35 dosya**. Sidebar.tsx ve
+Layout.tsx (aşağıda) düzeltildi; kalan 33 dosyanın neredeyse tamamı bu
+gece hiç dokunulmayan, eski CareDental sayfaları (modal'lar, yasal
+sayfalar, ödeme akışı, kayıt/şifre sayfaları). **Bilinçli karar:** kör bir
+mekanik `sed` ile hepsini değiştirmedim — B6'nın kendisi gösterdi ki bir
+gri sınıfın gerçekten sorunlu olup olmadığı o dosyanın zemin bağlamına
+(sabit koyu mu, theme-aware `bg-surface` mi) bağlı, doğrulanmadan
+değiştirmek ya hiçbir şey düzeltmez ya da farklı bir yerde yeni bir
+görsel hata açar. Dosya listesi `BLOKAJLAR.md` B6'da — ayrı, boyutu belli
+bir iş olarak bırakıldı.
+
+**G.4 — B4 kökten çözüldü:** `Layout.tsx`'in koşulsuz `<AppMeta
+title="CareNova">`'sı gerçek kök nedendi — her app-host sayfasında
+`<head>`'deki İLK `<title>` oluyordu ve React 19 onu deklaratif olarak
+yönetip `setDefaultTitle()`'ın emperatif değişikliğini geri alıyordu.
+Kaldırıldı. Canlı doğrulandı (fresh load + SPA-içi navigasyon):
+`/leads` (kendi AppMeta'sı yok) artık tek, doğru `<title>` gösteriyor;
+`/dashboard` → `/cases` → `/settings` SPA geçişlerinde `document.title`
+her adımda doğru. Tam detay ve kalan küçük not (görünmez, işlevi
+etkilemeyen bir DOM kalıntısı) `BLOKAJLAR.md` B4'te.
+
+**Doğrulama:** Hepsi `getComputedStyle`/`document.title` okuma ile,
+ekran görüntüsü kullanılmadan doğrulandı (rehber DEĞİL ama bu ölçümler
+için gerek yoktu). `npx tsc --noEmit`, `CI=true npm run build`,
+`node scripts/check-i18n-leaks.js` (0/0) hepsi temiz.
+
+**Commit:** (aşağıda)
+
+---
+
 

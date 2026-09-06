@@ -127,35 +127,43 @@ kullanıcılarla elle bir kez doğrulamak.
 
 ---
 
-## B4 — Kendi AppMeta'sını render etmeyen sayfalarda host-bazlı varsayılan sekme başlığı çalışmıyor (kozmetik, düşük öncelik)
+## ✅ B4 — Host-bazlı varsayılan sekme başlığı — Gece 3'te ÇÖZÜLDÜ (kök neden bulundu)
 
-**Ne oldu:** GECE-2-BRIEFI.md Bölüm B.3 madde 5, her host'un kendi varsayılan
-`<title>`'ına sahip olmasını istiyor ("CareNova | Klinik Paneli" app için,
-"CareNova | Platform" admin için). `AppMeta` render eden sayfalarda (Login,
-ComingSoon, vb.) sorun yok. Ama Dashboard gibi hiç `AppMeta` render etmeyen
-sayfalarda, host-bazlı varsayılanı ayarlamak için `document.title = ...`
-sonra daha açık bir `setDefaultTitle()` yardımcı fonksiyonu (mevcut
-`<title>` elemanını bulup güncelleme, fazlalıkları temizleme) denedim — her
-ikisinde de `<head>`'de İKİ `<title>` elemanı oluşuyor
-(`frontend/src/lib/setDefaultTitle.ts`'te tam açıklama var), ve
-`document.title` getter'ı (spec gereği ilk elemanı döndürür) boş kalan
-"CareNova" değerini gösteriyor.
+**Neydi:** Kendi `AppMeta`'sını render etmeyen sayfalarda (`/leads`,
+`/settings`, vb.) sekme başlığı host-bazlı varsayılan yerine boş
+"CareNova" gösteriyordu.
 
-**Kök neden bulunamadı** — React 19'un native head-yönetimi (title/meta/link
-hoisting) ile ilgili bir etkileşim olabilir ama tam izini süremedim. 3
-deneme kuralı gereği bıraktım.
+**Gerçek kök neden (Gece 2'de bulunamamıştı):** `components/Layout.tsx`
+HER app-host sayfasında (Dashboard dahil) koşulsuz `<AppMeta
+title="CareNova">` render ediyordu. Layout, sayfa içeriğinden ÖNCE mount
+olduğu için bu, `<head>`'deki İLK `<title>` elemanı oluyordu. React 19
+bunu deklaratif, reconcile edilen bir node olarak yönetiyor — `AppRoutes`'un
+`setDefaultTitle()`'ı bu SAME DOM node'un `textContent`'ini emperatif
+olarak değiştirmeye çalışınca, React'in bir sonraki render'ı bunu geri
+"CareNova"ya döndürüyordu. Yani sorun React 19'un genel head-yönetimi
+DEĞİLDİ — Layout'un gereksiz, koşulsuz kendi AppMeta'sıydı.
 
-**Etkisi:** SADECE kozmetik — tarayıcı sekmesi/geçmişinde host'a özel bir
-varsayılan başlık yerine boş "CareNova" görünüyor, kendi AppMeta'sı olan
-sayfalarda (çoğu kritik ekran) hiçbir etkisi yok. Güvenlik/işlevsellik
-etkilenmiyor.
+**Düzeltme:** `Layout.tsx`'ten `<AppMeta title="CareNova">` tamamen
+kaldırıldı. Artık `setDefaultTitle()`'ın React tarafından yönetilen
+rakip bir node'u yok, sahayı kontrolsüz kullanıyor.
 
-**Ne gerekiyor:** React 19'un `<title>`/head-hoisting mekanizmasının bu
-projedeki (CRA + react-router + iki ayrı `useEffect` kaynağı) tam
-davranışının araştırılması, ya da her app/admin sayfasına kendi `AppMeta`'sını
-eklemek (daha kesin ama daha çok dosya değişikliği gerektirir).
+**Canlı doğrulandı (fresh load + SPA içi navigasyon, ekran görüntüsü
+gerekmedi — `document.title` doğrudan okunabilir):**
+- `/leads` (kendi AppMeta'sı yok) → tek `<title>`, doğru değer:
+  "CareNova | Klinik Paneli"
+- `/dashboard` → "Dashboard | CareNova" (kendi AppMeta'sı)
+- `/dashboard`'dan SPA ile `/cases`'e geçiş → "Cases | CareNova" (doğru,
+  anında güncelleniyor)
+- `/cases`'ten SPA ile `/settings`'e geçiş (kendi AppMeta'sı yok) →
+  tek `<title>`, doğru varsayılan
 
-**Aciliyet:** Düşük — kozmetik, işlevsel hiçbir şeyi engellemiyor.
+**Kalan küçük not:** Fresh-load DEĞİL, SPA-içi geçişlerde ara sırada
+(örn. Dashboard'un kendi AppMeta'sı unmount olurken) `<head>`'de görünmez,
+`document.title`'ı ETKİLEMEYEN bir fazladan `<title>` node'u bir sonraki
+geçişe kadar kalabiliyor — kullanıcı hiçbir zaman yanlış bir sekme başlığı
+GÖRMÜYOR (test edilen her senaryoda `document.title` her zaman doğruydu),
+sadece DOM'da temizlenmemiş, görünmez bir kalıntı var. Orijinal hatanın
+(kullanıcıya yanlış başlık gösterme) kendisi giderildi.
 
 ---
 
@@ -191,26 +199,43 @@ kullanmaya başlaması.
 
 ---
 
-## B6 — Sidebar "Management" bölüm başlığı WCAG AA'yı geçemiyor (kozmetik, düşük öncelik, kapsam dışı)
+## ✅ B6 — Sidebar "Management" bölüm başlığı — Gece 3'te ÇÖZÜLDÜ (kök token hatasıydı)
 
-**Ne oldu:** Bölüm D doğrulaması sırasında çalıştırdığım genel bir
-kontrast taraması (`getComputedStyle` tabanlı, ekran görüntüsü değil),
-`/doctor-queue` sayfasında SIFIR ihlal buldu ama Sidebar'ın kendisinde
-1 ihlal yakaladı: `src/components/Sidebar.tsx:322`'deki "Management"
-bölüm başlığı `text-gray-600` (token sistemine değil, ham Tailwind gri
-paletine bağlı) kullanıyor, 10px punto, koyu sidebar zeminine karşı
-2.56:1 — gereken 4.5:1'in çok altında.
+**Neydi:** `Sidebar.tsx`'teki "Management"/"Super Admin" bölüm başlıkları
+`text-gray-600` (ham Tailwind, token değil) kullanıyordu, koyu zeminde
+2.56:1 — 4.5:1'in altında.
 
-**Neden düzeltmedim:** Bu, Gece 2'nin kapsamındaki (nav/host/admin/vaka)
-hiçbir dosyaya ait değil — muhtemelen Gece 1 öncesinden kalma bir hata,
-`docs/contrast-report.md`'in 35 bulgusuna da dahil değildi çünkü o rapor
-sadece landing sayfasını tarıyor, Sidebar'ı değil. Kapsam dışı bir hatayı
-düzeltmeye başlamak yerine not düşüp devam ettim (MUTLAK YASAK #10'un
-ruhu: bilinmeyen bir hataya dalıp zaman kaybetme).
+**Gerçek kök neden (beklenenden daha derindi):** `text-gray-600`'ü
+`text-ink-subtle`'a çevirmek TEK BAŞINA yetmiyordu, çünkü `--ink-subtle`
+token'ının KENDİSİ `[data-theme="dark"]` bloğunda hâlâ eski
+(Gece 2'de düzeltilmemiş) bir değer taşıyordu: `100 116 139` (slate-500),
+en zor yüzeye (`--surface-2`) karşı sadece 3.79:1. Gece 2'nin kontrast
+düzeltmesi `:root` (açık tema) ve `.surface-inverted`'ı (landing'in her
+zaman koyu bloğu) düzeltmişti ama gerçek KOYU TEMANIN kendi
+`--ink-subtle`'ını atlamıştı — bu token uygulamanın HER yerinde
+kullanıldığı için sadece Sidebar değil, koyu temadaki her `text-ink-subtle`
+kullanımı etkileniyordu.
 
-**Ne gerekiyor:** `text-gray-600`'ü token sistemine (`text-ink-subtle`
-veya benzeri, sidebar'ın koyu zeminine göre ayrıca ölçülmeli) çevirmek —
-tek satırlık bir düzeltme, muhtemelen 10-15 dakika sürer.
+**Düzeltme:** `index.css`'te `[data-theme="dark"]`'ın `--ink-subtle`'ı
+`123 142 167`'ye çıkarıldı (`--surface-2`'ye karşı 4.64:1, `--surface-0`'a
+karşı 5.39:1, `--surface-1`'e karşı 5.88:1 — hepsi ~4.55+ güvenlik payıyla).
+`Sidebar.tsx`'teki TÜM ham gri sınıfları (`text-gray-400/500/600`,
+`hover:text-white`, ternary'lerdeki `text-white`/`text-gray-200/300`)
+token karşılıklarına taşındı (sadece renkli chip'ler üzerindeki —
+bildirim rozeti, kullanıcı avatarı — sabit beyaz metin dokunulmadan
+bırakıldı, onlar zaten her temada doğru).
 
-**Aciliyet:** Düşük — kozmetik, tek bir bölüm başlığı, okunabilirlik
-tamamen imkansız değil (sadece AA eşiğinin altında).
+**Canlı doğrulandı (`getComputedStyle`, koyu tema):** "Management" etiketi
+artık 5.39:1. Bulgu 5'in admin sidebar "PLATFORM" etiketi de AYNI kök
+token'ı kullandığı için (zaten `text-ink-subtle` idi, ham gri değildi)
+bu düzeltmeyle bedavaya çözüldü — ayrıca doğrulandı: 5.39:1 koyu temada,
+5.19:1 açık temada (zaten Gece 2'de düzgündü).
+
+**Hâlâ kapsam dışı bırakılan (yeni not):** Uygulama genelinde 35 dosyada
+hâlâ ham `text-gray-*`/`bg-gray-*`/`border-gray-*` kullanımı var (brief'in
+Bölüm G.3 taraması bunları buldu) — çoğu bu gece hiç dokunulmayan, eski
+CareDental sayfaları (modal'lar, yasal sayfalar, ödeme sayfaları vb.).
+Kör bir mekanik değiştirme riskli (her dosyanın kendi zemin bağlamı
+doğrulanmadan) — ayrı, dosya listesi hazır bir iş olarak bırakıldı.
+
+---
