@@ -2388,7 +2388,7 @@ kullanıcının kendi önceden başlattığı `frontend` dev sunucusuydu (11+ sa
 çalışıyordu), ona dokunulmadı. Bundan sonra modül doğrulaması sadece
 `require()` ile (sunucu başlatmadan) yapıldı.
 
-**Commit:** (aşağıda)
+**Commit:** `f4f82e0` — "test(ai): end-to-end mock flow covering all 6 Bölüm F scenarios"
 
 ---
 
