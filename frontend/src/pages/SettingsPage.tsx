@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
+import { roleLabel } from '../lib/roleLabels';
+import AppMeta from '../components/AppMeta';
 import { MessageCircle, Bot, CalendarDays, User, Link2, Bell, Mail, Users, Eye, EyeOff, Calendar, Building2, Lock, CheckCircle, Globe, Archive, RotateCcw, Search } from 'lucide-react';
 
 type IconComponent = React.ComponentType<{ size?: number; className?: string }>;
@@ -36,6 +39,7 @@ const ROLE_BADGE: Record<string, string> = {
 };
 
 function TeamSection({ currentUserId }: { currentUserId: string }) {
+  const { t: tCommon } = useTranslation('common');
   const [users,   setUsers]   = useState<PlatformUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
@@ -177,8 +181,8 @@ function TeamSection({ currentUserId }: { currentUserId: string }) {
                   <p className="text-white text-sm font-medium">{u.firstName} {u.lastName}</p>
                   <p className="text-gray-500 text-xs truncate">{u.email}</p>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full border capitalize ${ROLE_BADGE[u.role] || 'text-gray-400 bg-surface-sunken border-line'}`}>
-                  {u.role.replace(/_/g, ' ')}
+                <span className={`text-xs px-2 py-0.5 rounded-full border ${ROLE_BADGE[u.role] || 'text-gray-400 bg-surface-sunken border-line'}`}>
+                  {roleLabel(tCommon, u.role)}
                 </span>
                 <span className={`text-xs px-2 py-0.5 rounded-full border ${u.isActive ? 'text-green-300 bg-green-900/40 border-green-700/50' : 'text-gray-500 bg-surface-sunken border-line'}`}>
                   {u.isActive ? 'Active' : 'Inactive'}
@@ -230,6 +234,7 @@ interface CalStatus {
 
 function IntegrationsSection() {
   const { user } = useAuth();
+  const { t } = useTranslation('settings');
   const [section,     setSection]     = useState<'whatsapp' | 'ai' | 'calendar' | 'website'>('whatsapp');
   const [wizardStep,  setWizardStep]  = useState<WizardStep>(1);
   const [waForm,      setWaForm]      = useState({ business_account_id: '', phone_number_id: '', access_token: '' });
@@ -368,10 +373,10 @@ function IntegrationsSection() {
       {/* Sub-nav */}
       <div className="flex gap-2 flex-wrap">
         {([
-          { key: 'whatsapp', label: 'WhatsApp',   icon: MessageCircle },
-          { key: 'ai',       label: 'AI Provider', icon: Bot           },
-          { key: 'calendar', label: 'Calendar',    icon: CalendarDays  },
-          ...(canAccessWebsite ? [{ key: 'website', label: 'Website', icon: Globe }] : []),
+          { key: 'whatsapp', label: t('integrations.whatsapp'),   icon: MessageCircle },
+          { key: 'ai',       label: t('integrations.aiProvider'), icon: Bot           },
+          { key: 'calendar', label: t('integrations.calendar'),   icon: CalendarDays  },
+          ...(canAccessWebsite ? [{ key: 'website', label: t('integrations.website'), icon: Globe }] : []),
         ] as { key: string; label: string; icon: IconComponent }[]).map(s => (
           <button key={s.key} onClick={() => setSection(s.key as any)}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
@@ -465,7 +470,11 @@ function IntegrationsSection() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 font-medium uppercase tracking-wider block mb-1.5">Verify Token</label>
+                    {/* Görev 4: literal English label, but `html lang` still
+                        follows the UI language toggle — under TR, CSS
+                        `uppercase` would render "VERİFY" (dotted İ). Same
+                        fix as elsewhere: force the transform in code. */}
+                    <label className="text-xs text-gray-500 font-medium tracking-wider block mb-1.5">{'Verify Token'.toLocaleUpperCase('en')}</label>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 bg-surface border border-line rounded-lg px-3 py-2 text-accent text-xs font-mono">{VERIFY_TOKEN}</code>
                       <button onClick={() => copy(VERIFY_TOKEN, 'token')}
@@ -515,7 +524,7 @@ function IntegrationsSection() {
             <p className="text-gray-500 text-xs">Choose the AI model powering your WhatsApp assistant.</p>
           </div>
           <div>
-            <label className="text-xs text-gray-500 font-medium uppercase tracking-wider block mb-2">Provider</label>
+            <label className="text-xs text-gray-500 font-medium tracking-wider block mb-2">{'Provider'.toLocaleUpperCase('en')}</label>
             <div className="grid grid-cols-2 gap-3">
               {AI_PROVIDERS.map(p => (
                 <button key={p.value} onClick={() => { setAiProvider(p.value); setAiModel(p.models[0]); }}
@@ -777,6 +786,7 @@ interface ClinicData {
 
 function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () => void }) {
   const { user } = useAuth();
+  const { t } = useTranslation('settings');
   const canEdit = user ? EDITOR_ROLES.includes(user.role) : false;
 
   const [loading,  setLoading]  = useState(true);
@@ -801,9 +811,9 @@ function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () 
         setWebsite(c.website ?? '');
         setTimezone(c.timezone ?? 'Europe/Istanbul');
       })
-      .catch(() => setMsg({ type: 'error', text: 'Failed to load clinic data.' }))
+      .catch(() => setMsg({ type: 'error', text: t('clinic.loadFailed') }))
       .finally(() => setLoading(false));
-  }, [user?.tenantId]);
+  }, [user?.tenantId, t]);
 
   async function save() {
     if (!user?.tenantId) return;
@@ -813,12 +823,12 @@ function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () 
       await api.put<{ clinic: ClinicData }>(`/api/clinics/${user.tenantId}`, {
         name, address, phone: cPhone, email: cEmail, website, timezone,
       });
-      setMsg({ type: 'success', text: 'Clinic settings saved.' });
+      setMsg({ type: 'success', text: t('clinic.saved') });
     } catch (err: any) {
       const status = err?.response?.status;
       const text = status === 403
-        ? "You don't have permission to update clinic settings."
-        : err?.response?.data?.error || 'Failed to save clinic settings.';
+        ? t('clinic.noPermission')
+        : err?.response?.data?.error || t('clinic.saveFailed');
       setMsg({ type: 'error', text });
     } finally {
       setSaving(false);
@@ -835,7 +845,7 @@ function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () 
     <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
       <div className="px-6 py-4 border-b border-line flex items-center gap-2">
         <Building2 size={20} />
-        <h2 className="font-medium text-white text-sm">Clinic Settings</h2>
+        <h2 className="font-medium text-white text-sm">{t('clinic.title')}</h2>
       </div>
 
       {loading ? (
@@ -844,45 +854,45 @@ function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () 
         </div>
       ) : !user?.tenantId ? (
         <div className="px-6 py-5">
-          <p className="text-gray-500 text-sm">No clinic associated with your account.</p>
+          <p className="text-gray-500 text-sm">{t('clinic.noClinic')}</p>
         </div>
       ) : (
         <div className="px-6 py-5 space-y-4">
           {msg && <div className={CMSG(msg.type)}>{msg.text}</div>}
 
           <div>
-            <label className={CLB}>Clinic name</label>
+            <label className={CLB}>{t('clinic.name')}</label>
             <input type="text" value={name} onChange={e => setName(e.target.value)}
               disabled={!canEdit} className={CIN(!canEdit)} placeholder="Riverside Dental" />
           </div>
 
           <div>
-            <label className={CLB}>Address</label>
+            <label className={CLB}>{t('clinic.address')}</label>
             <input type="text" value={address} onChange={e => setAddress(e.target.value)}
               disabled={!canEdit} className={CIN(!canEdit)} placeholder="123 High Street, London, W1A 1AA" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={CLB}>Phone</label>
+              <label className={CLB}>{t('clinic.phone')}</label>
               <input type="tel" value={cPhone} onChange={e => setCPhone(e.target.value)}
                 disabled={!canEdit} className={CIN(!canEdit)} placeholder="+44 20 7946 0000" />
             </div>
             <div>
-              <label className={CLB}>Email</label>
+              <label className={CLB}>{t('clinic.email')}</label>
               <input type="email" value={cEmail} onChange={e => setCEmail(e.target.value)}
                 disabled={!canEdit} className={CIN(!canEdit)} placeholder="hello@clinic.com" />
             </div>
           </div>
 
           <div>
-            <label className={CLB}>Website</label>
+            <label className={CLB}>{t('clinic.website')}</label>
             <input type="url" value={website} onChange={e => setWebsite(e.target.value)}
               disabled={!canEdit} className={CIN(!canEdit)} placeholder="https://www.myclinic.co.uk" />
           </div>
 
           <div>
-            <label className={CLB}>Timezone</label>
+            <label className={CLB}>{t('clinic.timezone')}</label>
             <select
               value={TIMEZONES.includes(timezone) ? timezone : timezone}
               onChange={e => setTimezone(e.target.value)}
@@ -898,13 +908,13 @@ function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () 
 
           <div className="bg-surface/60 border border-surface-sunken rounded-lg px-4 py-3 flex items-center justify-between">
             <div>
-              <p className="text-gray-300 text-sm">WhatsApp Number</p>
-              <p className="text-gray-600 text-xs mt-0.5">Managed via WhatsApp Cloud API</p>
+              <p className="text-gray-300 text-sm">{t('clinic.whatsappNumber')}</p>
+              <p className="text-gray-600 text-xs mt-0.5">{t('clinic.whatsappManaged')}</p>
             </div>
             <button
               onClick={() => { onGoToIntegrations(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               className="text-xs text-accent border border-accent/30 bg-accent/10 hover:bg-accent/20 px-2.5 py-1 rounded-full cursor-pointer transition-colors">
-              → Integrations
+              {t('clinic.goToIntegrations')}
             </button>
           </div>
 
@@ -912,11 +922,11 @@ function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () 
             <div className="pt-1">
               <button onClick={save} disabled={saving}
                 className="px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 transition-colors">
-                {saving ? 'Saving…' : 'Save Clinic Settings'}
+                {saving ? t('clinic.saving') : t('clinic.save')}
               </button>
             </div>
           ) : (
-            <p className="text-gray-600 text-xs">You have read-only access to clinic settings.</p>
+            <p className="text-gray-600 text-xs">{t('clinic.readOnly')}</p>
           )}
         </div>
       )}
@@ -928,6 +938,7 @@ function ClinicSettingsSection({ onGoToIntegrations }: { onGoToIntegrations: () 
 
 function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void }) {
   const { user, refreshUser } = useAuth();
+  const { t } = useTranslation('settings');
 
   const [firstName,  setFirstName]  = useState(user?.firstName ?? '');
   const [lastName,   setLastName]   = useState(user?.lastName  ?? '');
@@ -954,14 +965,14 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
       if (avatarUrl.trim() !== (user?.avatarUrl ?? '')) payload.avatarUrl = avatarUrl.trim();
 
       if (Object.keys(payload).length === 0) {
-        setProfMsg({ type: 'error', text: 'No changes to save.' });
+        setProfMsg({ type: 'error', text: t('profile.noChanges') });
         return;
       }
       await api.patch('/auth/profile', payload);
       await refreshUser();
-      setProfMsg({ type: 'success', text: 'Profile saved.' });
+      setProfMsg({ type: 'success', text: t('profile.saved') });
     } catch (err: any) {
-      setProfMsg({ type: 'error', text: err?.response?.data?.error || 'Failed to save profile.' });
+      setProfMsg({ type: 'error', text: err?.response?.data?.error || t('profile.saveFailed') });
     } finally {
       setProfSaving(false);
     }
@@ -970,17 +981,17 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
   async function changePassword() {
     setPwMsg(null);
     setPwValErr(null);
-    if (newPw.length < 8) { setPwValErr('New password must be at least 8 characters.'); return; }
-    if (newPw !== confirmPw) { setPwValErr('Passwords do not match.'); return; }
+    if (newPw.length < 8) { setPwValErr(t('password.tooShort')); return; }
+    if (newPw !== confirmPw) { setPwValErr(t('password.mismatch')); return; }
     setPwSaving(true);
     try {
       await api.post('/auth/profile/change-password', { currentPassword: curPw, newPassword: newPw });
       setCurPw(''); setNewPw(''); setConfirmPw('');
-      setPwMsg({ type: 'success', text: 'Password changed successfully.' });
+      setPwMsg({ type: 'success', text: t('password.success') });
     } catch (err: any) {
       const status = err?.response?.status;
-      const msg    = err?.response?.data?.error || 'Failed to change password.';
-      setPwMsg({ type: 'error', text: status === 401 ? 'Current password is incorrect.' : msg });
+      const msg    = err?.response?.data?.error || t('password.failed');
+      setPwMsg({ type: 'error', text: status === 401 ? t('password.incorrect') : msg });
     } finally {
       setPwSaving(false);
     }
@@ -998,48 +1009,48 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
       <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-line flex items-center gap-2">
           <User size={20} />
-          <h2 className="font-medium text-white text-sm">Profile</h2>
+          <h2 className="font-medium text-white text-sm">{t('profile.title')}</h2>
         </div>
         <div className="px-6 py-5 space-y-4">
           {profMsg && <div className={MSG(profMsg.type)}>{profMsg.text}</div>}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={LABEL}>First Name</label>
+              <label className={LABEL}>{t('profile.firstName')}</label>
               <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)}
-                className={INPUT} placeholder="First name" />
+                className={INPUT} placeholder={t('profile.firstName')} />
             </div>
             <div>
-              <label className={LABEL}>Last Name</label>
+              <label className={LABEL}>{t('profile.lastName')}</label>
               <input type="text" value={lastName} onChange={e => setLastName(e.target.value)}
-                className={INPUT} placeholder="Last name" />
+                className={INPUT} placeholder={t('profile.lastName')} />
             </div>
           </div>
 
           <div>
-            <label className={LABEL}>Email address</label>
+            <label className={LABEL}>{t('profile.email')}</label>
             <input type="email" value={user?.email ?? ''} disabled
               className={`${INPUT} opacity-50 cursor-not-allowed`} />
-            <p className="text-gray-600 text-xs mt-1">Email cannot be changed. Contact support to update.</p>
+            <p className="text-gray-600 text-xs mt-1">{t('profile.emailLocked')}</p>
           </div>
 
           <div>
-            <label className={LABEL}>Phone</label>
+            <label className={LABEL}>{t('profile.phone')}</label>
             <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
               className={INPUT} placeholder="+44 7700 900000" />
           </div>
 
           <div>
-            <label className={LABEL}>Avatar URL</label>
+            <label className={LABEL}>{t('profile.avatarUrl')}</label>
             <input type="url" value={avatarUrl} onChange={e => setAvatarUrl(e.target.value)}
               className={INPUT} placeholder="https://…" />
-            <p className="text-gray-600 text-xs mt-1">Direct image URL. File upload coming in a later update.</p>
+            <p className="text-gray-600 text-xs mt-1">{t('profile.avatarHelp')}</p>
           </div>
 
           <div className="pt-1">
             <button onClick={saveProfile} disabled={profSaving}
               className="px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 transition-colors">
-              {profSaving ? 'Saving…' : 'Save Profile'}
+              {profSaving ? t('profile.saving') : t('profile.save')}
             </button>
           </div>
         </div>
@@ -1049,23 +1060,23 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
       <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-line flex items-center gap-2">
           <Lock size={20} />
-          <h2 className="font-medium text-white text-sm">Change Password</h2>
+          <h2 className="font-medium text-white text-sm">{t('password.title')}</h2>
         </div>
         <div className="px-6 py-5 space-y-4">
           {pwMsg && <div className={MSG(pwMsg.type)}>{pwMsg.text}</div>}
 
           <div>
-            <label className={LABEL}>Current password</label>
+            <label className={LABEL}>{t('password.current')}</label>
             <input type="password" value={curPw} onChange={e => setCurPw(e.target.value)}
               className={INPUT} placeholder="••••••••" />
           </div>
           <div>
-            <label className={LABEL}>New password</label>
+            <label className={LABEL}>{t('password.new')}</label>
             <input type="password" value={newPw} onChange={e => setNewPw(e.target.value)}
-              className={INPUT} placeholder="Min. 8 characters" />
+              className={INPUT} placeholder={t('password.newPlaceholder')} />
           </div>
           <div>
-            <label className={LABEL}>Confirm new password</label>
+            <label className={LABEL}>{t('password.confirm')}</label>
             <input type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)}
               className={INPUT} placeholder="••••••••" />
             {pwValErr && <p className="text-red-400 text-xs mt-1">{pwValErr}</p>}
@@ -1074,7 +1085,7 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
           <div className="pt-1">
             <button onClick={changePassword} disabled={pwSaving}
               className="px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 transition-colors">
-              {pwSaving ? 'Changing…' : 'Change Password'}
+              {pwSaving ? t('password.submitting') : t('password.submit')}
             </button>
           </div>
         </div>
@@ -1090,14 +1101,10 @@ function ProfileSection({ onGoToIntegrations }: { onGoToIntegrations: () => void
 
 interface NotifPref { eventType: string; channel: string; enabled: boolean; }
 
-const EVENT_LABELS: Record<string, { title: string; desc: string }> = {
-  new_lead:             { title: 'New lead received',    desc: 'When a new lead enters your pipeline' },
-  lead_booked:          { title: 'Lead booked',          desc: 'When a lead converts to a booking' },
-  appointment_reminder: { title: 'Appointment reminder', desc: 'Upcoming appointment reminders' },
-  urgent_escalation:    { title: 'Urgent escalation',    desc: 'When a patient needs immediate attention' },
-  no_show:              { title: 'No-show',              desc: 'When a patient misses an appointment' },
-  ai_quota_warning:     { title: 'AI quota warning',     desc: 'When your AI message quota is running low' },
-};
+// Keys match settings.json's notifications.events.* — labels come from
+// there now (see NotificationsSection), this list only orders/whitelists
+// which event types render.
+const NOTIF_EVENT_KEYS = ['new_lead', 'lead_booked', 'appointment_reminder', 'urgent_escalation', 'no_show', 'ai_quota_warning'];
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -1120,6 +1127,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 }
 
 function NotificationsSection() {
+  const { t } = useTranslation('settings');
   const [prefs,   setPrefs]   = useState<NotifPref[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving,  setSaving]  = useState(false);
@@ -1127,10 +1135,10 @@ function NotificationsSection() {
 
   useEffect(() => {
     api.get<{ preferences: NotifPref[] }>('/api/notification-preferences')
-      .then(res => setPrefs(res.data.preferences))
-      .catch(() => setMsg({ type: 'error', text: 'Failed to load notification preferences.' }))
+      .then(res => setPrefs(res.data.preferences ?? []))
+      .catch(() => setMsg({ type: 'error', text: t('notifications.loadFailed') }))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   function toggle(eventType: string) {
     setPrefs(prev => prev.map(p =>
@@ -1143,10 +1151,10 @@ function NotificationsSection() {
     setMsg(null);
     try {
       const res = await api.put<{ preferences: NotifPref[] }>('/api/notification-preferences', { preferences: prefs });
-      setPrefs(res.data.preferences);
-      setMsg({ type: 'success', text: 'Notification preferences saved.' });
+      setPrefs(res.data.preferences ?? prefs);
+      setMsg({ type: 'success', text: t('notifications.saved') });
     } catch (err: any) {
-      setMsg({ type: 'error', text: err?.response?.data?.error || 'Failed to save preferences.' });
+      setMsg({ type: 'error', text: err?.response?.data?.error || t('notifications.saveFailed') });
     } finally {
       setSaving(false);
     }
@@ -1160,10 +1168,12 @@ function NotificationsSection() {
       <div className="px-6 py-4 border-b border-line flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Bell size={20} />
-          <h2 className="font-medium text-white text-sm">Notifications</h2>
+          <h2 className="font-medium text-white text-sm">{t('notifications.title')}</h2>
         </div>
-        {/* Channel header */}
-        <span className="text-xs text-gray-500 font-medium uppercase tracking-wider pr-1">Email</span>
+        {/* Channel header — deliberately no `uppercase` text-transform (Görev 4):
+            write already-uppercase i18n text instead of transforming it, so
+            Turkish-locale casing rules can never mangle it. */}
+        <span className="text-xs text-gray-500 font-medium tracking-wider pr-1">{t('notifications.channelEmail').toLocaleUpperCase('en')}</span>
       </div>
 
       {loading ? (
@@ -1175,25 +1185,21 @@ function NotificationsSection() {
           {msg && <div className={`mx-6 mt-4 ${NMSG(msg.type)}`}>{msg.text}</div>}
 
           <div className="divide-y divide-line">
-            {prefs.map(p => {
-              const label = EVENT_LABELS[p.eventType];
-              if (!label) return null;
-              return (
-                <div key={p.eventType} className="px-6 py-4 flex items-center justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="text-gray-200 text-sm font-medium">{label.title}</p>
-                    <p className="text-gray-500 text-xs mt-0.5">{label.desc}</p>
-                  </div>
-                  <Toggle checked={p.enabled} onChange={() => toggle(p.eventType)} />
+            {prefs.filter(p => NOTIF_EVENT_KEYS.includes(p.eventType)).map(p => (
+              <div key={p.eventType} className="px-6 py-4 flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-gray-200 text-sm font-medium">{t(`notifications.events.${p.eventType}.title`)}</p>
+                  <p className="text-gray-500 text-xs mt-0.5">{t(`notifications.events.${p.eventType}.desc`)}</p>
                 </div>
-              );
-            })}
+                <Toggle checked={p.enabled} onChange={() => toggle(p.eventType)} />
+              </div>
+            ))}
           </div>
 
           <div className="px-6 py-4 border-t border-line">
             <button onClick={save} disabled={saving}
               className="px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-semibold hover:bg-accent-hover disabled:opacity-60 transition-colors">
-              {saving ? 'Saving…' : 'Save Notification Preferences'}
+              {saving ? t('notifications.saving') : t('notifications.save')}
             </button>
           </div>
         </>
@@ -1389,26 +1395,29 @@ interface SettingsPageProps {
 
 export default function SettingsPage({ initialTab }: SettingsPageProps) {
   const { user } = useAuth();
+  const { t: tSettings } = useTranslation('settings');
+  const { t: tCommon } = useTranslation('common');
   const isSuperAdmin = user?.role === 'super_admin';
   const isAdmin = ['klinik_sahibi', 'super_admin'].includes(user?.role ?? '');
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab || 'profile');
 
   const tabs: { value: SettingsTab; label: string; icon: IconComponent; superAdminOnly?: boolean; adminOnly?: boolean }[] = [
-    { value: 'profile',      label: 'Profile',            icon: User    },
-    { value: 'integrations', label: 'Integrations',       icon: Link2   },
-    { value: 'notifications',label: 'Notifications',      icon: Bell    },
-    { value: 'archived',     label: 'Archived patients',  icon: Archive, adminOnly: true },
-    { value: 'team',         label: 'Team',               icon: Users,  superAdminOnly: true },
+    { value: 'profile',      label: tSettings('tabs.profile'),       icon: User    },
+    { value: 'integrations', label: tSettings('tabs.integrations'),  icon: Link2   },
+    { value: 'notifications',label: tSettings('tabs.notifications'), icon: Bell    },
+    { value: 'archived',     label: tSettings('tabs.archived'),      icon: Archive, adminOnly: true },
+    { value: 'team',         label: tSettings('tabs.team'),          icon: Users,  superAdminOnly: true },
   ];
 
   return (
     <div className="p-4 md:p-8">
+      <AppMeta title={`${tSettings('header.title')} | CareNova`} />
       <div className="max-w-3xl mx-auto">
 
         {/* Header */}
         <div className="mb-6">
-          <h1 className="font-serif text-3xl text-white">Settings</h1>
-          <p className="text-gray-400 text-sm mt-1">Manage your account, integrations, and platform configuration</p>
+          <h1 className="font-serif text-3xl text-white">{tSettings('header.title')}</h1>
+          <p className="text-gray-400 text-sm mt-1">{tSettings('header.subtitle')}</p>
         </div>
 
         {/* Current user card */}
@@ -1419,8 +1428,12 @@ export default function SettingsPage({ initialTab }: SettingsPageProps) {
           <div>
             <p className="text-white font-semibold">{user ? `${user.firstName} ${user.lastName}` : 'Demo User'}</p>
             <p className="text-gray-400 text-sm">{user?.email}</p>
-            <span className="inline-flex mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent border border-accent/20 capitalize">
-              {user?.role?.replace(/_/g, ' ')}
+            {/* Görev 4: no CSS text-transform on i18n-driven text — roleLabel()
+                already returns a correctly-capitalized string per language;
+                `capitalize`'s Turkish-locale casing rule is exactly what
+                turned "CONVERSION RATE" into "CONVERSİON RATE" elsewhere. */}
+            <span className="inline-flex mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent border border-accent/20">
+              {user?.role ? roleLabel(tCommon, user.role) : ''}
             </span>
           </div>
         </div>

@@ -1,0 +1,147 @@
+{
+  "page": {
+    "title": "Conversations",
+    "subtitle": "Real-time WhatsApp conversation monitoring",
+    "refresh": "↻ Refresh"
+  },
+  "receptionist": {
+    "title": "Action Required",
+    "subtitle_one": "{{count}} case needs a call today",
+    "subtitle_other": "{{count}} cases need a call today",
+    "allCaughtUp": "All caught up!",
+    "noActionNow": "No action required right now."
+  },
+  "summary": {
+    "todayMessages": "Today's AI Messages",
+    "leadsContacted": "Leads Contacted",
+    "replyRate": "Reply Rate",
+    "conversionRate": "Conversion Rate",
+    "pendingActions": "Pending Actions",
+    "needsAttention": "needs attention"
+  },
+  "weeklyReport": {
+    "title": "Performance Report",
+    "summaryLine": "{{leads}} leads · {{pipeline}} pipeline · {{bookings}} bookings",
+    "exportCsv": "Export CSV",
+    "loading": "Loading report…",
+    "noData": "No data available.",
+    "leadsRecovered": "Leads Recovered",
+    "pipelineCreated": "Pipeline Created",
+    "bookingsMade": "Bookings Made",
+    "avgResponse": "Avg Response",
+    "compareLabel": "vs last period",
+    "prior": "Prior: {{value}}",
+    "topScenario": "Top scenario:",
+    "periods": {
+      "today": "Today",
+      "this_week": "This Week",
+      "last_7": "Last 7 Days",
+      "last_30": "Last 30 Days",
+      "last_90": "Last 90 Days",
+      "custom": "Custom Range"
+    },
+    "from": "From",
+    "to": "to"
+  },
+  "myActions": {
+    "needFollowUp_one": "{{count}} lead needs human follow-up",
+    "needFollowUp_other": "{{count}} leads need human follow-up",
+    "aiCouldntClose": "AI couldn't close — these leads need a receptionist call",
+    "viewAll": "View all →"
+  },
+  "tabs": {
+    "all": "All Conversations ({{count}})",
+    "actionRequired": "Action Required ({{count}})",
+    "insights": "Insights"
+  },
+  "filters": {
+    "allTime": "All Time",
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "allClinics": "All Clinics",
+    "allScenarios": "All Scenarios",
+    "allOutcomes": "All Outcomes",
+    "allLanguages": "All Languages",
+    "exportCsv": "Export CSV",
+    "languages": {
+      "en": "🇬🇧 English",
+      "tr": "🇹🇷 Turkish",
+      "ar": "🇸🇦 Arabic",
+      "es": "🇪🇸 Spanish",
+      "ru": "🇷🇺 Russian"
+    }
+  },
+  "scenario": {
+    "new_enquiry": "New Enquiry",
+    "finance_objection": "Finance Objection",
+    "cold_lead": "Cold Lead",
+    "missed_call": "Missed Call"
+  },
+  "objection": {
+    "price_too_high": "Price",
+    "comparing_competitors": "Comparing",
+    "timing_issue": "Not Ready",
+    "anxiety_fear": "Anxiety",
+    "trust_concern": "Trust",
+    "availability": "Availability",
+    "finance_options": "Finance",
+    "general_enquiry": "Enquiry"
+  },
+  "outcome": {
+    "booked": "Booked ✓",
+    "replied": "Still Talking",
+    "no_response": "No Response",
+    "lost": "Lost"
+  },
+  "card": {
+    "actionNeeded": "Action needed",
+    "detectedObjection": "Detected objection",
+    "aiMessages_one": "{{count}} AI msg",
+    "aiMessages_other": "{{count}} AI msgs",
+    "takeOver": "Take Over",
+    "humanHandling": "Human handling",
+    "replyWhatsapp": "Reply via WhatsApp",
+    "messagePlaceholder": "Type your message...",
+    "send": "Send",
+    "sent": "✓ Sent",
+    "expand": "Expand conversation",
+    "collapse": "Collapse",
+    "noMessagesYet": "No messages yet.",
+    "interestedIn": "Interested in",
+    "notBookedYet": "— hasn't booked yet",
+    "lastSaid": "Last said: \"{{text}}\"",
+    "aiMessagesSentAgo": "{{count}} AI messages sent · last {{time}}",
+    "markCalled": "✓ Mark as Called",
+    "resolve": "Resolve",
+    "cancelReply": "Cancel reply",
+    "sendingAs": "Sending as {{clinic}} → {{patient}} ({{phone}})",
+    "sentViaWhatsapp": "Sent via WhatsApp",
+    "sendShortcut": "⌘↵ to send · Esc to cancel",
+    "cancel": "Cancel"
+  },
+  "list": {
+    "loading": "Loading activity…",
+    "noMatch": "No conversations match your filters",
+    "tryAdjusting": "Try adjusting the date range or filters above.",
+    "prev": "← Prev",
+    "next": "Next →",
+    "pageOf": "Page {{page}} of {{totalPages}}"
+  },
+  "errors": {
+    "sendFailed": "Failed to send message. Please try again.",
+    "markCalledFailed": "Failed to mark as called.",
+    "resolveFailed": "Failed to resolve.",
+    "loadInsightsFailed": "Failed to load insights",
+    "loadActivityFailed": "Failed to load activity",
+    "takeOverFailed": "Failed to take over lead",
+    "exportFailed": "Export failed"
+  },
+  "delivery": {
+    "sent": "Sent",
+    "delivered": "Delivered",
+    "read": "Read",
+    "replied": "Replied",
+    "pending": "pending"
+  }
+}

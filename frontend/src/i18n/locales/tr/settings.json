@@ -1,7 +1,90 @@
 {
   "language": {
     "label": "Arayüz dili",
-    "tr": "Türkçe",
-    "en": "İngilizce"
+    "tr": "Turkish",
+    "en": "English"
+  },
+  "header": {
+    "title": "Ayarlar",
+    "subtitle": "Hesabınızı, entegrasyonlarınızı ve klinik yapılandırmanızı yönetin"
+  },
+  "tabs": {
+    "profile": "Profil",
+    "integrations": "Entegrasyonlar",
+    "notifications": "Bildirimler",
+    "archived": "Arşivlenmiş hastalar",
+    "team": "Ekip"
+  },
+  "profile": {
+    "title": "Profil",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "email": "E-posta adresi",
+    "emailLocked": "E-posta değiştirilemez. Güncellemek için destek ekibiyle iletişime geçin.",
+    "phone": "Telefon",
+    "avatarUrl": "Profil fotoğrafı URL'si",
+    "avatarHelp": "Doğrudan görsel URL'si. Dosya yükleme özelliği ileride eklenecek.",
+    "save": "Profili Kaydet",
+    "saving": "Kaydediliyor…",
+    "noChanges": "Kaydedilecek değişiklik yok.",
+    "saved": "Profil kaydedildi.",
+    "saveFailed": "Profil kaydedilemedi."
+  },
+  "password": {
+    "title": "Şifre Değiştir",
+    "current": "Mevcut şifre",
+    "new": "Yeni şifre",
+    "newPlaceholder": "En az 8 karakter",
+    "confirm": "Yeni şifreyi onayla",
+    "submit": "Şifreyi Değiştir",
+    "submitting": "Değiştiriliyor…",
+    "tooShort": "Yeni şifre en az 8 karakter olmalı.",
+    "mismatch": "Şifreler eşleşmiyor.",
+    "success": "Şifre başarıyla değiştirildi.",
+    "incorrect": "Mevcut şifre yanlış.",
+    "failed": "Şifre değiştirilemedi."
+  },
+  "clinic": {
+    "title": "Klinik Ayarları",
+    "name": "Klinik adı",
+    "address": "Adres",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "website": "Web sitesi",
+    "timezone": "Saat dilimi",
+    "whatsappNumber": "WhatsApp Numarası",
+    "whatsappManaged": "WhatsApp Cloud API üzerinden yönetilir",
+    "goToIntegrations": "→ Entegrasyonlar",
+    "save": "Klinik Ayarlarını Kaydet",
+    "saving": "Kaydediliyor…",
+    "readOnly": "Klinik ayarlarına salt okunur erişiminiz var.",
+    "noClinic": "Hesabınıza bağlı bir klinik yok.",
+    "loadFailed": "Klinik verisi yüklenemedi.",
+    "saved": "Klinik ayarları kaydedildi.",
+    "saveFailed": "Klinik ayarları kaydedilemedi.",
+    "noPermission": "Klinik ayarlarını güncelleme yetkiniz yok."
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "channelEmail": "E-posta",
+    "save": "Bildirim Tercihlerini Kaydet",
+    "saving": "Kaydediliyor…",
+    "saved": "Bildirim tercihleri kaydedildi.",
+    "saveFailed": "Tercihler kaydedilemedi.",
+    "loadFailed": "Bildirim tercihleri yüklenemedi.",
+    "events": {
+      "new_lead": { "title": "Yeni potansiyel hasta", "desc": "Pipeline'ınıza yeni bir vaka girdiğinde" },
+      "lead_booked": { "title": "Randevu alındı", "desc": "Bir vaka randevuya dönüştüğünde" },
+      "appointment_reminder": { "title": "Randevu hatırlatması", "desc": "Yaklaşan randevu hatırlatmaları" },
+      "urgent_escalation": { "title": "Acil eskalasyon", "desc": "Bir hastanın acil ilgiye ihtiyacı olduğunda" },
+      "no_show": { "title": "Gelmeyen hasta", "desc": "Bir hasta randevusuna gelmediğinde" },
+      "ai_quota_warning": { "title": "AI kota uyarısı", "desc": "AI mesaj kotanız azaldığında" }
+    }
+  },
+  "integrations": {
+    "whatsapp": "WhatsApp",
+    "aiProvider": "AI Sağlayıcı",
+    "calendar": "Takvim",
+    "website": "Web Sitesi"
   }
 }

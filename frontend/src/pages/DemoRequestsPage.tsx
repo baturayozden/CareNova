@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import api from '../lib/api';
+import AppMeta from '../components/AppMeta';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -212,6 +213,7 @@ export default function DemoRequestsPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+      <AppMeta title="Demo Requests | CareNova" />
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white mb-1">Demo Requests</h1>

@@ -1,0 +1,147 @@
+{
+  "page": {
+    "title": "Sohbetler",
+    "subtitle": "WhatsApp konuşmalarının gerçek zamanlı takibi",
+    "refresh": "↻ Yenile"
+  },
+  "receptionist": {
+    "title": "Aksiyon Gerekiyor",
+    "subtitle_one": "Bugün {{count}} vaka için arama gerekiyor",
+    "subtitle_other": "Bugün {{count}} vaka için arama gerekiyor",
+    "allCaughtUp": "Hepsi tamam!",
+    "noActionNow": "Şu an aksiyon gerekmiyor."
+  },
+  "summary": {
+    "todayMessages": "Bugünkü AI Mesajları",
+    "leadsContacted": "İletişime Geçilen Vaka",
+    "replyRate": "Yanıt Oranı",
+    "conversionRate": "Dönüşüm Oranı",
+    "pendingActions": "Bekleyen Aksiyonlar",
+    "needsAttention": "ilgi gerekiyor"
+  },
+  "weeklyReport": {
+    "title": "Performans Raporu",
+    "summaryLine": "{{leads}} vaka · {{pipeline}} potansiyel · {{bookings}} rezervasyon",
+    "exportCsv": "CSV İndir",
+    "loading": "Rapor yükleniyor…",
+    "noData": "Veri yok.",
+    "leadsRecovered": "Kurtarılan Vakalar",
+    "pipelineCreated": "Oluşan Potansiyel",
+    "bookingsMade": "Rezervasyon",
+    "avgResponse": "Ort. Yanıt Süresi",
+    "compareLabel": "önceki döneme göre",
+    "prior": "Önceki: {{value}}",
+    "topScenario": "En sık senaryo:",
+    "periods": {
+      "today": "Bugün",
+      "this_week": "Bu Hafta",
+      "last_7": "Son 7 Gün",
+      "last_30": "Son 30 Gün",
+      "last_90": "Son 90 Gün",
+      "custom": "Özel Aralık"
+    },
+    "from": "Başlangıç",
+    "to": "Bitiş"
+  },
+  "myActions": {
+    "needFollowUp_one": "{{count}} vaka için insan takibi gerekiyor",
+    "needFollowUp_other": "{{count}} vaka için insan takibi gerekiyor",
+    "aiCouldntClose": "AI kapatamadı — bu vakalar için bir aramaya ihtiyaç var",
+    "viewAll": "Tümünü gör →"
+  },
+  "tabs": {
+    "all": "Tüm Sohbetler ({{count}})",
+    "actionRequired": "Aksiyon Gerekiyor ({{count}})",
+    "insights": "İçgörüler"
+  },
+  "filters": {
+    "allTime": "Tüm Zamanlar",
+    "today": "Bugün",
+    "thisWeek": "Bu Hafta",
+    "thisMonth": "Bu Ay",
+    "allClinics": "Tüm Klinikler",
+    "allScenarios": "Tüm Senaryolar",
+    "allOutcomes": "Tüm Sonuçlar",
+    "allLanguages": "Tüm Diller",
+    "exportCsv": "CSV İndir",
+    "languages": {
+      "en": "🇬🇧 İngilizce",
+      "tr": "🇹🇷 Türkçe",
+      "ar": "🇸🇦 Arapça",
+      "es": "🇪🇸 İspanyolca",
+      "ru": "🇷🇺 Rusça"
+    }
+  },
+  "scenario": {
+    "new_enquiry": "Yeni Talep",
+    "finance_objection": "Finansman İtirazı",
+    "cold_lead": "Soğuk Vaka",
+    "missed_call": "Cevapsız Arama"
+  },
+  "objection": {
+    "price_too_high": "Fiyat",
+    "comparing_competitors": "Karşılaştırma",
+    "timing_issue": "Zamanlama",
+    "anxiety_fear": "Endişe",
+    "trust_concern": "Güven",
+    "availability": "Uygunluk",
+    "finance_options": "Finansman",
+    "general_enquiry": "Genel Soru"
+  },
+  "outcome": {
+    "booked": "Rezerve Edildi ✓",
+    "replied": "Görüşme Sürüyor",
+    "no_response": "Yanıt Yok",
+    "lost": "Kayıp"
+  },
+  "card": {
+    "actionNeeded": "Aksiyon gerekiyor",
+    "detectedObjection": "Tespit edilen itiraz",
+    "aiMessages_one": "{{count}} AI mesajı",
+    "aiMessages_other": "{{count}} AI mesajı",
+    "takeOver": "Devral",
+    "humanHandling": "İnsan yürütüyor",
+    "replyWhatsapp": "WhatsApp'tan Yanıtla",
+    "messagePlaceholder": "Mesajınızı yazın…",
+    "send": "Gönder",
+    "sent": "✓ Gönderildi",
+    "expand": "Genişlet",
+    "collapse": "Daralt",
+    "noMessagesYet": "Henüz mesaj yok.",
+    "interestedIn": "İlgileniyor:",
+    "notBookedYet": "— henüz randevu almadı",
+    "lastSaid": "Son mesaj: \"{{text}}\"",
+    "aiMessagesSentAgo": "{{count}} AI mesajı gönderildi · son {{time}}",
+    "markCalled": "✓ Arandı Olarak İşaretle",
+    "resolve": "Çözüldü",
+    "cancelReply": "Yanıtı iptal et",
+    "sendingAs": "Gönderen: {{clinic}} → {{patient}} ({{phone}})",
+    "sentViaWhatsapp": "WhatsApp üzerinden gönderildi",
+    "sendShortcut": "⌘↵ göndermek için · Esc iptal",
+    "cancel": "İptal"
+  },
+  "list": {
+    "loading": "Etkinlik yükleniyor…",
+    "noMatch": "Filtrelerle eşleşen sohbet yok",
+    "tryAdjusting": "Yukarıdaki tarih aralığını veya filtreleri değiştirmeyi deneyin.",
+    "prev": "← Önceki",
+    "next": "Sonraki →",
+    "pageOf": "Sayfa {{page}} / {{totalPages}}"
+  },
+  "errors": {
+    "sendFailed": "Mesaj gönderilemedi. Lütfen tekrar deneyin.",
+    "markCalledFailed": "Aranmış olarak işaretlenemedi.",
+    "resolveFailed": "Çözüldü olarak işaretlenemedi.",
+    "loadInsightsFailed": "İçgörüler yüklenemedi",
+    "loadActivityFailed": "Etkinlik yüklenemedi",
+    "takeOverFailed": "Vaka devralınamadı",
+    "exportFailed": "Dışa aktarma başarısız oldu"
+  },
+  "delivery": {
+    "sent": "Gönderildi",
+    "delivered": "İletildi",
+    "read": "Okundu",
+    "replied": "Yanıtlandı",
+    "pending": "beklemede"
+  }
+}

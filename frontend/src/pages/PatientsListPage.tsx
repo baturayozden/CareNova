@@ -5,25 +5,30 @@ import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { Search, UserSquare2, ChevronRight, User, ArrowUp, ArrowDown } from 'lucide-react';
 import CustomSelect from '../components/CustomSelect';
+import AppMeta from '../components/AppMeta';
+import StatusBadge from '../components/StatusBadge';
+import { CaseStatus, CASE_STATUS_LABELS } from '../data/caseData';
+import { STATUS_TONE, BRANCH_LABELS } from '../lib/caseDisplay';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+//
+// APP-ADMIN-EKSIKLER-KOMUTU.md Görev 6.3 — this used to be its own
+// lead-shaped record (firstName/lastName/phone/dealCount/contractSigned/
+// paymentArranged/treatmentDateSet — CareDental's 3-step dental journey),
+// fed from a separate, smaller demo dataset than /cases. Now it's a case
+// row — same data /cases shows, same 15-stage status, same id space — so
+// a row here deep-links straight into /cases/:id.
 
 interface Patient {
   id: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string | null;
-  status: string;
-  language: string;
-  treatmentInterest: string | null;
+  caseNumber: string;
+  patientName: string;
+  patientCountryFlag: string;
+  branch: string;
+  status: CaseStatus;
   assignedTo: string | null;
   staffName: string | null;
-  dealCount: number;
   totalAgreed: number;
-  contractSigned: boolean;
-  paymentArranged: boolean;
-  treatmentDateSet: boolean;
   createdAt: string;
 }
 
@@ -41,21 +46,10 @@ type DatePreset = 'all' | 'today' | 'week' | 'month' | 'custom';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const STATUS_STYLES: Record<string, string> = {
-  new:       'bg-blue-900 text-blue-300',
-  contacted: 'bg-yellow-900 text-yellow-300',
-  responded: 'bg-purple-900 text-purple-300',
-  qualified: 'bg-cyan-900 text-cyan-300',
-  booked:    'bg-green-900 text-green-300',
-  attended:  'bg-emerald-900 text-emerald-300',
-  lost:      'bg-red-900 text-red-300',
-  archived:  'bg-gray-800 text-gray-400',
-};
-
 const selectCls = 'bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/50 cursor-pointer';
 const inputCls  = 'bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/50';
 
-const COLS = 'grid-cols-[1fr_140px_72px_90px_60px_80px_88px_24px]';
+const COLS = 'grid-cols-[1fr_140px_120px_100px_100px_140px_88px_24px]';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -90,23 +84,6 @@ function presetDates(preset: DatePreset): { dateFrom: string; dateTo: string } {
     return { dateFrom: toYMD(first), dateTo: toYMD(today) };
   }
   return { dateFrom: '', dateTo: '' };
-}
-
-// ── Journey progress dots ─────────────────────────────────────────────────────
-
-function JourneyBadge({ p }: { p: Patient }) {
-  const steps = [p.contractSigned, p.paymentArranged, p.treatmentDateSet];
-  const done  = steps.filter(Boolean).length;
-  return (
-    <div className="flex flex-col items-center gap-1 shrink-0">
-      <div className="flex gap-1">
-        {steps.map((checked, i) => (
-          <div key={i} className={`w-2 h-2 rounded-full ${checked ? 'bg-green-400' : 'bg-line'}`} />
-        ))}
-      </div>
-      <span className="text-[10px] text-gray-500">{done}/3</span>
-    </div>
-  );
 }
 
 // ── Sortable column header ────────────────────────────────────────────────────
@@ -146,7 +123,7 @@ function SortTh({ label, colSort, sort, onSort, className }: {
 export default function PatientsListPage() {
   const navigate   = useNavigate();
   const { user }   = useAuth();
-  const { t }      = useTranslation('common');
+  const { t }      = useTranslation('patients');
 
   const [patients,   setPatients]   = useState<Patient[]>([]);
   const [search,     setSearch]     = useState('');
@@ -171,16 +148,14 @@ export default function PatientsListPage() {
       { headers: { 'Cache-Control': 'no-store' } },
     ).then(r => {
         const raw = r.data.salesUsers ?? [];
-        console.log('[sales-users] raw:', raw);
         const list: StaffUser[] = raw.map(u => ({
           id:   u.id,
           name: `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || u.email || 'Unknown',
         })).filter(u => u.id);
-        console.log('[sales-users] → options:', list);
         setStaffList(list);
       })
       .catch(() => {});
-  }, [tenantId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tenantId]);
 
   const fetchPatients = useCallback((
     p: number, q: string, s: SortKey, assigned: string, from: string, to: string,
@@ -197,9 +172,9 @@ export default function PatientsListPage() {
       },
     })
       .then(r => {
-        setPatients(r.data.patients);
-        setTotal(r.data.total);
-        setTotalPages(r.data.totalPages);
+        setPatients(r.data.patients ?? []);
+        setTotal(r.data.total ?? 0);
+        setTotalPages(r.data.totalPages ?? 1);
       })
       .catch(() => setPatients([]))
       .finally(() => setLoading(false));
@@ -217,19 +192,20 @@ export default function PatientsListPage() {
     setDatePreset(v);
     setPage(1);
     if (v !== 'custom') {
-      const { dateFrom: f, dateTo: t } = presetDates(v);
+      const { dateFrom: f, dateTo: tt } = presetDates(v);
       setDateFrom(f);
-      setDateTo(t);
+      setDateTo(tt);
     }
   }
 
   return (
     <div className="flex flex-col flex-1 min-w-0 p-4 md:p-8">
+      <AppMeta title={`${t('title')} | CareNova`} />
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-white font-bold text-2xl">Patients</h1>
-          <p className="text-gray-500 text-sm mt-0.5">{total} total</p>
+          <h1 className="text-white font-bold text-2xl">{t('title')}</h1>
+          <p className="text-gray-500 text-sm mt-0.5">{t('subtitle', { count: total })}</p>
         </div>
       </div>
 
@@ -239,7 +215,7 @@ export default function PatientsListPage() {
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
           <input
             className="w-full bg-surface-sunken border border-line rounded-lg pl-9 pr-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent/50"
-            placeholder="Search by name, phone or email…"
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={e => handleSearch(e.target.value)}
           />
@@ -247,21 +223,21 @@ export default function PatientsListPage() {
 
         <CustomSelect
           className={selectCls}
-          placeholder="All staff"
+          placeholder={t('filters.allStaff')}
           value={assignedTo}
           onChange={handleAssigned}
           options={[
-            { id: '', label: 'All staff' },
+            { id: '', label: t('filters.allStaff') },
             ...staffList.map(s => ({ id: s.id, label: s.name })),
           ]}
         />
 
         <select value={datePreset} onChange={e => handleDatePreset(e.target.value as DatePreset)} className={selectCls}>
-          <option value="all">All time</option>
-          <option value="today">Today</option>
-          <option value="week">This week</option>
-          <option value="month">This month</option>
-          <option value="custom">Custom</option>
+          <option value="all">{t('filters.allTime')}</option>
+          <option value="today">{t('filters.today')}</option>
+          <option value="week">{t('filters.thisWeek')}</option>
+          <option value="month">{t('filters.thisMonth')}</option>
+          <option value="custom">{t('filters.custom')}</option>
         </select>
 
         {datePreset === 'custom' && (
@@ -280,42 +256,41 @@ export default function PatientsListPage() {
         )}
 
         <select value={sort} onChange={e => handleSort(e.target.value as SortKey)} className={selectCls}>
-          <option value="created_desc">Newest</option>
-          <option value="created_asc">Oldest</option>
-          <option value="name_asc">Name</option>
-          <option value="assigned_asc">Assigned</option>
+          <option value="created_desc">{t('sort.newest')}</option>
+          <option value="created_asc">{t('sort.oldest')}</option>
+          <option value="name_asc">{t('sort.name')}</option>
+          <option value="assigned_asc">{t('sort.assigned')}</option>
         </select>
       </div>
 
       {/* Table */}
       {loading ? (
-        <div className="text-gray-500 text-sm py-8 text-center">Loading…</div>
+        <div className="text-gray-500 text-sm py-8 text-center">{t('loading')}</div>
       ) : patients.length === 0 ? (
         <div className="flex flex-col items-center py-16 gap-3">
           <UserSquare2 size={32} className="text-gray-700" />
-          <p className="text-gray-500 text-sm">No patients match filters</p>
+          <p className="text-gray-500 text-sm">{t('empty')}</p>
         </div>
       ) : (
         <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
           {/* Column headers */}
           <div className={`hidden md:grid ${COLS} gap-3 px-5 py-2.5 border-b border-surface-sunken`}>
-            <SortTh label="Patient"     colSort="name_asc"     sort={sort} onSort={handleSort} />
-            <SortTh label="Assigned to" colSort="assigned_asc" sort={sort} onSort={handleSort} />
-            <span className="uppercase tracking-widest text-[10px] font-semibold text-gray-600 text-right">Deals</span>
-            <span className="uppercase tracking-widest text-[10px] font-semibold text-gray-600 text-right">Total €</span>
-            <span className="uppercase tracking-widest text-[10px] font-semibold text-gray-600 text-center">Journey</span>
-            <span className="uppercase tracking-widest text-[10px] font-semibold text-gray-600">Status</span>
-            <SortTh label="Added" colSort="created_desc" sort={sort} onSort={handleSort} />
+            <SortTh label={t('columns.patient')}     colSort="name_asc"     sort={sort} onSort={handleSort} />
+            <SortTh label={t('columns.assignedTo')}  colSort="assigned_asc" sort={sort} onSort={handleSort} />
+            <span className="uppercase tracking-widest text-[10px] font-semibold text-gray-600">{t('columns.branch')}</span>
+            <span className="uppercase tracking-widest text-[10px] font-semibold text-gray-600">{t('columns.caseNumber')}</span>
+            <span className="uppercase tracking-widest text-[10px] font-semibold text-gray-600 text-right">{t('columns.amount')}</span>
+            <span className="uppercase tracking-widest text-[10px] font-semibold text-gray-600">{t('columns.status')}</span>
+            <SortTh label={t('columns.added')} colSort="created_desc" sort={sort} onSort={handleSort} />
             <span />
           </div>
 
           {patients.map((p, i) => {
-            const name     = `${p.firstName} ${p.lastName}`.trim() || p.phone;
-            const initials = ((p.firstName?.[0] ?? '') + (p.lastName?.[0] ?? '')).toUpperCase() || '?';
+            const initials = p.patientName.split(' ').map(part => part[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '?';
             return (
               <button
                 key={p.id}
-                onClick={() => navigate(`/patients/${p.id}`)}
+                onClick={() => navigate(`/cases/${p.id}`)}
                 className={`w-full text-left hover:bg-surface-sunken transition-colors ${i > 0 ? 'border-t border-surface-sunken' : ''}`}
               >
                 {/* Mobile */}
@@ -324,14 +299,11 @@ export default function PatientsListPage() {
                     {initials}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium text-sm truncate">{name}</p>
-                    <p className="text-gray-500 text-xs mt-0.5">{p.phone}</p>
+                    <p className="text-white font-medium text-sm truncate">{p.patientCountryFlag} {p.patientName}</p>
+                    <p className="text-gray-500 text-xs mt-0.5 font-mono">{p.caseNumber}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <JourneyBadge p={p} />
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[p.status] ?? 'bg-gray-800 text-gray-400'}`}>
-                      {t(`leadStatus.${p.status}`, p.status)}
-                    </span>
+                    <StatusBadge tone={STATUS_TONE[p.status]}>{CASE_STATUS_LABELS[p.status]}</StatusBadge>
                     <ChevronRight size={14} className="text-gray-600" />
                   </div>
                 </div>
@@ -343,8 +315,8 @@ export default function PatientsListPage() {
                       {initials}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-white font-medium text-sm truncate">{name}</p>
-                      <p className="text-gray-500 text-xs truncate">{p.phone}</p>
+                      <p className="text-white font-medium text-sm truncate">{p.patientCountryFlag} {p.patientName}</p>
+                      <p className="text-gray-500 text-xs truncate font-mono">{p.caseNumber}</p>
                     </div>
                   </div>
 
@@ -355,28 +327,26 @@ export default function PatientsListPage() {
                         <span className="text-gray-300 text-xs truncate">{p.staffName}</span>
                       </div>
                     ) : (
-                      <span className="text-gray-600 text-xs">—</span>
+                      <span className="text-gray-600 text-xs">{t('notAssigned')}</span>
                     )}
                   </div>
 
-                  <div className="text-right">
-                    <span className="text-gray-300 text-sm font-medium">{p.dealCount || '—'}</span>
+                  <div className="min-w-0">
+                    <span className="text-gray-300 text-xs truncate">{BRANCH_LABELS[p.branch] ?? p.branch}</span>
+                  </div>
+
+                  <div className="min-w-0">
+                    <span className="text-gray-500 text-xs font-mono truncate">{p.caseNumber}</span>
                   </div>
 
                   <div className="text-right">
                     <span className={`text-sm font-medium ${p.totalAgreed > 0 ? 'text-accent' : 'text-gray-600'}`}>
-                      {fmtGBP(p.totalAgreed)}
+                      {p.totalAgreed > 0 ? fmtGBP(p.totalAgreed) : t('noQuoteYet')}
                     </span>
-                  </div>
-
-                  <div className="flex justify-center">
-                    <JourneyBadge p={p} />
                   </div>
 
                   <div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[p.status] ?? 'bg-gray-800 text-gray-400'}`}>
-                      {t(`leadStatus.${p.status}`, p.status)}
-                    </span>
+                    <StatusBadge tone={STATUS_TONE[p.status]}>{CASE_STATUS_LABELS[p.status]}</StatusBadge>
                   </div>
 
                   <div>
@@ -399,15 +369,15 @@ export default function PatientsListPage() {
             disabled={page === 1}
             className="px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-line rounded-lg disabled:opacity-30 transition-colors"
           >
-            ← Prev
+            {t('pagination.prev')}
           </button>
-          <span className="text-gray-500 text-sm">Page {page} of {totalPages}</span>
+          <span className="text-gray-500 text-sm">{t('pagination.pageOf', { page, totalPages })}</span>
           <button
             onClick={() => setPage(p => p + 1)}
             disabled={page >= totalPages}
             className="px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-line rounded-lg disabled:opacity-30 transition-colors"
           >
-            Next →
+            {t('pagination.next')}
           </button>
         </div>
       )}

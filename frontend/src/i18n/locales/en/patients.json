@@ -1,1 +1,37 @@
-{}
+{
+  "title": "Patients",
+  "subtitle": "{{count}} records",
+  "searchPlaceholder": "Search by patient name or case number…",
+  "filters": {
+    "allStaff": "All staff",
+    "allTime": "All time",
+    "today": "Today",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "custom": "Custom"
+  },
+  "sort": {
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "name": "Name",
+    "assigned": "Assigned"
+  },
+  "columns": {
+    "patient": "Patient",
+    "assignedTo": "Assigned to",
+    "branch": "Branch",
+    "caseNumber": "Case",
+    "amount": "Amount",
+    "status": "Status",
+    "added": "Added"
+  },
+  "loading": "Loading…",
+  "empty": "No patients match the filters",
+  "notAssigned": "Unassigned",
+  "noQuoteYet": "No quote yet",
+  "pagination": {
+    "prev": "← Prev",
+    "next": "Next →",
+    "pageOf": "Page {{page}} of {{totalPages}}"
+  }
+}

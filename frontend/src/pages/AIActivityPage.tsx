@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import type { ChangeEvent } from "react";
+import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
+import AppMeta from '../components/AppMeta';
 import { useAuth } from '../context/AuthContext';
 import {
   ConversationSummary, ActivitySummaryData, WeeklyReport,
@@ -17,42 +19,48 @@ type IconComponent = React.ComponentType<{ size?: number; className?: string }>;
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const SCENARIO_CONFIG: Record<string, { label: string; color: string }> = {
-  new_enquiry:       { label: 'New Enquiry',       color: 'bg-blue-900   text-blue-300   border border-blue-700'   },
-  finance_objection: { label: 'Finance Objection', color: 'bg-yellow-900 text-yellow-300 border border-yellow-700' },
-  cold_lead:         { label: 'Cold Lead',         color: 'bg-purple-900 text-purple-300 border border-purple-700' },
-  missed_call:       { label: 'Missed Call',       color: 'bg-orange-900 text-orange-300 border border-orange-700' },
+// Labels come from i18n now (activity.json's scenario/objection/outcome
+// keys) — these maps keep only the icon/color, looked up by the same key
+// the label translation uses, so the two can never drift out of sync.
+const SCENARIO_CONFIG: Record<string, { color: string }> = {
+  new_enquiry:       { color: 'bg-blue-900   text-blue-300   border border-blue-700'   },
+  finance_objection: { color: 'bg-yellow-900 text-yellow-300 border border-yellow-700' },
+  cold_lead:         { color: 'bg-purple-900 text-purple-300 border border-purple-700' },
+  missed_call:       { color: 'bg-orange-900 text-orange-300 border border-orange-700' },
 };
 
-const OBJECTION_CONFIG: Record<string, { label: string; icon: IconComponent; color: string }> = {
-  price_too_high:        { label: 'Price',        icon: Coins,           color: 'bg-red-900    text-red-300    border border-red-700'    },
-  comparing_competitors: { label: 'Comparing',    icon: Search,          color: 'bg-blue-900   text-blue-300   border border-blue-700'   },
-  timing_issue:          { label: 'Not Ready',    icon: Clock,           color: 'bg-yellow-900 text-yellow-300 border border-yellow-700' },
-  anxiety_fear:          { label: 'Anxiety',      icon: HeartPulse,      color: 'bg-purple-900 text-purple-300 border border-purple-700' },
-  trust_concern:         { label: 'Trust',        icon: ShieldQuestion,  color: 'bg-orange-900 text-orange-300 border border-orange-700' },
-  availability:          { label: 'Availability', icon: CalendarDays,    color: 'bg-cyan-900   text-cyan-300   border border-cyan-700'   },
-  finance_options:       { label: 'Finance',      icon: CreditCard,      color: 'bg-green-900  text-green-300  border border-green-700'  },
-  general_enquiry:       { label: 'Enquiry',      icon: MessageCircle,   color: 'bg-gray-800   text-gray-400   border border-gray-600'   },
+const OBJECTION_CONFIG: Record<string, { icon: IconComponent; color: string }> = {
+  price_too_high:        { icon: Coins,           color: 'bg-red-900    text-red-300    border border-red-700'    },
+  comparing_competitors: { icon: Search,          color: 'bg-blue-900   text-blue-300   border border-blue-700'   },
+  timing_issue:          { icon: Clock,           color: 'bg-yellow-900 text-yellow-300 border border-yellow-700' },
+  anxiety_fear:          { icon: HeartPulse,      color: 'bg-purple-900 text-purple-300 border border-purple-700' },
+  trust_concern:         { icon: ShieldQuestion,  color: 'bg-orange-900 text-orange-300 border border-orange-700' },
+  availability:          { icon: CalendarDays,    color: 'bg-cyan-900   text-cyan-300   border border-cyan-700'   },
+  finance_options:       { icon: CreditCard,      color: 'bg-green-900  text-green-300  border border-green-700'  },
+  general_enquiry:       { icon: MessageCircle,   color: 'bg-gray-800   text-gray-400   border border-gray-600'   },
 };
 
-const OUTCOME_CONFIG: Record<OutcomeType, { label: string; color: string; icon: IconComponent | string }> = {
-  booked:      { label: 'Booked ✓',      color: 'bg-green-900  text-green-300  border border-green-700',  icon: CheckCircle2   },
-  replied:     { label: 'Still Talking', color: 'bg-blue-900   text-blue-300   border border-blue-700',   icon: MessageSquare  },
-  no_response: { label: 'No Response',  color: 'bg-gray-800   text-gray-400   border border-gray-600',   icon: Hourglass      },
-  lost:        { label: 'Lost',         color: 'bg-red-900    text-red-300    border border-red-700',    icon: '✗'            },
+const OUTCOME_CONFIG: Record<OutcomeType, { color: string; icon: IconComponent | string }> = {
+  booked:      { color: 'bg-green-900  text-green-300  border border-green-700',  icon: CheckCircle2   },
+  replied:     { color: 'bg-blue-900   text-blue-300   border border-blue-700',   icon: MessageSquare  },
+  no_response: { color: 'bg-gray-800   text-gray-400   border border-gray-600',   icon: Hourglass      },
+  lost:        { color: 'bg-red-900    text-red-300    border border-red-700',    icon: '✗'            },
 };
 
 const LANG_FLAGS: Record<string, string> = { en: '🇬🇧', tr: '🇹🇷', ar: '🇸🇦', es: '🇪🇸', ru: '🇷🇺' };
 
+// Deliberately locale-invariant (m/h/d abbreviations, no words to
+// translate) rather than routed through i18n — same "D+1" style notation
+// already used for aftercare day markers elsewhere in the product.
 function formatTimeAgo(iso: string | null): string {
   if (!iso) return '—';
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
-  if (m < 1)  return 'just now';
-  if (m < 60) return `${m}m ago`;
+  if (m < 1)  return '<1m';
+  if (m < 60) return `${m}m`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
+  if (h < 24) return `${h}h`;
+  return `${Math.floor(h / 24)}d`;
 }
 
 function formatCurrency(n: number | null): string {
@@ -89,6 +97,7 @@ function getStepsDone(status: string | null, hasReply: boolean): number {
 }
 
 function DeliveryProgress({ status, hasReply }: { status: string | null; hasReply: boolean }) {
+  const { t } = useTranslation('activity');
   const steps: DeliveryStep[] = ['sent', 'delivered', 'read', 'replied'];
   const done = getStepsDone(status, hasReply);
   return (
@@ -96,7 +105,7 @@ function DeliveryProgress({ status, hasReply }: { status: string | null; hasRepl
       {steps.map((step, i) => (
         <React.Fragment key={step}>
           <div
-            title={step.charAt(0).toUpperCase() + step.slice(1)}
+            title={t(`delivery.${step}`)}
             className={`w-2 h-2 rounded-full transition-all ${
               i < done ? 'bg-accent' : 'bg-line'
             }`}
@@ -107,7 +116,7 @@ function DeliveryProgress({ status, hasReply }: { status: string | null; hasRepl
         </React.Fragment>
       ))}
       <span className="text-gray-500 text-[10px] ml-1">
-        {hasReply ? 'replied' : status || 'pending'}
+        {hasReply ? t('delivery.replied') : status ? t(`delivery.${status}`) : t('delivery.pending')}
       </span>
     </div>
   );
@@ -122,6 +131,7 @@ interface CardProps {
 }
 
 function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
+  const { t } = useTranslation('activity');
   const [expanded,     setExpanded]     = useState(false);
   const [messages,     setMessages]     = useState<Message[] | null>(null);
   const [msgLoading,   setMsgLoading]   = useState(false);
@@ -163,7 +173,7 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
       setReplyText('');
       setTimeout(() => { setSent(false); setShowReply(false); }, 2000);
     } catch {
-      alert('Failed to send message. Please try again.');
+      alert(t('errors.sendFailed'));
     } finally {
       setSending(false);
     }
@@ -199,7 +209,7 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
                 {showClinic && <span className="text-gray-500 text-xs">{conv.clinic}</span>}
                 {conv.actionRequired && (
                   <span className="text-xs bg-yellow-950 text-yellow-400 border border-yellow-700 px-1.5 py-0.5 rounded-full">
-                    Action needed
+                    {t('card.actionNeeded')}
                   </span>
                 )}
               </div>
@@ -218,21 +228,21 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
           {/* Right: badges + time */}
           <div className="flex flex-col items-start sm:items-end gap-1.5 shrink-0 w-full sm:w-auto">
             <div className="flex items-center gap-1.5 flex-wrap justify-start sm:justify-end">
-              {scenarioCfg && (
+              {scenarioCfg && conv.scenario && (
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${scenarioCfg.color}`}>
-                  {scenarioCfg.label}
+                  {t(`scenario.${conv.scenario}`)}
                 </span>
               )}
               {objectionCfg && (
-                <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${objectionCfg.color}`} title="Detected objection">
-                  {(() => { const Icon = objectionCfg.icon; return <Icon size={12} />; })()} {objectionCfg.label}
+                <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${objectionCfg.color}`} title={t('card.detectedObjection')}>
+                  {(() => { const Icon = objectionCfg.icon; return <Icon size={12} />; })()} {t(`objection.${conv.objectionType}`)}
                 </span>
               )}
               <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${outcomeCfg.color}`}>
                 {typeof outcomeCfg.icon === 'string'
                   ? outcomeCfg.icon
                   : (() => { const Icon = outcomeCfg.icon as IconComponent; return <Icon size={12} />; })()
-                } {outcomeCfg.label}
+                } {t(`outcome.${conv.outcome}`)}
               </span>
             </div>
             <span className="text-gray-600 text-xs">{formatTimeAgo(conv.lastAiAt)}</span>
@@ -265,33 +275,33 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
           <div className="flex items-center justify-between pt-1">
             <DeliveryProgress status={conv.deliveryStatus} hasReply={hasReply} />
             <div className="flex items-center gap-2">
-              <span className="text-gray-600 text-xs">{conv.aiMessages} AI msg{conv.aiMessages !== 1 ? 's' : ''}</span>
+              <span className="text-gray-600 text-xs">{t('card.aiMessages', { count: conv.aiMessages })}</span>
               {conv.aiFollowUpEnabled && conv.outcome !== 'booked' && (
                 <button
                   onClick={handleTakeOver}
                   disabled={takingOver}
                   className="text-xs text-gray-400 hover:text-white bg-surface-sunken hover:bg-line border border-line-strong px-2.5 py-1 rounded-lg transition-colors disabled:opacity-50"
                 >
-                  {takingOver ? '…' : 'Take Over'}
+                  {takingOver ? '…' : t('card.takeOver')}
                 </button>
               )}
               {!conv.aiFollowUpEnabled && (
                 <>
                   <span className="text-xs text-orange-400 border border-orange-800 bg-orange-950 px-2 py-0.5 rounded-full">
-                    Human handling
+                    {t('card.humanHandling')}
                   </span>
                   <button
                     onClick={(e) => { e.stopPropagation(); setShowReply(r => !r); }}
                     className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/30 hover:bg-[#25D366]/20 transition-colors"
                   >
-                    <MessageCircle size={14} /> Reply via WhatsApp
+                    <MessageCircle size={14} /> {t('card.replyWhatsapp')}
                   </button>
                 </>
               )}
               <button
                 onClick={toggleExpand}
                 className="text-gray-500 hover:text-white transition-colors text-sm ml-1"
-                title={expanded ? 'Collapse' : 'Expand conversation'}
+                title={expanded ? t('card.collapse') : t('card.expand')}
               >
                 {expanded ? '▲' : '▼'}
               </button>
@@ -307,7 +317,7 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
             value={replyText}
             onChange={e => setReplyText(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') handleSendReply(e as any); }}
-            placeholder="Type your message..."
+            placeholder={t('card.messagePlaceholder')}
             className="flex-1 bg-surface-sunken border border-line rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#25D366]/50"
             autoFocus
           />
@@ -316,7 +326,7 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
             disabled={sending || !replyText.trim()}
             className="text-xs px-3 py-1.5 rounded-lg bg-[#25D366] text-white disabled:opacity-40 hover:bg-[#20b858] transition-colors"
           >
-            {sending ? '…' : sent ? '✓ Sent' : 'Send'}
+            {sending ? '…' : sent ? t('card.sent') : t('card.send')}
           </button>
         </div>
       )}
@@ -329,7 +339,7 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
               <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
             </div>
           ) : !messages?.length ? (
-            <p className="text-gray-600 text-xs text-center py-3">No messages yet.</p>
+            <p className="text-gray-600 text-xs text-center py-3">{t('card.noMessagesYet')}</p>
           ) : (
             messages.map(msg => {
               const isOut = msg.direction === 'outbound';
@@ -369,6 +379,7 @@ interface ActionCardProps {
 }
 
 function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) {
+  const { t } = useTranslation('activity');
   const [marking,     setMarking]     = useState(false);
   const [resolving,   setResolving]   = useState(false);
   const [composing,   setComposing]   = useState(false);
@@ -419,7 +430,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
       }, 1800);
     } catch (err: unknown) {
       setSendStatus('error');
-      setSendError((err as any)?.response?.data?.error || 'Failed to send message');
+      setSendError((err as any)?.response?.data?.error || t('errors.sendFailed'));
     } finally {
       setSending(false);
     }
@@ -455,17 +466,17 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
           </p>
           {conv.treatment && (
             <p className="text-gray-300 text-sm mt-1.5">
-              Interested in <strong className="text-white">{conv.treatment}</strong>
+              {t('card.interestedIn')} <strong className="text-white">{conv.treatment}</strong>
               {conv.treatmentValue && <span className="text-accent ml-1">{formatCurrency(conv.treatmentValue)}</span>}
-              {' '}— hasn't booked yet
+              {' '}{t('card.notBookedYet')}
             </p>
           )}
           {conv.lastReplyContent && (
             <p className="text-gray-500 text-xs mt-1.5 italic">
-              Last said: "{conv.lastReplyContent.slice(0, 80)}{conv.lastReplyContent.length > 80 ? '…' : ''}"
+              {t('card.lastSaid', { text: conv.lastReplyContent.slice(0, 80) + (conv.lastReplyContent.length > 80 ? '…' : '') })}
             </p>
           )}
-          <p className="text-gray-600 text-xs mt-1">{conv.aiMessages} AI messages sent · last {formatTimeAgo(conv.lastAiAt)}</p>
+          <p className="text-gray-600 text-xs mt-1">{t('card.aiMessagesSentAgo', { count: conv.aiMessages, time: formatTimeAgo(conv.lastAiAt) })}</p>
 
           {/* Action buttons */}
           <div className="flex flex-wrap items-center gap-2 mt-3">
@@ -478,7 +489,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
                   : 'bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] border-[#25D366]/30'
               }`}
             >
-              <MessageCircle size={14} /> {composing ? 'Cancel reply' : 'Reply on WhatsApp'}
+              <MessageCircle size={14} /> {composing ? t('card.cancelReply') : t('card.replyWhatsapp')}
             </button>
 
             {/* Mark as Called */}
@@ -488,7 +499,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
               className="inline-flex items-center gap-1.5 bg-blue-900/50 hover:bg-blue-900 text-blue-300 border border-blue-700/50 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
             >
               {marking && <span className="w-3 h-3 border border-blue-300 border-t-transparent rounded-full animate-spin" />}
-              ✓ Mark as Called
+              {t('card.markCalled')}
             </button>
 
             {/* Resolve — clears action_required, re-enables AI */}
@@ -498,7 +509,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
               className="inline-flex items-center gap-1.5 bg-green-900/50 hover:bg-green-900 text-green-300 border border-green-700/50 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
             >
               {resolving && <span className="w-3 h-3 border border-green-300 border-t-transparent rounded-full animate-spin" />}
-              <CheckCircle size={14} /> Resolve
+              <CheckCircle size={14} /> {t('card.resolve')}
             </button>
           </div>
 
@@ -509,7 +520,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
               <div className="flex items-center gap-2 px-3 py-2 border-b border-surface-sunken">
                 <MessageCircle size={14} className="text-[#25D366] shrink-0" />
                 <span className="text-gray-400 text-xs">
-                  Sending as <strong className="text-gray-200">{conv.clinic}</strong> → {conv.patientName} ({conv.phone})
+                  {t('card.sendingAs', { clinic: conv.clinic, patient: conv.patientName, phone: conv.phone })}
                 </span>
               </div>
 
@@ -519,7 +530,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
                 value={message}
                 onChange={e => { setMessage(e.target.value); setSendStatus('idle'); }}
                 onKeyDown={handleKeyDown}
-                placeholder={`Message ${conv.patientName}…`}
+                placeholder={`${conv.patientName}…`}
                 rows={3}
                 className="w-full bg-transparent px-4 py-3 text-white text-sm placeholder-gray-600 resize-none focus:outline-none"
               />
@@ -527,7 +538,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
               {/* Status feedback */}
               {sendStatus === 'ok' && (
                 <div className="px-4 pb-2 text-xs text-green-400 flex items-center gap-1">
-                  <CheckCircle size={14} /> Sent via WhatsApp
+                  <CheckCircle size={14} /> {t('card.sentViaWhatsapp')}
                 </div>
               )}
               {sendStatus === 'error' && (
@@ -538,13 +549,13 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
 
               {/* Footer */}
               <div className="flex items-center justify-between px-3 py-2 border-t border-surface-sunken bg-surface/50">
-                <span className="text-gray-600 text-xs">⌘↵ to send · Esc to cancel</span>
+                <span className="text-gray-600 text-xs">{t('card.sendShortcut')}</span>
                 <div className="flex gap-2">
                   <button
                     onClick={e => { e.stopPropagation(); setComposing(false); setMessage(''); setSendStatus('idle'); }}
                     className="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg transition-colors"
                   >
-                    Cancel
+                    {t('card.cancel')}
                   </button>
                   <button
                     onClick={handleSend}
@@ -552,7 +563,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
                     className="inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#20b558] text-white text-xs font-semibold px-4 py-1.5 rounded-lg transition-colors disabled:opacity-40"
                   >
                     {sending && <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                    Send
+                    {t('card.send')}
                   </button>
                 </div>
               </div>
@@ -566,14 +577,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
 
 // ── Period helpers ─────────────────────────────────────────────────────────────
 
-const PERIOD_OPTIONS = [
-  { value: 'today',     label: 'Today' },
-  { value: 'this_week', label: 'This Week' },
-  { value: 'last_7',    label: 'Last 7 Days' },
-  { value: 'last_30',   label: 'Last 30 Days' },
-  { value: 'last_90',   label: 'Last 90 Days' },
-  { value: 'custom',    label: 'Custom Range' },
-];
+const PERIOD_KEYS = ['today', 'this_week', 'last_7', 'last_30', 'last_90', 'custom'];
 
 // ── Weekly Report Card ────────────────────────────────────────────────────────
 
@@ -583,6 +587,7 @@ interface WeeklyReportCardProps {
 }
 
 function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
+  const { t } = useTranslation('activity');
   const [open,     setOpen]     = useState(true);
   const [period,   setPeriod]   = useState('this_week');
   const [dateFrom, setDateFrom] = useState('');
@@ -603,26 +608,28 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
 
   const c = report?.current;
   const p = report?.previous;
-  const compareLabel = report?.compareLabel ?? 'vs last period';
+  const compareLabel = report?.compareLabel ?? t('weeklyReport.compareLabel');
 
+  // CareNova terminology (APP-ADMIN-EKSIKLER-KOMUTU.md Görev 3.2): CareDental's
+  // "lead"/"deal" framing renamed to CareNova's central concept — vaka (case).
   const stats = c && p ? [
     {
-      label: 'Leads Recovered',
+      label: t('weeklyReport.leadsRecovered'),
       cur: c.leadsRecovered, prev: p.leadsRecovered,
       fmt: (v: number) => String(v), higher: true,
     },
     {
-      label: 'Pipeline Created',
+      label: t('weeklyReport.pipelineCreated'),
       cur: c.pipelineValue, prev: p.pipelineValue,
       fmt: (v: number) => formatCurrency(v), higher: true,
     },
     {
-      label: 'Bookings Made',
+      label: t('weeklyReport.bookingsMade'),
       cur: c.bookingsMade, prev: p.bookingsMade,
       fmt: (v: number) => String(v), higher: true,
     },
     {
-      label: 'Avg Response',
+      label: t('weeklyReport.avgResponse'),
       cur: c.avgResponseSecs, prev: p.avgResponseSecs,
       fmt: (v: number) => formatResponseTime(v), higher: false,
     },
@@ -640,10 +647,10 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
         >
           <BarChart3 size={18} />
           <div>
-            <p className="text-white font-medium text-sm">Performance Report</p>
+            <p className="text-white font-medium text-sm">{t('weeklyReport.title')}</p>
             {c && !loading && (
               <p className="text-gray-500 text-xs">
-                {c.leadsRecovered} leads · {formatCurrency(c.pipelineValue)} pipeline · {c.bookingsMade} bookings
+                {t('weeklyReport.summaryLine', { leads: c.leadsRecovered, pipeline: formatCurrency(c.pipelineValue), bookings: c.bookingsMade })}
               </p>
             )}
           </div>
@@ -657,8 +664,8 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
             onClick={e => e.stopPropagation()}
             className="bg-surface-sunken border border-line-strong rounded-lg px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-accent transition-colors"
           >
-            {PERIOD_OPTIONS.map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
+            {PERIOD_KEYS.map(k => (
+              <option key={k} value={k}>{t(`weeklyReport.periods.${k}`)}</option>
             ))}
           </select>
 
@@ -670,7 +677,7 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
             {isExporting
               ? <span className="w-3 h-3 border border-accent border-t-transparent rounded-full animate-spin" />
               : '↓'}
-            Export CSV
+            {t('weeklyReport.exportCsv')}
           </button>
           <button onClick={() => setOpen(o => !o)} className="text-gray-500 text-sm px-1">
             {open ? '▲' : '▼'}
@@ -681,14 +688,14 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
       {/* Custom date pickers */}
       {period === 'custom' && (
         <div className="px-6 pb-3 flex items-center gap-3 border-t border-surface-sunken">
-          <span className="text-gray-500 text-xs">From</span>
+          <span className="text-gray-500 text-xs">{t('weeklyReport.from')}</span>
           <input
             type="date"
             value={dateFrom}
             onChange={e => setDateFrom(e.target.value)}
             className="bg-surface-sunken border border-line-strong rounded-lg px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-accent transition-colors"
           />
-          <span className="text-gray-500 text-xs">to</span>
+          <span className="text-gray-500 text-xs">{t('weeklyReport.to')}</span>
           <input
             type="date"
             value={dateTo}
@@ -703,10 +710,10 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
           {loading ? (
             <div className="flex items-center justify-center py-8 gap-2">
               <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-              <span className="text-gray-500 text-sm">Loading report…</span>
+              <span className="text-gray-500 text-sm">{t('weeklyReport.loading')}</span>
             </div>
           ) : !c ? (
-            <p className="text-gray-600 text-sm text-center py-6">No data available.</p>
+            <p className="text-gray-600 text-sm text-center py-6">{t('weeklyReport.noData')}</p>
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
@@ -725,16 +732,16 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
                           {icon} {pctDiff != null ? `${pctDiff}%` : '—'} {compareLabel}
                         </span>
                       </div>
-                      <p className="text-gray-600 text-xs mt-0.5">Prior: {s.fmt(s.prev)}</p>
+                      <p className="text-gray-600 text-xs mt-0.5">{t('weeklyReport.prior', { value: s.fmt(s.prev) })}</p>
                     </div>
                   );
                 })}
               </div>
-              {topScenarioCfg && (
+              {topScenarioCfg && c?.topScenario && (
                 <div className="mt-3 flex items-center gap-2 text-xs text-gray-400">
-                  <span>Top scenario:</span>
+                  <span>{t('weeklyReport.topScenario')}</span>
                   <span className={`px-2 py-0.5 rounded-full font-medium ${topScenarioCfg.color}`}>
-                    {topScenarioCfg.label}
+                    {t(`scenario.${c.topScenario}`)}
                   </span>
                 </div>
               )}
@@ -749,15 +756,16 @@ function WeeklyReportCard({ onExport, isExporting }: WeeklyReportCardProps) {
 // ── Summary Bar ───────────────────────────────────────────────────────────────
 
 function SummaryBar({ data, onPendingClick }: { data: ActivitySummaryData; onPendingClick: () => void }) {
+  const { t } = useTranslation('activity');
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
       {([
-        { label: "Today's AI Messages", value: data.todayMessages,        icon: Bot,           accent: false },
-        { label: 'Leads Contacted',     value: data.todayLeadsContacted,  icon: Users,         accent: false },
-        { label: 'Reply Rate',          value: `${data.replyRate}%`,      icon: MessageCircle, accent: true  },
-        { label: 'Conversion Rate',     value: `${data.conversionRate}%`, icon: TrendingUp,    accent: true  },
+        { label: t('summary.todayMessages'), value: data.todayMessages,        icon: Bot,           accent: false },
+        { label: t('summary.leadsContacted'), value: data.todayLeadsContacted,  icon: Users,         accent: false },
+        { label: t('summary.replyRate'),      value: `${data.replyRate}%`,      icon: MessageCircle, accent: true  },
+        { label: t('summary.conversionRate'), value: `${data.conversionRate}%`, icon: TrendingUp,    accent: true  },
         {
-          label: 'Pending Actions',
+          label: t('summary.pendingActions'),
           value: data.pendingActions,
           icon: AlertTriangle,
           accent: false,
@@ -773,7 +781,12 @@ function SummaryBar({ data, onPendingClick }: { data: ActivitySummaryData; onPen
           }`}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-gray-500 uppercase tracking-wider leading-tight">{card.label}</span>
+            {/* Görev 4: no CSS `uppercase` on i18n-driven text — that's
+                exactly what produced "CONVERSİON RATE" under <html lang="tr">
+                (Turkish casing rules turn i→İ). Force the transform in code
+                against a fixed 'en' locale instead, so it can never pick up
+                the active document language. */}
+            <span className="text-xs text-gray-500 tracking-wider leading-tight">{card.label.toLocaleUpperCase('en')}</span>
             {(() => { const Icon = card.icon; return <Icon size={20} className="text-gray-400" />; })()}
           </div>
           <div className="flex items-end gap-1.5">
@@ -782,7 +795,7 @@ function SummaryBar({ data, onPendingClick }: { data: ActivitySummaryData; onPen
             </span>
             {'badge' in card && card.badge ? (
               <span className="text-xs text-yellow-400 bg-yellow-950 border border-yellow-800 px-1.5 py-0.5 rounded-full mb-0.5">
-                needs attention
+                {t('summary.needsAttention')}
               </span>
             ) : null}
           </div>
@@ -814,6 +827,7 @@ interface FiltersBarProps {
 const SEL = 'bg-surface-sunken border border-line rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-accent transition-colors';
 
 function FiltersBar({ filters, clinicOptions, showClinicFilter, onChange, onExport, isExporting }: FiltersBarProps) {
+  const { t } = useTranslation('activity');
   const set = (k: keyof Filters) => (e: React.ChangeEvent<HTMLSelectElement>) =>
     onChange({ ...filters, [k]: e.target.value });
 
@@ -821,16 +835,16 @@ function FiltersBar({ filters, clinicOptions, showClinicFilter, onChange, onExpo
     <div className="flex flex-wrap gap-2 items-center">
       {/* Date range */}
       <select className={SEL} value={filters.dateRange} onChange={set('dateRange')}>
-        <option value="all">All Time</option>
-        <option value="today">Today</option>
-        <option value="this_week">This Week</option>
-        <option value="this_month">This Month</option>
+        <option value="all">{t('filters.allTime')}</option>
+        <option value="today">{t('filters.today')}</option>
+        <option value="this_week">{t('filters.thisWeek')}</option>
+        <option value="this_month">{t('filters.thisMonth')}</option>
       </select>
 
       {/* Clinic (super_admin only) */}
       {showClinicFilter && (
         <select className={SEL} value={filters.clinicId} onChange={set('clinicId')}>
-          <option value="">All Clinics</option>
+          <option value="">{t('filters.allClinics')}</option>
           {clinicOptions.map(c => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
@@ -839,30 +853,30 @@ function FiltersBar({ filters, clinicOptions, showClinicFilter, onChange, onExpo
 
       {/* Scenario */}
       <select className={SEL} value={filters.scenario} onChange={set('scenario')}>
-        <option value="all">All Scenarios</option>
-        <option value="new_enquiry">New Enquiry</option>
-        <option value="finance_objection">Finance Objection</option>
-        <option value="cold_lead">Cold Lead</option>
-        <option value="missed_call">Missed Call</option>
+        <option value="all">{t('filters.allScenarios')}</option>
+        <option value="new_enquiry">{t('scenario.new_enquiry')}</option>
+        <option value="finance_objection">{t('scenario.finance_objection')}</option>
+        <option value="cold_lead">{t('scenario.cold_lead')}</option>
+        <option value="missed_call">{t('scenario.missed_call')}</option>
       </select>
 
       {/* Outcome */}
       <select className={SEL} value={filters.outcome} onChange={set('outcome')}>
-        <option value="all">All Outcomes</option>
-        <option value="booked">Booked</option>
-        <option value="replied">Replied</option>
-        <option value="no_response">No Response</option>
-        <option value="lost">Lost</option>
+        <option value="all">{t('filters.allOutcomes')}</option>
+        <option value="booked">{t('outcome.booked')}</option>
+        <option value="replied">{t('outcome.replied')}</option>
+        <option value="no_response">{t('outcome.no_response')}</option>
+        <option value="lost">{t('outcome.lost')}</option>
       </select>
 
       {/* Language */}
       <select className={SEL} value={filters.language} onChange={set('language')}>
-        <option value="all">All Languages</option>
-        <option value="en">🇬🇧 English</option>
-        <option value="tr">🇹🇷 Turkish</option>
-        <option value="ar">🇸🇦 Arabic</option>
-        <option value="es">🇪🇸 Spanish</option>
-        <option value="ru">🇷🇺 Russian</option>
+        <option value="all">{t('filters.allLanguages')}</option>
+        <option value="en">{t('filters.languages.en')}</option>
+        <option value="tr">{t('filters.languages.tr')}</option>
+        <option value="ar">{t('filters.languages.ar')}</option>
+        <option value="es">{t('filters.languages.es')}</option>
+        <option value="ru">{t('filters.languages.ru')}</option>
       </select>
 
       {/* Export */}
@@ -874,7 +888,7 @@ function FiltersBar({ filters, clinicOptions, showClinicFilter, onChange, onExpo
         {isExporting
           ? <span className="w-3.5 h-3.5 border border-accent border-t-transparent rounded-full animate-spin" />
           : '↓'}
-        Export CSV
+        {t('filters.exportCsv')}
       </button>
     </div>
   );
@@ -890,6 +904,7 @@ const INSIGHT_PERIODS = [
 ];
 
 function InsightsTab() {
+  const { t: tInsights } = useTranslation('activity');
   const [data,    setData]    = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState<string | null>(null);
@@ -899,9 +914,9 @@ function InsightsTab() {
     setLoading(true);
     api.get<InsightsData>('/api/insights/global', { params: { period } })
       .then(r => setData(r.data))
-      .catch(() => setError('Failed to load insights'))
+      .catch(() => setError(tInsights('errors.loadInsightsFailed')))
       .finally(() => setLoading(false));
-  }, [period]);
+  }, [period, tInsights]);
 
   if (loading) return (
     <div className="flex items-center justify-center py-20">
@@ -1029,7 +1044,7 @@ function InsightsTab() {
                   <div key={s.scenario} className="py-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cfg?.color ?? 'bg-gray-800 text-gray-400'}`}>
-                        {cfg?.label ?? s.scenario}
+                        {tInsights(`scenario.${s.scenario}`, s.scenario)}
                       </span>
                     </div>
                     <div className="text-right">
@@ -1159,6 +1174,7 @@ function InsightsTab() {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function AIActivityPage() {
+  const { t } = useTranslation('activity');
   const { user } = useAuth();
   const role = user?.role ?? 'koordinator';
   const isSuperAdmin  = role === 'super_admin';
@@ -1213,11 +1229,11 @@ export default function AIActivityPage() {
       setPages(convRes.data.pages);
       setSummary(sumRes.data);
     } catch (err: unknown) {
-      setError((err as any)?.response?.data?.error || 'Failed to load activity');
+      setError((err as any)?.response?.data?.error || t('errors.loadActivityFailed'));
     } finally {
       setIsLoading(false);
     }
-  }, [filters, activeTab, page]);
+  }, [filters, activeTab, page, t]);
 
   // Fetch clinic list for super_admin filter
   useEffect(() => {
@@ -1245,7 +1261,7 @@ export default function AIActivityPage() {
         cs.map(c => c.leadId === leadId ? { ...c, aiFollowUpEnabled: false, actionRequired: true } : c)
       );
     } catch (err: unknown) {
-      setError((err as any)?.response?.data?.error || 'Failed to take over lead');
+      setError((err as any)?.response?.data?.error || t('errors.takeOverFailed'));
     }
   }
 
@@ -1254,7 +1270,7 @@ export default function AIActivityPage() {
       await api.post(`/api/activity/leads/${leadId}/mark-called`);
       setConversations(cs => cs.filter(c => c.leadId !== leadId));
     } catch (err: unknown) {
-      setError((err as any)?.response?.data?.error || 'Failed to mark as called');
+      setError((err as any)?.response?.data?.error || t('errors.markCalledFailed'));
     }
   }
 
@@ -1268,7 +1284,7 @@ export default function AIActivityPage() {
           : cs.map(c => c.leadId === leadId ? { ...c, actionRequired: false, aiFollowUpEnabled: true } : c)
       );
     } catch (err: unknown) {
-      setError((err as any)?.response?.data?.error || 'Failed to resolve lead');
+      setError((err as any)?.response?.data?.error || t('errors.resolveFailed'));
     }
   }
 
@@ -1304,7 +1320,7 @@ export default function AIActivityPage() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch {
-      setError('Export failed');
+      setError(t('errors.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -1316,11 +1332,12 @@ export default function AIActivityPage() {
     const actionItems = conversations.filter(c => c.actionRequired);
     return (
       <div className="p-4 md:p-8">
+        <AppMeta title={`${t('receptionist.title')} | CareNova`} />
         <div className="max-w-3xl mx-auto space-y-5">
           <div className="mb-2">
-            <h1 className="font-serif text-3xl text-white">Action Required</h1>
+            <h1 className="font-serif text-3xl text-white">{t('receptionist.title')}</h1>
             <p className="text-gray-400 text-sm mt-1">
-              {actionItems.length} lead{actionItems.length !== 1 ? 's' : ''} need a call today
+              {t('receptionist.subtitle', { count: actionItems.length })}
             </p>
           </div>
 
@@ -1329,8 +1346,8 @@ export default function AIActivityPage() {
           ) : actionItems.length === 0 ? (
             <div className="bg-surface-sunken border border-line rounded-xl py-16 text-center">
               <p className="text-3xl mb-3">🎉</p>
-              <p className="text-white font-medium">All caught up!</p>
-              <p className="text-gray-500 text-sm mt-1">No action required right now.</p>
+              <p className="text-white font-medium">{t('receptionist.allCaughtUp')}</p>
+              <p className="text-gray-500 text-sm mt-1">{t('receptionist.noActionNow')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -1350,19 +1367,22 @@ export default function AIActivityPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <AppMeta title={`${t('page.title')} | CareNova`} />
       <div className="max-w-7xl mx-auto space-y-5">
 
-        {/* Header */}
+        {/* Header — page title matches the sidebar's "Sohbetler" label now
+            (APP-ADMIN-EKSIKLER-KOMUTU.md Görev 3.3: menu said "Sohbetler",
+            page said "AI Activity" — same route, two names). */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-1">
           <div>
-            <h1 className="font-serif text-3xl text-white">AI Activity</h1>
-            <p className="text-gray-400 text-sm mt-1">Real-time WhatsApp conversation monitoring</p>
+            <h1 className="font-serif text-3xl text-white">{t('page.title')}</h1>
+            <p className="text-gray-400 text-sm mt-1">{t('page.subtitle')}</p>
           </div>
           <button
             onClick={fetchAll}
             className="text-xs text-accent hover:text-accent-hover px-3 py-1.5 border border-line rounded-lg transition-colors mt-1"
           >
-            ↻ Refresh
+            {t('page.refresh')}
           </button>
         </div>
 
@@ -1386,16 +1406,16 @@ export default function AIActivityPage() {
                 <span className="text-yellow-400 text-lg">⚠</span>
                 <div>
                   <p className="text-yellow-300 font-medium text-sm">
-                    {actionCount} lead{actionCount !== 1 ? 's' : ''} need human follow-up
+                    {t('myActions.needFollowUp', { count: actionCount })}
                   </p>
-                  <p className="text-yellow-600 text-xs">AI couldn't close — these leads need a receptionist call</p>
+                  <p className="text-yellow-600 text-xs">{t('myActions.aiCouldntClose')}</p>
                 </div>
               </div>
               <button
                 onClick={() => setActiveTab('action_required')}
                 className="text-xs text-yellow-400 border border-yellow-700 bg-yellow-950 hover:bg-yellow-900 px-3 py-1.5 rounded-lg transition-colors"
               >
-                View all →
+                {t('myActions.viewAll')}
               </button>
             </div>
           </div>
@@ -1406,9 +1426,9 @@ export default function AIActivityPage() {
           {/* Tabs */}
           <div className="flex gap-2 border-b border-line pb-0">
             {([
-              { value: 'all',             label: `All Conversations (${total})` },
-              { value: 'action_required', label: `Action Required (${actionCount})`, alert: actionCount > 0 },
-              ...(isSuperAdmin ? [{ value: 'insights', label: 'Insights', icon: BarChart3 }] : []),
+              { value: 'all',             label: t('tabs.all', { count: total }) },
+              { value: 'action_required', label: t('tabs.actionRequired', { count: actionCount }), alert: actionCount > 0 },
+              ...(isSuperAdmin ? [{ value: 'insights', label: t('tabs.insights'), icon: BarChart3 }] : []),
             ] as { value: 'all' | 'action_required' | 'insights'; label: string; alert?: boolean; icon?: IconComponent }[]).map(tab => (
               <button
                 key={tab.value}
@@ -1448,8 +1468,8 @@ export default function AIActivityPage() {
         ) : conversations.length === 0 ? (
           <div className="bg-surface-sunken border border-line rounded-xl py-16 text-center">
             <div className="mb-3"><Bot size={48} className="mx-auto text-gray-400" /></div>
-            <p className="text-white font-medium">No conversations match your filters</p>
-            <p className="text-gray-500 text-sm mt-1">Try adjusting the date range or filters above.</p>
+            <p className="text-white font-medium">{t('list.noMatch')}</p>
+            <p className="text-gray-500 text-sm mt-1">{t('list.tryAdjusting')}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -1482,15 +1502,15 @@ export default function AIActivityPage() {
               disabled={page === 1}
               className="text-xs px-3 py-1.5 border border-line rounded-lg text-gray-400 hover:text-white disabled:opacity-40 transition-colors"
             >
-              ← Prev
+              {t('list.prev')}
             </button>
-            <span className="text-gray-500 text-xs">Page {page} of {pages}</span>
+            <span className="text-gray-500 text-xs">{t('list.pageOf', { page, totalPages: pages })}</span>
             <button
               onClick={() => setPage(p => Math.min(pages, p + 1))}
               disabled={page === pages}
               className="text-xs px-3 py-1.5 border border-line rounded-lg text-gray-400 hover:text-white disabled:opacity-40 transition-colors"
             >
-              Next →
+              {t('list.next')}
             </button>
           </div>
         )}
@@ -1500,11 +1520,12 @@ export default function AIActivityPage() {
 }
 
 function Spinner() {
+  const { t } = useTranslation('activity');
   return (
     <div className="flex items-center justify-center py-20">
       <div className="text-center space-y-3">
         <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-gray-500 text-sm">Loading activity…</p>
+        <p className="text-gray-500 text-sm">{t('list.loading')}</p>
       </div>
     </div>
   );

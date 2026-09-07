@@ -3,5 +3,88 @@
     "label": "Interface language",
     "tr": "Turkish",
     "en": "English"
+  },
+  "header": {
+    "title": "Settings",
+    "subtitle": "Manage your account, integrations, and platform configuration"
+  },
+  "tabs": {
+    "profile": "Profile",
+    "integrations": "Integrations",
+    "notifications": "Notifications",
+    "archived": "Archived patients",
+    "team": "Team"
+  },
+  "profile": {
+    "title": "Profile",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email address",
+    "emailLocked": "Email cannot be changed. Contact support to update.",
+    "phone": "Phone",
+    "avatarUrl": "Avatar URL",
+    "avatarHelp": "Direct image URL. File upload coming in a later update.",
+    "save": "Save Profile",
+    "saving": "Saving…",
+    "noChanges": "No changes to save.",
+    "saved": "Profile saved.",
+    "saveFailed": "Failed to save profile."
+  },
+  "password": {
+    "title": "Change Password",
+    "current": "Current password",
+    "new": "New password",
+    "newPlaceholder": "Min. 8 characters",
+    "confirm": "Confirm new password",
+    "submit": "Change Password",
+    "submitting": "Changing…",
+    "tooShort": "New password must be at least 8 characters.",
+    "mismatch": "Passwords do not match.",
+    "success": "Password changed successfully.",
+    "incorrect": "Current password is incorrect.",
+    "failed": "Failed to change password."
+  },
+  "clinic": {
+    "title": "Clinic Settings",
+    "name": "Clinic name",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "website": "Website",
+    "timezone": "Timezone",
+    "whatsappNumber": "WhatsApp Number",
+    "whatsappManaged": "Managed via WhatsApp Cloud API",
+    "goToIntegrations": "→ Integrations",
+    "save": "Save Clinic Settings",
+    "saving": "Saving…",
+    "readOnly": "You have read-only access to clinic settings.",
+    "noClinic": "No clinic associated with your account.",
+    "loadFailed": "Failed to load clinic data.",
+    "saved": "Clinic settings saved.",
+    "saveFailed": "Failed to save clinic settings.",
+    "noPermission": "You don't have permission to update clinic settings."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "channelEmail": "Email",
+    "save": "Save Notification Preferences",
+    "saving": "Saving…",
+    "saved": "Notification preferences saved.",
+    "saveFailed": "Failed to save preferences.",
+    "loadFailed": "Failed to load notification preferences.",
+    "events": {
+      "new_lead": { "title": "New lead received", "desc": "When a new lead enters your pipeline" },
+      "lead_booked": { "title": "Lead booked", "desc": "When a lead converts to a booking" },
+      "appointment_reminder": { "title": "Appointment reminder", "desc": "Upcoming appointment reminders" },
+      "urgent_escalation": { "title": "Urgent escalation", "desc": "When a patient needs immediate attention" },
+      "no_show": { "title": "No-show", "desc": "When a patient misses an appointment" },
+      "ai_quota_warning": { "title": "AI quota warning", "desc": "When your AI message quota is running low" }
+    }
+  },
+  "integrations": {
+    "whatsapp": "WhatsApp",
+    "aiProvider": "AI Provider",
+    "calendar": "Calendar",
+    "website": "Website"
   }
 }

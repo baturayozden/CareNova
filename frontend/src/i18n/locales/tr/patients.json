@@ -1,1 +1,37 @@
-{}
+{
+  "title": "Hastalar",
+  "subtitle": "{{count}} kayıt",
+  "searchPlaceholder": "Hasta adı veya vaka no ile ara…",
+  "filters": {
+    "allStaff": "Tüm danışmanlar",
+    "allTime": "Tüm zamanlar",
+    "today": "Bugün",
+    "thisWeek": "Bu hafta",
+    "thisMonth": "Bu ay",
+    "custom": "Özel"
+  },
+  "sort": {
+    "newest": "En yeni",
+    "oldest": "En eski",
+    "name": "İsim",
+    "assigned": "Danışman"
+  },
+  "columns": {
+    "patient": "Hasta",
+    "assignedTo": "Danışman",
+    "branch": "Branş",
+    "caseNumber": "Vaka",
+    "amount": "Tutar",
+    "status": "Durum",
+    "added": "Eklenme"
+  },
+  "loading": "Yükleniyor…",
+  "empty": "Filtrelerle eşleşen hasta yok",
+  "notAssigned": "Atanmadı",
+  "noQuoteYet": "Henüz teklif yok",
+  "pagination": {
+    "prev": "← Önceki",
+    "next": "Sonraki →",
+    "pageOf": "Sayfa {{page}} / {{totalPages}}"
+  }
+}

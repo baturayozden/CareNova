@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { formatDate } from '../utils/date';
 import { Deal, DealModal } from '../components/DealsTab';
+import AppMeta from '../components/AppMeta';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -604,6 +605,7 @@ export default function PatientProfilePage() {
 
   return (
     <div className="flex flex-col flex-1 min-w-0 h-full overflow-auto">
+      <AppMeta title={`${fullName} | CareNova`} />
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className="px-6 py-4 border-b border-line flex items-center gap-4 shrink-0">
