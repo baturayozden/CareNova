@@ -4,6 +4,7 @@ const { generateSlots } = require('../routes/appointments');
 const { createLead, normalizePhone } = require('./leadStore');
 const promptCompiler = require('./promptCompiler');
 const outputGuard    = require('./outputGuard');
+const complianceGuard = require('./complianceGuard');
 
 const MODEL = 'claude-sonnet-4-5';
 
@@ -773,6 +774,21 @@ async function generateFollowUp({ incomingText, language, scenario, patientName,
 
   if (guardResult.blocked) {
     console.warn(`[OutputGuard] blocked reply (${guardResult.reason}): "${rawReply.slice(0, 120)}"`);
+
+    // GECE-4-BRIEFI.md Bölüm E: "her engellenen deneme compliance_events'e
+    // loglanır (kim, ne zaman, ne, hangi kural)" — only compliance-shield
+    // blocks (outputGuard.js prefixes complianceGuard's reasons with
+    // 'compliance:') get an audit row here; pricing-authority and medical-
+    // inference blocks are outputGuard's own concern and already logged via
+    // console.warn above + the routes/whatsapp.js escalation path.
+    if (guardResult.reason?.startsWith('compliance:')) {
+      await complianceGuard.logComplianceEvent({
+        tenantId, leadId, caseId: caseRow?.id || null,
+        rule: guardResult.reason.slice('compliance:'.length),
+        blockedText: rawReply, language,
+      });
+    }
+
     return { reply: GUARD_BLOCKED_REPLY[language] || GUARD_BLOCKED_REPLY.en, guardBlocked: true, guardReason: guardResult.reason, blockedText: rawReply };
   }
 

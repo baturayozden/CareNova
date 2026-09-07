@@ -140,7 +140,40 @@ describe('outputGuard — guardOutboundMessage (the single gate)', () => {
     expect(result.blocked).toBe(false);
   });
 
-  test('does not throw when complianceGuard.js does not exist yet (skipCompliance=false, module missing)', () => {
+  test('does not throw now that complianceGuard.js exists (Bölüm E) — a clean message passes straight through', () => {
     expect(() => guardOutboundMessage({ replyText: 'Hello!', authority: 'full' })).not.toThrow();
+    expect(guardOutboundMessage({ replyText: 'Hello!', authority: 'full' }).blocked).toBe(false);
+  });
+
+  // GECE-4-BRIEFI.md Bölüm E: "aynı zincirde çalışsın, tek bir 'gönderilmeden
+  // önce' kapısı olsun" — this is that integration test. complianceGuard.js
+  // is real now (not lazily-missing), so a compliance violation must block
+  // here too, through the exact same guardOutboundMessage() call the pricing
+  // and medical-inference checks use, not a second call site.
+  test('a compliance violation blocks via the same gate, tagged with the compliance: prefix', () => {
+    const result = guardOutboundMessage({
+      replyText: 'Bu ay için özel fiyat kampanyamız var, %20 indirim!',
+      authority: 'full', // even the most permissive pricing authority does not bypass compliance
+    });
+    expect(result.blocked).toBe(true);
+    expect(result.reason).toMatch(/^compliance:/);
+  });
+
+  test('pricing violation is still checked first — a compliance-violating AND price-violating reply reports the pricing reason', () => {
+    const result = guardOutboundMessage({
+      replyText: 'Kesin sonuç garantisi ile fiyatımız €5,000.',
+      authority: 'qualification_only',
+    });
+    expect(result.blocked).toBe(true);
+    expect(result.reason).toMatch(/pricing_authority_violation/);
+  });
+
+  test('skipCompliance=true bypasses complianceGuard even though the module now exists', () => {
+    const result = guardOutboundMessage({
+      replyText: 'Bu ay için özel fiyat kampanyamız var, %20 indirim!',
+      authority: 'full',
+      skipCompliance: true,
+    });
+    expect(result.blocked).toBe(false);
   });
 });

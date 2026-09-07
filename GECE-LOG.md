@@ -2217,4 +2217,84 @@ yüklendi, hepsi temiz.
 
 ---
 
+## BÖLÜM E — Mevzuat Kalkanı (`services/complianceGuard.js`)
+
+**🔴 Brief'te bir gerçek hata:** Bölüm E metni "Gece 2'de iskelet olarak
+konmuştu" diyor. `backend/src/`'nin TAMAMINDA ve `GECE-LOG.md`'nin
+TAMAMINDA `grep -r "complianceGuard"` çalıştırıldı — böyle bir dosya YOK,
+böyle bir bahis YOK. Gece 2'nin raporu bu isimde hiçbir şeyden söz
+etmiyor. Bunu brief'teki bir hata olarak kaydediyorum ve dosyayı sıfırdan,
+gerçek çalışan bir filtre olarak inşa ettim — var olmayan bir "iskeleti
+gerçeğe çevirme" değil.
+
+**Tasarım — brief'in "aynı zincirde, tek kapı" isteği zaten hazırdı:**
+Bölüm B'de `outputGuard.js`'in `guardOutboundMessage`'ı, `complianceGuard.js`
+henüz yokken bile onu tembel (`require` içinde try/catch) çağıracak şekilde
+yazılmıştı — modül yoksa sessizce atlıyordu, modül gelince otomatik devreye
+girecekti. Bu gece sadece dosyayı yazdım, `outputGuard.js`'e HİÇBİR
+DEĞİŞİKLİK gerekmedi — entegrasyon noktası zaten oradaydı ve çalıştı.
+`services/__tests__/outputGuard.test.js`'teki "modül yokken çökmüyor"
+testi artık yanıltıcıydı (modül şimdi VAR) — ismi ve içeriği güncellendi,
+gerçek bir engelleme testi eklendi (`compliance:` önekli reason'ın
+`guardOutboundMessage`'dan geldiğinin doğrulanması) + fiyat VE uyum ihlali
+aynı anda olduğunda fiyat kuralının önce raporlandığının testi (checkPricingOutput
+zaten `checkOutboundCompliance`'dan önce çalışıyor, kod değişmedi, sadece
+doğrulandı).
+
+**5 kural** (brief'in birebir listesi): `domestic_campaign_price`
+(TR hedefli kampanya/indirim dili — Tanıtım Yönetmeliği; DİKKAT: "alıcı
+gerçekten Türkiye'de mi" tespiti yapmıyor, sadece kampanya/indirim
+DİLİNİ engelliyor — bu, düz bir fiyat teklifiyle asla karışmayan güvenli
+bir varsayılan), `testimonial_share` (başka hastanın yorumu/teşekkür
+mesajı paylaşımı — kliniğin KENDİ lisans/deneyim bilgisini paylaşmaktan
+ayrı tutuluyor, o hâlâ serbest), `outcome_guarantee` ("kesin sonuç",
+"%100 başarı", "sıfır risk" — hem mevzuat hem hasta-beklentisi güvenliği),
+`before_after_no_consent` (AI zaten hiçbir zaman görsel EKLEMİYOR —
+`whatsapp.sendText` her yerde metin-only — yani bu kural pratikte AI'ın
+"size önce-sonra fotoğraflarını gönderiyorum" diye METİNSEL SÖZ
+vermesini yakalıyor), `medical_advice_shaped` (doz/teşhis/reçete dili —
+`outputGuard.js`'in kendi `MEDICAL_INFERENCE_PATTERN`'inden farklı: o
+görsel-analiz sızıntısını hedefliyor, bu AI'ın doğrudan doktor gibi
+konuşmasını).
+
+**`compliance_events`'e loglama — mimari karar:** `checkOutboundCompliance`
+saf kalması için (DB bağımlılığı yok, ucuz, test edilmesi kolay) DB
+yazımı AYRI bir fonksiyona (`logComplianceEvent`) verildi ve çağrısı
+`services/ai.js`'in `generateFollowUp`'ına eklendi — `guardResult.reason`
+`'compliance:'` önekiyle geldiğinde (yani engelleme `outputGuard.js`'in
+kendi fiyat/tıbbi-çıkarım kontrolünden değil, `complianceGuard`'dan
+geldiğinde) `tenantId`/`leadId`/`caseId?.id`/kural/engellenen metin/dil
+`compliance_events`'e (migration 061, Bölüm A'da önden yazılmıştı)
+yazılıyor. Bu, `generateFollowUp`'ın zaten sahip olduğu TEK yer —
+`outputGuard.js`'in kendisi hiçbir zaman DB'ye dokunmuyor, saf filtre
+olarak kalıyor.
+
+**🔴 Aynı çelişki, aynı karar:** Brief'in Bölüm E metni "Uyum Paneli'ne
+yeni bir sekme ekle" diyor — Bölüm A'nın "Prompt Önizleme ekranı"
+isteğiyle birebir aynı çelişki, aynı gerekçeyle çözüldü: gecenin üst
+talimatı ("Bu gece EKRAN YAPILMAYACAK") daha güçlü sinyal, ekran
+yapılmadı. `compliance_events` tablosu ve loglama mantığı hazır — ekranı
+görüntüleyecek gelecekteki bir gece sadece SELECT yazıp bir sayfa
+render etmesi yeterli.
+
+**Testler:** `services/__tests__/complianceGuard.test.js` (31 test — 5
+kuralın her biri için TR/EN pozitif örnekler + benzer ama İHLAL OLMAYAN
+karşıt örnekler — örn. düz fiyat teklifi kampanya değildir, gerçekçi
+"sonuçlar değişebilir" ifadesi garanti değildir, doktorun ilaç konusunda
+bilgi vereceğini söylemek reçete değildir; `logComplianceEvent`'in
+INSERT parametreleri, eksik `tenantId`/`rule`'da no-op, DB hatasında
+sessizce `null` dönmesi). `outputGuard.test.js`'e 3 yeni test eklendi
+(gerçek entegrasyon: uyum ihlali `guardOutboundMessage` üzerinden
+engelleniyor, fiyat kuralı önce kontrol ediliyor, `skipCompliance: true`
+hâlâ atlıyor).
+
+**Doğrulama:** `npx jest --testPathIgnorePatterns=invoiceNumber` →
+**345/345 yeşil** (bu bölümden önce 311'di — 34 yeni test). Gerçek
+Anthropic çağrısı YOK. `node -e "require(...)"` ile `complianceGuard.js`,
+`outputGuard.js`, `ai.js`, `whatsapp.js` tek tek yüklendi, hepsi temiz.
+
+**Commit:** (aşağıda)
+
+---
+
 
