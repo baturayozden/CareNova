@@ -168,7 +168,7 @@ router.post('/', async (req, res) => {
       ? `Welcome back, ${incomingMsg.senderName || 'there'}! `
       : '';
 
-    const { language, scenario, reply: rawReply, escalate, outOfHours } =
+    const { language, scenario, reply: rawReply, escalate, guardBlocked, guardReason, outOfHours } =
       await ai.processIncoming(incomingMsg, history, tenantId, lead.id);
 
     const rawCombined = welcomeMsg && !escalate && !outOfHours
@@ -183,11 +183,15 @@ router.post('/', async (req, res) => {
       .replace(/[•·]\s?/g, '- ')         // bullet mid-line (edge case)
       .replace(/\*\*(.+?)\*\*/gs, '*$1*'); // double-asterisk → single
 
-    console.log(`[AI] lang=${language} scenario=${scenario} escalate=${escalate} ooh=${outOfHours}`);
+    console.log(`[AI] lang=${language} scenario=${scenario} escalate=${escalate} guardBlocked=${guardBlocked} ooh=${outOfHours}`);
     console.log(`[AI] Reply: "${reply}"`);
 
     // ── 7. Handle escalation ──────────────────────────────────────────────────
-    if (escalate) {
+    // GECE-4-BRIEFI.md Bölüm B: a guard block ("gönderme, logla, insana
+    // eskale et") is its own escalation trigger, independent of the
+    // emergency-keyword `escalate` path above — the patient never gets a
+    // forbidden price/medical-inference reply, and staff always find out.
+    if (escalate || guardBlocked) {
       // Mark lead as requiring human attention
       await pool.query(
         `UPDATE leads SET ai_follow_up_enabled = FALSE, action_required = TRUE
@@ -203,10 +207,16 @@ router.post('/', async (req, res) => {
       createNotification({
         tenantId,
         type:    'escalation',
-        title:   '⚠️ Urgent: Patient needs attention',
-        message: `${lead.name || lead.phone} sent: "${incomingMsg.text.slice(0, 120)}"`,
+        title:   guardBlocked ? '⚠️ AI reply blocked — needs a human reply' : '⚠️ Urgent: Patient needs attention',
+        message: guardBlocked
+          ? `${lead.name || lead.phone} — AI response withheld (${guardReason}). Original message: "${incomingMsg.text.slice(0, 120)}"`
+          : `${lead.name || lead.phone} sent: "${incomingMsg.text.slice(0, 120)}"`,
         link:    `/ai-activity`,
       });
+
+      if (guardBlocked) {
+        console.warn(`[OutputGuard] lead=${lead.id} tenant=${tenantId} reason=${guardReason}`);
+      }
     }
 
     // ── 8. Send reply via WhatsApp ────────────────────────────────────────────

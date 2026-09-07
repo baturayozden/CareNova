@@ -2,111 +2,30 @@ const Anthropic      = require('@anthropic-ai/sdk');
 const { pool }       = require('../db/index');
 const { generateSlots } = require('../routes/appointments');
 const { createLead, normalizePhone } = require('./leadStore');
+const promptCompiler = require('./promptCompiler');
+const outputGuard    = require('./outputGuard');
 
 const MODEL = 'claude-sonnet-4-5';
 
-// ── Tone instructions ─────────────────────────────────────────────────────────
-
-const TONE_INSTRUCTIONS = {
-  formal:       'Use strictly formal language. No emojis, no exclamation marks, no casual expressions. Use proper titles (Mr./Ms./Dr.). Maintain a professional, respectful register at all times.',
-  professional: 'Use warm but formal language. Minimal emojis only where appropriate. Polished and courteous.',
-  friendly:     'Approachable and conversational. Use emojis sparingly.',
-  casual:       'Relaxed, friendly tone. Use emojis freely.',
-};
-
-// ── Base system prompt ────────────────────────────────────────────────────────
-
-function buildSystemPrompt({ tone = 'professional', knowledgeContext = '', branchContext = '', welcomeBack = false, outOfHours = false, clinicTimezone = 'Europe/Istanbul', patientName = '' }) {
-  const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.professional;
-
-  // Compute today's date + weekday in clinic timezone (server runs UTC)
-  const tz       = clinicTimezone || 'Europe/Istanbul';
-  const now      = new Date();
-  const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now); // YYYY-MM-DD
-  const dayName  = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long' }).format(now); // Monday/Tuesday/…
-
-  // Pre-compute 14-day date map in clinic timezone — AI looks up, never calculates
-  // Anchor at noon UTC so DST/day-boundary shifts cannot affect the result
-  const base = new Date(todayStr + 'T12:00:00Z');
-  const upcoming = [];
-  for (let i = 0; i < 14; i++) {
-    const d    = new Date(base.getTime() + i * 86400000);
-    const dStr = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
-    const dDay = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long', day: 'numeric', month: 'long' }).format(d);
-    upcoming.push(`  ${dDay} = ${dStr}`);
-  }
-  const dateMap = upcoming.join('\n');
-
-  return `You are an expert patient care assistant for a healthcare facility.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CRITICAL RULES — violating any of these is a serious failure
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-PRICE RULE — CRITICAL: You must NEVER state, estimate, approximate, or give a price range for any treatment unless that EXACT figure appears verbatim in the CLINIC KNOWLEDGE BASE below. This explicitly forbids: "approximately €X", "typically €X–€Y", "starts from €X", "around €X", ranges like "€8,000–€12,000". If asked any price NOT in the knowledge base, your ONLY correct response: explain that each case is individual, prices are given as an itemised quote after a free consultation, and offer to book one. Inventing or estimating any price is a CRITICAL FAILURE.
-
-FACTS RULE — CRITICAL: Only state clinic-specific facts (brands, product names, specific treatments, materials, clinician names, guarantees) that appear EXPLICITLY in the clinic knowledge base. NEVER name a specific brand, manufacturer, material, or product the knowledge base does not mention. If asked about specifics not in the knowledge base, say the team will confirm during the consultation. Do NOT draw on general medical knowledge for clinic-specific facts.
-
-LANGUAGE RULE — CRITICAL: Reply ONLY in the language of the patient's CURRENT message. The explicit language instruction at the end of the user turn specifies which language to use — follow it exactly and immediately. The conversation history does NOT determine the reply language — only the patient's latest message does.
-
-MEDICAL INFERENCE RULE — CRITICAL: Never introduce medical conditions, diagnoses, or patient circumstances the patient did not explicitly state in this conversation. Do not infer or volunteer medical history that was not provided.
-
-WHATSAPP FORMATTING RULE — CRITICAL: You are replying on WhatsApp. This is a hard rule — check every line before replying.
-NEVER use the bullet character • anywhere. It renders incorrectly on WhatsApp.
-For any list, start each line with a hyphen and a space. Example:
-WRONG: • Straumann
-RIGHT: - Straumann
-For bold use SINGLE asterisks *word* only, NEVER double **word** — double asterisks appear as raw characters.
-No markdown headings (#), tables, or code blocks. Emojis are fine in moderation.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-YOUR VOICE — you are a warm, friendly clinic coordinator (not a robot, not a brochure):
-- Write like a real person messaging on WhatsApp: natural, warm, conversational.
-- Avoid marketing/brochure language ("premium, globally-certified", "state-of-the-art", "cutting-edge"). Say things simply, like a helpful human would.
-- Vary sentence length. It's fine to be warm and a little informal.
-- Lead with empathy when the patient shares a concern (pain, fear, cost worry) — acknowledge it before jumping to facts.
-- Don't dump everything as a list. Prefer short conversational paragraphs; use a - list only when genuinely listing 3+ items.
-- A light emoji here and there is fine, don't overdo it.
-- Sound like you actually care about this specific person, not a script.
-This voice operates within the CRITICAL RULES above — those rules are absolute and cannot be overridden by tone.
-
-${branchContext}
-📅 DATE REFERENCE — THIS IS THE ONLY SOURCE OF TRUTH FOR DATES:
-TODAY is ${todayStr} (${dayName}).
-${dateMap}
-
-CRITICAL DATE RULES:
-- The list above is the ONLY correct source for matching day names to dates.
-- You are FORBIDDEN from calculating, guessing, or recalling dates from memory.
-- When a patient says a day name ("Monday"), find that EXACT line in the list and use its date. Example: if the list says "Monday, June 8 = 2026-06-08", then "this coming Monday" = 8 June, and you pass 2026-06-08 to tools.
-- NEVER state a day-date pairing that is not in the list above. If you catch yourself about to say a date, verify it against the list first.
-- If the patient's stated day and date conflict with the list (e.g. they say "Monday 9th" but the list shows the 9th is a Tuesday), point this out and clarify.
-
-TONE: ${toneInstruction}
-
-CONVERSATION FLOW RULE: ALWAYS reply to every message. If the patient gives partial information (e.g. a time but no branch name, a branch but no date, a name but no treatment), acknowledge what they gave and ask for the remaining details in the SAME reply — never go silent. Keep the conversation moving forward.
-
-CORE RULES:
-- Keep WhatsApp messages concise — ideally under 200 characters. Use line breaks for readability.
-- Never be pushy or salesy. Always end with a gentle next step or question.
-- If the patient has an emergency (severe pain, bleeding, swelling, sudden worsening of symptoms) → immediately escalate and connect them with the team.
-- For appointment requests → check availability and offer 2–3 concrete time slots.
-- For pricing questions → follow the PRICE RULE above and offer a free consultation.
-- For treatment questions → use ONLY the clinic knowledge base; do not add facts from general knowledge.
-- For address, opening hours, contact details → answer from the knowledge base only.
-- Always be compassionate about medical anxiety — it is extremely common, especially for patients traveling for treatment.
-${welcomeBack ? '\nREPEAT PATIENT: This patient has visited before. Greet them warmly by name.' : ''}
-${outOfHours ? '\nIMPORTANT: The clinic is currently CLOSED (outside working hours). Still help the patient fully — answer their questions using the clinic info, and if they want to book, offer available slots using the get_available_slots tool. Let them know the clinic is currently closed and the team will confirm their appointment on the next working day.' : ''}
-
-CLINIC KNOWLEDGE BASE (this is your ONLY source of facts, prices, and brands — do not go beyond it):
-${knowledgeContext || 'No specific clinic information loaded. Answer general procedure questions only; never invent clinic-specific prices, brands, or services.'}
-
-APPOINTMENT BOOKING RULES:
-- Before booking, confirm in ONE message: date, time, treatment, and patient name — then wait for an explicit "yes".
-- The patient's WhatsApp profile name is "${patientName || 'unknown'}". If it looks like a genuine full name, use it but still confirm ("I'll book this under <name> — is that correct?"). If it is a nickname, handle, single letter, emoji, or unclear, ASK for their full name before booking.
-- Call create_appointment ONLY after explicit confirmation. Pass the exact date (YYYY-MM-DD) from the date reference list and a time from the slots offered by get_available_slots.
-- If create_appointment returns slot_taken: apologise and offer other free times. If it returns success: tell the patient their REQUEST has been received and the team will review and confirm it shortly — do NOT say "confirmed" or "booked" with certainty. If it returns error/missing_data: do NOT claim it is booked; say the team will follow up.`;
+// ── System prompt (GECE-4-BRIEFI.md Bölüm A) ────────────────────────────────
+//
+// This used to be ~90 lines of dental-flavored single-block text (see git
+// history). It's now a thin adapter over services/promptCompiler.js's 6
+// independently-testable layers — see that file for the actual rule text
+// and services/__tests__/promptCompiler.test.js for what's verified about
+// it. Keeping the name/signature close to the old one minimises the diff
+// at every call site below; the real logic moved out.
+function buildSystemPrompt({
+  tone = 'professional', knowledgeContext = '', branchContext = '',
+  welcomeBack = false, outOfHours = false, clinicTimezone = 'Europe/Istanbul',
+  patientName = '', branchTemplate = null, objectionType = null,
+  patientCountry = null, patientLanguage = null, patientTimezone = null,
+}) {
+  return promptCompiler.compileSystemPrompt({
+    tone, knowledgeContext, branchContext, welcomeBack, outOfHours,
+    clinicTimezone, patientName, branchTemplate, objectionType,
+    patientCountry, patientLanguage, patientTimezone,
+  });
 }
 
 // ── Knowledge base loader ─────────────────────────────────────────────────────
@@ -168,6 +87,78 @@ async function loadBranches(tenantId) {
     return rows;
   } catch {
     return [];
+  }
+}
+
+// ── Case File / branch template loaders (GECE-4-BRIEFI.md Bölüm A) ─────────
+//
+// NOTE the naming collision this deliberately avoids: `clinic_branches`
+// above is a PHYSICAL LOCATION (a clinic's second office), completely
+// unrelated to `branch_templates` (a MEDICAL SPECIALTY — hair transplant,
+// dental, ...). Both call themselves "branch" in this codebase for
+// historical reasons; the functions below are named *BranchTemplate*
+// specifically to keep that distinction visible at every call site.
+
+function mapBranchTemplateRow(row) {
+  if (!row) return null;
+  return {
+    key: row.key,
+    displayName: row.display_name,
+    aiPricingAuthority: row.ai_pricing_authority,
+    preAssessmentQuestions: row.pre_assessment_questions,
+    requiredMedia: row.required_media,
+    redFlags: row.red_flags,
+    objectionStrategies: row.objection_strategies || {},
+    knowledgeSeed: row.knowledge_seed,
+  };
+}
+
+async function loadBranchTemplate(branchKey) {
+  if (!branchKey) return null;
+  try {
+    const { rows } = await pool.query(`SELECT * FROM branch_templates WHERE key = $1`, [branchKey]);
+    return mapBranchTemplateRow(rows[0]);
+  } catch {
+    return null;
+  }
+}
+
+// A lead becomes a case at qualification time (leads.case_id, nullable —
+// migration 057); most leads never have one. Returns null rather than
+// throwing so every caller can treat "no case yet" as the common case.
+async function loadCaseForLead(leadId, tenantId) {
+  if (!leadId || !tenantId) return null;
+  try {
+    const { rows } = await pool.query(
+      `SELECT c.* FROM cases c
+         JOIN leads l ON l.case_id = c.id
+        WHERE l.id = $1 AND c.tenant_id = $2 AND c.deleted_at IS NULL`,
+      [leadId, tenantId],
+    );
+    return rows[0] || null;
+  } catch {
+    return null;
+  }
+}
+
+// Feeds outputGuard's range_from_photo/range_after_imaging enforcement —
+// "yeterli kalitede" (Bölüm B) means quality_ok = TRUE, not just present.
+// 'scan'/'report' are the medical-imaging kinds (panoramic/CBCT/MR/blood
+// work); a plain 'photo' does not satisfy range_after_imaging's stricter
+// requirement even if quality_ok.
+async function loadCaseMediaReadiness(caseId) {
+  if (!caseId) return { hasQualifyingPhoto: false, hasImaging: false };
+  try {
+    const { rows } = await pool.query(
+      `SELECT kind, quality_ok FROM case_media WHERE case_id = $1 AND quality_ok = TRUE`,
+      [caseId],
+    );
+    return {
+      hasQualifyingPhoto: rows.some(r => r.kind === 'photo'),
+      hasImaging: rows.some(r => r.kind === 'scan' || r.kind === 'report'),
+    };
+  } catch {
+    return { hasQualifyingPhoto: false, hasImaging: false };
   }
 }
 
@@ -584,11 +575,15 @@ async function generateFollowUp({ incomingText, language, scenario, patientName,
   const client = new Anthropic();
 
   // Load clinic-specific context
-  const [knowledgeContext, aiSettings, branches] = await Promise.all([
+  const [knowledgeContext, aiSettings, branches, caseRow] = await Promise.all([
     tenantId ? loadKnowledge(tenantId)   : Promise.resolve(''),
     tenantId ? loadAiSettings(tenantId)  : Promise.resolve(null),
     tenantId ? loadBranches(tenantId)    : Promise.resolve([]),
+    (tenantId && leadId) ? loadCaseForLead(leadId, tenantId) : Promise.resolve(null),
   ]);
+  const branchTemplate = caseRow ? await loadBranchTemplate(caseRow.branch_key) : null;
+  const mediaReadiness = caseRow ? await loadCaseMediaReadiness(caseRow.id) : { hasQualifyingPhoto: false, hasImaging: false };
+  const objectionType  = detectObjection(incomingText);
 
   // Build branch context block for system prompt (only when >1 active branch)
   let branchContext = '';
@@ -604,7 +599,13 @@ async function generateFollowUp({ incomingText, language, scenario, patientName,
 
   const tone           = aiSettings?.tone     || 'professional';
   const clinicTimezone = aiSettings?.tenant_timezone || aiSettings?.timezone || 'Europe/London';
-  const systemPrompt   = buildSystemPrompt({ tone, knowledgeContext, branchContext, outOfHours: !withinHours, clinicTimezone, patientName: patientName || '' });
+  const systemPrompt   = buildSystemPrompt({
+    tone, knowledgeContext, branchContext, outOfHours: !withinHours, clinicTimezone,
+    patientName: patientName || '', branchTemplate, objectionType,
+    patientCountry: caseRow?.patient_country || null,
+    patientLanguage: caseRow?.patient_language || language,
+    patientTimezone: caseRow?.patient_timezone || null,
+  });
 
   const scenarioHint = SCENARIO_CONTEXT[scenario] || SCENARIO_CONTEXT.new_enquiry;
 
@@ -651,6 +652,16 @@ async function generateFollowUp({ incomingText, language, scenario, patientName,
     tr: 'Özür dilerim, şu an bir aksaklık yaşıyoruz — lütfen tekrar dener misiniz? 🙏',
     ar: 'عذرًا، حدث خطأ ما — هل يمكنك المحاولة مرة أخرى؟ 🙏',
     en: 'Sorry, we ran into a problem right now — please try again in a moment. 🙏',
+  };
+
+  // GECE-4-BRIEFI.md Bölüm B: a guard block must never go silent either —
+  // the patient still gets a warm, honest reply, just not the one the
+  // model produced. "insana eskale et" happens one layer up, in
+  // processIncoming, which sees guardBlocked=true on the return value.
+  const GUARD_BLOCKED_REPLY = {
+    tr: 'Bu konuda size en doğru bilgiyi verebilmek için ekibimizden birinin sizinle görüşmesi gerekiyor — birazdan size dönüş yapacaklar. 🙏',
+    ar: 'لتقديم المعلومات الصحيحة لك، يحتاج أحد أعضاء فريقنا للتواصل معك — سيتم التواصل معك قريبًا. 🙏',
+    en: "To give you the exact details on this, one of our team needs to follow up with you directly — they'll be in touch shortly. 🙏",
   };
 
   // ── Tool-calling loop (max 3 turns to prevent infinite loops) ───────────────
@@ -708,12 +719,32 @@ async function generateFollowUp({ incomingText, language, scenario, patientName,
   } catch (apiErr) {
     // Anthropic API error (e.g. 400 orphan tool_use, 500, timeout) — never go silent.
     console.error('[AI] Anthropic API error:', apiErr.status || '', apiErr.message);
-    return FALLBACK_REPLY[language] || FALLBACK_REPLY.en;
+    return { reply: FALLBACK_REPLY[language] || FALLBACK_REPLY.en, guardBlocked: false, guardReason: null };
   }
 
   // Extract final text — find type==='text' (may not be index 0 when tools involved)
   const textBlock = response.content.find(b => b.type === 'text');
-  return sanitizeForWhatsApp(textBlock ? textBlock.text.trim() : '');
+  const rawReply = sanitizeForWhatsApp(textBlock ? textBlock.text.trim() : '');
+
+  // GECE-4-BRIEFI.md Bölüm B — second line of defense, after the prompt's
+  // own pricing-authority rule. hasQualifyingPhoto/hasImaging default to
+  // false (the conservative default: an unknown case has no photo/imaging
+  // on file, so range_from_photo/range_after_imaging branches stay
+  // blocked until Bölüm C's media pipeline actually confirms one exists).
+  const guardResult = outputGuard.guardOutboundMessage({
+    replyText: rawReply,
+    authority: branchTemplate?.aiPricingAuthority || null,
+    hasQualifyingPhoto: mediaReadiness.hasQualifyingPhoto,
+    hasImaging: mediaReadiness.hasImaging,
+    language,
+  });
+
+  if (guardResult.blocked) {
+    console.warn(`[OutputGuard] blocked reply (${guardResult.reason}): "${rawReply.slice(0, 120)}"`);
+    return { reply: GUARD_BLOCKED_REPLY[language] || GUARD_BLOCKED_REPLY.en, guardBlocked: true, guardReason: guardResult.reason, blockedText: rawReply };
+  }
+
+  return { reply: rawReply, guardBlocked: false, guardReason: null };
 }
 
 // ── Full pipeline ─────────────────────────────────────────────────────────────
@@ -741,6 +772,8 @@ async function processIncoming(incomingMsg, messageHistory = [], tenantId = null
   const withinHours = tenantId ? await isWithinWorkingHours(tenantId) : true;
 
   let reply;
+  let guardBlocked = false;
+  let guardReason  = null;
 
   if (escalate) {
     // Escalation response — short, immediate
@@ -751,7 +784,7 @@ async function processIncoming(incomingMsg, messageHistory = [], tenantId = null
         : "I'm connecting you with our team now. Someone will be with you shortly. 🆘";
   } else {
     // AI pipeline — active at all hours; withinHours informs system prompt context
-    reply = await generateFollowUp({
+    const result = await generateFollowUp({
       incomingText:   text,
       language,
       scenario,
@@ -762,9 +795,18 @@ async function processIncoming(incomingMsg, messageHistory = [], tenantId = null
       leadId,
       patientPhone:   incomingMsg?.from || null,
     });
+    reply        = result.reply;
+    guardBlocked = result.guardBlocked;
+    guardReason  = result.guardReason;
   }
 
-  return { language, scenario, reply, escalate, outOfHours: !withinHours };
+  // guardBlocked=true means outputGuard/complianceGuard caught something the
+  // prompt should have prevented — GECE-4-BRIEFI.md Bölüm B: "gönderme,
+  // logla, insana eskale et." `escalate` (the emergency/keyword path) and
+  // `guardBlocked` (the output-filter path) are independent signals; the
+  // caller (routes/whatsapp.js) treats a guard block as its own escalation
+  // reason even when the message itself wasn't an emergency.
+  return { language, scenario, reply, escalate, guardBlocked, guardReason, outOfHours: !withinHours };
 }
 
 module.exports = {
@@ -776,9 +818,13 @@ module.exports = {
   processIncoming,
   loadAiSettings,
   loadKnowledge,
+  loadBranchTemplate,
+  loadCaseForLead,
+  loadCaseMediaReadiness,
   isWithinWorkingHours,
   shouldEscalate,
   findExistingLead,
+  buildSystemPrompt,
   SCENARIOS,
   OBJECTION_TYPES,
 };

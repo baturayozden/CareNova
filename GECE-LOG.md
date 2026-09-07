@@ -1882,4 +1882,132 @@ için gerek yoktu). `npx tsc --noEmit`, `CI=true npm run build`,
 
 ---
 
+# GECE ÇALIŞMASI 4 — AI Motoru
+
+Üç gecedir arayüz derinleşti, ürünün kendisi (AI motoru) hiç dokunulmadan
+duruyordu (GECE-LOG Gece 1: "PAKET 7... hiç başlanmadı"). Bu gece **hiç
+ekran yapılmadı** — GECE-4-BRIEFI.md'nin kendi talimatı buydu, tamamı
+backend.
+
+## BÖLÜM A + B — Katmanlı prompt derleyici + AI fiyat yetki matrisi
+
+Brief bunları iki ayrı bölüm/commit olarak tanımlıyor, ama B'nin çıktı
+filtresi A'nın branş katmanındaki fiyat yetki kuralına o kadar sıkı bağlı
+ki (aynı `PRICING_AUTHORITY_RULES` haritası, aynı 5 değer) ayrı commit'lere
+bölmek yapay olurdu — **tek commit'te birleştirdim**, mesajı ikisini de
+yansıtıyor. Gerekçe budur, brief'in "A ve B bitmeden C'ye geçme" kuralı
+zaten ikisini bir birim olarak ele alıyordu.
+
+**`backend/src/services/promptCompiler.js`** (YENİ) — eski `ai.js`'in
+~90 satırlık tek-parça diş-spesifik `buildSystemPrompt`'u 6 bağımsız,
+test edilebilir katmana bölündü: `buildCoreLayer` (ses tonu, WhatsApp
+format, dil kuralı, tıbbi çıkarım yasağı — GÜÇLENDİRİLDİ: artık greft/
+implant sayısı taahhüdünü ve AI'ın kendi görsel-analiz çıktısını hastaya
+sızdırmayı da açıkça yasaklıyor), `buildComplianceLayer` (KVKK + Tanıtım
+Yönetmeliği — enforcement `complianceGuard.js`'de, bu sadece talimat
+katmanı), `buildBranchLayer` (branş kimliği + ön-değerlendirme soruları +
+gerekli görseller + **fiyat yetki kuralı** + itiraz rehberliği),
+`buildKnowledgeLayer`, `buildCaseContextLayer`, `buildDateTimeLayer`
+(**ÇİFT saat dilimi** — Bölüm A'nın özel isteği: hasta ve klinik saatleri
++ aralarındaki fark açıkça yazılıyor, AI her randevu önerisinde ikisini
+de belirtmek zorunda).
+
+**Determinizm:** her katman kendi argümanlarının saf fonksiyonu; tek
+gerçek-zaman kaynağı (`now`) açık parametre olarak geçiyor — testler sabit
+tarih verip byte-birebir aynı çıktı alıyor, prod `new Date()` kullanıyor.
+Bu, `/api/admin/platform/prompt-preview`'ın (aşağıda) güvenilir bir
+debug aracı olmasının koşulu.
+
+**`ai.js`'e gerçek branş/vaka bağlama:** `generateFollowUp` artık
+`leads.case_id` üzerinden (varsa) vakayı, vakanın `branch_key`'i
+üzerinden branş şablonunu, ve `case_media`'dan (kalite `quality_ok=true`)
+"yeterli fotoğraf/görüntüleme var mı" bilgisini yüklüyor — hepsi paralel
+Promise.all içinde, hiçbiri varsayılan akışı yavaşlatmıyor. Bir lead'in
+henüz vakası yoksa (çoğu lead) her şey `null`/boş dönüyor, derleyici branş
+katmanını atlıyor — kırılmıyor.
+
+**AI FİYAT YETKİ MATRİSİ (`buildPricingAuthorityRule`, 5 değer):**
+CARENOVA-STRATEJI.md Bölüm 7/M2'nin tablosu birebir — `full` (paket fiyatı
++ uçtan uca rezervasyon), `range_from_photo` (KALİTELİ fotoğraf gelene
+kadar HİÇBİR fiyat yok, geldikten sonra aralık + doktor onayı şartı),
+`range_after_imaging` (görüntüleme — panoramik/CBCT/MR — olmadan aralık
+bile yok, düz fotoğraf yetmiyor), `qualification_only` (HİÇBİR fiyat,
+baskı altında bile), `logistics_only` (satış çerçevesi yok, sadece
+lojistik). Her biri CRITICAL FAILURE çerçevesinde, PRICE RULE'un
+"taban kural" olduğunu (branş kuralının onu gevşetemeyeceğini, sadece
+sıkılaştırabileceğini) açıkça belirterek.
+
+**İki katmanlı savunma — `services/outputGuard.js`** (YENİ): prompt
+kuralı tek başına yeterli değil (model baskı altında kayabilir).
+`checkPricingOutput` — çok dilli (TR/EN/DE/RU/AR) para-örüntüsü dedektörü
+(`containsPriceLanguage`, hem sembol+rakam hem "yaklaşık"/"ballpark"/
+"circa"/"примерно"/"تقريبا" gibi YUMUŞATILMIŞ ifadeler) + branş yetkisine
+göre engelleme mantığı. `checkMedicalInferenceOutput` — Bölüm C.2'nin
+MUTLAK KURALI için dar, hedefli bir sızıntı dedektörü ("Norwood 4",
+"you're eligible", "3200 grafts" gibi). `guardOutboundMessage` — TEK
+kapı (Bölüm E'nin "aynı zincirde çalışsın" isteğini önden karşılıyor:
+`complianceGuard.js` henüz yok, `require` başarısız olursa sessizce
+atlıyor — modül yokken çökmemesi test edildi, Bölüm E'de gerçek modül
+gelince otomatik devreye girecek).
+
+**`ai.js`/`whatsapp.js` entegrasyonu:** `generateFollowUp` artık düz
+string değil `{ reply, guardBlocked, guardReason }` döndürüyor (tek
+çağıran nokta olan `processIncoming` güncellendi). Bloklanan bir yanıt
+ASLA sessiz kalmıyor — hastaya "ekibimizden biri size dönecek" tarzı
+sıcak bir yedek mesaj gidiyor (3 dilde), VE `routes/whatsapp.js`
+`guardBlocked`'ı `escalate` ile aynı eskalasyon yoluna (`action_required`,
+e-posta, bildirim) bağladı — brief'in "gönderme, logla, insana eskale et"
+talimatı üçü de karşılanıyor.
+
+**Debug ucu — `POST /api/admin/platform/prompt-preview`** (sadece
+`super_admin`, bu router'ın varsayılan super_admin+admin kapısından DAHA
+DAR): `generateFollowUp`'ın PRODUCTIONDA kullandığı AYNI yükleyicileri ve
+derleyiciyi çağırıyor — ayrı bir "tahmin" implementasyonu değil, gerçek
+akışın kendisi. tenantId zorunlu, branchKey/caseId opsiyonel.
+
+**🔴 Çözülen çelişki — admin ekranı:** Brief'in Bölüm A metni "Admin
+konsoluna 'Prompt Önizleme' ekranı ekle" diyor, ama gecenin en üstündeki
+talimat "**Bu gece EKRAN YAPILMAYACAK**" — birbirleriyle çelişiyor.
+Üstteki, gecenin GENEL çerçevesini belirleyen, daha güçlü sinyal olduğu
+için **ekranı yapmadım**, sadece backend endpoint'i (yukarıda) inşa
+ettim. Aynı çelişki Bölüm E'de de var ("Uyum Paneli'ne sekme ekle") —
+aynı kararla çözüldü, orada da not edilecek.
+
+**Testler:** `services/__tests__/promptCompiler.test.js` (27 test —
+determinizm, 6 katmanın hepsinin varlığı, çift saat dilimi hem var hem
+yok senaryoları, 5 yetki değerinin hepsinin gerçek kural metni taşıdığı,
+bilinmeyen bir yetki değerinin EN GÜVENLİ kurala — `full`'a değil
+`qualification_only`'a — düştüğü, itiraz rehberliğinin branşa özel VE
+jenerik fallback halleri, `trust_surgeon`/`safety_fear`'in zorunlu
+eskalasyon notu taşıdığı). `services/__tests__/outputGuard.test.js`
+(38 test — 5 yetki seviyesinin HER BİRİ için brief'in istediği 3+ test:
+kural metni var / filtre yasağı yakalıyor / izinli durum geçiyor; ayrıca
+4 ayrı jailbreak-baskı cümlesinin hepsinin `qualification_only`'da
+yakalandığı, tıbbi çıkarım sızıntısının yakalandığı, tek kapının
+`complianceGuard.js` yokken çökmediği). Ortak branş şablonu fixture'ları
+`services/__fixtures__/branchTemplates.js`'e taşındı (promptCompiler,
+outputGuard, ve ileride Bölüm F testleri paylaşıyor).
+
+**Migration'lar (çalıştırılmadı, B2):**
+`060_case_media_audio_kind.sql` (Bölüm C için önden — `case_media.kind`
+CHECK'ine 'audio' eklendi), `061_compliance_events.sql` (Bölüm E için
+önden — append-only ihlal kaydı tablosu), `062_branch_objection_strategies.sql`
+(Bölüm D için önden — Gece 2'nin seed'lediği `branch_objections`'taki
+YENİ taksonomiye ait olmayan eski etiketler — `donor_damage`,
+`graft_count_dispute`, `material_brand_dispute` — gerçek 11-değerli
+taksonomiye taşındı, artı 3 tam-yazılmış branşa `objection_strategies`
+JSONB kolonu eklendi). Üçünü de önden yazmamın nedeni: Bölüm C/D/E'ye
+gelince şemaları hazır bulmak, o bölümlerin kendi commit'lerini
+migration'sız bırakmamak.
+
+**Doğrulama:** `npx jest --testPathIgnorePatterns=invoiceNumber` →
+**201/201 yeşil** (bu bölümden önce 136'ydı — 65 yeni test). Gerçek
+Anthropic çağrısı YOK (MUTLAK YASAK #5). `node src/index.js` temiz açılıyor,
+`curl -X POST /api/admin/platform/prompt-preview` auth'suz → 401
+(doğrulandı).
+
+**Commit:** (aşağıda)
+
+---
+
 
