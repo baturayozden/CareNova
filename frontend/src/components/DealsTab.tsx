@@ -625,7 +625,7 @@ export function DealModal({ deal, tenantId, onClose, onSaved, fixedLeadId, fixed
 
                   {payerType === 'third_party' && (
                     <div className="bg-surface-sunken rounded-lg p-3 space-y-3">
-                      <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Third Party Details</p>
+                      <p className="text-xs text-gray-400 font-medium tracking-wide">THIRD PARTY DETAILS</p>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className={labelCls}>Name</label>

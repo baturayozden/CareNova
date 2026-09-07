@@ -470,11 +470,13 @@ function IntegrationsSection() {
                     </div>
                   </div>
                   <div>
-                    {/* Görev 4: literal English label, but `html lang` still
-                        follows the UI language toggle — under TR, CSS
-                        `uppercase` would render "VERİFY" (dotted İ). Same
-                        fix as elsewhere: force the transform in code. */}
-                    <label className="text-xs text-gray-500 font-medium tracking-wider block mb-1.5">{'Verify Token'.toLocaleUpperCase('en')}</label>
+                    {/* Always-English literal, no i18n key — written already
+                        upper-case so nothing has to case-fold it at render
+                        time (no CSS `uppercase`, no .toLocaleUpperCase()).
+                        A CSS transform would follow `html lang`, which
+                        tracks the UI language toggle, not this text's own
+                        (fixed) language. */}
+                    <label className="text-xs text-gray-500 font-medium tracking-wider block mb-1.5">VERIFY TOKEN</label>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 bg-surface border border-line rounded-lg px-3 py-2 text-accent text-xs font-mono">{VERIFY_TOKEN}</code>
                       <button onClick={() => copy(VERIFY_TOKEN, 'token')}
@@ -524,7 +526,7 @@ function IntegrationsSection() {
             <p className="text-gray-500 text-xs">Choose the AI model powering your WhatsApp assistant.</p>
           </div>
           <div>
-            <label className="text-xs text-gray-500 font-medium tracking-wider block mb-2">{'Provider'.toLocaleUpperCase('en')}</label>
+            <label className="text-xs text-gray-500 font-medium tracking-wider block mb-2">PROVIDER</label>
             <div className="grid grid-cols-2 gap-3">
               {AI_PROVIDERS.map(p => (
                 <button key={p.value} onClick={() => { setAiProvider(p.value); setAiModel(p.models[0]); }}
@@ -1170,10 +1172,11 @@ function NotificationsSection() {
           <Bell size={20} />
           <h2 className="font-medium text-white text-sm">{t('notifications.title')}</h2>
         </div>
-        {/* Channel header — deliberately no `uppercase` text-transform (Görev 4):
-            write already-uppercase i18n text instead of transforming it, so
-            Turkish-locale casing rules can never mangle it. */}
-        <span className="text-xs text-gray-500 font-medium tracking-wider pr-1">{t('notifications.channelEmail').toLocaleUpperCase('en')}</span>
+        {/* Channel header — deliberately no `uppercase` text-transform and no
+            runtime case conversion: settings.json's notifications.channelEmail
+            is written already-uppercase per language ("E-POSTA" / "EMAIL"),
+            so there's nothing left to case-fold at render time. */}
+        <span className="text-xs text-gray-500 font-medium tracking-wider pr-1">{t('notifications.channelEmail')}</span>
       </div>
 
       {loading ? (

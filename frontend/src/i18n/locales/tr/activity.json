@@ -12,11 +12,11 @@
     "noActionNow": "Şu an aksiyon gerekmiyor."
   },
   "summary": {
-    "todayMessages": "Bugünkü AI Mesajları",
-    "leadsContacted": "İletişime Geçilen Vaka",
-    "replyRate": "Yanıt Oranı",
-    "conversionRate": "Dönüşüm Oranı",
-    "pendingActions": "Bekleyen Aksiyonlar",
+    "todayMessages": "BUGÜNKÜ AI MESAJLARI",
+    "leadsContacted": "İLETİŞİME GEÇİLEN VAKA",
+    "replyRate": "YANIT ORANI",
+    "conversionRate": "DÖNÜŞÜM ORANI",
+    "pendingActions": "BEKLEYEN AKSİYONLAR",
     "needsAttention": "ilgi gerekiyor"
   },
   "weeklyReport": {

@@ -301,8 +301,8 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
           {/* Column mapping — only after a valid file is loaded */}
           {csvHeaders.length > 0 && (
             <div className="space-y-3">
-              <p className="text-gray-400 text-xs font-medium uppercase tracking-wider">
-                Column Mapping
+              <p className="text-gray-400 text-xs font-medium tracking-wider">
+                COLUMN MAPPING
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -506,8 +506,8 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
 
                 {/* Payment info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">
-                    Payment
+                  <p className="text-[10px] font-semibold text-gray-500 tracking-wider mb-1">
+                    PAYMENT
                   </p>
                   <p className="text-white font-medium text-sm truncate">
                     {item.patient_name ?? <span className="italic text-gray-500">Unknown patient</span>}
@@ -525,8 +525,8 @@ export default function PaymentImporter({ tenantId }: { tenantId?: string }) {
 
                 {/* Deal candidate */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">
-                    Deal Candidate
+                  <p className="text-[10px] font-semibold text-gray-500 tracking-wider mb-1">
+                    DEAL CANDIDATE
                   </p>
                   {item.deal_patient_name ? (
                     <>

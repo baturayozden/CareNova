@@ -66,19 +66,37 @@
   },
   "notifications": {
     "title": "Bildirimler",
-    "channelEmail": "E-posta",
+    "channelEmail": "E-POSTA",
     "save": "Bildirim Tercihlerini Kaydet",
     "saving": "Kaydediliyor…",
     "saved": "Bildirim tercihleri kaydedildi.",
     "saveFailed": "Tercihler kaydedilemedi.",
     "loadFailed": "Bildirim tercihleri yüklenemedi.",
     "events": {
-      "new_lead": { "title": "Yeni potansiyel hasta", "desc": "Pipeline'ınıza yeni bir vaka girdiğinde" },
-      "lead_booked": { "title": "Randevu alındı", "desc": "Bir vaka randevuya dönüştüğünde" },
-      "appointment_reminder": { "title": "Randevu hatırlatması", "desc": "Yaklaşan randevu hatırlatmaları" },
-      "urgent_escalation": { "title": "Acil eskalasyon", "desc": "Bir hastanın acil ilgiye ihtiyacı olduğunda" },
-      "no_show": { "title": "Gelmeyen hasta", "desc": "Bir hasta randevusuna gelmediğinde" },
-      "ai_quota_warning": { "title": "AI kota uyarısı", "desc": "AI mesaj kotanız azaldığında" }
+      "new_lead": {
+        "title": "Yeni potansiyel hasta",
+        "desc": "Pipeline'ınıza yeni bir vaka girdiğinde"
+      },
+      "lead_booked": {
+        "title": "Randevu alındı",
+        "desc": "Bir vaka randevuya dönüştüğünde"
+      },
+      "appointment_reminder": {
+        "title": "Randevu hatırlatması",
+        "desc": "Yaklaşan randevu hatırlatmaları"
+      },
+      "urgent_escalation": {
+        "title": "Acil eskalasyon",
+        "desc": "Bir hastanın acil ilgiye ihtiyacı olduğunda"
+      },
+      "no_show": {
+        "title": "Gelmeyen hasta",
+        "desc": "Bir hasta randevusuna gelmediğinde"
+      },
+      "ai_quota_warning": {
+        "title": "AI kota uyarısı",
+        "desc": "AI mesaj kotanız azaldığında"
+      }
     }
   },
   "integrations": {

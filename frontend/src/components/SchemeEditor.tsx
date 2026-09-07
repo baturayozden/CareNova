@@ -444,12 +444,12 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
               <div className="flex items-center gap-3">
                 <h3 className="text-white font-semibold text-lg">{scheme.name}</h3>
                 {scheme.is_active ? (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-900/60 text-green-300 uppercase tracking-wide">
-                    Active
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-900/60 text-green-300 tracking-wide">
+                    ACTIVE
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-700 text-gray-400 uppercase tracking-wide">
-                    Inactive
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-700 text-gray-400 tracking-wide">
+                    INACTIVE
                   </span>
                 )}
               </div>
@@ -499,11 +499,11 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-surface-sunken bg-surface/40">
-                    <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Order</th>
-                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Min Revenue</th>
-                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Max Revenue</th>
-                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Rate %</th>
-                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Flat Bonus</th>
+                    <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">ORDER</th>
+                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">MIN REVENUE</th>
+                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">MAX REVENUE</th>
+                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">RATE %</th>
+                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">FLAT BONUS</th>
                     <th className="px-4 py-2.5 w-28"></th>
                   </tr>
                 </thead>
@@ -584,9 +584,9 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-surface-sunken bg-surface/40">
-                    <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Target %</th>
-                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Multiplier</th>
-                    <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Label</th>
+                    <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">TARGET %</th>
+                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">MULTIPLIER</th>
+                    <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">LABEL</th>
                     <th className="px-4 py-2.5 w-28"></th>
                   </tr>
                 </thead>
@@ -665,10 +665,10 @@ export default function SchemeEditor({ tenantId }: { tenantId?: string }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-surface-sunken bg-surface/40">
-                    <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Order</th>
-                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Min Clinic Revenue</th>
-                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Max Clinic Revenue</th>
-                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs uppercase tracking-wide">Bonus / Staff</th>
+                    <th className="text-left px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">ORDER</th>
+                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">MIN CLINIC REVENUE</th>
+                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">MAX CLINIC REVENUE</th>
+                    <th className="text-right px-4 py-2.5 text-gray-400 font-medium text-xs tracking-wide">BONUS / STAFF</th>
                     <th className="px-4 py-2.5 w-28"></th>
                   </tr>
                 </thead>

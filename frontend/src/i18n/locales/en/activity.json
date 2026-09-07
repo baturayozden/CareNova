@@ -12,11 +12,11 @@
     "noActionNow": "No action required right now."
   },
   "summary": {
-    "todayMessages": "Today's AI Messages",
-    "leadsContacted": "Leads Contacted",
-    "replyRate": "Reply Rate",
-    "conversionRate": "Conversion Rate",
-    "pendingActions": "Pending Actions",
+    "todayMessages": "TODAY'S AI MESSAGES",
+    "leadsContacted": "LEADS CONTACTED",
+    "replyRate": "REPLY RATE",
+    "conversionRate": "CONVERSION RATE",
+    "pendingActions": "PENDING ACTIONS",
     "needsAttention": "needs attention"
   },
   "weeklyReport": {

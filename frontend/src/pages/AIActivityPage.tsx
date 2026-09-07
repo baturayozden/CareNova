@@ -781,12 +781,15 @@ function SummaryBar({ data, onPendingClick }: { data: ActivitySummaryData; onPen
           }`}
         >
           <div className="flex items-center justify-between mb-2">
-            {/* Görev 4: no CSS `uppercase` on i18n-driven text — that's
-                exactly what produced "CONVERSİON RATE" under <html lang="tr">
-                (Turkish casing rules turn i→İ). Force the transform in code
-                against a fixed 'en' locale instead, so it can never pick up
-                the active document language. */}
-            <span className="text-xs text-gray-500 tracking-wider leading-tight">{card.label.toLocaleUpperCase('en')}</span>
+            {/* No CSS `uppercase` and no runtime .toLocaleUpperCase() here —
+                both are locale-dependent (document `lang` for CSS, the
+                argument you pass for the JS method) and card.label is
+                translated: forcing 'en' casing on a Turkish string turns
+                dotted İ into dotless I ("İLETIŞIME GEÇILEN" instead of
+                "İLETİŞİME GEÇİLEN"). activity.json's summary.* values are
+                already written upper-case, correctly per language — this
+                just renders them as-is. */}
+            <span className="text-xs text-gray-500 tracking-wider leading-tight">{card.label}</span>
             {(() => { const Icon = card.icon; return <Icon size={20} className="text-gray-400" />; })()}
           </div>
           <div className="flex items-end gap-1.5">

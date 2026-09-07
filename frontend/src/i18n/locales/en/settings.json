@@ -66,19 +66,37 @@
   },
   "notifications": {
     "title": "Notifications",
-    "channelEmail": "Email",
+    "channelEmail": "EMAIL",
     "save": "Save Notification Preferences",
     "saving": "Saving…",
     "saved": "Notification preferences saved.",
     "saveFailed": "Failed to save preferences.",
     "loadFailed": "Failed to load notification preferences.",
     "events": {
-      "new_lead": { "title": "New lead received", "desc": "When a new lead enters your pipeline" },
-      "lead_booked": { "title": "Lead booked", "desc": "When a lead converts to a booking" },
-      "appointment_reminder": { "title": "Appointment reminder", "desc": "Upcoming appointment reminders" },
-      "urgent_escalation": { "title": "Urgent escalation", "desc": "When a patient needs immediate attention" },
-      "no_show": { "title": "No-show", "desc": "When a patient misses an appointment" },
-      "ai_quota_warning": { "title": "AI quota warning", "desc": "When your AI message quota is running low" }
+      "new_lead": {
+        "title": "New lead received",
+        "desc": "When a new lead enters your pipeline"
+      },
+      "lead_booked": {
+        "title": "Lead booked",
+        "desc": "When a lead converts to a booking"
+      },
+      "appointment_reminder": {
+        "title": "Appointment reminder",
+        "desc": "Upcoming appointment reminders"
+      },
+      "urgent_escalation": {
+        "title": "Urgent escalation",
+        "desc": "When a patient needs immediate attention"
+      },
+      "no_show": {
+        "title": "No-show",
+        "desc": "When a patient misses an appointment"
+      },
+      "ai_quota_warning": {
+        "title": "AI quota warning",
+        "desc": "When your AI message quota is running low"
+      }
     }
   },
   "integrations": {
