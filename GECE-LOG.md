@@ -2122,7 +2122,7 @@ Meta/OpenAI/Claude API çağrısı YOK (MUTLAK YASAK #5) — `axios` her testte
 mock'landı. `node -e "require(...)"` ile tüm değiştirilen/yeni modüller
 tek tek yüklendi, hepsi temiz.
 
-**Commit:** (aşağıda)
+**Commit:** `d080d42` — "feat(whatsapp): voice note transcription and image/document understanding pipeline"
 
 ---
 
