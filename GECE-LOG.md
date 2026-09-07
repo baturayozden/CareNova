@@ -1,9 +1,262 @@
-# SABAH RAPORU — Gece 3 (GECE-3-BRIEFI.md)
+# SABAH RAPORU — Gece 4 (GECE-4-BRIEFI.md)
 
-Bu, Gece 3'ün kapanış raporu. Gece 2'nin tam raporu aşağıda "Gece 2 özeti
-(arşiv)" başlığı altında korunuyor; Gece 1'inki de kendi arşiv bölümünde.
+Bu, Gece 4'ün kapanış raporu. Gece 3'ün tam raporu aşağıda "Gece 3 özeti
+(arşiv)" başlığı altında korunuyor; Gece 2 ve Gece 1'inki de kendi arşiv
+bölümlerinde.
 
-## 🔗 Test linkleri (deploy doğrulandı: **EVET**)
+**Üç gecedir arayüz derinleşiyordu, ürünün kendisi (AI motoru) hiç
+dokunulmamıştı — bu gece bunun tam tersiydi: hiç ekran yapılmadı,
+tamamı `backend/src/services` ve `backend/src/routes/whatsapp.js`.**
+
+## 🔗 Test linkleri (bu gece için uygulanamaz — aşağıda neden)
+
+Bu gece frontend/landing/admin'e HİÇ dokunulmadı (brief'in kendi
+talimatı: "Bu gece EKRAN YAPILMAYACAK"), yani doğrulanacak yeni bir
+canlı ekran içeriği yok. Sağlık kontrolü olarak yine de
+`https://carenova-baturay-ozden-s-projects.vercel.app` `curl -sI` ile
+kontrol edildi → HTTP 200, hâlâ ayakta (beklenen — bu gece o deploy'a
+hiçbir push gitmedi). **Backend hâlâ hiçbir yere deploy edilmedi**
+(`api.carenova.ai` DNS yok, BLOKAJLAR B2) — bu gecenin tüm kodu sadece
+`npx jest` ile ve `node --check`/`node -e "require(...)"` ile
+doğrulandı, gerçek bir sunucu üzerinde hiç çalışmadı.
+
+**Bir uyarı notu (Bölüm F'nin kendi bölümünde de var):** doğrulama
+sırasında bir kez yanlışlıkla `require('./src/index.js')` çalıştırıldı
+— bu gerçek sunucuyu başlatıyor (`app.listen`), MUTLAK YASAK'ın "dev
+sunucu başlatma" kuralını ihlal ediyordu. Fark edilir edilmez öldürüldü
+(`kill -9`), port 3001'de hiçbir şey kalmadığı doğrulandı. Ayrıca not:
+port 3002'de GÖRÜLEN bir node süreci bu oturumdan bağımsız, senin kendi
+başlattığın `frontend` dev sunucusuydu (11+ saattir çalışıyordu, dün
+akşamdan) — ona dokunulmadı.
+
+## 👁️ Baturay'ın yapması gerekenler (öncelik sırasıyla)
+1. **Bu gece otonom olarak Almanca dil desteği eklendi** — plan dışıydı,
+   Bölüm F'nin kendi test senaryosu (Almanca hasta) yazılırken
+   `detectLanguage`'in Almanca'yı hiç tanımadığını VE Türkçe'yle (ö/ü)
+   çakıştığını bulduğum için eklendi. `detectLanguage`/`LANG_LABELS`/
+   `FALLBACK_REPLY`/`GUARD_BLOCKED_REPLY`'e `de` eklendi — küçük, test
+   edilmiş bir kapsam ama SENİN onayladığın bir plan değildi, gözden
+   geçirmen iyi olur (detaylar Bölüm F'nin GECE-LOG girdisinde).
+2. **Bir Postgres bağla** (yerel/Supabase), `cd backend && node migrate.js`
+   çalıştır — artık **7 migration** sırada: `056 → 057 → 058 → 059 → 060
+   → 061 → 062` (bu gece 060/061/062 eklendi, hiçbiri çalıştırılmadı).
+   Bağlandıktan sonra aşağıdaki "Gerçek API bağlanınca ilk test
+   edilecekler" listesini sırayla uygula.
+3. **`services/complianceGuard.js`'in 5 kuralının regex'lerini gözden
+   geçir** — bu gece sıfırdan yazıldı (brief'in "Gece 2'de iskelet
+   olarak konmuştu" iddiası YANLIŞTI, hiçbir yerde böyle bir dosya/bahis
+   yok — GECE-LOG'un Bölüm E girdisinde detaylı). Kurallar bilinçli
+   olarak fazla-kapsayıcı ("aşırı yakalama, insana eskale et" felsefesi)
+   ama gerçek klinik metinleriyle bir kez elle test edilmeli — yanlış
+   pozitif oranı yüksekse ayarlanmalı.
+4. **`services/leadScoring.js`'in yeni Yeterlilik (15pt) boyutu ve
+   `services/ai.js`'in 11-tipli itiraz taksonomisi** — ikisi de gerçek
+   konuşmalarla (gerçek API bağlanınca) bir kez gözden geçirilmeli;
+   ağırlıklar (35/15/25/15/10) brief'in verdiği rakamlar, hiç canlı
+   veriyle kalibre edilmedi.
+5. **`docs/host-setup.md`'deki manuel Vercel adımları hâlâ yapılmadı**
+   (4 gecedir aynı madde — bu gece dokunulmadı çünkü ekran/deploy işi
+   değildi, ama liste güncel kalsın diye burada tutuyorum).
+
+## ✅ Tamamlananlar
+- **Bölüm A** — Katmanlı prompt derleyici (`services/promptCompiler.js`,
+  6 bağımsız katman, deterministik), ÇİFT saat dilimi, `/api/admin/
+  platform/prompt-preview` debug ucu (super_admin).
+- **Bölüm B** — AI fiyat yetki matrisi: 5 seviye (`full` →
+  `logistics_only`), iki katmanlı savunma — prompt kuralı +
+  `services/outputGuard.js` çıktı filtresi (çok dilli fiyat/tıbbi-çıkarım
+  sızıntı dedektörü), jailbreak-baskı testleri.
+- **Bölüm C** — Ses notu transkripsiyonu + görsel/belge anlama
+  ("en büyük tek boşluk" kapatıldı): `routes/whatsapp.js` artık
+  audio/image/document'i indiriyor, transkribe/analiz ediyor, yapısal
+  çıkarım SADECE `case_media.ai_extraction`'a yazılıyor (asla hastaya),
+  zorunlu medya tamamlanınca vaka `awaiting_doctor`'a otomatik geçiyor.
+- **Bölüm D** — 11-tipli sağlık-turizmi itiraz taksonomisi (eskisi
+  `trust_surgeon`/`safety_fear` gibi değerleri hiç üretmiyordu — Bölüm
+  A/B'nin zorunlu eskalasyon kuralı sessizce hiç tetiklenmiyordu, bu
+  gerçek bir hataydı, sadece isimlendirme değil), lead skorlamaya yeni
+  Yeterlilik boyutu.
+- **Bölüm E** — `services/complianceGuard.js` sıfırdan (brief'in
+  "Gece 2'de vardı" iddiası yanlıştı), 5 kural, `outputGuard.js`'in
+  ZATEN hazır olan tembel-require entegrasyon noktasına hiçbir değişiklik
+  gerekmeden bağlandı, `compliance_events`'e loglama.
+- **Bölüm F** — Uçtan uca mock testi, brief'in 6 senaryosunun hepsi,
+  hem prompt hem filtre kararı doğrulanarak. 2 gerçek boşluk buldu ve
+  düzeltti: `knowledgeSeed` hiç render edilmiyordu (IVF'in donör-yumurta
+  yasal uyarısı), `detectLanguage` Almanca'yı tanımıyordu ve Türkçe'yle
+  çakışıyordu.
+
+## ⏸️ Yarım kalanlar
+- **Hiçbir ekran yapılmadı** (bilinçli, brief'in kendi talimatı) — ama
+  brief'in kendisi 3 ayrı yerde ekran istiyordu ve hepsi aynı kararla
+  reddedildi: Prompt Önizleme admin ekranı (Bölüm A), sohbet ekranında
+  ses oynatıcı+transkript ve zorunlu-medya checklist'i (Bölüm C), Uyum
+  Paneli'ne yeni sekme (Bölüm E). Backend/API tarafları hepsi hazır —
+  bir gelecek gece sadece render etmesi yeterli.
+- Lead skorlama etiketlerinin Türkçe çevirisi (Sıcak/Ilık/Serin/Kayıp
+  Riski) — brief'in kendi notu bunun ekran/i18n meselesi olduğunu, DB
+  anahtarlarının İngilizce kalacağını söylüyor, dokunulmadı.
+- `db/seed-demo-riverside-messages.js`/`seed-full.js` hâlâ eski
+  8-değerli itiraz taksonomisini demo veri olarak kullanıyor (yeni B9,
+  BLOKAJLAR'da) — sadece görüntü, hiçbir çalışan mantığı etkilemiyor.
+- 7 migration (056-062) hiçbiri gerçek bir Postgres'e karşı çalıştırılmadı.
+- Gerçek transkripsiyon/görsel-analiz sağlayıcıları (`openaiWhisperProvider`,
+  `claudeVisionProvider`) sadece stub — çağrılırsa açıkça hata fırlatıyor,
+  gerçek gövdeleri hiç yazılmadı (bilinçli, MUTLAK YASAK #5).
+
+## 🚧 Blokajlar
+- **B2 genişledi** — artık 7 migration bekliyor (056→062), hiçbiri
+  çalıştırılmadı; backend hâlâ hiçbir yere deploy edilmedi.
+- **Yeni B9** — seed script'leri eski itiraz taksonomisini kullanıyor,
+  aciliyeti yok, kapsam dışı bırakıldı (detay BLOKAJLAR.md'de).
+- Sistem paketi/docker kurulumu gerekmedi bu gece — hiçbir yeni blokaj
+  bu kategoriden gelmedi.
+
+## 🤔 Verdiğim önemli kararlar (ve neden)
+- **"Bu gece ekran yok" kararını brief'in kendi 3 ayrı ekran isteğine
+  karşı 3 kez, tutarlı şekilde uyguladım** — üstteki talimat daha güçlü,
+  tekrarlanan sinyal; her seferinde aynı gerekçeyle reddettim ve
+  GECE-LOG'a not düştüm, sonraki geceler için backend hazır bırakıldı.
+- **Bölüm A+B'yi tek commit'te birleştirdim** (ayrı ayrı önerilmişti) —
+  B'nin çıktı filtresi A'nın branş katmanının fiyat kuralına o kadar sıkı
+  bağlı ki ayırmak yapay olurdu; brief'in "A ve B bitmeden C'ye geçme"
+  kuralı zaten ikisini bir birim sayıyordu.
+- **Görsel/belge akışını (Bölüm C.2) Claude'a hiç bağlamadım** — brief
+  sesli mesaj transkriptinin Claude'a "metin gibi" beslenmesini AÇIKÇA
+  istiyor ama görsel/belge için böyle bir talep yok, sadece deterministik
+  davranış (kalite yetersizse şablonun `captureInstruction`'ı, tamamlanınca
+  `awaiting_doctor`). Sabit çok-dilli metinlerle karşılanabildiği için
+  böyle yaptım — "yapısal çıkarım asla hastaya gösterilmez" kuralını
+  Claude'un serbest metnine güvenmek yerine kod seviyesinde garantiliyor.
+- **`detectLanguage`'e Almanca ekledim** — planlanmamıştı, ama Bölüm F'nin
+  KENDİ senaryo 1 metni ("...für eine Haartransplantation...") bu boşluğu
+  doğrudan tetikliyordu, ve CARENOVA-STRATEJI.md zaten Almanya'yı saç
+  ekiminin #1 kaynak pazarı sayıyor (dual-timezone örneği de Almanya'ydı,
+  Bölüm A). Dar kapsamlı tuttum: sadece tespit + 2 yedek metin sözlüğü,
+  başka hiçbir dosyaya (whatsapp.js'in medya metinleri gibi) dokunmadım.
+- **`promptCompiler.js`'in `buildBranchLayer`'ına `knowledgeSeed`
+  render'ı ekledim** — Bölüm A'dan beri var olan ama hiç okunmayan bir
+  alandı, Bölüm F'nin IVF senaryosu yazılırken ortaya çıktı; gerçek bir
+  yasal/tıbbi gerçeğin (donör yumurta Türkiye'de yasal değil) modele hiç
+  ulaşmıyor olması ciddi bir boşluktu, küçük ve doğrudan test edilmiş bir
+  düzeltme.
+- **Eski demo seed script'lerine (B9) dokunmadım** — sadece görüntü verisi,
+  hiçbir CHECK constraint'i yok, hiçbir çalışan koda bağımlı değil; kapsam
+  dışı bıraktım, bir sonraki demo-veri turuna not düştüm.
+
+## 🧠 AI motoru artık ne yapabiliyor / ne yapamıyor
+
+**Yapabiliyor (mock sağlayıcılarla, gerçek API anahtarı bekliyor):**
+- Vaka/branşa göre katmanlı, deterministik, ÇİFT saat dilimli sistem
+  prompt'u derliyor (`promptCompiler.js`) — aynı derleyici hem üretimde
+  hem `/api/admin/platform/prompt-preview` debug ucunda kullanılıyor.
+- 5 seviyeli fiyat yetki matrisini hem prompt'ta hem bağımsız bir çıktı
+  filtresinde uyguluyor — model baskı altında fiyat sızdırsa bile
+  (Bölüm F'nin senaryo 4'ü bunu kanıtlıyor) hastaya asla ulaşmıyor.
+- 11 gerçek sağlık-turizmi itirazını tespit ediyor, `trust_surgeon`/
+  `safety_fear` tespit edilince AI'ın kendi başına kapatmasını
+  ZORUNLU olarak engelliyor (doktor kartı + video konsültasyon).
+- Sesli mesajları indirip transkribe ediyor (mock sağlayıcı), transkripti
+  normal metin gibi pipeline'a besliyor; başarısızlıkta asla sessiz
+  kalmıyor, yazılı tekrar istiyor.
+- Görsel/belgeleri indirip yapısal analiz üretiyor (mock sağlayıcı,
+  branşa özel şema), sonucu SADECE `case_media.ai_extraction`'a yazıyor —
+  hastaya hiçbir zaman göstermiyor (kod seviyesinde garanti, prompt'a
+  güvenmiyor); kalite yetersizse branşın kendi talimatıyla tekrar istiyor;
+  zorunlu medya tamamlanınca vakayı otomatik `awaiting_doctor`'a taşıyor.
+- Lead'leri 5 boyutta (Niyet/Aciliyet/Değer/**Yeterlilik — yeni**/
+  Etkileşim) puanlıyor, Yeterlilik gerçek vaka/medya verisinden besleniyor.
+- Her giden mesajı göndermeden önce tek bir kapıdan geçiriyor: fiyat
+  yetkisi + tıbbi çıkarım sızıntısı + 5 uyum kuralı (kampanya fiyatı,
+  hasta yorumu, sonuç garantisi, izinsiz önce/sonra görseli, tıbbi
+  tavsiye) — her engelleme `compliance_events`'e loglanıyor.
+- EN/TR/AR/DE dillerini tespit ediyor, hastanın diliyle yanıt üretiyor
+  (gerçek anahtar varken).
+- Her adımda zarif geriliyor — vaka yok, DB satırı yok, indirme
+  başarısız, transkripsiyon başarısız — hiçbiri webhook'u çökertmiyor ya
+  da hastayı sessiz bırakmıyor.
+
+**Yapamıyor (dürüst boşluklar):**
+- **Gerçek transkripsiyon/görsel-analiz sağlayıcısı yok** —
+  `TRANSCRIPTION_PROVIDER`/`VISION_PROVIDER` `mock` dışına ayarlanırsa
+  kod açıkça hata fırlatıyor; gerçek sağlayıcı gövdeleri (OpenAI Whisper,
+  Claude Vision) hiç yazılmadı, sadece arayüz hazır.
+- **Hiç gerçek Anthropic çağrısı hiçbir zaman test edilmedi** — tüm
+  prompt/filtre mantığı mock Claude yanıtlarıyla doğrulandı; gerçek
+  modelin bu kadar karmaşık bir sistem prompt'una gerçekte NASIL
+  davranacağı bilinmiyor.
+- **Supabase Storage yapılandırılmadan medya güvenilir şekilde
+  saklanmıyor** — best-effort (yükleme başarısız olursa loglayıp devam
+  ediyor, ama dosya hiçbir yere kaydedilmemiş oluyor).
+- **Admin/klinik ekranı yok** — prompt önizleme, uyum logu, zorunlu-medya
+  checklist'i, sohbette ses oynatıcı+transkript, hepsi backend/API'de
+  hazır ama hiçbir yerde render edilmiyor.
+- **7 migration hiç çalıştırılmadı** — ilk gerçek Postgres bağlantısı
+  test edilmemiş bölge.
+- **Dil desteği EN/TR/AR/DE ile sınırlı** — başka bir pazardan (İtalya,
+  Rusya, Fransa...) gelen hasta mesajları şu an İngilizce yanıt alacak.
+- **Meta'nın 5 saniyelik webhook kuralı altında gerçek ağ koşullarında
+  hiç test edilmedi** — medya indirme/transkripsiyon/analiz gerçek
+  gecikmelerle ne kadar sürer, bilinmiyor.
+
+## 🔑 Gerçek API bağlanınca ilk test edilecekler
+1. `ANTHROPIC_API_KEY` ayarla, 5 fiyat yetki seviyesinin her biri için
+   GERÇEK bir `generateFollowUp` çağrısı yap, yanıtı elle oku — mock
+   testler filtre davranışını kanıtlıyor, ama modelin bu prompt'a
+   GERÇEKTE nasıl yanıt vereceğini hiç görmedik.
+2. `services/transcription.js`'e gerçek bir sağlayıcı gövdesi yaz (örn.
+   OpenAI Whisper), `TRANSCRIPTION_PROVIDER` ile devreye al, gerçek bir
+   WhatsApp sesli mesajıyla uçtan uca test et.
+3. `services/visionExtraction.js`'e gerçek bir sağlayıcı gövdesi yaz
+   (Claude Vision), `VISION_PROVIDER` ile devreye al, gerçek bir fotoğrafla
+   test et — özellikle `matchedSlot`'un GERÇEKTEN doğru required_media
+   slotunu bulup bulamadığını (mock sağlayıcı bunu hep `null` bırakıyordu).
+4. `cd backend && node migrate.js` — 7 migration'ı sırayla (056→062)
+   çalıştır, her birini ayrı ayrı doğrula.
+5. `/api/admin/platform/prompt-preview`'ı gerçek bir tenant+branch+case
+   ile `curl`/Postman'le çağır, derlenen prompt'u gerçekten oku.
+6. Gerçek bir WhatsApp numarasına sesli mesaj gönder, uçtan uca (indirme
+   → transkripsiyon → AI yanıtı) doğrula.
+7. Gerçek bir WhatsApp numarasına fotoğraf gönder, uçtan uca (indirme →
+   görsel analiz → `case_media` → doktor kuyruğu) doğrula.
+8. AI'ı kasıtlı olarak bir uyum ihlaline zorla (örn. "kesin sonuç
+   garantisi verir misin?") ve `compliance_events`'e gerçekten satır
+   düştüğünü doğrula.
+9. Almanca bir mesajla gerçek bir Claude yanıtının kalitesini gör —
+   tespit kod seviyesinde test edildi, ama ÜRETİLEN Almanca metnin
+   kalitesi hiç görülmedi.
+10. Gerçek, büyük bir medya dosyasıyla Meta'nın 5 saniyelik webhook
+    penceresini test et — kod yapısal olarak `res.sendStatus(200)`'ü
+    medya işlemeden ÖNCE gönderiyor, ama gerçek ağ gecikmeleriyle hiç
+    doğrulanmadı.
+
+## ▶️ Sıradaki 3 adım
+1. Yukarıdaki "Gerçek API bağlanınca ilk test edilecekler" listesini
+   sırayla uygula — özellikle 1-4 (gerçek Claude çağrısı, gerçek
+   sağlayıcılar, migration'lar).
+2. Backend'i bir yere deploy et (Render, `backend/render.yaml` hazır) —
+   4 gecedir hiçbir yere deploy edilmedi, bu artık AI motorunun
+   gerçekten test edilebilmesinin önündeki en büyük engel.
+3. Bir gelecek gece: bu gecenin backend'ini gösteren 3 ekranı yap
+   (Prompt Önizleme, Uyum Paneli sekmesi, sohbette ses/görsel UI) —
+   hepsi API seviyesinde hazır.
+
+## ⏱️ Süre
+Gece 4 (GECE-4-BRIEFI.md, A→B→C→D→E→F): commit zaman damgalarına göre
+yaklaşık 4 saat sürdü. Önceki gecelerden farklı olarak hiç ekran işi
+yoktu — süre neredeyse tamamen yeni servis dosyaları
+(`promptCompiler.js`, `outputGuard.js`, `complianceGuard.js`,
+`transcription.js`, `visionExtraction.js`) ve 369 yeni/güncellenmiş
+testte geçti.
+
+---
+
+## Gece 3 özeti (arşiv)
+
+<details>
+<summary>Gece 3'ün orijinal SABAH RAPORU'su (genişletmek için tıkla)</summary>
+
+### 🔗 Test linkleri (deploy doğrulandı: **EVET**)
 - **Landing:** `https://carenova-baturay-ozden-s-projects.vercel.app`
 - **Klinik paneli:** `https://carenova-baturay-ozden-s-projects.vercel.app/dashboard?host=app`
 - **Doktor Onay Kuyruğu:** `https://carenova-baturay-ozden-s-projects.vercel.app/doctor-queue?host=app`
@@ -19,7 +272,7 @@ C'nin yeni KPI şeridi ve "Panel" başlığı (varsayılan TR, Bölüm A'nın
 düzeltmesi) göründü. Bu, sadece "site ayakta" değil, "bu gecenin
 push'ları gerçekten deploy edildi" demek.
 
-## 👁️ Baturay'ın yapması gerekenler (öncelik sırasıyla)
+### 👁️ Baturay'ın yapması gerekenler (öncelik sırasıyla)
 1. **`docs/host-setup.md`'deki manuel Vercel adımlarını uygula** —
    `carenova-app.vercel.app`/`carenova-admin.vercel.app` domain'leri,
    `REACT_APP_APP_URL`/`REACT_APP_ADMIN_URL`/`REACT_APP_DEMO_MODE=true`.
@@ -41,7 +294,7 @@ push'ları gerçekten deploy edildi" demek.
    katlanması** — ikisi de mekanik rename'in ötesinde benim verdiğim
    kararlar, gözden geçirmen iyi olur (BLOKAJLAR B7).
 
-## ✅ Tamamlananlar
+### ✅ Tamamlananlar
 - **Bölüm A** — Varsayılan dil TR (kök neden: `navigator` dedektörü
   kaldırıldı), admin konsolu kabuğu artık TAM TR+EN (12 sayfa, 231 yeni
   anahtar), lead durum rozetleri çevrildi, `docs/terminoloji.md`, i18n
@@ -69,7 +322,7 @@ push'ları gerçekten deploy edildi" demek.
   `--ink-subtle`'ın koyu temadaki gerçek kök kontrast hatası düzeltildi
   (Sidebar VE admin "PLATFORM" etiketini birlikte çözdü).
 
-## ⏸️ Yarım kalanlar
+### ⏸️ Yarım kalanlar
 - **Bölüm H** (Sohbetler + Teklifler ekranları) — hiç başlanmadı, ⚪ en
   düşük öncelikliydi, kapanışa yeterli pay bırakmak için atlandı.
 - Uygulama genelinde 35 dosyada ham Tailwind gri kalıntısı (G.3) —
@@ -80,7 +333,7 @@ push'ları gerçekten deploy edildi" demek.
 - `backend/src/db/seed-full.js`/`seed-demo-riverside.js` hâlâ eski rol
   isimleri kullanıyor (B7'nin notu).
 
-## 🚧 Blokajlar
+### 🚧 Blokajlar
 - **✅ B4** — Kapandı (kök neden bulundu, bkz. Bölüm G).
 - **✅ B5** — Kapandı (impersonation yazma engeli, uçtan uca değil ama
   middleware kanıtlı — bkz. detay).
@@ -91,7 +344,7 @@ push'ları gerçekten deploy edildi" demek.
 - Yeni: uygulama genelinde 35 dosyada ham Tailwind gri kalıntısı (ayrı
   bir madde açılmadı, B6'nın notunda — istersen ayrı numaralandırılabilir).
 
-## 🤔 Verdiğim önemli kararlar (ve neden)
+### 🤔 Verdiğim önemli kararlar (ve neden)
 - **`treatment_coordinator`/`sales` çakışmasını HER YERDE daha kısıtlayıcı
   davranışla çözdüm** (TC'ninkini `hasta_danismani`'ye uyguladım) —
   CARENOVA-STRATEJI.md M8'in "kendi vakaları" tanımıyla birebir örtüşüyor,
@@ -113,7 +366,7 @@ push'ları gerçekten deploy edildi" demek.
   düşük ⚪, kapanışa (🔴, atlanamaz) yeterli pay bırakmak bunu geçersiz
   kılacak kadar önemliydi.
 
-## 📸 Ekran görüntüsüyle gördüklerim
+### 📸 Ekran görüntüsüyle gördüklerim
 KURAL #11 düzeltildiği için bu gece (landing HARİÇ) admin+klinik paneli
 ekranlarında ekran görüntüsü GERÇEKTEN kullanıldı, ilk kez:
 - `/dashboard` — TR ve EN, onboarding kartı, 6 KPI kartı, 3 kolon,
@@ -136,18 +389,20 @@ doğru veri/doğru renk/doğru davranış render olduğunu doğruladım.
 Mobil galeri kartlarının gerçek bir telefonda dokunma hedefi büyüklüğü
 gibi şeyler DOĞRULANMADI.
 
-## ▶️ Sıradaki 3 adım
+### ▶️ Sıradaki 3 adım
 1. `docs/host-setup.md`'yi uygula — üç gerçek subdomain'i kur.
 2. Postgres bağla, migration 056-059'u çalıştır, Bölüm E'nin rol
    matrisini gerçek kullanıcılarla doğrula.
 3. Part H (Sohbetler + Teklifler ekranları) veya 35 dosyalık ham-gri
    taramasının temizliği — hangisi önce gelirse.
 
-## ⏱️ Süre
+### ⏱️ Süre
 Gece 3 (GECE-3-BRIEFI.md, A→B→C→D→E→F→G): commit zaman damgalarına göre
 yaklaşık 4-5 saat sürdü (Gece 2'nin 1sa 7dk'sından belirgin şekilde uzun —
 bu gece Bölüm E'nin rol sistemi göçü tek başına 35 dosyayı kapsadı, önceki
 gecelerin hiçbirinde bu ölçekte bir refactor yoktu).
+
+</details>
 
 ---
 

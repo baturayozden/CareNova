@@ -78,6 +78,19 @@ hepsi yeşil** (Gece 3 sonu itibarıyla).
 (`caseFiles.js`'in rol matrisi dahil) gerçek verilerle bir kez elle
 doğrula.
 
+**Güncelleme (Gece 4 — GECE-4-BRIEFI.md):** 3 migration daha eklendi,
+YİNE hiçbiri çalıştırılmadı: `060_case_media_audio_kind.sql`
+(`case_media.kind` CHECK'ine `'audio'` eklendi — Bölüm C'nin ses notu
+kaydı için), `061_compliance_events.sql` (append-only ihlal kaydı
+tablosu — Bölüm E'nin `complianceGuard.js`'i buraya yazıyor),
+`062_branch_objection_strategies.sql` (`branch_templates`'e
+`objection_strategies` JSONB kolonu + eski taksonomi etiketlerinin yeni
+11-değerli taksonomiye taşınması — Bölüm D). Sıra artık `056 → 057 → 058
+→ 059 → 060 → 061 → 062`. Backend hâlâ hiçbir yere deploy edilmedi
+(aşağıdaki not), yani bu 7 migration'ın hiçbiri şu ana kadar gerçek bir
+şemaya dokunmadı — ilk gerçek Postgres bağlantısında hepsi sırayla
+çalıştırılıp doğrulanmalı.
+
 ---
 
 ## ✅ B7 — CareNova'nın 7 klinik rolü backend'de yoktu — Gece 3'te ÇÖZÜLDÜ (kod+test; DB'ye karşı doğrulanmadı)
