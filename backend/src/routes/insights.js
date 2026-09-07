@@ -7,15 +7,21 @@ const express = require('express');
 const router  = express.Router();
 const { pool } = require('../db/index');
 
+// GECE-4-BRIEFI.md Bölüm D.1 — health-tourism objection taxonomy (11 types),
+// replacing the old 8 generic labels to match services/ai.js's detectObjection.
 const OBJECTION_LABELS = {
-  price_too_high:         'Price Too High',
-  comparing_competitors:  'Comparing Competitors',
-  timing_issue:           'Timing Issue',
-  anxiety_fear:           'Anxiety / Fear',
-  trust_concern:          'Trust Concern',
-  availability:           'Availability',
-  finance_options:        'Finance Options',
-  general_enquiry:        'General Enquiry',
+  price_shock:          'Price Shock',
+  trust_surgeon:        'Trust in Surgeon',
+  trust_clinic:         'Trust in Clinic',
+  safety_fear:          'Safety Fear',
+  aftercare_fear:       'Aftercare Fear',
+  travel_friction:      'Travel Friction',
+  timing:               'Timing',
+  comparison_shopping:  'Comparison Shopping',
+  language_barrier:     'Language Barrier',
+  partner_approval:     'Partner/Family Approval',
+  financing:            'Financing',
+  general_enquiry:      'General Enquiry',
 };
 
 function parseDateRange(query) {

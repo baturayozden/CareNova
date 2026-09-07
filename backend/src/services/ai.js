@@ -520,39 +520,71 @@ function classifyScenario(text) {
   return SCENARIOS.NEW_ENQUIRY;
 }
 
-// ── Objection detection ───────────────────────────────────────────────────────
+// ── Objection detection (GECE-4-BRIEFI.md Bölüm D.1) ──────────────────────
+//
+// Replaces the old 8-value generic taxonomy with the 11-type health-tourism
+// taxonomy that promptCompiler.js/outputGuard.js were already written
+// against (GENERIC_OBJECTION_GUIDANCE, MUST_ESCALATE_OBJECTIONS, and
+// branch_templates.objection_strategies — migration 062 — all use these
+// exact keys). Until this change, detectObjection returned values like
+// 'trust_concern' that promptCompiler's MUST_ESCALATE_OBJECTIONS
+// (`trust_surgeon`/`safety_fear`) never matched — the mandatory
+// doctor-card/video-consultation escalation was silently unreachable.
 
 const OBJECTION_TYPES = {
-  price_too_high:        'price_too_high',
-  comparing_competitors: 'comparing_competitors',
-  timing_issue:          'timing_issue',
-  anxiety_fear:          'anxiety_fear',
-  trust_concern:         'trust_concern',
-  availability:          'availability',
-  finance_options:       'finance_options',
-  general_enquiry:       'general_enquiry',
+  price_shock:          'price_shock',
+  trust_surgeon:        'trust_surgeon',
+  trust_clinic:         'trust_clinic',
+  safety_fear:          'safety_fear',
+  aftercare_fear:       'aftercare_fear',
+  travel_friction:      'travel_friction',
+  timing:               'timing',
+  comparison_shopping:  'comparison_shopping',
+  language_barrier:     'language_barrier',
+  partner_approval:     'partner_approval',
+  financing:            'financing',
+  general_enquiry:      'general_enquiry',
 };
 
 function detectObjection(text) {
   if (!text) return OBJECTION_TYPES.general_enquiry;
   const t = text.toLowerCase();
 
-  if (/too expensive|can'?t afford|cannot afford|out of budget|pahal[ıi]|bütçe|غالي جداً/.test(t))
-    return OBJECTION_TYPES.price_too_high;
-  if (/other clinic|checking around|got a quote|comparing|başka klinik|عيادة أخرى/.test(t))
-    return OBJECTION_TYPES.comparing_competitors;
-  if (/not ready|maybe later|next month|not yet|hazır değil|sonra|لاحقاً/.test(t))
-    return OBJECTION_TYPES.timing_issue;
-  if (/scared|nervous|anxious|afraid|does it hurt|korkuyorum|korku|ağrı|خائف|يؤلم/.test(t))
-    return OBJECTION_TYPES.anxiety_fear;
-  if (/is it safe|who is the doctor|who is the surgeon|qualified|experienced|güvenli mi|أمان|موثوق/.test(t))
-    return OBJECTION_TYPES.trust_concern;
-  if (/dates don'?t work|can'?t make|not available on|müsait değil|الموعد لا يناسبني/.test(t))
-    return OBJECTION_TYPES.availability;
-  if (/payment plan|pay monthly|instalments?|installments?|finance|taksit|ödeme planı|أقساط/.test(t))
-    return OBJECTION_TYPES.finance_options;
-  if (/how much|what.?s the cost|what.?s the price|fiyat ne|كم التكلفة/.test(t))
-    return OBJECTION_TYPES.price_too_high;
+  // 🔴 trust_surgeon / safety_fear are checked first — these are the two
+  // objections that trigger mandatory escalation in promptCompiler.js, so a
+  // message that also happens to mention price or timing should still be
+  // caught here first.
+  if (/who is the doctor|who is the surgeon|which doctor|doctor'?s experience|is the (doctor|surgeon) (good|qualified|experienced)|doktor kim|cerrah kim|hangi doktor|doktor deneyimli mi|من هو الطبيب|من الجراح|خبرة الطبيب/.test(t))
+    return OBJECTION_TYPES.trust_surgeon;
+  if (/is it safe|does it hurt|will it hurt|complication|risky|scared|nervous|anxious|afraid|güvenli mi|ağrır mı|acıyor mu|korkuyorum|riskli|komplikasyon|آمن\?|هل هو آمن|يؤلم|خائف|مخاطر|مضاعفات/.test(t))
+    return OBJECTION_TYPES.safety_fear;
+
+  if (/is (this|the) clinic (real|legit|legitimate)|clinic reviews|reviews? (of|about|for) (this |the )?clinic|licensed clinic|trustworthy clinic|klinik güvenilir mi|klinik gerçek mi|kliniğin lisansı|هل العيادة موثوقة|تراخيص العيادة|تقييمات العيادة/.test(t))
+    return OBJECTION_TYPES.trust_clinic;
+
+  if (/what if something goes wrong after|after i go home|aftercare|follow.?up care|ameliyat sonrası|sonrasında (bir )?sorun|eve döndükten sonra|بعد عودتي|متابعة بعد العملية|إذا حدثت مشكلة بعد/.test(t))
+    return OBJECTION_TYPES.aftercare_fear;
+
+  if (/\bvisa\b|flight|how do i (get|travel) there|too far|travel arrangements|vize|uçuş|nasıl gelirim|seyahat düzenlemeleri|تأشيرة|رحلة الطيران|كيف أصل|ترتيبات السفر/.test(t))
+    return OBJECTION_TYPES.travel_friction;
+
+  if (/do you speak|don'?t understand|(anyone|someone) who speaks|can we talk in (arabic|turkish|my language)|i don'?t speak english|konuşan (biri|bir kişi) var|i̇ngilizce bilmiyorum|anlamıyorum|kendi dilimde|هل تتحدث|لا أفهم|بلغتي/.test(t))
+    return OBJECTION_TYPES.language_barrier;
+
+  if (/ask my (husband|wife|partner|family)|check with my (husband|wife|partner|family)|need to discuss with|eşime sormam|ailemle konuşmam|eşimle görüşmem|زوجي|زوجتي|أستشير عائلتي|أسأل عائلتي/.test(t))
+    return OBJECTION_TYPES.partner_approval;
+
+  if (/other clinic|checking around|got a quote|comparing (clinics|prices)|başka(\s+\w+){0,2}\s+klinik|karşılaştırıyorum|fiyat karşılaştır|عيادة أخرى|أقارن (الأسعار|العيادات)|عرض سعر آخر/.test(t))
+    return OBJECTION_TYPES.comparison_shopping;
+
+  if (/not ready|maybe later|next month|not yet|dates don'?t work|can'?t make (it|that date)|not available on|hazır değil|müsait değil|sonra düşünürüm|لست جاهزاً|لاحقاً|لا يناسبني الموعد|غير متاح/.test(t))
+    return OBJECTION_TYPES.timing;
+
+  if (/payment plan|pay monthly|instalments?|installments?|\bfinanc(e|ing)\b|taksit|ödeme planı|أقساط|تقسيط|تمويل/.test(t))
+    return OBJECTION_TYPES.financing;
+
+  if (/too expensive|can'?t afford|cannot afford|out of budget|how much|what.?s the cost|what.?s the price|pahal[ıi]|bütçe|fiyat ne|ne kadar tutar|غالي جداً|كم التكلفة|كم السعر/.test(t))
+    return OBJECTION_TYPES.price_shock;
 
   return OBJECTION_TYPES.general_enquiry;
 }

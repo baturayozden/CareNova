@@ -247,3 +247,26 @@ Kör bir mekanik değiştirme riskli (her dosyanın kendi zemin bağlamı
 doğrulanmadan) — ayrı, dosya listesi hazır bir iş olarak bırakıldı.
 
 ---
+
+## 🟡 B9 — Seed script'leri eski itiraz taksonomisini kullanıyor (Gece 4, D.1)
+
+**Neydi:** `db/seed-demo-riverside-messages.js` ve `db/seed-full.js`, bu
+gecenin `services/ai.js`'te 11-tipe yeniden yazdığı `detectObjection`
+taksonomisinden ÖNCEKİ 8-değerli jenerik etiketleri (`price_too_high`,
+`comparing_competitors`, `timing_issue`, `anxiety_fear`, `trust_concern`,
+`availability`, `finance_options`) demo mesaj verisi olarak hâlâ
+kullanıyor.
+
+**Neden dokunulmadı:** `messages.objection_type` kolonunda CHECK
+constraint yok (serbest varchar) — bu script'ler bozulmaz, sadece demo
+verisi eski etiketler taşır. Hiçbir çalışan kod yolu bu değerlere
+taksonomi-doğrulaması yapmıyor. Kapsam: sadece görüntü/demo amaçlı,
+Bölüm D'nin gerçek işi (canlı `detectObjection` + `promptCompiler`'ın
+`MUST_ESCALATE_OBJECTIONS`'ı) zaten düzeltildi.
+
+**Ne zaman düzeltilmeli:** Bir sonraki demo-veri yenileme turunda, bu iki
+dosyadaki `objection:` alanları yeni 11 değere (`price_shock`,
+`trust_surgeon`, vb.) taşınabilir — mekanik bir bul-değiştir, aciliyeti
+yok.
+
+---

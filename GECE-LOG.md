@@ -2126,4 +2126,95 @@ tek tek yüklendi, hepsi temiz.
 
 ---
 
+## BÖLÜM D — İtiraz taksonomisi ve lead skorlama
+
+**D.1 — `detectObjection` gerçek bir uyumsuzluğu düzeltti, sadece yeniden
+adlandırma değil.** `services/ai.js`'in kendi `detectObjection`'ı hâlâ
+CareDental'dan kalma 8-değerli JENERİK bir taksonomi kullanıyordu
+(`price_too_high`, `comparing_competitors`, `timing_issue`, `anxiety_fear`,
+`trust_concern`, `availability`, `finance_options`, `general_enquiry`) —
+brief'in tarif ettiği "8 diş itirazı" değildi ama YİNE DE yanlıştı, çünkü
+Bölüm A'da bu gece zaten yazılmış olan `promptCompiler.js`
+(`GENERIC_OBJECTION_GUIDANCE`, `MUST_ESCALATE_OBJECTIONS`) ve migration
+062'nin `branch_templates.objection_strategies`'i ZATEN yeni 11-değerli
+taksonomiyi (`trust_surgeon`, `safety_fear`, vb.) bekliyordu.
+`detectObjection` `'trust_concern'` döndürdüğü sürece,
+`MUST_ESCALATE_OBJECTIONS.has('trust_surgeon')` hiçbir zaman `true`
+olamıyordu — yani **"doktor güvenilirliği ya da güvenlik korkusu tespit
+edilirse AI kapatmaya çalışmasın" zorunlu eskalasyon kuralı sessizce hiç
+tetiklenmiyordu.** Bunu bulup düzeltmek D.1'in asıl işiydi.
+
+11 tip yeniden yazıldı: `price_shock`, `trust_surgeon`, `trust_clinic`,
+`safety_fear`, `aftercare_fear`, `travel_friction`, `timing`,
+`comparison_shopping`, `language_barrier`, `partner_approval`,
+`financing` (+ `general_enquiry` fallback). Her biri TR/EN/AR
+pattern'leriyle, `trust_surgeon`/`safety_fear` diğerlerinden ÖNCE
+kontrol ediliyor (fiyat VE güven endişesi aynı mesajda geçerse, güven
+kazanmalı — bu davranış ayrı bir testle doğrulandı).
+`routes/insights.js`'in `OBJECTION_LABELS` haritası (super-admin genel
+içgörüler ekranının etiketleri) aynı yeni 11 anahtara güncellendi — bu
+bir ekran DEĞİL, zaten var olan bir backend veri haritası, ekran yasağını
+ihlal etmiyor.
+
+**D.2 — `services/leadScoring.js`'e YENİ bir boyut: Yeterlilik
+(Eligibility, 15pt).** Mevcut prompt zaten CareDental'ın diş-prosedürü
+ağırlıklandırmasından bir miktar uzaklaşmıştı (Intent 40/Urgency 25/
+Value 25/Engagement 10, `treatment_value_weight` branşa özel) ama hâlâ
+tıbbi uygunluk kavramı YOKTU — ön taramayı geçmiş bir hasta ile tıbben
+uygun olmayan bir hasta aynı puanı alabiliyordu. Brief'in istediği
+35/15/25/15/10 dağılımına geçildi: **Intent (35)** artık "hangi
+tarihler", "kaç gün kalmam gerekiyor", uçuş/vize soruları, belge
+gönderimi gibi SEYAHAT EDEN hastaya özgü sinyallere bakıyor (jenerik
+"randevu sordu mu" yerine); **Aciliyet (15)** izin/seyahat tarihi
+belirtme, uçuş aramaya başlamış olma; **Değer (25)** aynı
+`treatment_value_weight` mekanizması; **Yeterlilik (15, YENİ)** —
+vakanın `medical_eligibility` kararı VE branş şablonunun zorunlu
+görsel/belge slotlarının kaçının `quality_ok=true` ile dolu olduğu;
+**Etkileşim (10)** değişmedi.
+
+Yeterlilik boyutunun gerçek bir sinyale ihtiyacı vardı — sadece konuşma
+metninden çıkarılamaz. Yeni `buildEligibilityContext(leadId, tenantId)`
+`ai.js`'in `loadCaseForLead`/`loadBranchTemplate`'ini kullanıyor (aynı
+"vaka yoksa null dön, çökme" sözleşmesi) ve `case_media`'da
+`routes/whatsapp.js`'in `handleIncomingVisualMedia`'sıyla AYNI
+"tamamlanmış" tanımını kullanıyor (zorunlu slot id'leri `quality_ok=true`
+medya ile eşleşiyor mu) — iki yerde iki farklı "tamamlanma" tanımı
+olmaması bilinçli bir tercih. Sonuç, prompt'a `{eligibilityContext}`
+olarak enjekte ediliyor, örn. `Case file: medical eligibility is
+"eligible". Required documents: 2/3 required documents/photos received
+at sufficient quality.` Vakası olmayan lead'ler (çoğu lead) için dürüst
+"henüz vaka yok, ön tarama başlamadı" metni.
+
+**Etiketler değişmedi:** brief'in kendi notu "Labels stay English DB
+keys, i18n'd in UI (screen concern)" — yani DB'de `Hot|Warm|Cool|Ghost
+Risk` İngilizce kalıyor, Türkçe (Sıcak/Ilık/Serin/Kayıp Riski) sadece
+ekranda gösterilecek bir çeviri meselesi, bu gece dokunulmadı (ekran
+yasağıyla tutarlı).
+
+**Bilinçli kapsam dışı bırakma:** `db/seed-demo-riverside-messages.js` ve
+`db/seed-full.js` hâlâ eski 8-değerli taksonomiyi demo veri olarak
+kullanıyor (`objection: 'price_too_high'` vb.) — bunlar sadece görüntü
+amaçlı seed script'leri, `objection_type` kolonunda CHECK constraint yok
+(serbest varchar), hiçbir çalışan mantık bu değerlere bağımlı değil.
+Kasıtlı olarak dokunmadım — kapsam dışı, BLOKAJLAR.md'ye not düştüm.
+
+**Testler:** `services/__tests__/detectObjection.test.js` (57 test — 11
+taksonomi tipinin her biri için TR/EN/AR örnek cümleler, `general_enquiry`
+fallback, `trust_surgeon`/`safety_fear`'in fiyat ile aynı cümlede
+geçtiğinde bile önce tespit edildiğinin doğrulaması).
+`services/__tests__/leadScoring.test.js` (7 test — `buildEligibilityContext`:
+vaka yok/vaka var+zorunlu medya var/vaka var+zorunlu medya yok (IVF gibi),
+farklı branşın slot id'sinin yanlışlıkla sayılmadığı, DB/loader
+hatalarında çökmeyip zarifçe `0/N`'e düştüğü).
+
+**Doğrulama:** `npx jest --testPathIgnorePatterns=invoiceNumber` →
+**311/311 yeşil** (bu bölümden önce 247'ydi — 64 yeni test). Gerçek
+Anthropic çağrısı YOK. `node -e "require(...)"` ile `ai.js`,
+`leadScoring.js`, `insights.js`, `whatsapp.js`, `leads.js` tek tek
+yüklendi, hepsi temiz.
+
+**Commit:** (aşağıda)
+
+---
+
 
