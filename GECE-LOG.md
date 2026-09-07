@@ -2010,4 +2010,120 @@ Anthropic çağrısı YOK (MUTLAK YASAK #5). `node src/index.js` temiz açılıy
 
 ---
 
+## BÖLÜM C — Ses notu ve görsel anlama ("en büyük tek boşluk")
+
+Brief'in kendi tanımıyla gecenin en büyük boşluğuydu: `routes/whatsapp.js`
+`if (incomingMsg.type !== 'text' || !incomingMsg.text) return;` satırıyla
+sesli mesajları, fotoğrafları ve belgeleri SESSİZCE düşürüyordu. Arapça/
+Türkçe WhatsApp kullanımında sesli mesaj baskın davranış biçimi olduğu için
+bu, ürünün gerçek kullanımda hasta mesajlarının önemli bir kısmını hiç
+görmediği anlamına geliyordu.
+
+**`services/whatsapp.js`** genişletildi: Meta Media API'nin iki adımlı
+akışı (`getMediaUrl` — `GET /{media-id}`, telefon numarası path'inin
+ALTINDA DEĞİL, kısa ömürlü imzalı bir `url` döndürüyor — sonra
+`downloadMedia` o url'i aynı Bearer token'la ikinci kez çekip ham byte'ları
+döndürüyor). `parseIncomingMessage` artık `audio`/`image`/`document`
+tiplerini de tanıyor: `mediaId`, `mimeType`, sesli mesaj için `isVoiceNote`
+(WhatsApp `message.audio.voice` bayrağı — paylaşılan bir ses dosyasıyla
+sesli mesajı ayırt ediyor), görsel/belge için `caption`, belge için
+`filename`.
+
+**Sağlayıcı soyutlaması — `services/transcription.js` ve
+`services/visionExtraction.js`** (İKİSİ DE YENİ): brief'in gece boyunca
+tekrarlanan kalıbı — `PROVIDERS = { mock: çalışan, gerçek_isim: açıkça
+fırlatan stub }`, `TRANSCRIPTION_PROVIDER`/`VISION_PROVIDER` env
+değişkeniyle seçiliyor, varsayılan `mock`. Gerçek sağlayıcı stub'ları
+(`openaiWhisperProvider`, `claudeVisionProvider`) çağrılırsa net bir "bu
+gece API anahtarı yok" hatası fırlatıyor — MUTLAK YASAK #5'in kod
+seviyesindeki karşılığı, yanlışlıkla gerçek bir çağrı tetiklenemez.
+`visionExtraction.js`'in branşa özel şemaları brief'te birebir istenen
+şekilde: `hair_transplant` → `norwoodEstimate`/`donorDensityNote`/
+`imageQuality`/`matchedSlot`, `dental` → `visibleMissingTeeth`/
+`imageType`/`imageQuality`/`matchedSlot`, her şey diğeri (branş şeması
+olmayan branşlar VE her belge) → `general` → `documentType`/
+`extractedText`/`relevance`.
+
+**`services/leadStore.js` — gerçek, önceden fark edilmemiş bir boşluk
+düzeltildi:** `messages.message_type` kolonu migration 006'dan beri
+text/template/image/audio/document'i destekliyordu ama `saveMessage()`
+bunu hiç parametre olarak almıyor, hep `'text'`'e düşüyordu — DB şeması
+zaten hazırdı, kod hiç kullanmamıştı. `messageType` parametresi eklendi,
+INSERT'e ve `pgMsgToStore`'un dönüş haritasına işlendi.
+
+**`routes/whatsapp.js`'in asıl değişikliği — tip kapısı yeniden yazıldı:**
+eski tek satır `SUPPORTED_TYPES = ['text','audio','image','document']`
+kontrolüyle değiştirildi (sticker/location/reaction gibi henüz ürün
+tanımı olmayan tipler hâlâ sessizce çıkıyor — bunlar için brief'te hiçbir
+spesifikasyon yok). İki yeni yardımcı fonksiyon (`_internal` altında test
+edilebilir şekilde export edildi, `routes/caseFiles.js`'in kalıbıyla
+aynı):
+
+- **`transcribeIncomingVoiceNote`** — indir → `transcription.transcribeAudio`
+  ile transkribe et → dönen metni normal AI pipeline'ına `incomingMsg.text`
+  gibi besle (brief'in C.1 talimatı birebir: "as if text"). Vaka varsa
+  transkript + tespit edilen dil + güven skoru `case_media`'ya
+  `kind='audio'` olarak kaydediliyor. **Başarısızlıkta AI asla sessiz
+  kalmıyor** (C.1 madde 5): indirme veya transkripsiyon hatası olursa,
+  hastanın bilinen diline (vaka varsa `patient_language`, yoksa
+  `lead.language`, TR/EN/AR hazır metin) göre "yazarak tekrar gönderir
+  misiniz" mesajı doğrudan gönderiliyor, hata vaka varsa `case_events`'e
+  `media_error` olarak loglanıyor.
+
+- **`handleIncomingVisualMedia`** — indir → Supabase Storage'a yükle
+  (best-effort; bucket yapılandırılmamışsa yükleme başarısız olsa BİLE
+  görsel analiz ve hastaya yanıt devam ediyor) → vaka yoksa (çoğu erken
+  lead'de yok) sadece teşekkür + "ekibimiz dönecek" mesajı, hiçbir
+  `case_media` yazımı yok (yazılacak `case_id` yok). Vaka VARSA:
+  `visionExtraction.extractFromImage` branşa göre yapısal veri üretiyor,
+  `case_media.ai_extraction`'a yazılıyor — **🔴 MUTLAK KURAL burada da iki
+  yerde ayrı ayrı test edildi**: hastaya giden hiçbir mesajda (`ack`, ne
+  de `retake` metninde) yapısal alan adları veya değerleri (`Norwood`,
+  vb.) geçmiyor, sadece sabit, deterministik TR/EN/AR metinler gidiyor.
+  Kalite yetersizse (`isQualityInsufficient`) branş şablonunun eşleşen
+  slot'unun `captureInstruction`'ı hastanın dilinde "tekrar çeker misiniz"
+  mesajına gömülüyor. Kalite yeterliyse VE branşın tüm zorunlu slot'ları
+  artık `quality_ok=true` ile dolmuşsa (C.2 madde 5), vaka otomatik
+  `awaiting_doctor`'a geçiyor (`caseFileStore.updateCaseStatus`) — zaten o
+  durumdaysa tekrar geçiş tetiklenmiyor.
+
+**Webhook dayanıklılığı (C.3):** her iki yardımcı fonksiyon da kendi
+try/catch'i içinde — medya indirme/işleme hatası ASLA webhook'u
+çökertmiyor (Meta'nın 200'ü zaten fonksiyon çağrılmadan ÖNCE gönderiliyor,
+`res.sendStatus(200)` en tepede), hata `case_events`'e (vaka varsa)
+`media_error` olarak yazılıyor.
+
+**Bilinçli tasarım kararı — görsel/belge yanıtları Claude'u çağırmıyor:**
+brief'in C.1'i sesli mesaj transkriptinin "normal AI pipeline'a metin gibi"
+beslenmesini AÇIKÇA istiyor (yani Claude çağrılıyor), ama C.2'de görsel/
+belge için böyle bir talep yok — sadece "kalite yetersizse şablonun
+`captureInstruction`'ıyla tekrar iste" ve "tamamlanınca `awaiting_doctor`'a
+geç" deniyor. Bu ikisi de deterministik, sabit çok-dilli metinlerle
+karşılanabildiği için görsel/belge akışını Claude'a bağlamadım — hem
+MUTLAK YASAK #5'in test edilebilirliğini kolaylaştırıyor (gerçek API
+olmadan uçtan uca test edilebiliyor) hem de "yapısal çıkarım asla hastaya
+gösterilmez" kuralını Claude'un ürettiği serbest metne güvenmek yerine
+kod seviyesinde garanti ediyor.
+
+**Testler:** `services/__tests__/transcription.test.js` (9 test),
+`services/__tests__/visionExtraction.test.js` (14 test),
+`services/__tests__/whatsapp.test.js` (13 test — `parseIncomingMessage`'ın
+audio/image/document/bilinmeyen-tip dalları, `getMediaUrl`/`downloadMedia`
+Meta'nın iki-adımlı akışı tamamen mock axios ile), `routes/__tests__/
+whatsapp.test.js` (13 test — `transcribeIncomingVoiceNote` başarı/
+başarısızlık, `handleIncomingVisualMedia` vaka-yok/kalite-yetersiz/kısmi-
+tamamlanma/tam-tamamlanma/depolama-hatası, ve 🔴 MUTLAK KURAL'ın kendisi:
+gönderilen HİÇBİR mesajda "norwood" veya çıkarım metni geçmediğinin ayrı
+bir testle doğrulanması).
+
+**Doğrulama:** `npx jest --testPathIgnorePatterns=invoiceNumber` →
+**247/247 yeşil** (bu bölümden önce 201'di — 46 yeni test). Gerçek
+Meta/OpenAI/Claude API çağrısı YOK (MUTLAK YASAK #5) — `axios` her testte
+mock'landı. `node -e "require(...)"` ile tüm değiştirilen/yeni modüller
+tek tek yüklendi, hepsi temiz.
+
+**Commit:** (aşağıda)
+
+---
+
 

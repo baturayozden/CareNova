@@ -265,18 +265,26 @@ async function getLeadById(id) {
 // Messages
 // ---------------------------------------------------------------------------
 
-async function saveMessage({ leadId, direction, content, aiGenerated = false, whatsappMessageId = null, status = 'pending', scenarioType = null, objectionType = null, whatsappConfigId = null }) {
+// messageType (GECE-4-BRIEFI.md Bölüm C): migration 006 already defined
+// messages.message_type with a CHECK allowing text/template/image/audio/
+// document, but this function never passed it through — every message
+// silently defaulted to 'text' regardless of what actually arrived. For
+// audio, `content` holds the transcript (Bölüm C.1: "transkripti normal
+// AI hattına metin gibi ver" — treat it exactly like a text message); for
+// image/document, `content` is a neutral placeholder, NEVER the vision
+// extraction — that only ever goes to case_media.ai_extraction (doctor-only).
+async function saveMessage({ leadId, direction, content, aiGenerated = false, whatsappMessageId = null, status = 'pending', scenarioType = null, objectionType = null, whatsappConfigId = null, messageType = 'text' }) {
   const { rows } = await pool.query(`
     INSERT INTO messages
       (tenant_id, lead_id, direction, content, ai_generated,
-       whatsapp_message_id, status, scenario_type, objection_type, sent_at, whatsapp_config_id)
+       whatsapp_message_id, status, scenario_type, objection_type, sent_at, whatsapp_config_id, message_type)
     SELECT
       l.tenant_id, l.id, $2::text, $3, $4::boolean, $5, $6::text, $7, $8,
       CASE WHEN $2::text = 'outbound' THEN NOW() ELSE NULL END,
-      $9
+      $9, $10::text
     FROM leads l WHERE l.id = $1
     RETURNING *
-  `, [leadId, direction, content, aiGenerated, whatsappMessageId, status, scenarioType, objectionType, whatsappConfigId]);
+  `, [leadId, direction, content, aiGenerated, whatsappMessageId, status, scenarioType, objectionType, whatsappConfigId, messageType]);
   return rows[0] ? pgMsgToStore(rows[0]) : null;
 }
 
@@ -345,6 +353,7 @@ function pgMsgToStore(r) {
     status:           r.status,
     scenarioType:     r.scenario_type    || null,
     objectionType:    r.objection_type   || null,
+    messageType:      r.message_type     || 'text',
     createdAt:        r.created_at,
   };
 }

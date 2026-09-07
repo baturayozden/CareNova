@@ -101,11 +101,39 @@ async function getPhoneNumberInfo() {
 }
 
 /**
+ * GECE-4-BRIEFI.md Bölüm C.1/C.2 — Meta Media API is a two-step fetch:
+ * (1) GET /{media-id} (NOT under the phone-number path) returns metadata
+ *     including a short-lived, authenticated `url`.
+ * (2) GET that url (still with the same Bearer token) returns the raw bytes.
+ * Real network calls — never invoked in tests tonight (MUTLAK YASAK #5);
+ * see __tests__/whatsapp.test.js for how the mock-provider pipeline is
+ * tested instead.
+ */
+async function getMediaUrl(mediaId, config = {}) {
+  const version     = process.env.WHATSAPP_API_VERSION || 'v21.0';
+  const accessToken = config.accessToken || process.env.WHATSAPP_ACCESS_TOKEN;
+  const response = await axios.get(`${BASE_URL}/${version}/${mediaId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return response.data; // { url, mime_type, sha256, file_size, id }
+}
+
+async function downloadMedia(mediaId, config = {}) {
+  const accessToken = config.accessToken || process.env.WHATSAPP_ACCESS_TOKEN;
+  const meta = await getMediaUrl(mediaId, config);
+  const response = await axios.get(meta.url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    responseType: 'arraybuffer',
+  });
+  return { buffer: Buffer.from(response.data), mimeType: meta.mime_type, fileSize: meta.file_size };
+}
+
+/**
  * Parse a raw webhook body into a normalised message object.
  * Returns null if the payload doesn't contain a message.
  *
  * @param {object} body - req.body from the webhook POST
- * @returns {{ from, messageId, timestamp, type, text, raw } | null}
+ * @returns {{ from, messageId, timestamp, type, text, mediaId, mimeType, raw } | null}
  */
 function parseIncomingMessage(body) {
   try {
@@ -118,13 +146,27 @@ function parseIncomingMessage(body) {
 
     const contact = value?.contacts?.[0];
 
+    // GECE-4-BRIEFI.md Bölüm C.1: audio/voice, image, and document all
+    // carry their media reference the same way in Meta's payload —
+    // message[type].id — just under a different type key. 'audio' covers
+    // both voice notes and shared audio files; WhatsApp doesn't
+    // distinguish them in the webhook payload itself (voice notes set
+    // `message.audio.voice: true`, exposed below for callers that care).
+    const mediaTypes = ['audio', 'image', 'document'];
+    const mediaBlock = mediaTypes.includes(message.type) ? message[message.type] : null;
+
     return {
       from:        message.from,                          // E.164 without +
       senderName:  contact?.profile?.name || 'Unknown',
       messageId:   message.id,
       timestamp:   new Date(parseInt(message.timestamp, 10) * 1000).toISOString(),
-      type:        message.type,                          // text, image, audio, etc.
+      type:        message.type,                          // text, image, audio, document, etc.
       text:        message.type === 'text' ? message.text?.body : null,
+      mediaId:     mediaBlock?.id || null,
+      mimeType:    mediaBlock?.mime_type || null,
+      isVoiceNote: message.type === 'audio' ? Boolean(message.audio?.voice) : false,
+      caption:     mediaBlock?.caption || null,           // image/document may carry a text caption
+      filename:    message.type === 'document' ? message.document?.filename || null : null,
       phoneNumberId: value?.metadata?.phone_number_id,
       raw:         message,
     };
@@ -165,6 +207,8 @@ module.exports = {
   sendTemplate,
   markAsRead,
   getPhoneNumberInfo,
+  getMediaUrl,
+  downloadMedia,
   parseIncomingMessage,
   parseStatusUpdate,
 };

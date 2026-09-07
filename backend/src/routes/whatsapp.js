@@ -9,6 +9,13 @@ const { createNotification } = require('./notifications');
 const { scoreLeadAsync }    = require('../services/leadScoring');
 const { sendEscalationAlert } = require('../utils/email');
 const { getDefaultAssignee } = require('../config/tenantDefaults');
+// GECE-4-BRIEFI.md Bölüm C — voice note transcription + image/document
+// understanding. See transcribeIncomingVoiceNote / handleIncomingVisualMedia
+// near the bottom of this file.
+const caseFileStore   = require('../services/caseFileStore');
+const transcription   = require('../services/transcription');
+const visionExtraction = require('../services/visionExtraction');
+const supabaseStorage  = require('../lib/supabaseStorage');
 
 // ---------------------------------------------------------------------------
 // GET /webhook/whatsapp  — Meta webhook verification handshake
@@ -88,8 +95,16 @@ router.post('/', async (req, res) => {
     phoneNumberId: incomingMsg.phoneNumberId,
   });
 
-  // Only process text messages
-  if (incomingMsg.type !== 'text' || !incomingMsg.text) return;
+  // GECE-4-BRIEFI.md Bölüm C: this used to be `if (type !== 'text') return`,
+  // silently dropping every voice note, photo, and document — "en büyük tek
+  // boşluk" per the brief, since voice notes are dominant behaviour on
+  // Arabic/Turkish WhatsApp. audio/image/document are now handled below;
+  // anything else (stickers, contacts, location, reactions, ...) still
+  // exits here — no product spec exists yet for those types.
+  const SUPPORTED_TYPES = ['text', 'audio', 'image', 'document'];
+  if (!SUPPORTED_TYPES.includes(incomingMsg.type)) return;
+  if (incomingMsg.type === 'text' && !incomingMsg.text) return;
+  if (incomingMsg.type !== 'text' && !incomingMsg.mediaId) return;
 
   try {
     // ── 1. Resolve tenant from phone_number_id ────────────────────────────────
@@ -119,6 +134,26 @@ router.post('/', async (req, res) => {
       assignedTo: getDefaultAssignee(tenantId),
     });
 
+    // ── 2.5 Media (voice note / image / document) pre-processing ────────────
+    // GECE-4-BRIEFI.md Bölüm C. audio → downloaded + transcribed, transcript
+    // becomes incomingMsg.text and the pipeline continues exactly as for a
+    // text message. image/document → downloaded, structurally extracted,
+    // saved to case_media (never messages.content, never sent to the
+    // patient) and handled to completion here — this pass ends without
+    // calling the Claude pipeline, since nothing in the brief calls for an
+    // AI-generated reply to a photo/document beyond a deterministic
+    // acknowledgement or retake request.
+    let inboundMessageType = 'text';
+    if (incomingMsg.type === 'audio') {
+      const transcript = await transcribeIncomingVoiceNote(incomingMsg, { tenantId, lead, waConfig });
+      if (transcript == null) return; // failure already handled — retry-in-writing request sent
+      incomingMsg.text = transcript;
+      inboundMessageType = 'audio';
+    } else if (incomingMsg.type === 'image' || incomingMsg.type === 'document') {
+      await handleIncomingVisualMedia(incomingMsg, { tenantId, lead, waConfig });
+      return;
+    }
+
     // ── 3. Returning patient recognition ────────────────────────────────────
     const isReturning = lead.aiFollowUpCount > 0 || lead.status === 'responded';
 
@@ -134,6 +169,7 @@ router.post('/', async (req, res) => {
       whatsappConfigId,
       status:            'delivered',
       objectionType,
+      messageType:       inboundMessageType,
     });
 
     if (lead.status === 'contacted') {
@@ -324,4 +360,224 @@ async function sendEscalationEmail({ lead, tenantId, message }) {
   }
 }
 
+// ── Media handling (GECE-4-BRIEFI.md Bölüm C) ──────────────────────────────
+
+function pickLocalized(map, language) {
+  if (!map) return null;
+  return map[language] || map.en || Object.values(map)[0] || null;
+}
+
+const TRANSCRIPTION_FAILURE_TEXT = {
+  tr: 'Üzgünüm, sesli mesajınızı anlayamadım. Yazarak tekrar iletebilir misiniz?',
+  ar: 'عذرًا، لم أتمكن من فهم رسالتك الصوتية. هل يمكنك إعادة إرسالها كتابةً؟',
+  en: "Sorry, I couldn't understand your voice message. Could you send it again in writing?",
+};
+
+const MEDIA_ACK_NO_CASE_TEXT = {
+  tr: 'Gönderdiğiniz için teşekkürler, aldım. Ekibimiz kısa süre içinde sizinle iletişime geçecek.',
+  ar: 'شكرًا لإرسالك هذا. لقد استلمته، وسيتواصل معك فريقنا قريبًا.',
+  en: "Thanks for sending that — I've received it. Our team will follow up with you shortly.",
+};
+
+const MEDIA_ACK_PARTIAL_TEXT = {
+  tr: 'Aldım, teşekkürler. Değerlendirmeyi tamamlamak için birkaç görsel/belge daha gerekiyor.',
+  ar: 'استلمته، شكرًا لك. نحتاج إلى بعض الصور/المستندات الإضافية لإكمال التقييم.',
+  en: "Got it, thank you. We still need a few more photos/documents to complete the assessment.",
+};
+
+const MEDIA_ACK_COMPLETE_TEXT = {
+  tr: 'Teşekkürler, ihtiyacımız olan her şeyi aldık. Doktorumuz dosyanızı inceleyip size geri dönecek.',
+  ar: 'شكرًا لك، لقد استلمنا كل ما نحتاجه. سيقوم طبيبنا بمراجعة ملفك والتواصل معك.',
+  en: "Thank you — we now have everything we need. Our doctor will review your file and get back to you.",
+};
+
+const RETAKE_PREFIX_TEXT = {
+  tr: 'Bu görsel biraz belirsiz görünüyor, tekrar çeker misiniz?',
+  ar: 'تبدو هذه الصورة غير واضحة بعض الشيء، هل يمكنك التقاطها مرة أخرى؟',
+  en: "That photo came out a little unclear — could you retake it?",
+};
+
+const RETAKE_GENERIC_TEXT = {
+  tr: 'Bu görsel biraz belirsiz görünüyor. İyi ışıkta, net bir şekilde tekrar gönderebilir misiniz?',
+  ar: 'تبدو هذه الصورة غير واضحة. هل يمكنك إرسالها مرة أخرى في إضاءة جيدة وبوضوح؟',
+  en: "That photo came out a little unclear. Could you send it again in good lighting, clearly in frame?",
+};
+
+/**
+ * Voice note → transcript. Returns the transcript string on success, or
+ * null on failure (media download or transcription error) after already
+ * sending the patient a "please retype it" request — Bölüm C.1 item 5:
+ * "AI must NOT go silent" on transcription failure.
+ */
+async function transcribeIncomingVoiceNote(incomingMsg, { tenantId, lead, waConfig }) {
+  try {
+    const { buffer, mimeType } = await whatsapp.downloadMedia(incomingMsg.mediaId, waConfig);
+    const { transcript, detectedLanguage, confidence, provider } =
+      await transcription.transcribeAudio(buffer, mimeType);
+
+    const caseRow = tenantId ? await ai.loadCaseForLead(lead.id, tenantId) : null;
+    if (caseRow) {
+      await caseFileStore
+        .addMedia(tenantId, caseRow.id, {
+          kind: 'audio',
+          whatsappMediaId: incomingMsg.mediaId,
+          aiExtraction: { transcript, detectedLanguage, confidence, provider },
+        }, null)
+        .catch(err => console.error('[Media] addMedia(audio) failed:', err.message));
+    }
+
+    return transcript;
+  } catch (err) {
+    console.error(`[Media] Voice transcription failed for lead=${lead.id}:`, err.message);
+    const knownLanguage = lead.language || 'en';
+    await whatsapp
+      .sendText(`+${incomingMsg.from}`, pickLocalized(TRANSCRIPTION_FAILURE_TEXT, knownLanguage), waConfig)
+      .catch(sendErr => console.error('[Media] retry-request send failed:', sendErr.message));
+
+    if (tenantId) {
+      const caseRow = await ai.loadCaseForLead(lead.id, tenantId).catch(() => null);
+      if (caseRow) {
+        await caseFileStore
+          .appendCaseEvent(tenantId, caseRow.id, 'media_error', null, { type: 'audio', reason: err.message })
+          .catch(() => {});
+      }
+    }
+    return null;
+  }
+}
+
+/**
+ * Image/document → structured extraction, saved only to
+ * case_media.ai_extraction (🔴 MUTLAK KURAL — never patient-facing, see
+ * visionExtraction.js). Fully self-contained: downloads, uploads to
+ * storage, extracts, saves, and replies (ack / retake request) on its own;
+ * the caller does not continue into the Claude pipeline for this message.
+ * Bölüm C.3: any failure here is caught and logged to case_events —
+ * res.sendStatus(200) to Meta already happened before this ever runs.
+ */
+async function handleIncomingVisualMedia(incomingMsg, { tenantId, lead, waConfig }) {
+  const kind = incomingMsg.type === 'image' ? 'photo' : 'document';
+  const messageType = incomingMsg.type === 'image' ? 'image' : 'document';
+
+  try {
+    const { buffer, mimeType } = await whatsapp.downloadMedia(incomingMsg.mediaId, waConfig);
+
+    const caseRow = tenantId ? await ai.loadCaseForLead(lead.id, tenantId) : null;
+    const language = caseRow?.patient_language || lead.language || 'en';
+    const branchTemplate = caseRow ? await ai.loadBranchTemplate(caseRow.branch_key) : null;
+
+    const storagePath = `${tenantId}/${lead.id}/${incomingMsg.mediaId}`;
+    let uploaded = false;
+    try {
+      await supabaseStorage.uploadFile(storagePath, buffer, mimeType);
+      uploaded = true;
+    } catch (storageErr) {
+      // Storage is best-effort here — a missing/misconfigured bucket must
+      // not stop vision extraction or the patient-facing acknowledgement.
+      console.error('[Media] Supabase upload failed:', storageErr.message);
+    }
+
+    await leadStore.saveMessage({
+      leadId:            lead.id,
+      direction:         'inbound',
+      content:           incomingMsg.caption || `[${kind} received]`,
+      aiGenerated:       false,
+      whatsappMessageId: incomingMsg.messageId,
+      status:            'delivered',
+      messageType,
+    });
+
+    if (!caseRow) {
+      // No case yet — qualification happens before a case exists, so
+      // there's no branch template / required-media checklist to extract
+      // against. Acknowledge receipt and stop; nothing to write to
+      // case_media without a case_id.
+      await whatsapp
+        .sendText(`+${incomingMsg.from}`, pickLocalized(MEDIA_ACK_NO_CASE_TEXT, language), waConfig)
+        .catch(err => console.error('[Media] ack send failed:', err.message));
+      return;
+    }
+
+    const extraction = await visionExtraction.extractFromImage(buffer, mimeType, caseRow.branch_key, {
+      requiredMediaSlots: branchTemplate?.requiredMedia || [],
+    });
+    const qualityInsufficient = visionExtraction.isQualityInsufficient(extraction);
+
+    await caseFileStore
+      .addMedia(tenantId, caseRow.id, {
+        kind,
+        whatsappMediaId: incomingMsg.mediaId,
+        storagePath: uploaded ? storagePath : null,
+        templateSlotId: extraction.matchedSlot || null,
+        qualityOk: !qualityInsufficient,
+        aiExtraction: extraction,
+      }, null)
+      .catch(err => console.error('[Media] addMedia failed:', err.message));
+
+    if (qualityInsufficient) {
+      const requiredMedia = branchTemplate?.requiredMedia || [];
+      const slot = requiredMedia.find(s => s.id === extraction.matchedSlot) || requiredMedia[0];
+      const instruction = slot?.captureInstruction ? pickLocalized(slot.captureInstruction, language) : null;
+      const retakeMsg = instruction
+        ? `${pickLocalized(RETAKE_PREFIX_TEXT, language)} ${instruction}`
+        : pickLocalized(RETAKE_GENERIC_TEXT, language);
+      await whatsapp.sendText(`+${incomingMsg.from}`, retakeMsg, waConfig)
+        .catch(err => console.error('[Media] retake send failed:', err.message));
+      return;
+    }
+
+    // Bölüm C.2 item 5: once every required-media slot has a quality_ok
+    // entry, auto-transition the case to awaiting_doctor. The structured
+    // extraction stays doctor-only regardless of which branch this takes.
+    const requiredSlots = branchTemplate?.requiredMedia || [];
+    let allComplete = requiredSlots.length === 0;
+    if (requiredSlots.length > 0) {
+      const existingMedia = await caseFileStore.listMedia(tenantId, caseRow.id).catch(() => []);
+      const qualifyingSlotIds = new Set(
+        (existingMedia || [])
+          .filter(m => m.quality_ok)
+          .map(m => m.template_slot_id)
+          .filter(Boolean),
+      );
+      allComplete = requiredSlots.every(s => qualifyingSlotIds.has(s.id));
+    }
+
+    if (allComplete && caseRow.status !== 'awaiting_doctor') {
+      await caseFileStore
+        .updateCaseStatus(tenantId, caseRow.id, 'awaiting_doctor', null)
+        .catch(err => console.error('[Media] case auto-transition failed:', err.message));
+    }
+
+    const ackMsg = allComplete
+      ? pickLocalized(MEDIA_ACK_COMPLETE_TEXT, language)
+      : pickLocalized(MEDIA_ACK_PARTIAL_TEXT, language);
+    await whatsapp.sendText(`+${incomingMsg.from}`, ackMsg, waConfig)
+      .catch(err => console.error('[Media] ack send failed:', err.message));
+
+  } catch (err) {
+    console.error(`[Media] Visual media handling failed for lead=${lead.id}:`, err.message);
+    if (tenantId) {
+      const caseRow = await ai.loadCaseForLead(lead.id, tenantId).catch(() => null);
+      if (caseRow) {
+        await caseFileStore
+          .appendCaseEvent(tenantId, caseRow.id, 'media_error', null, { type: incomingMsg.type, reason: err.message })
+          .catch(() => {});
+      }
+    }
+  }
+}
+
 module.exports = router;
+// GECE-4-BRIEFI.md Bölüm C — exported for unit testing without the HTTP
+// layer (same _internal pattern as routes/caseFiles.js).
+module.exports._internal = {
+  transcribeIncomingVoiceNote,
+  handleIncomingVisualMedia,
+  pickLocalized,
+  TRANSCRIPTION_FAILURE_TEXT,
+  MEDIA_ACK_NO_CASE_TEXT,
+  MEDIA_ACK_PARTIAL_TEXT,
+  MEDIA_ACK_COMPLETE_TEXT,
+  RETAKE_PREFIX_TEXT,
+  RETAKE_GENERIC_TEXT,
+};
