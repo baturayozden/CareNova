@@ -1,0 +1,185 @@
+{
+  "header": {
+    "title": "Komisyon",
+    "subtitle": "Komisyon dönemlerini, raporları ve komisyon şemasını yönetin"
+  },
+  "clinicSelector": {
+    "label": "Klinik:",
+    "loading": "Klinikler yükleniyor…",
+    "placeholder": "— Klinik seçin —"
+  },
+  "clinicPlaceholder": {
+    "title": "Komisyon verilerini görmek için bir klinik seçin",
+    "subtitle": "Başlamak için yukarıdaki listeden bir klinik seçin."
+  },
+  "tabs": {
+    "report": "Rapor",
+    "deals": "Vakalar",
+    "schemes": "Şema",
+    "payments": "Ödemeler"
+  },
+  "status": {
+    "locked": "Kilitli",
+    "open": "Açık"
+  },
+  "recordStatus": {
+    "draft": "Taslak",
+    "approved": "Onaylandı",
+    "disputed": "İtirazlı"
+  },
+  "controls": {
+    "loading": "Yükleniyor…",
+    "noPeriods": "Henüz dönem yok.",
+    "createOne": "Bir tane oluştur.",
+    "newPeriod": "+ Yeni Dönem",
+    "editQuotaOverride": "Vaka Değerini Düzenle",
+    "overrideQuotaRevenue": "Vaka Değerini Geçersiz Kıl",
+    "calculating": "Hesaplanıyor…",
+    "calculate": "Hesapla",
+    "approving": "Onaylanıyor…",
+    "approve": "Onayla",
+    "unlock": "Aç"
+  },
+  "errors": {
+    "loadPeriods": "Dönemler yüklenemedi.",
+    "createPeriod": "Dönem oluşturulamadı.",
+    "saveTarget": "Hedef kaydedilemedi.",
+    "saveRevenue": "Ciro kaydedilemedi.",
+    "calculate": "Hesaplama başarısız oldu.",
+    "approve": "Onay başarısız oldu.",
+    "unlockAlreadyOpen": "Bu dönem zaten açık.",
+    "unlockNoPermission": "Bu dönemi açma yetkiniz yok.",
+    "unlock": "Açma işlemi başarısız oldu."
+  },
+  "hero": {
+    "quotaProgress": "VAKA DEĞERİ İLERLEMESİ",
+    "subtitle": "Hasta danışmanı vakaları",
+    "targetSuffix": "hedef",
+    "autoFromDeals": "vakalardan otomatik hesaplanır",
+    "toTarget": "hedefe kalan",
+    "noTarget": "Bu dönem için hedef belirlenmedi",
+    "noTargetRing": "hedef\nyok",
+    "setTarget": "Hedef belirle",
+    "approvedBy": "Onaylayan"
+  },
+  "gates": {
+    "title": "ÇARPAN KADEMELERİ"
+  },
+  "cards": {
+    "quotaRevenue": {
+      "label": "VAKA DEĞERİ",
+      "sub": "Hasta danışmanı vakaları"
+    },
+    "totalClinicRevenue": {
+      "label": "TOPLAM KLİNİK CİROSU",
+      "sub_one": "{{count}} vaka — tüm satışlar, hedef kapsamında değil",
+      "sub_other": "{{count}} vaka — tüm satışlar, hedef kapsamında değil"
+    },
+    "dealCount": {
+      "label": "VAKA SAYISI",
+      "sub_one": "1 aktif vaka",
+      "sub_other": "{{count}} aktif vaka"
+    },
+    "activeConsultants": {
+      "label": "AKTİF DANIŞMAN",
+      "subCommission": "{{amount}} komisyon",
+      "subRunCalculate": "Komisyon için Hesapla'ya tıklayın"
+    }
+  },
+  "leaderboard": {
+    "title": "Satış Lider Tablosu",
+    "liveFromDeals": "— vakalardan canlı",
+    "commissionsCalculated": "Komisyonlar hesaplandı",
+    "loadingDeals": "Vakalar yükleniyor…",
+    "noSalesYet": "Bu dönemde henüz satış yok",
+    "columns": {
+      "rank": "#",
+      "name": "İSİM",
+      "sales": "SATIŞ",
+      "deals": "VAKA",
+      "commission": "KOMİSYON",
+      "progress": "İLERLEME"
+    },
+    "notInQuota": "Hedef Dışı",
+    "subColumns": {
+      "patient": "HASTA",
+      "treatment": "TEDAVİ",
+      "date": "TARİH",
+      "amount": "TUTAR",
+      "status": "DURUM",
+      "entity": "KURUM"
+    },
+    "noActiveDeals": "Aktif vaka yok",
+    "unverified": "Doğrulanmadı",
+    "rejected": "Reddedildi"
+  },
+  "dealStatus": {
+    "accepted": "Kabul Edildi",
+    "in_progress": "Devam Ediyor",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal"
+  },
+  "report": {
+    "loading": "Komisyon kayıtları yükleniyor…",
+    "detailTitle": "Komisyon Detayı",
+    "clickToExpand": "Detay için satıra tıklayın",
+    "columns": {
+      "staff": "DANIŞMAN",
+      "personalRev": "KİŞİSEL CİRO",
+      "base": "TABAN",
+      "performance": "PERFORMANS",
+      "team": "TAKIM",
+      "total": "TOPLAM",
+      "targetPct": "HEDEF %",
+      "status": "Durum"
+    },
+    "totalRow_one": "TOPLAM (1 DANIŞMAN)",
+    "totalRow_other": "TOPLAM ({{count}} DANIŞMAN)",
+    "breakdown": "HESAPLAMA DETAYI",
+    "noBreakdown": "Kayıtlı detay yok.",
+    "adjustment": "Düzeltme",
+    "approvedByLine": "Onaylayan: {{name}} — {{date}}"
+  },
+  "modals": {
+    "newPeriod": {
+      "title": "Yeni Komisyon Dönemi",
+      "periodName": "Dönem Adı",
+      "periodNamePlaceholder": "örn. Temmuz 2026",
+      "startDate": "Başlangıç Tarihi",
+      "endDate": "Bitiş Tarihi",
+      "targetLabel": "Klinik Ciro Hedefi (€)",
+      "targetHelp": "Üst kısımdaki ilerleme halkası ve çarpan kademeleri için kullanılır.",
+      "overrideLabel": "Vaka Değeri Geçersiz Kılma (€)",
+      "overrideLabelOptional": "opsiyonel, hasta danışmanı vakaları",
+      "overrideHelp": "Boş bırakılırsa vakalardan otomatik hesaplanır.",
+      "cancel": "Vazgeç",
+      "creating": "Oluşturuluyor…",
+      "create": "Oluştur"
+    },
+    "revenueOverride": {
+      "title": "Vaka Değerini Geçersiz Kıl",
+      "label": "Vaka Değeri Geçersiz Kılma (€) — hasta danışmanı vakaları",
+      "help": "Otomatik hesaplanan vaka değerini geçersiz kılar. Toplam klinik cirosunu etkilemez.",
+      "cancel": "Vazgeç",
+      "saving": "Kaydediliyor…",
+      "save": "Geçersiz Kılmayı Kaydet"
+    },
+    "unlock": {
+      "title": "Dönemi Aç",
+      "body": "Bu işlem {{period}} dönemini düzenlemeye yeniden açacak. Onaylanmış tüm komisyon kayıtları taslağa dönecek ve kilitli vaka anlaşmaları açılacak.",
+      "auditNote": "Bu işlem denetim kaydına işlenir. Devam edilsin mi?",
+      "cancel": "Vazgeç",
+      "unlocking": "Açılıyor…",
+      "confirm": "Dönemi Aç"
+    },
+    "setTarget": {
+      "title": "Ciro Hedefi Belirle",
+      "periodLabel": "Dönem:",
+      "targetLabel": "Klinik Ciro Hedefi (€)",
+      "targetHelp": "İlerleme halkası ve çarpan kademesi hesaplaması için kullanılır.",
+      "cancel": "Vazgeç",
+      "saving": "Kaydediliyor…",
+      "save": "Hedefi Kaydet"
+    }
+  }
+}

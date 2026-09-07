@@ -1,0 +1,185 @@
+{
+  "header": {
+    "title": "Commission",
+    "subtitle": "Manage commission periods, reports, and the commission scheme"
+  },
+  "clinicSelector": {
+    "label": "Clinic:",
+    "loading": "Loading clinics…",
+    "placeholder": "— Select a clinic —"
+  },
+  "clinicPlaceholder": {
+    "title": "Select a clinic to view commission data",
+    "subtitle": "Choose a clinic from the dropdown above to get started."
+  },
+  "tabs": {
+    "report": "Report",
+    "deals": "Deals",
+    "schemes": "Scheme",
+    "payments": "Payments"
+  },
+  "status": {
+    "locked": "Locked",
+    "open": "Open"
+  },
+  "recordStatus": {
+    "draft": "Draft",
+    "approved": "Approved",
+    "disputed": "Disputed"
+  },
+  "controls": {
+    "loading": "Loading…",
+    "noPeriods": "No periods yet.",
+    "createOne": "Create one.",
+    "newPeriod": "+ New Period",
+    "editQuotaOverride": "Edit Case Value Override",
+    "overrideQuotaRevenue": "Override Case Value",
+    "calculating": "Calculating…",
+    "calculate": "Calculate",
+    "approving": "Approving…",
+    "approve": "Approve",
+    "unlock": "Unlock"
+  },
+  "errors": {
+    "loadPeriods": "Failed to load periods.",
+    "createPeriod": "Failed to create period.",
+    "saveTarget": "Failed to save target.",
+    "saveRevenue": "Failed to save revenue.",
+    "calculate": "Calculation failed.",
+    "approve": "Approval failed.",
+    "unlockAlreadyOpen": "This period is already open.",
+    "unlockNoPermission": "You do not have permission to unlock this period.",
+    "unlock": "Unlock failed."
+  },
+  "hero": {
+    "quotaProgress": "CASE VALUE PROGRESS",
+    "subtitle": "Patient consultant cases",
+    "targetSuffix": "target",
+    "autoFromDeals": "auto from cases",
+    "toTarget": "to target",
+    "noTarget": "No target set for this period",
+    "noTargetRing": "no\ntarget",
+    "setTarget": "Set target",
+    "approvedBy": "Approved by"
+  },
+  "gates": {
+    "title": "MULTIPLIER GATES"
+  },
+  "cards": {
+    "quotaRevenue": {
+      "label": "CASE VALUE",
+      "sub": "Patient consultant cases"
+    },
+    "totalClinicRevenue": {
+      "label": "TOTAL CLINIC REVENUE",
+      "sub_one": "{{count}} case — all sales, not quota-eligible",
+      "sub_other": "{{count}} cases — all sales, not quota-eligible"
+    },
+    "dealCount": {
+      "label": "CASE COUNT",
+      "sub_one": "1 active case",
+      "sub_other": "{{count}} active cases"
+    },
+    "activeConsultants": {
+      "label": "ACTIVE CONSULTANTS",
+      "subCommission": "{{amount}} commission",
+      "subRunCalculate": "Run Calculate for commission"
+    }
+  },
+  "leaderboard": {
+    "title": "Sales Leaderboard",
+    "liveFromDeals": "— live from cases",
+    "commissionsCalculated": "Commissions calculated",
+    "loadingDeals": "Loading cases…",
+    "noSalesYet": "No sales yet this period",
+    "columns": {
+      "rank": "#",
+      "name": "NAME",
+      "sales": "SALES",
+      "deals": "CASES",
+      "commission": "COMMISSION",
+      "progress": "PROGRESS"
+    },
+    "notInQuota": "Not in quota",
+    "subColumns": {
+      "patient": "PATIENT",
+      "treatment": "TREATMENT",
+      "date": "DATE",
+      "amount": "AMOUNT",
+      "status": "STATUS",
+      "entity": "ENTITY"
+    },
+    "noActiveDeals": "No active cases",
+    "unverified": "Unverified",
+    "rejected": "Rejected"
+  },
+  "dealStatus": {
+    "accepted": "Accepted",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "report": {
+    "loading": "Loading commission records…",
+    "detailTitle": "Commission Detail",
+    "clickToExpand": "Click a row to expand breakdown",
+    "columns": {
+      "staff": "CONSULTANT",
+      "personalRev": "PERSONAL REV",
+      "base": "BASE",
+      "performance": "PERFORMANCE",
+      "team": "TEAM",
+      "total": "TOTAL",
+      "targetPct": "TARGET %",
+      "status": "Status"
+    },
+    "totalRow_one": "TOTAL (1 CONSULTANT)",
+    "totalRow_other": "TOTAL ({{count}} CONSULTANTS)",
+    "breakdown": "CALCULATION BREAKDOWN",
+    "noBreakdown": "No breakdown recorded.",
+    "adjustment": "Adjustment",
+    "approvedByLine": "Approved by {{name}} — {{date}}"
+  },
+  "modals": {
+    "newPeriod": {
+      "title": "New Commission Period",
+      "periodName": "Period Name",
+      "periodNamePlaceholder": "e.g. July 2026",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "targetLabel": "Clinic Revenue Target (€)",
+      "targetHelp": "Used for the hero progress ring and multiplier gates.",
+      "overrideLabel": "Case Value Override (€)",
+      "overrideLabelOptional": "optional, patient consultant cases",
+      "overrideHelp": "Leave blank to auto-compute from cases.",
+      "cancel": "Cancel",
+      "creating": "Creating…",
+      "create": "Create"
+    },
+    "revenueOverride": {
+      "title": "Override Case Value",
+      "label": "Case Value Override (€) — patient consultant cases",
+      "help": "Overrides the auto-computed case value. Does not affect total clinic revenue.",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "save": "Save Override"
+    },
+    "unlock": {
+      "title": "Unlock Period",
+      "body": "This will reopen {{period}} for editing. All approved commission records will revert to draft status, and locked deals will be unlocked.",
+      "auditNote": "The action is logged in the audit trail. Continue?",
+      "cancel": "Cancel",
+      "unlocking": "Unlocking…",
+      "confirm": "Unlock Period"
+    },
+    "setTarget": {
+      "title": "Set Revenue Target",
+      "periodLabel": "Period:",
+      "targetLabel": "Clinic Revenue Target (€)",
+      "targetHelp": "Used for progress ring and multiplier gate calculation.",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "save": "Save Target"
+    }
+  }
+}

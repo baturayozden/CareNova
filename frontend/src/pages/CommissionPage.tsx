@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 import SchemeEditor from '../components/SchemeEditor';
@@ -23,7 +24,10 @@ const APPROVE_ROLES = ['super_admin', 'admin', 'operasyon_muduru'];
 // would be actively misleading.
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function formatGBP(n: number | string | null | undefined): string {
+// CareDental's original name (formatGBP) formatted Pounds for its UK sales
+// reps; CareNova's clinics bill in Euro, so this is renamed to match what it
+// actually outputs — GBP never appears anywhere in this file anymore.
+function formatEUR(n: number | string | null | undefined): string {
   const val = Number(n ?? 0);
   return `€${val.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
@@ -76,9 +80,9 @@ function ProgressRing({ pct: pctVal, color }: { pct: number; color: string }) {
 }
 
 // Animated GBP number
-function AnimatedGBP({ value }: { value: number }) {
+function AnimatedEUR({ value }: { value: number }) {
   const v = useCountUp(value);
-  return <span className="tabular-nums">{formatGBP(v)}</span>;
+  return <span className="tabular-nums">{formatEUR(v)}</span>;
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -155,18 +159,20 @@ interface TCRow {
 
 // ─── Badges ───────────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: Period['status'] }) {
+  const { t } = useTranslation('commission');
   const styles: Record<string, string> = {
     open:   'bg-blue-900/60 text-blue-300',
     locked: 'bg-green-900/60 text-green-300',
   };
   return (
     <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${styles[status] ?? 'bg-gray-700 text-gray-300'}`}>
-      {status === 'locked' ? 'Locked' : 'Open'}
+      {status === 'locked' ? t('status.locked') : t('status.open')}
     </span>
   );
 }
 
 function RecordStatusBadge({ status }: { status: string }) {
+  const { t } = useTranslation('commission');
   const styles: Record<string, string> = {
     draft:    'bg-gray-700 text-gray-300',
     approved: 'bg-green-900/60 text-green-300',
@@ -174,12 +180,13 @@ function RecordStatusBadge({ status }: { status: string }) {
   };
   return (
     <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${styles[status] ?? 'bg-gray-700 text-gray-400'}`}>
-      {status}
+      {t(`recordStatus.${status}`, status)}
     </span>
   );
 }
 
-// Multiplier gate thresholds (per product spec)
+// Multiplier gate thresholds (per product spec) — purely numeric, no
+// translation needed.
 const GATES = [
   { label: '<80%',   mult: '×0',   min: 0,   max: 80  },
   { label: '80–99%', mult: '×0.5', min: 80,  max: 100 },
@@ -197,6 +204,7 @@ function gateColor(gate: typeof GATES[0], attainment: number) {
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function CommissionPage() {
   const { user } = useAuth();
+  const { t } = useTranslation('commission');
 
   const [periods, setPeriods]               = useState<Period[]>([]);
   const [periodsLoading, setPeriodsLoading] = useState(true);
@@ -300,11 +308,11 @@ export default function CommissionPage() {
       setPeriods(fetchedPeriods);
       setSelectedId(prev => prev || (fetchedPeriods[0]?.id ?? ''));
     } catch (err: any) {
-      setPeriodsError(err?.response?.data?.error || 'Failed to load periods.');
+      setPeriodsError(err?.response?.data?.error || t('errors.loadPeriods'));
     } finally {
       setPeriodsLoading(false);
     }
-  }, [isPlatformAdmin, effectiveTenantId]);
+  }, [isPlatformAdmin, effectiveTenantId, t]);
 
   useEffect(() => { fetchPeriods(); }, [fetchPeriods]);
 
@@ -375,7 +383,7 @@ export default function CommissionPage() {
           period_end:    newEnd,
           target_amount: Number(newTarget),
           target_type:   'monthly',
-          currency:      'GBP',
+          currency:      'EUR',
           ...(effectiveTenantId ? { tenantId: effectiveTenantId } : {}),
         });
       }
@@ -388,7 +396,7 @@ export default function CommissionPage() {
       setPeriods(fetchedPeriods);
       if (fetchedPeriods[0]) setSelectedId(fetchedPeriods[0].id);
     } catch (err: any) {
-      setNewPeriodError(err?.response?.data?.error || 'Failed to create period.');
+      setNewPeriodError(err?.response?.data?.error || t('errors.createPeriod'));
     } finally {
       setNewPeriodLoading(false);
     }
@@ -405,7 +413,7 @@ export default function CommissionPage() {
         period_end:    period.period_end,
         target_amount: Number(targetInput),
         target_type:   'monthly',
-        currency:      'GBP',
+        currency:      'EUR',
         ...(effectiveTenantId ? { tenantId: effectiveTenantId } : {}),
       });
       setShowSetTarget(false);
@@ -419,7 +427,7 @@ export default function CommissionPage() {
       const updated = fetchedPeriods.find(p => p.id === selectedId);
       if (updated) setReport(r => r ? { ...r, period: updated } : r);
     } catch (err: any) {
-      setTargetError(err?.response?.data?.error || 'Failed to save target.');
+      setTargetError(err?.response?.data?.error || t('errors.saveTarget'));
     } finally {
       setTargetLoading(false);
     }
@@ -440,7 +448,7 @@ export default function CommissionPage() {
       setPeriods(ps => ps.map(p => (p.id === selectedId ? { ...p, ...updated } : p)));
       setReport(r => r ? { ...r, period: updated } : r);
     } catch (err: any) {
-      setRevenueError(err?.response?.data?.error || 'Failed to save revenue.');
+      setRevenueError(err?.response?.data?.error || t('errors.saveRevenue'));
     } finally {
       setRevenueLoading(false);
     }
@@ -456,7 +464,7 @@ export default function CommissionPage() {
       });
       await fetchReport(selectedId);
     } catch (err: any) {
-      setCalcError(err?.response?.data?.error || 'Calculation failed.');
+      setCalcError(err?.response?.data?.error || t('errors.calculate'));
     } finally {
       setCalcLoading(false);
     }
@@ -474,7 +482,7 @@ export default function CommissionPage() {
       setPeriods(ps => ps.map(p => (p.id === selectedId ? { ...p, ...updated } : p)));
       await fetchReport(selectedId);
     } catch (err: any) {
-      setApproveError(err?.response?.data?.error || 'Approval failed.');
+      setApproveError(err?.response?.data?.error || t('errors.approve'));
     } finally {
       setApproveLoading(false);
     }
@@ -494,9 +502,9 @@ export default function CommissionPage() {
       await fetchReport(selectedId);
     } catch (err: any) {
       const s = err?.response?.status;
-      if (s === 409) setUnlockError('This period is already open.');
-      else if (s === 403) setUnlockError('You do not have permission to unlock this period.');
-      else setUnlockError(err?.response?.data?.error || 'Unlock failed.');
+      if (s === 409) setUnlockError(t('errors.unlockAlreadyOpen'));
+      else if (s === 403) setUnlockError(t('errors.unlockNoPermission'));
+      else setUnlockError(err?.response?.data?.error || t('errors.unlock'));
     } finally {
       setUnlockLoading(false);
     }
@@ -578,27 +586,27 @@ export default function CommissionPage() {
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <AppMeta title="Komisyon | CareNova" />
+      <AppMeta title={`${t('header.title')} | CareNova`} />
 
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-serif font-bold text-white">Commission</h1>
-        <p className="text-sm text-gray-400 mt-0.5">Manage commission periods, reports, and schemes</p>
+        <h1 className="text-2xl font-serif font-bold text-white">{t('header.title')}</h1>
+        <p className="text-sm text-gray-400 mt-0.5">{t('header.subtitle')}</p>
       </div>
 
       {/* Clinic selector (platform admin) */}
       {isPlatformAdmin && (
         <div className="flex items-center gap-3">
-          <span className="text-gray-400 text-sm font-medium shrink-0">Clinic:</span>
+          <span className="text-gray-400 text-sm font-medium shrink-0">{t('clinicSelector.label')}</span>
           {clinicsLoading ? (
-            <span className="text-gray-500 text-sm">Loading clinics…</span>
+            <span className="text-gray-500 text-sm">{t('clinicSelector.loading')}</span>
           ) : (
             <select
               value={selectedClinicId ?? ''}
               onChange={e => setSelectedClinicId(e.target.value || null)}
               className="bg-surface-sunken border border-line text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 min-w-[240px]"
             >
-              <option value="">— Select a clinic —</option>
+              <option value="">{t('clinicSelector.placeholder')}</option>
               {clinics.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           )}
@@ -616,12 +624,12 @@ export default function CommissionPage() {
             }`}
           >
             {tab === 'report'
-              ? <><BarChart2 size={14} className="inline mr-1.5 -mt-0.5" />Report</>
+              ? <><BarChart2 size={14} className="inline mr-1.5 -mt-0.5" />{t('tabs.report')}</>
               : tab === 'deals'
-              ? <><Briefcase size={14} className="inline mr-1.5 -mt-0.5" />Deals</>
+              ? <><Briefcase size={14} className="inline mr-1.5 -mt-0.5" />{t('tabs.deals')}</>
               : tab === 'schemes'
-              ? <><SettingsIcon size={14} className="inline mr-1.5 -mt-0.5" />Scheme</>
-              : <><CreditCard size={14} className="inline mr-1.5 -mt-0.5" />Payments</>}
+              ? <><SettingsIcon size={14} className="inline mr-1.5 -mt-0.5" />{t('tabs.schemes')}</>
+              : <><CreditCard size={14} className="inline mr-1.5 -mt-0.5" />{t('tabs.payments')}</>}
           </button>
         ))}
       </div>
@@ -630,8 +638,8 @@ export default function CommissionPage() {
       {isPlatformAdmin && !selectedClinicId ? (
         <div className="bg-surface-sunken border border-line rounded-xl p-12 flex flex-col items-center text-center">
           <Building2 size={48} className="mx-auto mb-4 text-gray-400" />
-          <p className="text-white font-semibold text-base mb-1">Select a clinic to view commission data</p>
-          <p className="text-gray-400 text-sm">Choose a clinic from the dropdown above to get started.</p>
+          <p className="text-white font-semibold text-base mb-1">{t('clinicPlaceholder.title')}</p>
+          <p className="text-gray-400 text-sm">{t('clinicPlaceholder.subtitle')}</p>
         </div>
       ) : (
         <>
@@ -645,15 +653,15 @@ export default function CommissionPage() {
       {/* ── Compact controls bar ─────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-3">
         {periodsLoading ? (
-          <span className="text-gray-500 text-sm">Loading…</span>
+          <span className="text-gray-500 text-sm">{t('controls.loading')}</span>
         ) : periodsError ? (
           <span className="text-red-400 text-sm">{periodsError}</span>
         ) : periods.length === 0 ? (
           <span className="text-gray-500 text-sm">
-            No periods yet.{' '}
+            {t('controls.noPeriods')}{' '}
             {canManage && (
               <button onClick={() => setShowNewPeriod(true)} className="text-accent underline">
-                Create one.
+                {t('controls.createOne')}
               </button>
             )}
           </span>
@@ -676,7 +684,7 @@ export default function CommissionPage() {
             onClick={() => setShowNewPeriod(true)}
             className="px-3 py-1.5 text-xs bg-surface-sunken text-gray-300 border border-line rounded-lg hover:bg-line transition-colors"
           >
-            + New Period
+            {t('controls.newPeriod')}
           </button>
         )}
 
@@ -685,7 +693,7 @@ export default function CommissionPage() {
             onClick={() => { setRevenueInput(period.clinic_revenue ?? ''); setShowRevenue(true); }}
             className="px-3 py-1.5 text-xs bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-lg hover:bg-yellow-500/30 transition-colors whitespace-nowrap"
           >
-            {period.clinic_revenue ? 'Edit Quota Override' : 'Override Quota Revenue'}
+            {period.clinic_revenue ? t('controls.editQuotaOverride') : t('controls.overrideQuotaRevenue')}
           </button>
         )}
 
@@ -696,7 +704,7 @@ export default function CommissionPage() {
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-50 transition-colors"
           >
             <Calculator size={13} />
-            {calcLoading ? 'Calculating…' : 'Calculate'}
+            {calcLoading ? t('controls.calculating') : t('controls.calculate')}
           </button>
         )}
 
@@ -707,7 +715,7 @@ export default function CommissionPage() {
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-500 disabled:opacity-50 transition-colors"
           >
             <CheckCircle2 size={13} />
-            {approveLoading ? 'Approving…' : 'Approve'}
+            {approveLoading ? t('controls.approving') : t('controls.approve')}
           </button>
         )}
 
@@ -716,7 +724,7 @@ export default function CommissionPage() {
             onClick={() => { setUnlockError(''); setShowUnlockConfirm(true); }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-amber-600/80 text-white rounded-lg hover:bg-amber-600 transition-colors"
           >
-            <LockOpen size={13} /> Unlock
+            <LockOpen size={13} /> {t('controls.unlock')}
           </button>
         )}
       </div>
@@ -742,46 +750,51 @@ export default function CommissionPage() {
                       {attainmentPct.toFixed(1)}%
                     </span>
                   ) : (
-                    <span className="text-gray-600 text-xs text-center leading-tight px-1">no<br/>target</span>
+                    <span className="text-gray-600 text-xs text-center leading-tight px-1" style={{ whiteSpace: 'pre-line' }}>{t('hero.noTargetRing')}</span>
                   )}
                 </div>
               </div>
               <div>
-                <p className="text-gray-400 text-xs uppercase tracking-widest mb-1">Quota Progress</p>
+                {/* No CSS `uppercase` — hero.quotaProgress is written
+                    already upper-case per language in commission.json, so
+                    there's nothing for Turkish-locale casing rules to
+                    mangle (this is what produced "MULTİPLİER GATES" below
+                    before this page had any i18n at all). */}
+                <p className="text-gray-400 text-xs tracking-widest mb-1">{t('hero.quotaProgress')}</p>
                 <p className="text-white text-2xl font-bold tabular-nums leading-tight">
-                  <AnimatedGBP value={effectiveRev} />
+                  <AnimatedEUR value={effectiveRev} />
                 </p>
-                <p className="text-[10px] text-accent/60 mt-0.5">UK TC sales only</p>
+                <p className="text-[10px] text-accent/60 mt-0.5">{t('hero.subtitle')}</p>
                 {hasTarget ? (
                   <>
                     <p className="text-gray-500 text-sm tabular-nums mt-0.5">
-                      / {formatGBP(targetAmount)} target
+                      / {formatEUR(targetAmount)} {t('hero.targetSuffix')}
                     </p>
                     {!period.clinic_revenue && (
-                      <p className="text-gray-600 text-[10px] italic mt-0.5">auto from TC deals</p>
+                      <p className="text-gray-600 text-[10px] italic mt-0.5">{t('hero.autoFromDeals')}</p>
                     )}
                     {toTarget > 0 && (
                       <p className="text-gray-500 text-xs mt-1">
-                        {formatGBP(toTarget)} to target
+                        {formatEUR(toTarget)} {t('hero.toTarget')}
                       </p>
                     )}
                   </>
                 ) : (
                   <div className="mt-1 flex items-center gap-2">
-                    <span className="text-gray-600 text-xs italic">No target set for this period</span>
+                    <span className="text-gray-600 text-xs italic">{t('hero.noTarget')}</span>
                     {canManage && !isLocked && (
                       <button
                         onClick={() => { setTargetInput(''); setTargetError(''); setShowSetTarget(true); }}
                         className="text-xs text-accent underline hover:text-accent/80 transition-colors"
                       >
-                        Set target
+                        {t('hero.setTarget')}
                       </button>
                     )}
                   </div>
                 )}
                 {isLocked && period.locked_by_first && (
                   <p className="text-gray-600 text-xs mt-1">
-                    Approved by {period.locked_by_first} {period.locked_by_last}
+                    {t('hero.approvedBy')} {period.locked_by_first} {period.locked_by_last}
                   </p>
                 )}
               </div>
@@ -791,7 +804,7 @@ export default function CommissionPage() {
 
             {/* Multiplier gates — only meaningful when target exists */}
             <div>
-              <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-2">Multiplier Gates</p>
+              <p className="text-gray-500 text-[10px] tracking-widest mb-2">{t('gates.title')}</p>
               <div className="flex gap-2">
                 {GATES.map(gate => (
                   <div
@@ -830,32 +843,34 @@ export default function CommissionPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             {
-              label: 'Quota Revenue',
-              value: formatGBP(liveQuotaSales),
-              sub: 'UK TC deals only',
+              label: t('cards.quotaRevenue.label'),
+              value: formatEUR(liveQuotaSales),
+              sub: t('cards.quotaRevenue.sub'),
               loading: liveDealsLoading,
             },
             {
-              label: 'Total Clinic Revenue',
-              value: formatGBP(liveTotalSales),
-              sub: `${activeDeals.length} deal${activeDeals.length !== 1 ? 's' : ''} — all sales, not quota-eligible`,
+              label: t('cards.totalClinicRevenue.label'),
+              value: formatEUR(liveTotalSales),
+              sub: t('cards.totalClinicRevenue.sub', { count: activeDeals.length }),
               loading: liveDealsLoading,
             },
             {
-              label: 'Deal Count',
+              label: t('cards.dealCount.label'),
               value: String(activeDeals.length),
-              sub: liveDealsLoading ? '—' : activeDeals.length === 1 ? '1 active deal' : `${activeDeals.length} active deals`,
+              sub: liveDealsLoading ? '—' : t('cards.dealCount.sub', { count: activeDeals.length }),
               loading: liveDealsLoading,
             },
             {
-              label: 'Active TCs',
+              label: t('cards.activeConsultants.label'),
               value: String(activeTCCount),
-              sub: hasRecords ? `${formatGBP(totalCommission)} commission` : 'Run Calculate for commission',
+              sub: hasRecords ? t('cards.activeConsultants.subCommission', { amount: formatEUR(totalCommission) }) : t('cards.activeConsultants.subRunCalculate'),
               loading: liveDealsLoading,
             },
           ].map(card => (
             <div key={card.label} className="bg-surface-sunken border border-line rounded-xl px-5 py-4">
-              <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">{card.label}</p>
+              {/* No CSS `uppercase` — every card.label above is already
+                  upper-case in commission.json per language. */}
+              <p className="text-gray-400 text-[11px] tracking-widest mb-1">{card.label}</p>
               <p className="text-white text-2xl font-bold tabular-nums leading-tight">
                 {card.loading ? <span className="text-gray-600">…</span> : card.value}
               </p>
@@ -870,32 +885,32 @@ export default function CommissionPage() {
         <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-surface-sunken flex items-center gap-2">
             <Trophy size={15} className="text-accent" />
-            <h3 className="text-white font-semibold text-sm">Sales Leaderboard</h3>
-            <span className="text-gray-600 text-xs ml-1">— live from deals</span>
+            <h3 className="text-white font-semibold text-sm">{t('leaderboard.title')}</h3>
+            <span className="text-gray-600 text-xs ml-1">{t('leaderboard.liveFromDeals')}</span>
             {hasRecords && (
-              <span className="ml-auto text-gray-500 text-xs">Commissions calculated</span>
+              <span className="ml-auto text-gray-500 text-xs">{t('leaderboard.commissionsCalculated')}</span>
             )}
           </div>
 
           {liveDealsLoading ? (
-            <div className="px-5 py-8 text-center text-gray-500 text-sm">Loading deals…</div>
+            <div className="px-5 py-8 text-center text-gray-500 text-sm">{t('leaderboard.loadingDeals')}</div>
           ) : leaderboard.length === 0 ? (
             <div className="px-5 py-10 text-center">
               <BarChart3 size={28} className="mx-auto mb-2 text-gray-600" />
-              <p className="text-gray-500 text-sm">No sales yet this period</p>
+              <p className="text-gray-500 text-sm">{t('leaderboard.noSalesYet')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-surface-sunken bg-surface/40">
-                    <th className="text-left px-4 py-2.5 text-gray-500 font-medium text-[11px] uppercase tracking-wide w-8">#</th>
-                    <th className="text-left px-4 py-2.5 text-gray-500 font-medium text-[11px] uppercase tracking-wide">Name</th>
-                    <th className="text-right px-4 py-2.5 text-gray-500 font-medium text-[11px] uppercase tracking-wide">Sales</th>
-                    <th className="text-right px-4 py-2.5 text-gray-500 font-medium text-[11px] uppercase tracking-wide">Deals</th>
-                    <th className="text-right px-4 py-2.5 text-gray-500 font-medium text-[11px] uppercase tracking-wide">Commission</th>
+                    <th className="text-left px-4 py-2.5 text-gray-500 font-medium text-[11px] tracking-wide w-8">{t('leaderboard.columns.rank')}</th>
+                    <th className="text-left px-4 py-2.5 text-gray-500 font-medium text-[11px] tracking-wide">{t('leaderboard.columns.name')}</th>
+                    <th className="text-right px-4 py-2.5 text-gray-500 font-medium text-[11px] tracking-wide">{t('leaderboard.columns.sales')}</th>
+                    <th className="text-right px-4 py-2.5 text-gray-500 font-medium text-[11px] tracking-wide">{t('leaderboard.columns.deals')}</th>
+                    <th className="text-right px-4 py-2.5 text-gray-500 font-medium text-[11px] tracking-wide">{t('leaderboard.columns.commission')}</th>
                     {targetAmount > 0 && (
-                      <th className="px-4 py-2.5 text-gray-500 font-medium text-[11px] uppercase tracking-wide min-w-[120px]">Progress</th>
+                      <th className="px-4 py-2.5 text-gray-500 font-medium text-[11px] tracking-wide min-w-[120px]">{t('leaderboard.columns.progress')}</th>
                     )}
                   </tr>
                 </thead>
@@ -923,20 +938,20 @@ export default function CommissionPage() {
                               <span className="text-white font-medium">{tc.name}</span>
                               {isNonQuota && (
                                 <span className="px-1.5 py-0.5 bg-slate-600 text-white rounded text-[10px] font-medium">
-                                  Not in quota
+                                  {t('leaderboard.notInQuota')}
                                 </span>
                               )}
                             </div>
                           </td>
                           <td className="px-4 py-3 text-right text-white font-semibold tabular-nums">
-                            {formatGBP(tc.totalSales)}
+                            {formatEUR(tc.totalSales)}
                           </td>
                           <td className="px-4 py-3 text-right text-gray-400 tabular-nums">
                             {tc.dealCount}
                           </td>
                           <td className="px-4 py-3 text-right tabular-nums">
                             {tc.commission !== null
-                              ? <span className="text-accent font-semibold">{formatGBP(tc.commission)}</span>
+                              ? <span className="text-accent font-semibold">{formatEUR(tc.commission)}</span>
                               : <span className="text-gray-600">—</span>}
                           </td>
                           {targetAmount > 0 && (
@@ -961,18 +976,18 @@ export default function CommissionPage() {
                               <table className="w-full text-xs">
                                 <thead>
                                   <tr className="border-b border-surface-sunken/60">
-                                    <th className="text-left pl-12 pr-3 py-2 text-gray-600 font-medium uppercase tracking-wide">Patient</th>
-                                    <th className="text-left px-3 py-2 text-gray-600 font-medium uppercase tracking-wide">Treatment</th>
-                                    <th className="text-left px-3 py-2 text-gray-600 font-medium uppercase tracking-wide">Date</th>
-                                    <th className="text-right px-3 py-2 text-gray-600 font-medium uppercase tracking-wide">Amount</th>
-                                    <th className="text-left px-3 py-2 text-gray-600 font-medium uppercase tracking-wide">Status</th>
-                                    <th className="text-left px-3 py-2 text-gray-600 font-medium uppercase tracking-wide">Entity</th>
+                                    <th className="text-left pl-12 pr-3 py-2 text-gray-600 font-medium tracking-wide">{t('leaderboard.subColumns.patient')}</th>
+                                    <th className="text-left px-3 py-2 text-gray-600 font-medium tracking-wide">{t('leaderboard.subColumns.treatment')}</th>
+                                    <th className="text-left px-3 py-2 text-gray-600 font-medium tracking-wide">{t('leaderboard.subColumns.date')}</th>
+                                    <th className="text-right px-3 py-2 text-gray-600 font-medium tracking-wide">{t('leaderboard.subColumns.amount')}</th>
+                                    <th className="text-left px-3 py-2 text-gray-600 font-medium tracking-wide">{t('leaderboard.subColumns.status')}</th>
+                                    <th className="text-left px-3 py-2 text-gray-600 font-medium tracking-wide">{t('leaderboard.subColumns.entity')}</th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-surface-sunken/60">
                                   {tcDeals.length === 0 ? (
                                     <tr>
-                                      <td colSpan={6} className="pl-12 pr-3 py-3 text-gray-600 italic">No active deals</td>
+                                      <td colSpan={6} className="pl-12 pr-3 py-3 text-gray-600 italic">{t('leaderboard.noActiveDeals')}</td>
                                     </tr>
                                   ) : tcDeals.map(d => (
                                     <tr key={d.id} className="hover:bg-surface-sunken/40 transition-colors">
@@ -996,7 +1011,7 @@ export default function CommissionPage() {
                                         {d.deal_date ? formatDate(d.deal_date) : '—'}
                                       </td>
                                       <td className="px-3 py-2.5 text-right text-white font-medium tabular-nums">
-                                        {formatGBP(d.agreed_amount)}
+                                        {formatEUR(d.agreed_amount)}
                                       </td>
                                       <td className="px-3 py-2.5">
                                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -1006,16 +1021,16 @@ export default function CommissionPage() {
                                             d.status === 'accepted'     ? 'bg-purple-900/60 text-purple-300':
                                             'bg-gray-800 text-gray-400'
                                           }`}>
-                                            {d.status.replace('_', ' ')}
+                                            {t(`dealStatus.${d.status}`, d.status.replace('_', ' '))}
                                           </span>
                                           {d.verification_status === 'unverified' && (
                                             <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-600 text-amber-950">
-                                              Unverified
+                                              {t('leaderboard.unverified')}
                                             </span>
                                           )}
                                           {d.verification_status === 'rejected' && (
                                             <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-600 text-white">
-                                              Rejected
+                                              {t('leaderboard.rejected')}
                                             </span>
                                           )}
                                         </div>
@@ -1043,7 +1058,7 @@ export default function CommissionPage() {
       {/* ── Report loading / error ────────────────────────────────────────────── */}
       {reportLoading && (
         <div className="bg-surface-sunken border border-line rounded-xl p-8 text-center text-gray-400 text-sm">
-          Loading commission records…
+          {t('report.loading')}
         </div>
       )}
       {reportError && !reportLoading && (
@@ -1056,22 +1071,22 @@ export default function CommissionPage() {
       {!reportLoading && !reportError && hasRecords && report && (
         <div className="bg-surface-sunken border border-line rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-surface-sunken flex items-center justify-between">
-            <h3 className="text-white font-semibold text-sm">Commission Detail</h3>
-            <p className="text-gray-500 text-xs">Click a row to expand breakdown</p>
+            <h3 className="text-white font-semibold text-sm">{t('report.detailTitle')}</h3>
+            <p className="text-gray-500 text-xs">{t('report.clickToExpand')}</p>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-surface-sunken bg-surface/40">
-                  <th className="text-left px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Staff</th>
-                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Personal Rev</th>
-                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Base</th>
-                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Performance</th>
-                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Team</th>
-                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Total</th>
-                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs uppercase tracking-wide">Target %</th>
-                  <th className="px-4 py-3 text-gray-400 font-medium text-xs w-10">Status</th>
+                  <th className="text-left px-4 py-3 text-gray-400 font-medium text-xs tracking-wide">{t('report.columns.staff')}</th>
+                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs tracking-wide">{t('report.columns.personalRev')}</th>
+                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs tracking-wide">{t('report.columns.base')}</th>
+                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs tracking-wide">{t('report.columns.performance')}</th>
+                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs tracking-wide">{t('report.columns.team')}</th>
+                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs tracking-wide">{t('report.columns.total')}</th>
+                  <th className="text-right px-4 py-3 text-gray-400 font-medium text-xs tracking-wide">{t('report.columns.targetPct')}</th>
+                  <th className="px-4 py-3 text-gray-400 font-medium text-xs w-10">{t('report.columns.status')}</th>
                   <th className="px-3 py-3 w-8"></th>
                 </tr>
               </thead>
@@ -1086,11 +1101,11 @@ export default function CommissionPage() {
                         <p className="text-white font-medium">{rec.first_name} {rec.last_name}</p>
                         <p className="text-gray-500 text-xs">{rec.email}</p>
                       </td>
-                      <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatGBP(rec.total_revenue)}</td>
-                      <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatGBP(rec.base_commission)}</td>
-                      <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatGBP(rec.performance_bonus)}</td>
-                      <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatGBP(rec.team_bonus)}</td>
-                      <td className="px-4 py-3 text-right text-accent font-semibold tabular-nums">{formatGBP(rec.total_commission)}</td>
+                      <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatEUR(rec.total_revenue)}</td>
+                      <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatEUR(rec.base_commission)}</td>
+                      <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatEUR(rec.performance_bonus)}</td>
+                      <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatEUR(rec.team_bonus)}</td>
+                      <td className="px-4 py-3 text-right text-accent font-semibold tabular-nums">{formatEUR(rec.total_commission)}</td>
                       <td className="px-4 py-3 text-right text-gray-400 text-xs tabular-nums">
                         {rec.target_attainment ? pct(rec.target_attainment) : '—'}
                       </td>
@@ -1109,20 +1124,20 @@ export default function CommissionPage() {
                       <tr className="bg-surface/60">
                         <td colSpan={9} className="px-6 py-5">
                           <div className="space-y-2">
-                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Calculation Breakdown</p>
+                            <p className="text-xs font-semibold text-gray-500 tracking-wider">{t('report.breakdown')}</p>
                             {rec.notes ? (
                               <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap font-mono bg-surface/60 rounded-lg px-4 py-3 border border-surface-sunken">
                                 {rec.notes}
                               </p>
                             ) : (
-                              <p className="text-gray-500 text-sm italic">No breakdown recorded.</p>
+                              <p className="text-gray-500 text-sm italic">{t('report.noBreakdown')}</p>
                             )}
                             {rec.adjustment_amount && Number(rec.adjustment_amount) !== 0 && (
-                              <p className="text-xs text-yellow-400">Adjustment: {formatGBP(rec.adjustment_amount)}</p>
+                              <p className="text-xs text-yellow-400">{t('report.adjustment')}: {formatEUR(rec.adjustment_amount)}</p>
                             )}
                             {rec.approved_at && (
                               <p className="text-xs text-gray-500">
-                                Approved by {rec.approved_by_first} {rec.approved_by_last} — {formatDate(rec.approved_at)}
+                                {t('report.approvedByLine', { name: `${rec.approved_by_first ?? ''} ${rec.approved_by_last ?? ''}`.trim(), date: formatDate(rec.approved_at) })}
                               </p>
                             )}
                           </div>
@@ -1135,20 +1150,20 @@ export default function CommissionPage() {
 
               <tfoot>
                 <tr className="border-t-2 border-line bg-surface/40">
-                  <td className="px-4 py-3 text-gray-400 text-xs font-semibold uppercase tracking-wide">
-                    Total ({report.records.length} {report.records.length === 1 ? 'staff member' : 'staff members'})
+                  <td className="px-4 py-3 text-gray-400 text-xs font-semibold tracking-wide">
+                    {t('report.totalRow', { count: report.records.length })}
                   </td>
-                  <td className="px-4 py-3 text-right text-white font-semibold text-sm tabular-nums">{formatGBP(totalPersonalRev)}</td>
+                  <td className="px-4 py-3 text-right text-white font-semibold text-sm tabular-nums">{formatEUR(totalPersonalRev)}</td>
                   <td className="px-4 py-3 text-right text-white font-semibold text-sm tabular-nums">
-                    {formatGBP(report.records.reduce((s, r) => s + Number(r.base_commission), 0))}
-                  </td>
-                  <td className="px-4 py-3 text-right text-white font-semibold text-sm tabular-nums">
-                    {formatGBP(report.records.reduce((s, r) => s + Number(r.performance_bonus), 0))}
+                    {formatEUR(report.records.reduce((s, r) => s + Number(r.base_commission), 0))}
                   </td>
                   <td className="px-4 py-3 text-right text-white font-semibold text-sm tabular-nums">
-                    {formatGBP(report.records.reduce((s, r) => s + Number(r.team_bonus), 0))}
+                    {formatEUR(report.records.reduce((s, r) => s + Number(r.performance_bonus), 0))}
                   </td>
-                  <td className="px-4 py-3 text-right text-accent font-bold text-sm tabular-nums">{formatGBP(totalCommission)}</td>
+                  <td className="px-4 py-3 text-right text-white font-semibold text-sm tabular-nums">
+                    {formatEUR(report.records.reduce((s, r) => s + Number(r.team_bonus), 0))}
+                  </td>
+                  <td className="px-4 py-3 text-right text-accent font-bold text-sm tabular-nums">{formatEUR(totalCommission)}</td>
                   <td colSpan={3}></td>
                 </tr>
               </tfoot>
@@ -1186,50 +1201,50 @@ export default function CommissionPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-md mx-4 p-6">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-white font-semibold text-lg">New Commission Period</h2>
+              <h2 className="text-white font-semibold text-lg">{t('modals.newPeriod.title')}</h2>
               <button onClick={() => setShowNewPeriod(false)} className="text-gray-400 hover:text-white text-xl leading-none">✕</button>
             </div>
 
             <form onSubmit={handleCreatePeriod} className="space-y-4">
               <div>
-                <label className="block text-gray-400 text-xs font-medium mb-1.5">Period Name <span className="text-red-400">*</span></label>
-                <input required type="text" placeholder="e.g. July 2026" value={newLabel} onChange={e => setNewLabel(e.target.value)} className={inputCls} />
+                <label className="block text-gray-400 text-xs font-medium mb-1.5">{t('modals.newPeriod.periodName')} <span className="text-red-400">*</span></label>
+                <input required type="text" placeholder={t('modals.newPeriod.periodNamePlaceholder')} value={newLabel} onChange={e => setNewLabel(e.target.value)} className={inputCls} />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-gray-400 text-xs font-medium mb-1.5">Start Date <span className="text-red-400">*</span></label>
+                  <label className="block text-gray-400 text-xs font-medium mb-1.5">{t('modals.newPeriod.startDate')} <span className="text-red-400">*</span></label>
                   <input required type="date" value={newStart} onChange={e => setNewStart(e.target.value)} className={inputCls} />
                 </div>
                 <div>
-                  <label className="block text-gray-400 text-xs font-medium mb-1.5">End Date <span className="text-red-400">*</span></label>
+                  <label className="block text-gray-400 text-xs font-medium mb-1.5">{t('modals.newPeriod.endDate')} <span className="text-red-400">*</span></label>
                   <input required type="date" value={newEnd} onChange={e => setNewEnd(e.target.value)} className={inputCls} />
                 </div>
               </div>
 
               <div>
-                <label className="block text-gray-400 text-xs font-medium mb-1.5">Clinic Revenue Target (€) <span className="text-red-400">*</span></label>
+                <label className="block text-gray-400 text-xs font-medium mb-1.5">{t('modals.newPeriod.targetLabel')} <span className="text-red-400">*</span></label>
                 <input
                   required
                   type="number" min="0" step="0.01" placeholder="300000"
                   value={newTarget} onChange={e => setNewTarget(e.target.value)}
                   className={inputCls}
                 />
-                <p className="text-gray-600 text-xs mt-1">Used for the hero progress ring and multiplier gates.</p>
+                <p className="text-gray-600 text-xs mt-1">{t('modals.newPeriod.targetHelp')}</p>
               </div>
 
               <div>
-                <label className="block text-gray-400 text-xs font-medium mb-1.5">Quota Revenue Override (€) <span className="text-gray-600 font-normal">— optional, UK TC sales only</span></label>
+                <label className="block text-gray-400 text-xs font-medium mb-1.5">{t('modals.newPeriod.overrideLabel')} <span className="text-gray-600 font-normal">— {t('modals.newPeriod.overrideLabelOptional')}</span></label>
                 <input type="number" min="0" step="0.01" placeholder="0.00" value={newRevenue} onChange={e => setNewRevenue(e.target.value)} className={inputCls} />
-                <p className="text-gray-600 text-xs mt-1">Leave blank to auto-compute from TC deals.</p>
+                <p className="text-gray-600 text-xs mt-1">{t('modals.newPeriod.overrideHelp')}</p>
               </div>
 
               {newPeriodError && <p className="text-red-400 text-sm">{newPeriodError}</p>}
 
               <div className="flex justify-end gap-3 pt-1">
-                <button type="button" onClick={() => setShowNewPeriod(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+                <button type="button" onClick={() => setShowNewPeriod(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">{t('modals.newPeriod.cancel')}</button>
                 <button type="submit" disabled={newPeriodLoading} className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 transition-colors">
-                  {newPeriodLoading ? 'Creating…' : 'Create'}
+                  {newPeriodLoading ? t('modals.newPeriod.creating') : t('modals.newPeriod.create')}
                 </button>
               </div>
             </form>
@@ -1244,27 +1259,27 @@ export default function CommissionPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-sm mx-4 p-6">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-white font-semibold text-lg">Override Quota Revenue</h2>
+              <h2 className="text-white font-semibold text-lg">{t('modals.revenueOverride.title')}</h2>
               <button onClick={() => setShowRevenue(false)} className="text-gray-400 hover:text-white text-xl leading-none">✕</button>
             </div>
 
             <form onSubmit={handleEnterRevenue} className="space-y-4">
               <div>
-                <label className="block text-gray-400 text-xs font-medium mb-1.5">Quota Revenue Override (€) — UK TC sales only</label>
+                <label className="block text-gray-400 text-xs font-medium mb-1.5">{t('modals.revenueOverride.label')}</label>
                 <input
                   required type="number" min="0" step="0.01" placeholder="0.00"
                   value={revenueInput} onChange={e => setRevenueInput(e.target.value)}
                   autoFocus className={inputCls}
                 />
-                <p className="text-gray-600 text-xs mt-1">Overrides the auto-computed TC-only quota. Does not affect total clinic revenue.</p>
+                <p className="text-gray-600 text-xs mt-1">{t('modals.revenueOverride.help')}</p>
               </div>
 
               {revenueError && <p className="text-red-400 text-sm">{revenueError}</p>}
 
               <div className="flex justify-end gap-3 pt-1">
-                <button type="button" onClick={() => setShowRevenue(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+                <button type="button" onClick={() => setShowRevenue(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">{t('modals.revenueOverride.cancel')}</button>
                 <button type="submit" disabled={revenueLoading} className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 transition-colors">
-                  {revenueLoading ? 'Saving…' : 'Save Override'}
+                  {revenueLoading ? t('modals.revenueOverride.saving') : t('modals.revenueOverride.save')}
                 </button>
               </div>
             </form>
@@ -1279,23 +1294,21 @@ export default function CommissionPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-sm mx-4 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-semibold text-lg">Unlock Period</h2>
+              <h2 className="text-white font-semibold text-lg">{t('modals.unlock.title')}</h2>
               <button onClick={() => setShowUnlockConfirm(false)} className="text-gray-400 hover:text-white text-xl leading-none">✕</button>
             </div>
 
             <p className="text-gray-300 text-sm leading-relaxed mb-2">
-              This will reopen <span className="text-white font-medium">{period?.period_label}</span> for
-              editing. All approved commission records will revert to draft status, and locked treatment
-              deals will be unlocked.
+              {t('modals.unlock.body', { period: period?.period_label ?? '' })}
             </p>
-            <p className="text-gray-500 text-xs mb-5">The action is logged in the audit trail. Continue?</p>
+            <p className="text-gray-500 text-xs mb-5">{t('modals.unlock.auditNote')}</p>
 
             {unlockError && <p className="text-red-400 text-sm mb-4">{unlockError}</p>}
 
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowUnlockConfirm(false)} disabled={unlockLoading} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50">Cancel</button>
+              <button onClick={() => setShowUnlockConfirm(false)} disabled={unlockLoading} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50">{t('modals.unlock.cancel')}</button>
               <button onClick={handleUnlock} disabled={unlockLoading} className="px-5 py-2 bg-amber-600 text-white rounded-lg text-sm font-semibold hover:bg-amber-500 disabled:opacity-50 transition-colors">
-                {unlockLoading ? 'Unlocking…' : 'Unlock Period'}
+                {unlockLoading ? t('modals.unlock.unlocking') : t('modals.unlock.confirm')}
               </button>
             </div>
           </div>
@@ -1309,17 +1322,17 @@ export default function CommissionPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-surface-sunken border border-line rounded-2xl w-full max-w-sm mx-4 p-6">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-white font-semibold text-lg">Set Revenue Target</h2>
+              <h2 className="text-white font-semibold text-lg">{t('modals.setTarget.title')}</h2>
               <button onClick={() => setShowSetTarget(false)} className="text-gray-400 hover:text-white text-xl leading-none">✕</button>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              Period: <span className="text-white font-medium">{period.period_label}</span>
+              {t('modals.setTarget.periodLabel')} <span className="text-white font-medium">{period.period_label}</span>
             </p>
 
             <form onSubmit={handleSetTarget} className="space-y-4">
               <div>
                 <label className="block text-gray-400 text-xs font-medium mb-1.5">
-                  Clinic Revenue Target (€) <span className="text-red-400">*</span>
+                  {t('modals.setTarget.targetLabel')} <span className="text-red-400">*</span>
                 </label>
                 <input
                   required
@@ -1327,15 +1340,15 @@ export default function CommissionPage() {
                   value={targetInput} onChange={e => setTargetInput(e.target.value)}
                   autoFocus className={inputCls}
                 />
-                <p className="text-gray-600 text-xs mt-1">Used for progress ring and multiplier gate calculation.</p>
+                <p className="text-gray-600 text-xs mt-1">{t('modals.setTarget.targetHelp')}</p>
               </div>
 
               {targetError && <p className="text-red-400 text-sm">{targetError}</p>}
 
               <div className="flex justify-end gap-3 pt-1">
-                <button type="button" onClick={() => setShowSetTarget(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+                <button type="button" onClick={() => setShowSetTarget(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">{t('modals.setTarget.cancel')}</button>
                 <button type="submit" disabled={targetLoading} className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-semibold hover:bg-accent/90 disabled:opacity-50 transition-colors">
-                  {targetLoading ? 'Saving…' : 'Save Target'}
+                  {targetLoading ? t('modals.setTarget.saving') : t('modals.setTarget.save')}
                 </button>
               </div>
             </form>
