@@ -115,6 +115,50 @@
     "empty": "Bakım hattı henüz başlamadı"
   },
   "audit": { "empty": "Kayıt yok" },
+  "quotesList": {
+    "title": "Teklifler",
+    "subtitle": "teklif gösteriliyor",
+    "searchPlaceholder": "Hasta adı veya vaka no ara…",
+    "allStatuses": "Tüm durumlar",
+    "allBranches": "Tüm branşlar",
+    "allConsultants": "Tüm danışmanlar",
+    "columns": { "patient": "Hasta", "caseNumber": "Vaka No", "branch": "Branş", "version": "Versiyon", "amount": "Tutar", "status": "Durum", "validUntil": "Geçerlilik Bitişi", "consultant": "Danışman" },
+    "status": { "draft": "Taslak", "locked": "Kilitli", "accepted": "Kabul Edildi", "expired": "Süresi Doldu" },
+    "expiringSoon": "Süresi dolmak üzere",
+    "noExpiry": "—",
+    "noResults": "Henüz oluşturulmuş bir teklif yok"
+  },
+  "travelList": {
+    "title": "Seyahat",
+    "subtitle": "seyahat planı gösteriliyor",
+    "searchPlaceholder": "Hasta adı veya vaka no ara…",
+    "allBranches": "Tüm branşlar",
+    "columns": { "patient": "Hasta", "caseNumber": "Vaka No", "flight": "Uçuş Durumu", "hotel": "Otel", "transfer": "Transfer", "companions": "Refakatçi", "coordinator": "Koordinatör", "lastUpdate": "Son Güncelleme" },
+    "todayHighlight": "Bugün",
+    "noResults": "Henüz seyahat planı oluşturulmuş bir vaka yok",
+    "onlyPlanned": "Sadece seyahat planı olan {{count}} / {{total}} vaka listeleniyor — henüz uçuş/otel bilgisi girilmemiş vakalar bu listede görünmez."
+  },
+  "aftercareList": {
+    "title": "Bakım Hattı",
+    "subtitle": "vaka gösteriliyor",
+    "searchPlaceholder": "Hasta adı veya vaka no ara…",
+    "allBranches": "Tüm branşlar",
+    "columns": { "patient": "Hasta", "caseNumber": "Vaka No", "treatedDate": "İşlem Tarihi", "dayPostOp": "Operasyon Sonrası Gün", "nextContact": "Sıradaki Temas", "lastContact": "Son Temas", "status": "Durum" },
+    "status": { "upToDate": "Güncel", "dueNow": "Temas Zamanı", "complete": "Takvim Tamamlandı", "notStarted": "Henüz Başlamadı" },
+    "noContactYet": "Henüz temas yok",
+    "scheduleComplete": "Tamamlandı",
+    "noResults": "Bakım hattı takibinde vaka yok"
+  },
+  "reportsPage": {
+    "title": "Raporlar",
+    "subtitle": "Klinik performansının haftalık özeti",
+    "periods": { "this_week": "Bu hafta", "this_month": "Bu ay", "last_90": "Son 90 gün" },
+    "funnel": { "title": "Huni", "new": "Yeni", "qualified": "Nitelendi", "awaiting_doctor": "Doktor Onayı", "quoted": "Teklif Verildi", "awaiting_deposit": "Depozito Bekliyor", "arrived": "Geldi", "completed": "Tamamlandı" },
+    "byBranch": { "title": "Branş Kırılımı", "cases": "vaka", "value": "toplam değer" },
+    "byConsultant": { "title": "Danışman Performansı", "columns": { "consultant": "Danışman", "cases": "Vaka", "value": "Toplam Değer", "avgResponse": "Ort. Yanıt" } },
+    "avgResponseTime": { "title": "Ortalama İlk Yanıt Süresi" },
+    "lossReasons": { "title": "Kayıp Nedenleri", "empty": "Bu dönemde kayıp vaka yok", "lost": "Kayıp", "medically_ineligible": "Tıbben Uygun Değil" }
+  },
   "doctorQueue": {
     "title": "Doktor Onay Kuyruğu",
     "subtitle": "Ön değerlendirmesi tamamlanan vakalar, doktor onayını bekliyor",

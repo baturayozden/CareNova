@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import AppMeta from './AppMeta';
 import { cases, CaseFile, DEMO_NOW_MS, todaysSchedule, ScheduleEntry } from '../data/caseData';
+import { averageFirstResponseMinutes } from '../lib/caseDisplay';
 
 // GECE-3-BRIEFI.md Bölüm C — replaces CareDental's inherited lead board
 // (Bulgu 3: "Total Leads 4" while /cases showed 15 cases — two screens
@@ -43,20 +44,6 @@ function resolveVariant(role?: string): Variant {
 function lastMessageSide(c: CaseFile): 'in' | 'out' | null {
   if (c.messages.length === 0) return null;
   return c.messages[c.messages.length - 1].side;
-}
-
-function averageFirstResponseMinutes(): number | null {
-  const deltas: number[] = [];
-  for (const c of cases) {
-    for (let i = 0; i < c.messages.length - 1; i++) {
-      if (c.messages[i].side === 'in' && c.messages[i + 1].side === 'out') {
-        const mins = (new Date(c.messages[i + 1].at).getTime() - new Date(c.messages[i].at).getTime()) / 60000;
-        if (mins >= 0) deltas.push(mins);
-      }
-    }
-  }
-  if (deltas.length === 0) return null;
-  return Math.round(deltas.reduce((a, b) => a + b, 0) / deltas.length);
 }
 
 function isToday(iso: string): boolean {

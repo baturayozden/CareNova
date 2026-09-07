@@ -115,6 +115,50 @@
     "empty": "Aftercare line hasn't started yet"
   },
   "audit": { "empty": "No entries" },
+  "quotesList": {
+    "title": "Quotes",
+    "subtitle": "quotes shown",
+    "searchPlaceholder": "Search by patient name or case number…",
+    "allStatuses": "All statuses",
+    "allBranches": "All branches",
+    "allConsultants": "All consultants",
+    "columns": { "patient": "Patient", "caseNumber": "Case No.", "branch": "Branch", "version": "Version", "amount": "Amount", "status": "Status", "validUntil": "Valid Until", "consultant": "Consultant" },
+    "status": { "draft": "Draft", "locked": "Locked", "accepted": "Accepted", "expired": "Expired" },
+    "expiringSoon": "Expiring soon",
+    "noExpiry": "—",
+    "noResults": "No quotes created yet"
+  },
+  "travelList": {
+    "title": "Travel",
+    "subtitle": "travel plans shown",
+    "searchPlaceholder": "Search by patient name or case number…",
+    "allBranches": "All branches",
+    "columns": { "patient": "Patient", "caseNumber": "Case No.", "flight": "Flight Status", "hotel": "Hotel", "transfer": "Transfer", "companions": "Companions", "coordinator": "Coordinator", "lastUpdate": "Last Update" },
+    "todayHighlight": "Today",
+    "noResults": "No cases with a travel plan yet",
+    "onlyPlanned": "Showing {{count}} / {{total}} cases with a travel plan — cases without flight/hotel details yet don't appear here."
+  },
+  "aftercareList": {
+    "title": "Aftercare",
+    "subtitle": "cases shown",
+    "searchPlaceholder": "Search by patient name or case number…",
+    "allBranches": "All branches",
+    "columns": { "patient": "Patient", "caseNumber": "Case No.", "treatedDate": "Treatment Date", "dayPostOp": "Days Post-Op", "nextContact": "Next Contact", "lastContact": "Last Contact", "status": "Status" },
+    "status": { "upToDate": "Up to Date", "dueNow": "Contact Due", "complete": "Schedule Complete", "notStarted": "Not Started" },
+    "noContactYet": "No contact yet",
+    "scheduleComplete": "Complete",
+    "noResults": "No cases in aftercare tracking"
+  },
+  "reportsPage": {
+    "title": "Reports",
+    "subtitle": "Weekly summary of clinic performance",
+    "periods": { "this_week": "This week", "this_month": "This month", "last_90": "Last 90 days" },
+    "funnel": { "title": "Funnel", "new": "New", "qualified": "Qualified", "awaiting_doctor": "Doctor Approval", "quoted": "Quoted", "awaiting_deposit": "Awaiting Deposit", "arrived": "Arrived", "completed": "Completed" },
+    "byBranch": { "title": "Branch Breakdown", "cases": "cases", "value": "total value" },
+    "byConsultant": { "title": "Consultant Performance", "columns": { "consultant": "Consultant", "cases": "Cases", "value": "Total Value", "avgResponse": "Avg Response" } },
+    "avgResponseTime": { "title": "Average First Response Time" },
+    "lossReasons": { "title": "Loss Reasons", "empty": "No lost cases in this period", "lost": "Lost", "medically_ineligible": "Medically Ineligible" }
+  },
   "doctorQueue": {
     "title": "Doctor Approval Queue",
     "subtitle": "Cases with completed pre-assessment, awaiting doctor approval",

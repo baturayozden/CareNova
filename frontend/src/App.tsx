@@ -32,6 +32,10 @@ import CaseDetailPage from './pages/CaseDetailPage';
 import CasesPage from './pages/CasesPage';
 import CaseFileDetailPage from './pages/CaseFileDetailPage';
 import DoctorQueuePage from './pages/DoctorQueuePage';
+import QuotesPage from './pages/QuotesPage';
+import TravelPage from './pages/TravelPage';
+import AftercarePage from './pages/AftercarePage';
+import ReportsPage from './pages/ReportsPage';
 import PatientProfilePage from './pages/PatientProfilePage';
 import PatientsListPage  from './pages/PatientsListPage';
 import PaymentSuccessPage  from './pages/PaymentSuccessPage';
@@ -42,7 +46,6 @@ import CookiePage from './pages/legal/CookiePage';
 import GdprPage from './pages/legal/GdprPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 import { hostMode } from './config/hosts';
-import { setDefaultTitle } from './lib/setDefaultTitle';
 
 // The admin console is a real, separate route tree (GECE-2-BRIEFI.md Bölüm
 // B.3, güvenlik kuralı #3: "Admin route'ları app bundle'ında hiç mount
@@ -87,15 +90,19 @@ function MarketingRoutes() {
 
 // ── App host (app.carenova.ai) — clinic users ───────────────────────────────
 function AppRoutes() {
-  // Default tab title for routes that don't render their own <AppMeta> (most
-  // of the dashboard doesn't yet). Set imperatively (document.title, not a
-  // JSX <title>) specifically so it never competes with a page that DOES
-  // render its own AppMeta — React 19 hoists JSX <title> elements and the
-  // first one it finds wins (see AppMeta.tsx's own warning about mounting
-  // two at once); a plain imperative assignment sits outside that mechanism
-  // entirely, so a page's own AppMeta always overrides it on navigation,
-  // and it re-takes effect as the fallback the moment that page unmounts.
-  useEffect(() => { setDefaultTitle('CareNova | Klinik Paneli'); }, []);
+  // APP-ADMIN-EKSIKLER-KOMUTU.md Görev 5 — this used to call
+  // setDefaultTitle('CareNova | Klinik Paneli') imperatively here, always
+  // mounted regardless of which child route was active. The real root
+  // cause of the "2 <title> elements" bug: that raw DOM manipulation sits
+  // completely outside React 19's <title> hoisting/reconciliation, so
+  // when a child page (e.g. CasesPage) later renders its OWN declarative
+  // <AppMeta>, React has no way to know the imperative one even exists —
+  // it never gets removed, and both stay in <head> at once (confirmed:
+  // `document.querySelectorAll('title').length === 2` on /cases). Every
+  // page under this route tree now renders its own <AppMeta> instead (see
+  // each page file) — since <Routes> only ever mounts ONE matched route
+  // element at a time, that structurally guarantees exactly one component
+  // providing a title at any moment, with no separate fallback needed.
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
@@ -131,10 +138,10 @@ function AppRoutes() {
           <Route path="/cases"          element={<CasesPage />} />
           <Route path="/cases/:id"      element={<CaseFileDetailPage />} />
           <Route path="/doctor-queue"   element={<DoctorQueuePage />} />
-          <Route path="/quotes"         element={<ComingSoonPage title="Teklifler" />} />
-          <Route path="/travel"         element={<ComingSoonPage title="Seyahat" />} />
-          <Route path="/aftercare"      element={<ComingSoonPage title="Bakım Hattı" />} />
-          <Route path="/reports"        element={<ComingSoonPage title="Raporlar" />} />
+          <Route path="/quotes"         element={<QuotesPage />} />
+          <Route path="/travel"         element={<TravelPage />} />
+          <Route path="/aftercare"      element={<AftercarePage />} />
+          <Route path="/reports"        element={<ReportsPage />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
