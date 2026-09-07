@@ -2006,7 +2006,7 @@ Anthropic çağrısı YOK (MUTLAK YASAK #5). `node src/index.js` temiz açılıy
 `curl -X POST /api/admin/platform/prompt-preview` auth'suz → 401
 (doğrulandı).
 
-**Commit:** (aşağıda)
+**Commit:** `61ad3b5` — "feat(ai): layered system prompt compiler with branch pricing authority matrix and output guard"
 
 ---
 
