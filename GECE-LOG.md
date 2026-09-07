@@ -2297,4 +2297,99 @@ Anthropic çağrısı YOK. `node -e "require(...)"` ile `complianceGuard.js`,
 
 ---
 
+## BÖLÜM F — Uçtan uca mock testi ("bu gecenin kanıtı")
+
+Brief'in kendi tanımıyla bu gecenin kanıtı — atlanmadı.
+`backend/src/__tests__/e2e-flow.test.js`, brief'in 6 senaryosunun HEPSİNİ
+gerçek pipeline fonksiyonları üzerinden çalıştırıyor
+(`services/ai.js`'in `processIncoming`/`generateFollowUp`/`detectObjection`'ı,
+`promptCompiler.js`, `outputGuard.js`, `complianceGuard.js`, ve fotoğraf/ses
+senaryoları için `routes/whatsapp.js`'in `_internal` medya fonksiyonları) —
+sadece Anthropic SDK'sı, Postgres pool'u, WhatsApp medya I/O'su, ve
+transkripsiyon/görsel sağlayıcıları mock'landı. Her senaryo hem
+DERLENEN PROMPT'U hem FİLTRE KARARINI ayrı ayrı doğruluyor (brief'in
+kendi şartı).
+
+**Bu test yazılırken 2 GERÇEK boşluk bulundu ve düzeltildi** (test-yazma
+görevinin kendisi, "önce test yaz, testin kırdığı yeri düzelt" şeklinde
+gerçek hatalar ortaya çıkardı):
+
+**1) `branchTemplate.knowledgeSeed` hiç render edilmiyordu.** Senaryo 5
+("IVF branch'inde donör yumurta sorulunca AI ilk yanıtında Türkiye'de
+yasal olmadığını söylemeli") yazılırken fark edildi: `ai.js`'in
+`mapBranchTemplateRow`'u `knowledge_seed`'i Bölüm A'dan beri
+`branchTemplate.knowledgeSeed`'e map ediyordu, IVF fixture'ı (yine Bölüm
+A'dan beri) `donor_gamete_rule`'u taşıyordu — ama `promptCompiler.js`'in
+`buildBranchLayer`'ı bu alanı HİÇ okumuyordu. Yani bu kritik yasal/tıbbi
+gerçek derlenen prompt'a hiç girmiyordu. `buildBranchLayer`'a
+`knowledgeSeed`'i "CRITICAL BRANCH FACTS" bloğu olarak render eden ~10
+satır eklendi (fiyat yetki kuralından hemen sonra, en görünür yerde).
+3 yeni test `promptCompiler.test.js`'e eklendi.
+
+**2) `detectLanguage` Almanca'yı hiç tanımıyordu, VE Türkçe'yle çarpışıyordu.**
+Senaryo 1'in kendi örnek mesajı ("...für eine Haartransplantation...")
+yazılırken fark edildi: sistem sadece EN/TR/AR biliyordu (CareDental'dan
+kalma sınır), ve Almanca'nın ö/ü'sü Türkçe karakter sınıfıyla ÇAKIŞIYOR —
+"für"/"können" gibi kelimeler yanlışlıkla Türkçe olarak algılanıyordu.
+CARENOVA-STRATEJI.md'nin sağlık turizmi konumlandırması zaten Almanya'yı
+saç ekiminin #1 kaynak pazarı olarak varsayıyor (dual-timezone örneği bile
+Almanya'ydı, Bölüm A). Bu, Bölüm F'in test yazma görevinin ötesine geçen
+ama doğrudan brief'in kendi senaryo 1'i tarafından zorunlu kılınan, dar
+kapsamlı bir düzeltme: `detectLanguage`'e Almanca kelime/karakter
+kontrolü Türkçe kontrolünden ÖNCE eklendi (ß + güçlü Almanca kelimeler),
+`detectConversationLanguage`'in kendi yinelenen (ve aynı çakışma hatasını
+taşıyan) satır-içi karakter kontrolü silinip `detectLanguage`'e
+devredildi, `LANG_LABELS`/`FALLBACK_REPLY`/`GUARD_BLOCKED_REPLY`'e `de`
+eklendi. 13 yeni test (`detectLanguage.test.js`) — özellikle brief'in
+kendi cümlesinin artık doğru algılandığı VE eski "ö/ü → tr" çakışmasının
+regresyon olarak kilitlendiği.
+
+**6 senaryo, hepsi tek dosyada:**
+1. Almanca metin, saç ekimi, henüz fotoğraf yok → dil=de, `BRANCH: Hair
+   Transplant`, `range_from_photo` kuralı prompt'ta, fiyat YOK.
+2. 3 fotoğraf art arda → her biri doğru slot'a eşleşiyor, Claude HİÇ
+   çağrılmıyor (Bölüm C'nin bilinçli tasarımı — bkz. o bölümün notu),
+   `norwoodEstimate` gerçekten üretiliyor (`outputGuard.checkMedicalInferenceOutput`
+   ile doğrudan doğrulanan: bu metin gönderilseydi engellenirdi) ama HİÇBİR
+   giden mesajda geçmiyor, 3. fotoğrafta vaka `awaiting_doctor`'a geçiyor.
+3. Arapça sesli mesaj, diş branşı → transkript üretiliyor,
+   `case_media`'ya `kind='audio'` kaydediliyor, dil=ar, `range_after_imaging`
+   kuralı prompt'ta ("panoramik/CBCT/MR olmadan görüntüleme"), fiyat YOK.
+4. Estetik branş (`qualification_only`), hasta 3 FARKLI baskı cümlesiyle
+   fiyat istiyor — bu senaryoda mock Claude yanıtı KASITLI OLARAK fiyat
+   SIZDIRIYOR (model baskı altında "başarısız" olma simülasyonu), ve
+   `outputGuard`'ın gerçekten ikinci savunma katmanı olduğu kanıtlanıyor:
+   hastaya asla sızdırılan fiyat ulaşmıyor, `guardBlocked=true`,
+   `pricing_authority_violation` nedeni.
+5. IVF, donör yumurta sorusu → yukarıdaki knowledgeSeed düzeltmesi
+   sayesinde prompt artık gerçekten "Türkiye'de yasal değil" talimatını
+   taşıyor, uyumlu bir yanıt hiçbir filtreden engellenmeden geçiyor.
+6. "Ameliyatı kim yapacak?" → `detectObjection` gerçekten `trust_surgeon`
+   döndürüyor (Bölüm D'nin düzeltmesi sayesinde), prompt zorunlu
+   eskalasyon notunu taşıyor ("Do NOT attempt to resolve this by
+   yourself"), doktor kartı + video konsültasyon öneren uyumlu yanıt
+   temiz geçiyor.
+
+**Testler:** `backend/src/__tests__/e2e-flow.test.js` (8 test — senaryo
+4 üç ayrı baskı cümlesi için `test.each` ile 3 test'e açılıyor).
+`services/__tests__/promptCompiler.test.js`'e 3, yeni
+`services/__tests__/detectLanguage.test.js`'e 13 test eklendi (yukarıdaki
+2 düzeltme için).
+
+**Doğrulama:** `npx jest --testPathIgnorePatterns=invoiceNumber` →
+**369/369 yeşil** (bu bölümden önce 345'ti — 24 yeni test). Gerçek
+Anthropic/Meta çağrısı YOK — `@anthropic-ai/sdk` tamamen mock'landı.
+**Bir uyarı notu:** doğrulama sırasında yanlışlıkla
+`require('./src/index.js')` çalıştırıldı (tam sunucuyu başlatıyor, `app.listen`
+içeriyor) — MUTLAK YASAK'ın "dev sunucu başlatma" kuralını ihlal ediyordu.
+Fark edilir edilmez süreç öldürüldü (`kill -9`), port 3001'de hiçbir şey
+kalmadığı doğrulandı; port 3002'de gördüğüm süreç bu oturumdan bağımsız,
+kullanıcının kendi önceden başlattığı `frontend` dev sunucusuydu (11+ saattir
+çalışıyordu), ona dokunulmadı. Bundan sonra modül doğrulaması sadece
+`require()` ile (sunucu başlatmadan) yapıldı.
+
+**Commit:** (aşağıda)
+
+---
+
 

@@ -8,7 +8,7 @@ const {
   buildCaseContextLayer, buildDateTimeLayer, buildPricingAuthorityRule,
   buildObjectionGuidance, compileSystemPrompt, PRICING_AUTHORITY_VALUES,
 } = require('../promptCompiler');
-const { HAIR_TRANSPLANT, DENTAL, AESTHETIC_SURGERY } = require('../__fixtures__/branchTemplates');
+const { HAIR_TRANSPLANT, DENTAL, AESTHETIC_SURGERY, IVF } = require('../__fixtures__/branchTemplates');
 
 const FIXED_NOW = new Date('2026-09-10T10:00:00Z');
 
@@ -56,6 +56,26 @@ describe('promptCompiler — layer presence', () => {
   test('a prompt with no branchTemplate omits the BRANCH section entirely', () => {
     const prompt = compileSystemPrompt({ knowledgeContext: 'x', now: FIXED_NOW });
     expect(prompt).not.toMatch(/BRANCH:/);
+  });
+});
+
+// GECE-4-BRIEFI.md Bölüm F (e2e scenario 5) caught this gap: IVF's fixture
+// has carried a knowledgeSeed.donor_gamete_rule since Bölüm A, but nothing
+// ever rendered branchTemplate.knowledgeSeed into the compiled prompt.
+describe('promptCompiler — branch knowledgeSeed (Bölüm F gap fix)', () => {
+  test('IVF donor_gamete_rule appears in the compiled branch layer, framed as a CRITICAL, proactive fact', () => {
+    const layer = buildBranchLayer(IVF);
+    expect(layer).toMatch(/CRITICAL BRANCH FACTS/);
+    expect(layer).toContain('Donor eggs and donor sperm are not legal in Turkey');
+    expect(layer).toMatch(/FIRST response/i);
+  });
+
+  test('a branch with no knowledgeSeed (e.g. dental) has no CRITICAL BRANCH FACTS section', () => {
+    expect(buildBranchLayer(DENTAL)).not.toMatch(/CRITICAL BRANCH FACTS/);
+  });
+
+  test('an empty knowledgeSeed object produces no section either', () => {
+    expect(buildBranchLayer({ ...DENTAL, knowledgeSeed: {} })).not.toMatch(/CRITICAL BRANCH FACTS/);
   });
 });
 

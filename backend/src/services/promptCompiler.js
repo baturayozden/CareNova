@@ -183,6 +183,22 @@ function buildBranchLayer(branchTemplate, { objectionType = null } = {}) {
 
   parts.push(buildPricingAuthorityRule(branchTemplate.aiPricingAuthority));
 
+  // GECE-4-BRIEFI.md Bölüm F (e2e scenario 5: "IVF branch, patient asks
+  // about donor eggs → AI states in first reply this is illegal in
+  // Turkey") caught a real gap here: mapBranchTemplateRow (ai.js) has
+  // always mapped branch_templates.knowledge_seed into branchTemplate.
+  // knowledgeSeed, and __fixtures__/branchTemplates.js's IVF fixture has
+  // carried a donor_gamete_rule seed since Bölüm A tonight — but nothing
+  // ever rendered it into the compiled prompt. Bölüm A's own branch layer
+  // covered pricing/pre-assessment/required-media/red-flags/objections and
+  // simply never wired this field in.
+  if (branchTemplate.knowledgeSeed && typeof branchTemplate.knowledgeSeed === 'object') {
+    const seedFacts = Object.values(branchTemplate.knowledgeSeed).filter(Boolean);
+    if (seedFacts.length) {
+      parts.push(`CRITICAL BRANCH FACTS — state these proactively the moment they become relevant, do not wait to be asked and do not bury them later in the conversation:\n${seedFacts.map(s => `- ${s}`).join('\n')}`);
+    }
+  }
+
   if (Array.isArray(branchTemplate.preAssessmentQuestions) && branchTemplate.preAssessmentQuestions.length) {
     const qs = branchTemplate.preAssessmentQuestions
       .map(q => `- ${q.label?.en || q.id}${q.required ? ' (required)' : ''}`)

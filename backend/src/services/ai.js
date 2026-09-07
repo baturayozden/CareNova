@@ -440,9 +440,21 @@ const SCENARIO_CONTEXT = {
 
 // ── Language detection ────────────────────────────────────────────────────────
 
+// GECE-4-BRIEFI.md Bölüm F (e2e scenario 1: German patient, German reply)
+// caught a real gap here: detectLanguage only ever recognised en/tr/ar —
+// CARENOVA-STRATEJI.md's health-tourism positioning (hair transplant's
+// #1 source market is Germany) has always implied German-speaking
+// patients, but nothing added German support at the reply-generation
+// level. German and Turkish share ö/ü, so a bare-character test alone
+// can't tell "für"/"können" from Turkish text — that's not a hypothetical,
+// the brief's own scenario 1 message contains "für" — so the word-level
+// German check below MUST run before the Turkish character-class check.
+const GERMAN_PATTERN = /ß|\b(ich|und|für|möchte|können|kostet|termin|zahnarzt|zahnbehandlung|haartransplantation|schön|über|guten\s+tag|hallo|vielen\s+dank|wie\s+viel)\b/i;
+
 function detectLanguage(text) {
   if (!text) return 'en';
   if (/[؀-ۿ]/.test(text)) return 'ar';
+  if (GERMAN_PATTERN.test(text)) return 'de';
   // ı and İ excluded: Turkish keyboard users often type English with ı/İ ("ıs there", "İ am"),
   // causing false positives. Only strong Turkish-exclusive characters qualify alone.
   if (/[çğşöüÇĞŞÖÜ]/.test(text)) return 'tr';
@@ -468,21 +480,23 @@ function detectLanguage(text) {
  *   4. No signal anywhere → 'en' fallback.
  */
 function detectConversationLanguage(currentText, messageHistory = []) {
-  // Step 1 — strong character-level signal in current message
-  if (/[؀-ۿ]/.test(currentText)) return 'ar';
-  if (/[çğşöüÇĞŞÖÜ]/.test(currentText)) return 'tr';
-
-  // Step 2 — keyword match in current message
+  // Step 1 — character/keyword signal in current message. Delegates to
+  // detectLanguage (which already runs Arabic → German → Turkish → English
+  // in that order) instead of duplicating the Arabic/Turkish char checks
+  // inline — the old inline duplicate checked Turkish characters BEFORE
+  // German could ever be considered, so a German message containing
+  // "für"/"können" was misdetected as Turkish before detectLanguage's own
+  // (correct) ordering ever ran.
   const currentLang = detectLanguage(currentText);
   if (currentLang !== 'en') return currentLang;
 
-  // Step 3 — if current text is a substantial ASCII sentence (≥4 words), trust 'en' directly.
+  // Step 2 — if current text is a substantial ASCII sentence (≥4 words), trust 'en' directly.
   // Short 1-3 word responses ("ok", "4pm", "arın 4pm") are ambiguous and need history;
   // longer phrases ("I want to book", "what times do you have") are clearly English.
   const wordCount = currentText.trim().split(/\s+/).filter(Boolean).length;
   if (wordCount >= 4) return 'en';
 
-  // Step 4 — current message is ambiguous; walk inbound history newest-first
+  // Step 3 — current message is ambiguous; walk inbound history newest-first
   const inbound = messageHistory
     .filter(m => m.direction === 'inbound' && m.content)
     .slice(-6)
@@ -642,7 +656,7 @@ async function generateFollowUp({ incomingText, language, scenario, patientName,
 
   const scenarioHint = SCENARIO_CONTEXT[scenario] || SCENARIO_CONTEXT.new_enquiry;
 
-  const LANG_LABELS = { en: 'English', tr: 'Turkish', ar: 'Arabic' };
+  const LANG_LABELS = { en: 'English', tr: 'Turkish', ar: 'Arabic', de: 'German' };
   const langLabel = LANG_LABELS[language] || 'English';
 
   const userPrompt = [
@@ -684,6 +698,7 @@ async function generateFollowUp({ incomingText, language, scenario, patientName,
   const FALLBACK_REPLY = {
     tr: 'Özür dilerim, şu an bir aksaklık yaşıyoruz — lütfen tekrar dener misiniz? 🙏',
     ar: 'عذرًا، حدث خطأ ما — هل يمكنك المحاولة مرة أخرى؟ 🙏',
+    de: 'Es tut uns leid, gerade gibt es ein technisches Problem — könnten Sie es in einem Moment noch einmal versuchen? 🙏',
     en: 'Sorry, we ran into a problem right now — please try again in a moment. 🙏',
   };
 
@@ -694,6 +709,7 @@ async function generateFollowUp({ incomingText, language, scenario, patientName,
   const GUARD_BLOCKED_REPLY = {
     tr: 'Bu konuda size en doğru bilgiyi verebilmek için ekibimizden birinin sizinle görüşmesi gerekiyor — birazdan size dönüş yapacaklar. 🙏',
     ar: 'لتقديم المعلومات الصحيحة لك، يحتاج أحد أعضاء فريقنا للتواصل معك — سيتم التواصل معك قريبًا. 🙏',
+    de: 'Um Ihnen dazu genau die richtigen Informationen zu geben, muss sich jemand aus unserem Team persönlich bei Ihnen melden — das passiert in Kürze. 🙏',
     en: "To give you the exact details on this, one of our team needs to follow up with you directly — they'll be in touch shortly. 🙏",
   };
 
