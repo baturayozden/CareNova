@@ -2293,7 +2293,7 @@ hâlâ atlıyor).
 Anthropic çağrısı YOK. `node -e "require(...)"` ile `complianceGuard.js`,
 `outputGuard.js`, `ai.js`, `whatsapp.js` tek tek yüklendi, hepsi temiz.
 
-**Commit:** (aşağıda)
+**Commit:** `194c291` — "feat(compliance): real compliance shield (services/complianceGuard.js)"
 
 ---
 
