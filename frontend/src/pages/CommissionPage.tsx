@@ -1,10 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 import SchemeEditor from '../components/SchemeEditor';
 import PaymentImporter from '../components/PaymentImporter';
 import DealsTab from '../components/DealsTab';
 import { formatDate } from '../utils/date';
+import { COMMISSION_ROLES } from '../lib/roles';
+import AppMeta from '../components/AppMeta';
 import {
   BarChart2, Settings as SettingsIcon, CreditCard, Building2, Briefcase,
   Calculator, CheckCircle2, LockOpen, BarChart3, Trophy,
@@ -12,7 +15,12 @@ import {
 
 // ─── Role constants ───────────────────────────────────────────────────────────
 const APPROVE_ROLES = ['super_admin', 'admin', 'operasyon_muduru'];
-const MANAGE_ROLES  = ['super_admin', 'admin', 'operasyon_muduru', 'klinik_sahibi'];
+// MANAGE_ROLES was a second, independent copy of the exact same 4 roles as
+// lib/roles.ts's COMMISSION_ROLES — the "two sources that can drift apart"
+// pattern APP-ADMIN-EKSIKLER-KOMUTU.md Görev 3.4 warns about for role
+// labels applies here too. COMMISSION_ROLES is also this page's own access
+// guard now (below), so keeping a duplicate name for the identical list
+// would be actively misleading.
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatGBP(n: number | string | null | undefined): string {
@@ -242,7 +250,7 @@ export default function CommissionPage() {
   const [clinics, setClinics]                   = useState<{ id: string; name: string }[]>([]);
   const [clinicsLoading, setClinicsLoading]     = useState(false);
 
-  const canManage       = MANAGE_ROLES.includes(user?.role ?? '');
+  const canManage       = COMMISSION_ROLES.includes((user?.role ?? '') as typeof COMMISSION_ROLES[number]);
   const canApprove      = APPROVE_ROLES.includes(user?.role ?? '');
   const isPlatformAdmin = user?.role ? ['super_admin', 'admin'].includes(user.role) : false;
 
@@ -283,8 +291,14 @@ export default function CommissionPage() {
       const res = await api.get<{ periods: Period[] }>('/api/commissions/periods', {
         params: effectiveTenantId ? { tenantId: effectiveTenantId } : undefined,
       });
-      setPeriods(res.data.periods);
-      setSelectedId(prev => prev || (res.data.periods[0]?.id ?? ''));
+      // A malformed/empty API response (missing `periods` entirely) must
+      // render as "no periods yet", never crash — this exact unguarded
+      // `res.data.periods[0]` is what took down the whole app shell before
+      // (see App-Admin-Eksikler brief Görev 1: demo mode had no mock for
+      // this endpoint at all, so res.data was `{}`).
+      const fetchedPeriods = res.data.periods ?? [];
+      setPeriods(fetchedPeriods);
+      setSelectedId(prev => prev || (fetchedPeriods[0]?.id ?? ''));
     } catch (err: any) {
       setPeriodsError(err?.response?.data?.error || 'Failed to load periods.');
     } finally {
@@ -370,8 +384,9 @@ export default function CommissionPage() {
       const res = await api.get<{ periods: Period[] }>('/api/commissions/periods', {
         params: effectiveTenantId ? { tenantId: effectiveTenantId } : undefined,
       });
-      setPeriods(res.data.periods);
-      if (res.data.periods[0]) setSelectedId(res.data.periods[0].id);
+      const fetchedPeriods = res.data.periods ?? [];
+      setPeriods(fetchedPeriods);
+      if (fetchedPeriods[0]) setSelectedId(fetchedPeriods[0].id);
     } catch (err: any) {
       setNewPeriodError(err?.response?.data?.error || 'Failed to create period.');
     } finally {
@@ -399,8 +414,9 @@ export default function CommissionPage() {
       const res = await api.get<{ periods: Period[] }>('/api/commissions/periods', {
         params: effectiveTenantId ? { tenantId: effectiveTenantId } : undefined,
       });
-      setPeriods(res.data.periods);
-      const updated = res.data.periods.find(p => p.id === selectedId);
+      const fetchedPeriods = res.data.periods ?? [];
+      setPeriods(fetchedPeriods);
+      const updated = fetchedPeriods.find(p => p.id === selectedId);
       if (updated) setReport(r => r ? { ...r, period: updated } : r);
     } catch (err: any) {
       setTargetError(err?.response?.data?.error || 'Failed to save target.');
@@ -548,9 +564,21 @@ export default function CommissionPage() {
 
   const inputCls = 'w-full bg-surface border border-line text-white rounded-lg px-3 py-2 text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-accent/40';
 
+  // APP-ADMIN-EKSIKLER-KOMUTU.md Görev 1.4 — the Sidebar link is already
+  // role-gated (COMMISSION_NAV_ROLES), but that only hides the link; a
+  // tercuman/koordinator/doktor could still open /commission directly by
+  // URL before this page-level guard existed. Placed after every hook
+  // above (Rules of Hooks — hooks can't be called conditionally), not
+  // before; the wasted single demo-mode fetch this causes for a rejected
+  // user is harmless.
+  if (user && !COMMISSION_ROLES.includes(user.role as typeof COMMISSION_ROLES[number])) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="p-4 md:p-6 space-y-6">
+      <AppMeta title="Komisyon | CareNova" />
 
       {/* Page header */}
       <div>

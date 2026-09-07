@@ -5,6 +5,7 @@ import { useAuth, TenantChoice } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../lib/api';
 import { roleLabel } from '../lib/roleLabels';
+import { COMMISSION_NAV_ROLES } from '../lib/roles';
 import carenovaLogoDark  from '../assets/carenova-logo-transparent-dark.svg';
 import carenovaLogoLight from '../assets/carenova-logo-transparent-light.svg';
 import {
@@ -51,8 +52,6 @@ const superAdminItems: NavItem[] = [
   { labelKey: 'commission',    icon: Wallet,        path: '/commission'     },
   { labelKey: 'demoRequests',  icon: ClipboardList, path: '/demo-requests'  },
 ];
-
-const COMMISSION_ROLES = ['operasyon_muduru', 'klinik_sahibi'];
 
 const commissionItems: NavItem[] = [
   { labelKey: 'commission', icon: Wallet, path: '/commission' },
@@ -318,7 +317,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </NavLink>
           ))}
 
-          {user?.role && COMMISSION_ROLES.includes(user.role) && (
+          {user?.role && COMMISSION_NAV_ROLES.includes(user.role) && (
             <>
               <div className="pt-4 pb-1 px-3">
                 <p className="text-[10px] font-semibold text-ink-subtle uppercase tracking-widest">{t('management')}</p>

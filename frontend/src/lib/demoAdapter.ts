@@ -3,6 +3,10 @@ import {
   DEMO_USER, DEMO_SUPER_ADMIN, DEMO_TENANT_ID, DEMO_TENANT_NAME,
   demoLeads, demoMessages, demoConversations, demoActivityEvents, demoStats,
 } from '../data/demoData';
+import {
+  demoCommissionDeals, demoCommissionRecords, demoCommissionPeriod, demoSalesStaff,
+} from '../data/commissionDemoData';
+import { cases as demoCases } from '../data/caseData';
 import { hostMode } from '../config/hosts';
 
 // Which demo user "is logged in" on this host. On the admin host this is
@@ -138,30 +142,119 @@ const demoAdapter: AxiosAdapter = async (config) => {
   }
 
   // ── Patients ───────────────────────────────────────────────────────────
+  // APP-ADMIN-EKSIKLER-KOMUTU.md Görev 6.3 — this used to derive from the
+  // older, 4-record `demoLeads` (pre-Case-File-model), while /cases shows
+  // 18 records from `cases` — two different sources for what's supposed to
+  // be the same patient population. Now derived from the SAME `cases` data
+  // /cases uses; a patient row's id IS its case id, so PatientsListPage
+  // deep-links straight into /cases/:id (CaseFileDetailPage) — the one
+  // real, up-to-date case detail view — instead of the legacy
+  // /patients/:leadId profile page, which has no notion of the Case File
+  // model's 15-stage status/quotes/travel/aftercare at all.
   if (url === '/api/patients' && method === 'get') {
-    const limit = parseInt(params.get('limit') || '20', 10);
-    const patients = demoLeads.map(l => ({
-      id: l.id, firstName: l.firstName, lastName: l.lastName, phone: l.phone, email: l.email,
-      status: l.status, language: l.language, treatmentInterest: l.treatmentInterest,
-      assignedTo: l.assignedTo, staffName: l.assignedTo, dealCount: 1,
-      totalAgreed: l.treatmentValue || 0,
-      contractSigned: l.status === 'booked' || l.status === 'attended',
-      paymentArranged: l.status === 'booked' || l.status === 'attended',
-      treatmentDateSet: l.status === 'attended',
-      createdAt: l.createdAt,
-    }));
-    return ok({ patients, total: patients.length, page: 1, totalPages: Math.max(1, Math.ceil(patients.length / limit)) }) as AxiosResponse;
+    const limit      = parseInt(params.get('limit') || '20', 10);
+    const page       = parseInt(params.get('page')  || '1', 10);
+    const q          = (params.get('q') || '').trim().toLowerCase();
+    const assignedTo = params.get('assignedTo') || '';
+    const sort       = params.get('sort') || 'created_desc';
+    const dateFrom   = params.get('dateFrom') || '';
+    const dateTo     = params.get('dateTo')   || '';
+
+    let list = demoCases.map(c => {
+      const staff = demoSalesStaff.find(s => `${s.firstName} ${s.lastName}`.trim() === c.assignedConsultant);
+      const latestQuote = c.quotes[c.quotes.length - 1];
+      const createdAt = c.timeline[0]?.at ?? c.lastActivityAt;
+      return {
+        id: c.id,
+        caseNumber: c.caseNumber,
+        patientName: c.patientName,
+        patientCountryFlag: c.patientCountryFlag,
+        branch: c.branch,
+        status: c.status,
+        assignedTo: staff?.id ?? null,
+        staffName: staff ? `${staff.firstName} ${staff.lastName}`.trim() : null,
+        totalAgreed: latestQuote?.amountEur ?? 0,
+        createdAt,
+      };
+    });
+
+    if (q) {
+      list = list.filter(p => p.patientName.toLowerCase().includes(q) || p.caseNumber.toLowerCase().includes(q));
+    }
+    if (assignedTo) list = list.filter(p => p.assignedTo === assignedTo);
+    if (dateFrom) list = list.filter(p => p.createdAt >= dateFrom);
+    if (dateTo) list = list.filter(p => p.createdAt <= `${dateTo}T23:59:59.999Z`);
+
+    const sorters: Record<string, (a: (typeof list)[number], b: (typeof list)[number]) => number> = {
+      created_desc: (a, b) => b.createdAt.localeCompare(a.createdAt),
+      created_asc:  (a, b) => a.createdAt.localeCompare(b.createdAt),
+      name_asc:     (a, b) => a.patientName.localeCompare(b.patientName),
+      assigned_asc: (a, b) => (a.staffName || '￿').localeCompare(b.staffName || '￿'),
+    };
+    list = [...list].sort(sorters[sort] || sorters.created_desc);
+
+    const total = list.length;
+    const paged = list.slice((page - 1) * limit, page * limit);
+    return ok({ patients: paged, total, page, totalPages: Math.max(1, Math.ceil(total / limit)) }) as AxiosResponse;
   }
 
   // ── Clinics / notifications — safe defaults ──────────────────────────────
   if (/^\/api\/clinics\/[^/]+\/sales-users$/.test(url) && method === 'get') {
-    return ok({ salesUsers: demoLeads.filter(l => l.assignedTo).map((l, i) => ({ id: `staff-${i}`, firstName: (l.assignedTo || '').split(' ')[0], lastName: (l.assignedTo || '').split(' ').slice(1).join(' '), email: '' })) }) as AxiosResponse;
+    // Real consultants (same 4 people /cases' DANIŞMAN column shows), not an
+    // ad-hoc derivation from the older demoLeads set — this list feeds both
+    // Commission's Deals tab and /patients' "Assigned to" filter.
+    return ok({ salesUsers: demoSalesStaff }) as AxiosResponse;
   }
   if (url === '/api/clinics' && method === 'get') {
     return ok({ clinics: [{ id: DEMO_TENANT_ID, name: DEMO_TENANT_NAME }] }) as AxiosResponse;
   }
   if (url === '/api/notifications' && method === 'get') {
     return ok({ notifications: [], unreadCount: 0 }) as AxiosResponse;
+  }
+
+  // ── Notification preferences ──────────────────────────────────────────
+  // Same bug class as /api/commissions/* (Görev 1): never mocked at all,
+  // so SettingsPage.tsx's NotificationsSection did `setPrefs(res.data.
+  // preferences)` against `undefined` from the generic `ok({})` fallback,
+  // then crashed on `prefs.map(...)` the moment the Notifications tab was
+  // opened. Found while translating that page for Görev 3.
+  const DEMO_NOTIF_PREFS = [
+    { eventType: 'new_lead',             channel: 'email', enabled: true  },
+    { eventType: 'lead_booked',          channel: 'email', enabled: true  },
+    { eventType: 'appointment_reminder', channel: 'email', enabled: true  },
+    { eventType: 'urgent_escalation',    channel: 'email', enabled: true  },
+    { eventType: 'no_show',              channel: 'email', enabled: false },
+    { eventType: 'ai_quota_warning',     channel: 'email', enabled: true  },
+  ];
+  if (url === '/api/notification-preferences' && method === 'get') {
+    return ok({ preferences: DEMO_NOTIF_PREFS }) as AxiosResponse;
+  }
+  if (url === '/api/notification-preferences' && method === 'put') {
+    return ok({ preferences: body.preferences ?? DEMO_NOTIF_PREFS }) as AxiosResponse;
+  }
+
+  // ── Commission ─────────────────────────────────────────────────────────
+  // APP-ADMIN-EKSIKLER-KOMUTU.md Görev 1 — CommissionPage.tsx crashed the
+  // entire app shell because these endpoints were never mocked at all
+  // (fell through to the generic `ok({})` fallback below), and the page
+  // does an unguarded `res.data.periods[0]` the moment it loads. Real
+  // handlers here fix that at the root: a genuinely absent `periods` array
+  // is a demo-mode-only failure mode, not something the real backend does.
+  const commissionReportMatch = url.match(/^\/api\/commissions\/periods\/([^/]+)\/report$/);
+  if (url === '/api/commissions/periods' && method === 'get') {
+    return ok({ periods: [demoCommissionPeriod] }) as AxiosResponse;
+  }
+  if (commissionReportMatch && method === 'get') {
+    if (commissionReportMatch[1] !== demoCommissionPeriod.id) {
+      return { data: { error: 'Not found' }, status: 404, statusText: 'Not Found', headers: {}, config: {} as never } as AxiosResponse;
+    }
+    return ok({ period: demoCommissionPeriod, records: demoCommissionRecords }) as AxiosResponse;
+  }
+  if (url === '/api/commissions/deals' && method === 'get') {
+    return ok({ deals: demoCommissionDeals }) as AxiosResponse;
+  }
+  if (url === '/api/commissions/schemes' && method === 'get') {
+    return ok({ schemes: [] }) as AxiosResponse;
   }
 
   // ── Fallback — never hit the network, never crash a page ────────────────

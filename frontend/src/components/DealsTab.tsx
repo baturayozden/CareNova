@@ -714,7 +714,7 @@ export default function DealsTab({ tenantId, currentUserId, userRole, currentUse
       const params: Record<string, string> = {};
       if (tenantId) params.tenantId = tenantId;
       const res = await api.get<{ deals: Deal[] }>('/api/commissions/deals', { params });
-      setDeals(res.data.deals);
+      setDeals(res.data.deals ?? []);
     } catch (err: any) {
       setError(err?.response?.data?.error || 'Failed to load deals.');
     } finally {
