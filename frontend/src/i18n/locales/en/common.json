@@ -16,6 +16,11 @@
   "retry": "Retry",
   "language": "Language",
   "comingSoon": "This section will be here soon.",
+  "errorBoundary": {
+    "title": "This section couldn't load right now",
+    "body": "Something unexpected went wrong. You can switch to another page from the menu, or reload this page.",
+    "reload": "Reload page"
+  },
   "leadStatus": {
     "new": "New",
     "contacted": "Contacted",

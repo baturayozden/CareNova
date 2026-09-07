@@ -16,6 +16,11 @@
   "retry": "Tekrar dene",
   "language": "Dil",
   "comingSoon": "Bu bölüm yakında burada olacak.",
+  "errorBoundary": {
+    "title": "Bu bölüm şu an yüklenemedi",
+    "body": "Beklenmedik bir hata oluştu. Menüden başka bir sayfaya geçebilir ya da bu sayfayı yeniden yükleyebilirsiniz.",
+    "reload": "Sayfayı yenile"
+  },
   "leadStatus": {
     "new": "Yeni",
     "contacted": "İletişime geçildi",

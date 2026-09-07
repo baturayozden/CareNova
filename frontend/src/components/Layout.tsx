@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Sidebar from './Sidebar';
+import RouteErrorBoundary from './RouteErrorBoundary';
 
 export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -12,16 +13,13 @@ export default function Layout() {
       {/* GECE-3-BRIEFI.md Bölüm G (B4): this used to unconditionally render
           <AppMeta title="CareNova">. Since Layout mounts before any page
           content, that made it the first <title> in <head> on every
-          single app-host page — and since React 19 manages it as a
-          declarative, reconciled node, AppRoutes' setDefaultTitle()
-          imperatively rewriting that same DOM node's textContent got
-          fought back on the next render, leaving `document.title` stuck
-          on "CareNova" for any page without its own AppMeta (see
-          docs/ — this is the actual root cause, not something further
-          setDefaultTitle tinkering could have fixed). Removing it
-          entirely gives setDefaultTitle's plain, non-React-managed
-          <title> a clear field, and pages that DO render their own
-          AppMeta (Dashboard, admin pages, ...) are unaffected either way. */}
+          single app-host page, conflicting with whatever the active child
+          page's own AppMeta tried to set. Removed here entirely —
+          APP-ADMIN-EKSIKLER-KOMUTU.md Görev 5 finished the job by also
+          removing AppRoutes' imperative setDefaultTitle() fallback (the
+          part of the original conflict this comment used to describe):
+          every app-host page now renders its own <AppMeta>, so exactly one
+          <title> source is ever mounted at a time — see App.tsx. */}
       {/* ── Mobile top-bar (hidden on md+) ───────────────────────────────── */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 h-14 bg-surface border-b border-line flex items-center px-4 gap-3 shrink-0">
         {/* eslint-disable i18next/no-literal-string -- ☰ is a symbol; "CareNova" is the brand name, not translatable */}
@@ -42,7 +40,9 @@ export default function Layout() {
 
       {/* ── Main content — top padding on mobile for fixed top-bar ────────── */}
       <main className="flex-1 overflow-y-auto bg-surface-page pt-14 md:pt-0">
-        <Outlet />
+        <RouteErrorBoundary>
+          <Outlet />
+        </RouteErrorBoundary>
       </main>
     </div>
   );
