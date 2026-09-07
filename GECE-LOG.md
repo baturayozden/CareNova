@@ -2213,7 +2213,7 @@ Anthropic çağrısı YOK. `node -e "require(...)"` ile `ai.js`,
 `leadScoring.js`, `insights.js`, `whatsapp.js`, `leads.js` tek tek
 yüklendi, hepsi temiz.
 
-**Commit:** (aşağıda)
+**Commit:** `182b6e0` — "feat(ai): health-tourism objection taxonomy and eligibility-aware lead scoring"
 
 ---
 
