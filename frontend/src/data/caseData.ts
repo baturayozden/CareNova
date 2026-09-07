@@ -220,7 +220,13 @@ export const cases: CaseFile[] = [
     messages: [], medicalFile: { preAssessment: [], uploadedImages: 5, doctorDecision: 'eligible', doctorNote: 'Operasyon başarılı.', aiExtraction: '' },
     quotes: [{ version: 1, amountEur: 6100, items: ['Liposuction', 'Karın germe'], locked: true }],
     travel: { flight: 'Tamamlandı', hotel: 'Devam ediyor', transfer: 'Tamamlandı', itinerary: [{ day: 'Gün 3', plan: 'Operasyon tamamlandı, dinlenme' }] },
-    aftercare: [], auditLog: [{ actor: 'Dr. Selin Kaya', action: 'Operasyon tamamlandı', at: daysAgo(1) }],
+    // APP-ADMIN-EKSIKLER-KOMUTU.md Görev 6.1: this was the exact bug report
+    // ("Tedavi Edildi durumundaki case-10 bile 'Bakım hattı henüz
+    // başlamadı' diyor") — treated daysAgo(1), and aesthetic_surgery's own
+    // aftercareSchedule (adminBranchTemplates.ts) starts at D+1, so exactly
+    // one checkpoint is due by now — not further ones that haven't arrived yet.
+    aftercare: [{ day: 'D+1', contactedAt: daysAgo(0.5), response: 'Şişlik var ama beklenen düzeyde, ağrı kesicilerle idare ediyorum', photoUploaded: true }],
+    auditLog: [{ actor: 'Dr. Selin Kaya', action: 'Operasyon tamamlandı', at: daysAgo(1) }],
   },
   {
     id: 'case-11', caseNumber: 'CN-2026-0012', patientName: 'Sophie Martin', patientCountryFlag: '🇫🇷', patientCountry: 'France', patientLanguage: 'en', patientAge: 33,
@@ -238,7 +244,7 @@ export const cases: CaseFile[] = [
     companions: [], branch: 'hair_transplant', status: 'in_aftercare',
     assignedConsultant: 'Jonas Fischer', assignedDoctor: 'Dr. Emre Yıldız', assignedCoordinator: null, assignedInterpreter: null,
     estimatedValueEur: 3050, lastActivityAt: daysAgo(7),
-    timeline: [{ status: 'returned', at: daysAgo(30) }, { status: 'in_aftercare', at: daysAgo(30) }],
+    timeline: [{ status: 'treated', at: daysAgo(32) }, { status: 'returned', at: daysAgo(30) }, { status: 'in_aftercare', at: daysAgo(30) }],
     messages: [], medicalFile: { preAssessment: [], uploadedImages: 4, doctorDecision: 'eligible', doctorNote: '', aiExtraction: '' },
     quotes: [{ version: 1, amountEur: 3050, items: ['FUE saç ekimi'], locked: true }],
     travel: null,
@@ -256,7 +262,7 @@ export const cases: CaseFile[] = [
     companions: [], branch: 'aesthetic_surgery', status: 'completed',
     assignedConsultant: 'Layla Hassan', assignedDoctor: 'Dr. Selin Kaya', assignedCoordinator: null, assignedInterpreter: 'Reem Al-Sayed',
     estimatedValueEur: 5500, lastActivityAt: daysAgo(90),
-    timeline: [{ status: 'in_aftercare', at: daysAgo(180) }, { status: 'completed', at: daysAgo(90) }],
+    timeline: [{ status: 'treated', at: daysAgo(185) }, { status: 'in_aftercare', at: daysAgo(180) }, { status: 'completed', at: daysAgo(90) }],
     messages: [], medicalFile: { preAssessment: [], uploadedImages: 6, doctorDecision: 'eligible', doctorNote: '', aiExtraction: '' },
     quotes: [{ version: 1, amountEur: 5500, items: ['Rinoplasti'], locked: true }],
     travel: null,
