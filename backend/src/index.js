@@ -11,11 +11,26 @@ const staticOrigins = [
   process.env.APP_URL,
   process.env.ADMIN_URL,
   process.env.LANDING_URL,
+  process.env.FRONTEND_URL,
+  // ONE exact Vercel preview origin, set only while a staging deployment is
+  // being validated against the real database, then cleared again.
+  process.env.PREVIEW_URL,
   'https://carenova.ai',
   'https://www.carenova.ai',
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:3002', // frontend dev server (.claude/launch.json)
 ].filter(Boolean);
+
+// Vercel preview hosts, by pattern — deliberately NON-PRODUCTION ONLY.
+// `*.vercel.app` is a domain anyone can deploy under, so pairing a wildcard
+// match with `credentials: true` below would hand any stranger's preview
+// deployment an authenticated cross-origin channel into this API. Matching a
+// narrower prefix (e.g. /^carenova-/) would not fix it either — a project
+// named `carenova-anything` is free to create. In production the only way in
+// is PREVIEW_URL above: one exact origin, set on purpose.
+const allowVercelPreviews = process.env.NODE_ENV !== 'production';
+const VERCEL_PREVIEW_ORIGIN = /^https:\/\/[a-z0-9-]+\.vercel\.app$/;
 
 // Global CORS — covers all routes including /api/widget/*.
 // Origin callback: static list first, then DB widget_allowed_origins fallback.
@@ -26,6 +41,7 @@ app.use(cors({
   origin: async (origin, callback) => {
     if (!origin) return callback(null, true); // server-to-server / curl / same-origin
     if (staticOrigins.includes(origin)) return callback(null, true);
+    if (allowVercelPreviews && VERCEL_PREVIEW_ORIGIN.test(origin)) return callback(null, true);
     try {
       const { rows } = await pool.query(
         `SELECT 1 FROM tenants
