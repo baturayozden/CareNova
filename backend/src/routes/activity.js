@@ -165,7 +165,7 @@ function buildListQuery(user, query, forExport = false) {
         t.name                                             AS clinic,
         l.language,
         l.treatment_interest                               AS treatment,
-        l.treatment_value,
+        c.estimated_value                                  AS treatment_value,
         last_ai.scenario_type                              AS scenario,
         l.ai_follow_up_count                               AS ai_messages,
         ${OUTCOME_CASE}                                    AS outcome,
@@ -182,7 +182,7 @@ function buildListQuery(user, query, forExport = false) {
         last_ai.scenario_type                              AS scenario,
         ${OUTCOME_CASE}                                    AS outcome,
         l.treatment_interest                               AS treatment,
-        l.treatment_value                                  AS "treatmentValue",
+        c.estimated_value                                  AS "treatmentValue",
         l.ai_follow_up_count                               AS "aiMessages",
         last_ai.content                                    AS "lastAiContent",
         last_ai.created_at                                 AS "lastAiAt",
@@ -198,6 +198,7 @@ function buildListQuery(user, query, forExport = false) {
   const fromClause = `
     FROM leads l
     JOIN tenants t ON t.id = l.tenant_id
+    LEFT JOIN cases c      ON c.id                 = l.case_id
     LEFT JOIN last_ai      ON last_ai.lead_id      = l.id
     LEFT JOIN last_reply   ON last_reply.lead_id   = l.id
     LEFT JOIN last_inbound ON last_inbound.lead_id = l.id
@@ -217,10 +218,10 @@ function buildListQuery(user, query, forExport = false) {
   }
 
   const groupBy = forExport
-    ? `GROUP BY l.id, t.id, t.name, last_ai.id, last_ai.scenario_type, last_ai.content,
+    ? `GROUP BY l.id, t.id, t.name, c.estimated_value, last_ai.id, last_ai.scenario_type, last_ai.content,
                last_ai.created_at, last_ai.status, last_reply.id, last_reply.content, last_reply.created_at,
                last_inbound.objection_type`
-    : `GROUP BY l.id, t.id, t.name, last_ai.id, last_ai.scenario_type, last_ai.content,
+    : `GROUP BY l.id, t.id, t.name, c.estimated_value, last_ai.id, last_ai.scenario_type, last_ai.content,
                last_ai.created_at, last_ai.status, last_reply.id, last_reply.content, last_reply.created_at,
                last_inbound.objection_type`;
 
@@ -459,8 +460,9 @@ router.get('/weekly-report', async (req, res) => {
       const { rows: recovRows } = await pool.query(`
         SELECT
           COUNT(DISTINCT l.id)               AS leads_recovered,
-          COALESCE(SUM(l.treatment_value), 0) AS pipeline_value
+          COALESCE(SUM(c.estimated_value), 0) AS pipeline_value
         FROM leads l
+        LEFT JOIN cases c ON c.id = l.case_id
         JOIN messages first_ai ON first_ai.id = (
           SELECT id FROM messages
           WHERE lead_id = l.id
