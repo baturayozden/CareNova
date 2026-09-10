@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ORGANIZATION_SCHEMA } from '../lib/organizationSchema';
 import { resolveOgImage, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT } from '../lib/ogImage';
+import { LOCALES, DEFAULT_LOCALE, alternatesFor, canonicalFor } from '../i18n/locales';
 
 interface SEOMetaProps {
   title: string;
@@ -12,7 +14,8 @@ interface SEOMetaProps {
   structuredData?: object;
 }
 
-const BASE_URL = 'https://carenova.ai';
+// Absolute URLs now come from i18n/locales.ts (canonicalFor/alternatesFor),
+// which owns BASE_URL — one definition, shared with the sitemap generator.
 const DEFAULT_OG_IMAGE = 'https://carenova.ai/og-image.png';
 // Actual file dimensions (frontend/public/og-image.png) — must match the real
 // asset or platforms that read these before fetching the image render it
@@ -31,7 +34,14 @@ export default function SEOMeta({
   ogImageAlt,
   structuredData,
 }: SEOMetaProps) {
-  const url = `${BASE_URL}${path}`;
+  // `path` is the BASE path (no locale prefix) — callers pass '/', '/about'…
+  // The canonical is that path in the locale currently being rendered, so /en
+  // canonicals to /en and never to /. Alternates come from the registry and
+  // are empty for pages that exist in only one language.
+  const { i18n } = useTranslation();
+  const locale = LOCALES.find(l => i18n.language?.startsWith(l.code)) ?? DEFAULT_LOCALE;
+  const url = canonicalFor(path, locale);
+  const alternates = alternatesFor(path);
   const { url: image, knownDimensions } = resolveOgImage(ogImage, DEFAULT_OG_IMAGE);
   const imageAlt = ogImageAlt || (image === DEFAULT_OG_IMAGE ? DEFAULT_OG_IMAGE_ALT : title);
 
@@ -40,12 +50,13 @@ export default function SEOMeta({
       <title>{title}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={url} />
-      {/* TR/EN is a client-side toggle, not separate URLs — so both alternates
-          and x-default point at the same path. Honest given the architecture:
-          declares language support without claiming URLs that don't exist. */}
-      <link rel="alternate" hrefLang="tr" href={url} />
-      <link rel="alternate" hrefLang="en" href={url} />
-      <link rel="alternate" hrefLang="x-default" href={url} />
+      {/* Generated from i18n/locales.json. A page that exists in one language
+          only gets NO alternates at all — the previous version pointed
+          hreflang="tr" and hreflang="en" at the same URL, which told Google a
+          Turkish version existed for pages that are hardcoded English. */}
+      {alternates.map(alt => (
+        <link key={alt.hreflang} rel="alternate" hrefLang={alt.hreflang} href={alt.href} />
+      ))}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={url} />

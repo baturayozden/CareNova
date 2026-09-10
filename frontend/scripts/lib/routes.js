@@ -8,6 +8,7 @@
  * is exactly the kind of silent gap this phase exists to close.
  */
 
+const { urlsFor } = require('./locales');
 const https = require('https');
 const http = require('http');
 
@@ -66,13 +67,19 @@ async function fetchBlogPosts(label = 'routes') {
   return posts;
 }
 
-/** Every path the marketing site serves, in sitemap order. */
+/**
+ * Every path the marketing site serves, in sitemap order.
+ *
+ * Marketing routes are locale-expanded (see lib/locales.js): '/' yields '/'
+ * and '/en'. Blog posts are NOT — the blog API serves one language per post,
+ * so an /en/blog/:slug would be the same bytes at a second URL.
+ */
 async function allPaths(label) {
   const posts = await fetchBlogPosts(label);
   return {
     posts,
     paths: [
-      ...MARKETING_ROUTES.map(r => r.path),
+      ...MARKETING_ROUTES.flatMap(r => urlsFor(r.path).map(u => u.path)),
       ...posts.filter(p => p.slug).map(p => `/blog/${p.slug}`),
     ],
   };
