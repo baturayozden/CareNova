@@ -1,3 +1,4 @@
+import LocaleSwitcher from './LocaleSwitcher';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -49,19 +50,12 @@ export default function Footer() {
           <span className="text-xs text-ink-subtle">
             © {new Date().getFullYear()} CareNova{BUSINESS.legalName ? ` — ${BUSINESS.legalName}` : ''}
           </span>
-          <div className="flex items-center gap-1 rounded-lg border border-line p-0.5">
-            {(['tr', 'en'] as const).map(lng => (
-              <button
-                key={lng}
-                onClick={() => i18n.changeLanguage(lng)}
-                className={`px-2 py-1 rounded-md text-xs font-semibold uppercase transition-colors ${
-                  i18n.language?.startsWith(lng) ? 'bg-accent text-white' : 'text-ink-muted hover:text-ink'
-                }`}
-              >
-                {lng}
-              </button>
-            ))}
-          </div>
+          <LocaleSwitcher
+            className="flex items-center gap-1 rounded-lg border border-line p-0.5"
+            buttonClassName={active => `px-2 py-1 rounded-md text-xs font-semibold transition-colors ${
+              active ? 'bg-accent text-white' : 'text-ink-muted hover:text-ink'
+            }`}
+          />
         </div>
       </div>
     </footer>

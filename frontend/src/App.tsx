@@ -1,5 +1,6 @@
-import React, { Suspense, useEffect } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import React, { Suspense, useEffect, useLayoutEffect } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -46,6 +47,10 @@ import CookiePage from './pages/legal/CookiePage';
 import GdprPage from './pages/legal/GdprPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 import { hostMode } from './config/hosts';
+import {
+  LOCALES, LOCALIZED_ROUTES, localizedPath, localeFromPathname,
+  contentLocaleFor, isLocalizedRoute, stripLocale,
+} from './i18n/locales';
 
 // The admin console is a real, separate route tree (GECE-2-BRIEFI.md Bölüm
 // B.3, güvenlik kuralı #3: "Admin route'ları app bundle'ında hiç mount
@@ -65,10 +70,70 @@ function AdminLoadingFallback() {
 }
 
 // ── Marketing host (carenova.ai) ────────────────────────────────────────────
+
+// Elements for the paths that exist in every locale (i18n/locales.json →
+// localizedRoutes). Adding a language adds a prefixed Route for each entry
+// here automatically; adding a localized PAGE means adding its base path to
+// locales.json and its element here.
+const LOCALIZED_ELEMENTS: Record<string, React.ReactElement> = {
+  '/': <LandingPage />,
+};
+
+/**
+ * Keeps the active language equal to the language the URL addresses, for as
+ * long as the marketing tree is mounted.
+ *
+ * i18n/index.ts already does this once at module scope, which is what makes
+ * the FIRST render (and therefore the prerendered HTML) correct. But that runs
+ * once per document: a client-side move between /en and / — the language
+ * switcher, a <Link>, the back button — changes the URL without reloading, and
+ * without this the page would keep rendering the previous language while the
+ * address bar claimed otherwise.
+ */
+function MarketingLocaleSync() {
+  const { pathname } = useLocation();
+  const { i18n } = useTranslation();
+  const localized = isLocalizedRoute(stripLocale(pathname));
+  const urlLocale = localeFromPathname(pathname);
+  const contentLocale = contentLocaleFor(pathname);
+
+  useLayoutEffect(() => {
+    if (localized && !i18n.language?.startsWith(urlLocale.code)) {
+      i18n.changeLanguage(urlLocale.code);
+    }
+  }, [localized, urlLocale.code, i18n]);
+
+  // Owns <html lang> on the marketing host. i18n's own languageChanged handler
+  // also writes it, from the CHROME's language — which is wrong on an
+  // English-only page whose nav happens to be Turkish. Re-running on
+  // i18n.language means this always gets the last word.
+  useLayoutEffect(() => {
+    document.documentElement.lang = contentLocale.code;
+  }, [contentLocale.code, i18n.language]);
+
+  return null;
+}
+
 function MarketingRoutes() {
   return (
+    <>
+    <MarketingLocaleSync />
     <Routes>
       <Route path="/" element={<LandingPage />} />
+
+      {/* Prefixed locale URLs, generated from the registry — /en today.
+          Only genuinely translated pages appear here: giving an English-only
+          page an /en twin would publish the same bytes at two URLs. */}
+      {LOCALES.filter(l => l.prefix).flatMap(locale =>
+        LOCALIZED_ROUTES.filter(basePath => LOCALIZED_ELEMENTS[basePath]).map(basePath => (
+          <Route
+            key={`${locale.code}:${basePath}`}
+            path={localizedPath(basePath, locale)}
+            element={LOCALIZED_ELEMENTS[basePath]}
+          />
+        )),
+      )}
+
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/blog/:slug" element={<BlogPostPage />} />
       <Route path="/about" element={<AboutPage />} />
@@ -85,6 +150,7 @@ function MarketingRoutes() {
           host has no auth concept of its own. */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }
 

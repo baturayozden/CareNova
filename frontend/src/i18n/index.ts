@@ -1,6 +1,11 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { hostMode } from '../config/hosts';
+import {
+  localeFromPathname, contentLocaleFor, isLocalizedRoute, stripLocale,
+  DEFAULT_LOCALE, LOCALE_CODES,
+} from './locales';
 
 import trCommon   from './locales/tr/common.json';
 import trAuth     from './locales/tr/auth.json';
@@ -49,8 +54,8 @@ i18n
       tr: { common: trCommon, auth: trAuth, nav: trNav, landing: trLanding, cases: trCases, patients: trPatients, settings: trSettings, billing: trBilling, admin: trAdmin, activity: trActivity, commission: trCommission },
       en: { common: enCommon, auth: enAuth, nav: enNav, landing: enLanding, cases: enCases, patients: enPatients, settings: enSettings, billing: enBilling, admin: enAdmin, activity: enActivity, commission: enCommission },
     },
-    fallbackLng: 'tr',
-    supportedLngs: ['tr', 'en'],
+    fallbackLng: DEFAULT_LOCALE.code,
+    supportedLngs: LOCALE_CODES,
     defaultNS,
     ns: ['common', 'auth', 'nav', 'landing', 'cases', 'patients', 'settings', 'billing', 'admin', 'activity', 'commission'],
     interpolation: { escapeValue: false }, // React already escapes
@@ -68,5 +73,36 @@ const syncHtmlLang = (lng: string) => {
 };
 syncHtmlLang(i18n.language);
 i18n.on('languageChanged', syncHtmlLang);
+
+// ── Marketing host: the URL is the language ─────────────────────────────────
+// DIL-ALGILAMA-VE-URL-YAPISI.md KARAR 2 — "sayfanın dili URL'den gelir,
+// tarayıcıdan değil". /en is English for a Turkish visitor too, and / is
+// Turkish for an English one; the browser only ever gets a say in the
+// one-time redirect off `/` (see the snippet in public/index.html).
+//
+// This runs at module scope, BEFORE ReactDOM renders, on purpose. Doing it in
+// an effect would let the first paint use the detector's language and then
+// swap — which on this site is not a cosmetic flicker but a correctness bug:
+// scripts/prerender.js captures document.outerHTML from a real browser, so a
+// wrong first render can be written to disk as the canonical HTML for the
+// route. Resources are bundled (no async backend), so changeLanguage settles
+// before the first render.
+//
+// App and admin hosts are untouched: there the language is a logged-in user's
+// stored preference, not a URL fact.
+if (hostMode === 'marketing' && typeof window !== 'undefined') {
+  const { pathname } = window.location;
+  // Only a route that genuinely exists in several languages may override the
+  // visitor's language. On a single-URL page (English-only today) the stored
+  // preference still drives the surrounding chrome — forcing it to the site
+  // default there would silently undo the visitor's own choice.
+  if (isLocalizedRoute(stripLocale(pathname))) {
+    const urlLocale = localeFromPathname(pathname);
+    if (i18n.language !== urlLocale.code) i18n.changeLanguage(urlLocale.code);
+  }
+  // <html lang> describes the DOCUMENT, so it follows the content, not the
+  // chrome: /about is an English document whatever the nav is showing.
+  syncHtmlLang(contentLocaleFor(pathname).code);
+}
 
 export default i18n;

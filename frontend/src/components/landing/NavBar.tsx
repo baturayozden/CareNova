@@ -6,6 +6,7 @@ import { Menu, X } from 'lucide-react';
 import { navLinks, navCta, navLogin } from '../../data/landingContent';
 import { useTheme } from '../../context/ThemeContext';
 import { urlFor } from '../../config/hosts';
+import LocaleSwitcher from './LocaleSwitcher';
 import carenovaLogoDark from '../../assets/carenova-logo-transparent-dark.svg';
 import carenovaLogoLight from '../../assets/carenova-logo-transparent-light.svg';
 
@@ -39,19 +40,12 @@ export default function NavBar() {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          <div className="flex items-center gap-1 rounded-lg border border-line p-0.5">
-            {(['tr', 'en'] as const).map(lng => (
-              <button
-                key={lng}
-                onClick={() => i18n.changeLanguage(lng)}
-                className={`px-2 py-1 rounded-md text-xs font-semibold uppercase transition-colors ${
-                  i18n.language?.startsWith(lng) ? 'bg-accent text-white' : 'text-ink-muted hover:text-ink'
-                }`}
-              >
-                {lng}
-              </button>
-            ))}
-          </div>
+          <LocaleSwitcher
+            className="flex items-center gap-1 rounded-lg border border-line p-0.5"
+            buttonClassName={active => `px-2 py-1 rounded-md text-xs font-semibold transition-colors ${
+              active ? 'bg-accent text-white' : 'text-ink-muted hover:text-ink'
+            }`}
+          />
           <a
             href={loginUrl}
             className="rounded-xl border border-line px-4 py-2.5 text-sm font-semibold text-ink hover:bg-surface-sunken transition-colors"
@@ -87,19 +81,13 @@ export default function NavBar() {
                   {l.label}
                 </a>
               ))}
-              <div className="flex items-center gap-2">
-                {(['tr', 'en'] as const).map(lng => (
-                  <button
-                    key={lng}
-                    onClick={() => i18n.changeLanguage(lng)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-semibold uppercase ${
-                      i18n.language?.startsWith(lng) ? 'bg-accent text-white' : 'text-ink-muted border border-line'
-                    }`}
-                  >
-                    {lng}
-                  </button>
-                ))}
-              </div>
+              <LocaleSwitcher
+                className="flex items-center gap-2"
+                buttonClassName={active => `px-3 py-1.5 rounded-md text-xs font-semibold ${
+                  active ? 'bg-accent text-white' : 'text-ink-muted border border-line'
+                }`}
+                onPicked={() => setOpen(false)}
+              />
               <a
                 href={loginUrl}
                 onClick={() => setOpen(false)}
