@@ -1,0 +1,22 @@
+{
+  "_comment": "THE place to add a language. Read by src/i18n/locales.ts (app) and scripts/lib/locales.js (build: sitemap, prerender, the <head> redirect snippet). Nothing else keeps its own language list. See locales.ts for the helpers built on top of this.",
+
+  "defaultLocale": "tr",
+
+  "locales": [
+    { "code": "tr", "prefix": "", "hreflang": "tr", "label": "TR", "name": "Türkçe" },
+    { "code": "en", "prefix": "/en", "hreflang": "en", "label": "EN", "name": "English" }
+  ],
+
+  "_choiceStorageKeyComment": "localStorage key holding an EXPLICIT language choice (the switcher). Deliberately not i18next's own language cache, which also gets written when the language changes merely because a prefixed URL was opened. The <head> redirect snippet reads only this key.",
+  "choiceStorageKey": "carenova_lang_choice",
+
+  "_xDefaultComment": "Where a visitor whose language matches no locale is sent. English, per the brief.",
+  "xDefault": "en",
+
+  "_localizedRoutesComment": "Marketing paths that genuinely exist in EVERY locale, i.e. whose copy is translated. Only these get a /<prefix> URL and tr<->en hreflang pairs. Today that is the landing page alone: /about, /contact, /careers, /blog and the four legal pages are hardcoded English with no translation layer, so giving them an /en twin would publish two URLs with byte-identical English content and tell Google they are translations of each other. When one of those pages is actually translated, add its path here — that is the whole change.",
+  "_unlocalizedLocaleComment": "The real content language of the marketing pages that are NOT in localizedRoutes. /about, /contact, /careers, /blog and the legal pages are written in English only, so <html lang> must say en on them even though the site's default locale is tr — claiming tr would mislabel an English document for screen readers and search engines. Each page that gets translated moves into localizedRoutes and stops depending on this.",
+  "unlocalizedLocale": "en",
+
+  "localizedRoutes": ["/"]
+}
