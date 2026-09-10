@@ -29,7 +29,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "ALLOW_PLACEHOLDERS=1 node scripts/check-placeholders.js && node scripts/generate-sitemap.js && react-scripts build && node scripts/generate-og-cards.js && node scripts/prerender.js",
+    "build": "ALLOW_PLACEHOLDERS=1 node scripts/check-placeholders.js && node scripts/generate-locale-redirect.js && node scripts/generate-sitemap.js && react-scripts build && node scripts/generate-og-cards.js && node scripts/prerender.js",
+    "generate-locale-redirect": "node scripts/generate-locale-redirect.js",
     "generate-sitemap": "node scripts/generate-sitemap.js",
     "generate-og-cards": "node scripts/generate-og-cards.js",
     "check:placeholders": "node scripts/check-placeholders.js",

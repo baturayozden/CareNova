@@ -28,7 +28,7 @@
       "destination": "/_hosts/prerendered/index.html"
     },
     {
-      "source": "/:page(about|blog|contact|careers|privacy|terms|gdpr|cookies)",
+      "source": "/:page(en|about|blog|contact|careers|privacy|terms|gdpr|cookies)",
       "has": [{ "type": "host", "value": "carenova.ai" }],
       "destination": "/_hosts/prerendered/:page/index.html"
     },

@@ -36,6 +36,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const { allPaths, API_URL, MARKETING_ROUTES } = require('./lib/routes');
+const { urlsFor, localizedPath, LOCALES } = require('./lib/locales');
 
 const BUILD_DIR = path.join(__dirname, '..', 'build');
 const OUT_DIR   = path.join(BUILD_DIR, '_hosts', 'prerendered');
@@ -184,7 +185,15 @@ function assertVercelRoutesInSync() {
   }
 
   const inVercel = new Set((marketingRule.source.match(/\(([^)]+)\)/)?.[1] || '').split('|').filter(Boolean));
-  const expected = new Set(MARKETING_ROUTES.map(r => r.path.replace(/^\//, '')).filter(Boolean));
+  // Every URL the marketing site serves, locale-expanded: '/' also produces
+  // '/en', which needs its own apex-gated rewrite or it falls through to the
+  // app shell and the English landing page silently 404s into a login screen.
+  const expected = new Set(
+    MARKETING_ROUTES
+      .flatMap(r => urlsFor(r.path).map(u => u.path))
+      .map(p => p.replace(/^\//, ''))
+      .filter(Boolean),
+  );
   const missing = [...expected].filter(p => !inVercel.has(p));
   const extra   = [...inVercel].filter(p => !expected.has(p));
   if (missing.length || extra.length) {
@@ -308,7 +317,9 @@ async function run() {
     // /blog itself needs the post list too (its readiness check requires
     // >=10 post links), so it falls back to the client shell along with the
     // individual posts — only the 8 truly static marketing pages render here.
-    paths = MARKETING_ROUTES.map(r => r.path).filter(p => p !== '/blog');
+    paths = MARKETING_ROUTES
+      .flatMap(r => urlsFor(r.path).map(u => u.path))
+      .filter(p => p !== '/blog');
     console.warn('\n[prerender] ================================================================');
     console.warn(`[prerender] BLOG API UNAVAILABLE: ${err.message}`);
     console.warn('[prerender] Prerendering marketing pages only. Blog posts will serve the');
