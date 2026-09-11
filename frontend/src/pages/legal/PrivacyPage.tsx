@@ -46,7 +46,7 @@ export default function PrivacyPage() {
             </li>
             <li>
               <strong>As a data processor</strong> — for personal data of patients and prospective patients
-              ("leads") that a dental clinic ("Customer") uploads to, or generates within, the platform
+              ("leads") that a clinic or healthcare provider ("Customer") uploads to, or generates within, the platform
               (e.g. names, phone numbers, treatment interests, WhatsApp conversation content). Here, the
               clinic is the data controller and CareNova processes this data only on the clinic's documented
               instructions, under a Data Processing Agreement (see our GDPR page).
@@ -80,8 +80,12 @@ export default function PrivacyPage() {
             <li>Consent records relating to AI follow-up and messaging</li>
           </ul>
           <p className="text-gray-700 leading-relaxed mb-4">
-            <strong>Special category data:</strong> Information relating to a person's dental treatment may, in
-            some contexts, constitute health-related data (a "special category" under UK GDPR). Where clinics
+            <strong>Special category data:</strong> Information relating to a person's treatment may, in
+            some contexts, constitute health-related data (a "special category" under UK GDPR). Depending on
+            the clinical branch the Customer works in — for example hair transplant, dental, aesthetic surgery,
+            eye (LASIK), bariatric, IVF, orthopaedics, cardiology, oncology or check-up — this may include the
+            treatment the person is enquiring about, their answers to branch-specific pre-assessment questions,
+            medical images they upload, and clinical notes recorded by the clinic. Where clinics
             input such data, they act as controller and are responsible for ensuring an appropriate lawful basis
             and condition for processing. CareNova processes it solely as processor on the clinic's instructions.
           </p>

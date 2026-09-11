@@ -8,7 +8,7 @@ export default function TermsPage() {
     <div className="min-h-screen bg-white">
       <SEOMeta
         title="Terms of Service | CareNova"
-        description="The terms governing use of the CareNova WhatsApp AI platform for dental clinics."
+        description="The terms governing use of the CareNova WhatsApp AI platform for healthcare providers and clinics."
         path="/terms"
       />
       <NavBar />
@@ -26,15 +26,17 @@ export default function TermsPage() {
           </p>
           <p className="text-gray-700 leading-relaxed mb-8">
             By creating an account, accessing, or using the Service, you ("Customer", "you") agree to these
-            Terms. If you are entering into these Terms on behalf of a dental practice or other organisation,
-            you confirm you have authority to bind that organisation.
+            Terms. If you are entering into these Terms on behalf of a clinic, healthcare provider, or other
+            organisation, you confirm you have authority to bind that organisation.
           </p>
 
           <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-3">1. The Service</h2>
           <p className="text-gray-700 leading-relaxed mb-4">
-            CareNova provides a multi-tenant software platform that enables dental clinics to manage and
-            recover leads through WhatsApp-based, multilingual, AI-assisted messaging, together with related
-            features (lead management, reporting, commission tracking, calendar integration, and similar).
+            CareNova provides a multi-tenant software platform that enables healthcare providers and clinics,
+            including those treating patients travelling from abroad, to manage and recover leads through
+            WhatsApp-based, multilingual, AI-assisted messaging, together with related features (lead
+            management, reporting, commission tracking, calendar integration, and similar). The Service is
+            used across a range of clinical branches, and the branches supported may change over time.
             Features may change, improve, or be discontinued over time.
           </p>
 
@@ -43,7 +45,7 @@ export default function TermsPage() {
             <li>You must provide accurate account information and keep it up to date.</li>
             <li>You are responsible for safeguarding login credentials and for all activity under your account.</li>
             <li>Accounts are provisioned on an invitation basis; you must not share credentials or allow unauthorised access.</li>
-            <li>The Service is intended for business use by dental practices and their staff, not for consumers.</li>
+            <li>The Service is intended for business use by healthcare providers, clinics and their staff, not for consumers.</li>
           </ul>
 
           <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-3">3. Customer responsibilities and acceptable use</h2>

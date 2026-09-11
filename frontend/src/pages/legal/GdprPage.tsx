@@ -83,7 +83,10 @@ export default function GdprPage() {
 
           <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-3">4. Special category (health) data</h2>
           <p className="text-gray-700 leading-relaxed mb-4">
-            Information about dental treatment may constitute health data, a special category under GDPR.
+            Information about a person's treatment may constitute health data, a special category under GDPR.
+            Across the clinical branches the platform supports, this may include the treatment enquired about,
+            answers to branch-specific pre-assessment questions, medical images uploaded by the person, and
+            clinical notes recorded by the clinic.
             Clinics, as controllers, are responsible for ensuring an appropriate Article 9 condition for
             processing such data. CareNova processes it only as processor, under appropriate safeguards.
           </p>
