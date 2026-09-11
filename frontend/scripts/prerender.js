@@ -174,8 +174,21 @@ function sanitize() {
  *    above an apex rule, the whole safety property this file's header
  *    describes is gone, silently. This asserts the shape at every build.
  */
+const VERCEL_JSON = path.join(__dirname, '..', '..', 'vercel.json');
+
 function assertVercelRoutesInSync() {
-  const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'vercel.json'), 'utf8'));
+  // The REPO ROOT vercel.json — verified as the one Vercel actually reads:
+  // the project's Root Directory is "." (vercel project inspect carenova).
+  // There used to be a second copy at frontend/vercel.json, created
+  // speculatively in case Root Directory was ever switched to frontend/
+  // (GECE-CALISMA-BRIEFI.md 2.1). It never was, so Vercel never read it —
+  // but THIS assertion did, which meant the one guard against routing drift
+  // was validating a file with no effect on the deployment. It is deleted;
+  // there is now exactly one vercel.json, so the two cannot diverge.
+  if (!fs.existsSync(VERCEL_JSON)) {
+    throw new Error(`[prerender] ${VERCEL_JSON} missing — cannot verify routing is in sync.`);
+  }
+  const cfg = JSON.parse(fs.readFileSync(VERCEL_JSON, 'utf8'));
 
   const marketingRule = cfg.rewrites.find(r => /prerendered\/:page/.test(r.destination || ''));
   if (!marketingRule) throw new Error('[prerender] vercel.json has no marketing-page rewrite rule.');
