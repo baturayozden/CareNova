@@ -1,4 +1,9 @@
 import { demoSource, registerDemoNames } from '../lib/demoProvenance';
+// SEED SOURCE — no screen imports this file any more (ASAMA-3A). The admin
+// console reads the API; these records reach it as real is_demo tenant rows,
+// generated from here by backend/scripts/generate-admin-seed-data.js. Edit
+// this file, then regenerate the JSON (the --check flag catches drift).
+//
 // Platform-wide demo data for the admin console (admin.carenova.ai).
 // Realistic Turkish health-tourism clinics, generic-but-plausible names
 // ("Nova Hair Clinic", "Ege Estetik") — never a real clinic's name or brand.

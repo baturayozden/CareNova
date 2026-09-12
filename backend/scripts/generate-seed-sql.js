@@ -9,7 +9,7 @@ const L=[];
 L.push('BEGIN;');
 const branches=[...new Set(D.cases.map(c=>c.branchKey))];
 L.push(`INSERT INTO tenants (name, slug, status, plan_tier, country, timezone, is_demo, active_branch_keys)
-VALUES ('CareNova Demo Klinik','carenova-demo','active','growth','TR','Europe/Istanbul',true, ARRAY[${branches.map(q).join(',')}]::text[])
+VALUES ('CareNova Demo Klinik','carenova-demo','active','klinik','TR','Europe/Istanbul',true, ARRAY[${branches.map(q).join(',')}]::text[])
 ON CONFLICT (slug) DO UPDATE SET is_demo=true, active_branch_keys=EXCLUDED.active_branch_keys, updated_at=now();`);
 L.push(`CREATE TEMP TABLE _t AS SELECT id FROM tenants WHERE slug='carenova-demo';`);
 // staff
@@ -37,7 +37,7 @@ for(const c of D.cases){
   const phone='+90000'+String(1000000+n).slice(0,7);
   L.push(`WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), ${q(c.patientName)}, ${q(phone)}, ${q((c.patientLanguage||'en').slice(0,5))}, 'new', ${q(c.branchKey)}, true)
+  VALUES ((SELECT id FROM _t), ${q(c.patientName)}, ${q(phone)}, ${q((c.patientLanguage||'en').slice(0,5))}, 'new', ${q(c.branchKey)}, false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -62,6 +62,9 @@ for(const c of D.cases){
   else L.push(`SELECT 1 FROM cse;`);
 }
 L.push('COMMIT;');
-fs.writeFileSync('/tmp/seed-demo.sql', L.join('\n'));
-console.log('SQL yazildi. Satir:', L.join('\n').split('\n').length, '| Bayt:', fs.statSync('/tmp/seed-demo.sql').size);
+// Written next to this script — the committed file IS the generated output, not a
+// hand-copied snapshot of a /tmp file (which is how it used to drift).
+const OUT = require('path').join(__dirname, 'seed-demo-tenant.sql');
+fs.writeFileSync(OUT, L.join('\n'));
+console.log('SQL yazildi. Satir:', L.join('\n').split('\n').length, '| Bayt:', fs.statSync(OUT).size);
 console.log('personel:', staffRows.length, '| vaka:', D.cases.length);

@@ -35,13 +35,12 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const { pool } = require('../src/db/index');
+const { purgePlatform } = require('./demo-platform-seed');
 
 const TENANT_SLUG = 'carenova-demo';
 const TENANT_NAME = 'CareNova Demo Klinik';
-// chk_tenants_plan_tier hala CareDental'in katmanlarini kabul ediyor
-// (free/starter/growth/pro/enterprise). CareNova'nin paketleri Solo/Klinik/Grup;
-// kisit guncellenene kadar en yakin karsilik olarak 'growth' kullaniliyor.
-const TENANT_PLAN_TIER = 'growth';
+// CareNova paketi (migration 067: solo | klinik | grup).
+const TENANT_PLAN_TIER = 'klinik';
 const BCRYPT_ROUNDS = 12;
 const MIN_LENGTH = 8;
 
@@ -133,12 +132,12 @@ async function seed(client, loginEmail, loginPassword) {
   const branchKeys = [...new Set(DATA.cases.map((c) => c.branchKey))];
   const { rows: [tenant] } = await client.query(
     `INSERT INTO tenants (name, slug, status, plan_tier, country, timezone, is_demo, active_branch_keys)
-     VALUES ($1,$2,'active','growth','TR','Europe/Istanbul',true,$3)
+     VALUES ($1,$2,'active',$4,'TR','Europe/Istanbul',true,$3)
      ON CONFLICT (slug) DO UPDATE SET
        name = EXCLUDED.name, is_demo = true,
        active_branch_keys = EXCLUDED.active_branch_keys, updated_at = now()
      RETURNING id`,
-    [TENANT_NAME, TENANT_SLUG, branchKeys],
+    [TENANT_NAME, TENANT_SLUG, branchKeys, TENANT_PLAN_TIER],
   );
   const tenantId = tenant.id;
   console.log(`Tenant: ${TENANT_NAME} (${tenantId}) | is_demo = true | bransler: ${branchKeys.join(', ')}`);
@@ -200,11 +199,11 @@ async function seed(client, loginEmail, loginPassword) {
   await client.query('DELETE FROM leads WHERE tenant_id = $1', [tenantId]);
 
   let companions = 0, events = 0, assessments = 0, itinerary = 0;
-  for (const c of DATA.cases) {
+  for (const [i, c] of DATA.cases.entries()) {
     const { rows: [lead] } = await client.query(
       `INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-       VALUES ($1,$2,$3,$4,'new',$5,true) RETURNING id`,
-      [tenantId, c.patientName, `+90000${String(Math.abs(hashCode(c.caseNumber))).slice(0, 7)}`,
+       VALUES ($1,$2,$3,$4,'new',$5,false) RETURNING id`, // gdpr_consent_given=false: never fabricate consent
+      [tenantId, c.patientName, `+90000${1000001 + i}`, // index-based, like generate-seed-sql.js: a hash of the case number collided,
         (c.patientLanguage || 'en').slice(0, 5), c.branchKey],
     );
 
@@ -269,12 +268,6 @@ async function seed(client, loginEmail, loginPassword) {
   return { tenantId, loginEmail };
 }
 
-function hashCode(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
-  return h;
-}
-
 (async () => {
   const purgeMode = process.argv.includes('--purge');
   const client = await pool.connect();
@@ -282,6 +275,10 @@ function hashCode(s) {
     await client.query('BEGIN');
     if (purgeMode) {
       await purge(client);
+      // The admin console's demo platform (seed-demo-platform.js) goes with it:
+      // one command removes every demo row.
+      const platform = await purgePlatform(client);
+      console.log('Demo platform silindi ->', JSON.stringify(platform));
     } else {
       const loginEmail = process.env.SEED_USER_EMAIL || 'demo@carenova.ai';
       let pw = process.env.SEED_USER_PASSWORD;

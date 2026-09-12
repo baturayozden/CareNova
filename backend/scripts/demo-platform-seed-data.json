@@ -1,0 +1,703 @@
+{
+  "_generatedFrom": "frontend/src/data/adminDemoData.ts — do not edit by hand; re-run generate-admin-seed-data.js",
+  "_timeModel": "All *Offset fields are milliseconds before the seed moment (negative = in the future).",
+  "onboardingSteps": [
+    "Klinik bilgisi",
+    "Branş seçimi",
+    "WhatsApp bağlama",
+    "Doktor kartları",
+    "Bilgi bankası",
+    "Fiyat/yetki onayı",
+    "KVKK metinleri",
+    "Test → canlı"
+  ],
+  "clinics": [
+    {
+      "key": "clinic-nova-hair",
+      "name": "Nova Hair Clinic",
+      "legalName": "Nova Saç Ekimi Sağlık Hiz. A.Ş.",
+      "city": "İstanbul",
+      "branches": [
+        "hair_transplant"
+      ],
+      "plan": "klinik",
+      "status": "active",
+      "userCount": 12,
+      "contactEmail": "ops@novahairclinic.com",
+      "contactPhone": "+90 212 555 0101",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": "USHT-2026-00142",
+      "licenseExpiryOffset": -24192000000,
+      "onboarding": {
+        "step": 7,
+        "stepStartedOffset": 10368000000,
+        "stuck": false
+      },
+      "whatsapp": {
+        "displayNumber": "+90 212 555 0102",
+        "phoneNumberId": "778812345600100",
+        "connected": true,
+        "messagesLast24h": 214,
+        "errorsLast24h": 0,
+        "lastWebhookSuccessOffset": 720000
+      },
+      "aiUsage": {
+        "monthlyQuota": 2000,
+        "usedThisMonth": 1680,
+        "overagePolicy": "allow"
+      },
+      "compliance": {
+        "licenseOnFile": true,
+        "complicationInsurance": true,
+        "complicationInsuranceExpiryOffset": -26784000000,
+        "verbisRegistered": true,
+        "foreignLanguageStaffRatio": 24,
+        "crossBorderNotified": true,
+        "crossBorderNotifiedOffset": 17280000000
+      },
+      "billing": {
+        "periodicity": "annual",
+        "status": "current",
+        "nextChargeOffset": -5011200000
+      }
+    },
+    {
+      "key": "clinic-ege-estetik",
+      "name": "Ege Estetik",
+      "legalName": "Ege Estetik Cerrahi Ltd. Şti.",
+      "city": "İzmir",
+      "branches": [
+        "aesthetic_surgery"
+      ],
+      "plan": "klinik",
+      "status": "active",
+      "userCount": 8,
+      "contactEmail": "yonetim@egeestetik.com.tr",
+      "contactPhone": "+90 232 555 0201",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": "USHT-2026-00098",
+      "licenseExpiryOffset": -12096000000,
+      "onboarding": {
+        "step": 7,
+        "stepStartedOffset": 17280000000,
+        "stuck": false
+      },
+      "whatsapp": {
+        "displayNumber": "+90 232 555 0202",
+        "phoneNumberId": "778812345600200",
+        "connected": true,
+        "messagesLast24h": 87,
+        "errorsLast24h": 1,
+        "lastWebhookSuccessOffset": 1800000
+      },
+      "aiUsage": {
+        "monthlyQuota": 2000,
+        "usedThisMonth": 940,
+        "overagePolicy": "block"
+      },
+      "compliance": {
+        "licenseOnFile": true,
+        "complicationInsurance": true,
+        "complicationInsuranceExpiryOffset": -3888000000,
+        "verbisRegistered": true,
+        "foreignLanguageStaffRatio": 18,
+        "crossBorderNotified": true,
+        "crossBorderNotifiedOffset": 15552000000
+      },
+      "billing": {
+        "periodicity": "monthly",
+        "status": "current",
+        "nextChargeOffset": -1036800000
+      }
+    },
+    {
+      "key": "clinic-anadolu-dental",
+      "name": "Anadolu Dental",
+      "legalName": "Anadolu Ağız ve Diş Sağlığı Poliklinik A.Ş.",
+      "city": "Ankara",
+      "branches": [
+        "dental"
+      ],
+      "plan": "grup",
+      "status": "active",
+      "userCount": 22,
+      "contactEmail": "info@anadoludental.com.tr",
+      "contactPhone": "+90 312 555 0301",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": "USHT-2025-00512",
+      "licenseExpiryOffset": -34560000000,
+      "onboarding": {
+        "step": 7,
+        "stepStartedOffset": 25920000000,
+        "stuck": false
+      },
+      "whatsapp": {
+        "displayNumber": "+90 312 555 0302",
+        "phoneNumberId": "778812345600300",
+        "connected": true,
+        "messagesLast24h": 341,
+        "errorsLast24h": 0,
+        "lastWebhookSuccessOffset": 360000
+      },
+      "aiUsage": {
+        "monthlyQuota": 10000,
+        "usedThisMonth": 7200,
+        "overagePolicy": "allow"
+      },
+      "compliance": {
+        "licenseOnFile": true,
+        "complicationInsurance": true,
+        "complicationInsuranceExpiryOffset": -43200000000,
+        "verbisRegistered": true,
+        "foreignLanguageStaffRatio": 31,
+        "crossBorderNotified": true,
+        "crossBorderNotifiedOffset": 24192000000
+      },
+      "billing": {
+        "periodicity": "annual",
+        "status": "current",
+        "nextChargeOffset": -5616000000
+      }
+    },
+    {
+      "key": "clinic-akdeniz-goz",
+      "name": "Akdeniz Göz Merkezi",
+      "legalName": "Akdeniz Göz Sağlığı Hiz. Ltd.",
+      "city": "Antalya",
+      "branches": [
+        "eye_lasik"
+      ],
+      "plan": "solo",
+      "status": "active",
+      "userCount": 3,
+      "contactEmail": "ilgi@akdenizgoz.com",
+      "contactPhone": "+90 242 555 0401",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": "USHT-2026-00201",
+      "licenseExpiryOffset": -1728000000,
+      "onboarding": {
+        "step": 7,
+        "stepStartedOffset": 5184000000,
+        "stuck": false
+      },
+      "whatsapp": {
+        "displayNumber": "+90 242 555 0402",
+        "phoneNumberId": "778812345600400",
+        "connected": true,
+        "messagesLast24h": 12,
+        "errorsLast24h": 0,
+        "lastWebhookSuccessOffset": 7200000
+      },
+      "aiUsage": {
+        "monthlyQuota": 300,
+        "usedThisMonth": 290,
+        "overagePolicy": "block"
+      },
+      "compliance": {
+        "licenseOnFile": true,
+        "complicationInsurance": false,
+        "complicationInsuranceExpiryOffset": null,
+        "verbisRegistered": true,
+        "foreignLanguageStaffRatio": 15,
+        "crossBorderNotified": false,
+        "crossBorderNotifiedOffset": null
+      },
+      "billing": {
+        "periodicity": "monthly",
+        "status": "overdue",
+        "nextChargeOffset": 259200000
+      }
+    },
+    {
+      "key": "clinic-bogazici-bariatrik",
+      "name": "Boğaziçi Bariatrik",
+      "legalName": "Boğaziçi Obezite Cerrahisi A.Ş.",
+      "city": "İstanbul",
+      "branches": [
+        "bariatric"
+      ],
+      "plan": "klinik",
+      "status": "trial",
+      "userCount": 5,
+      "contactEmail": "info@bogazicibariatrik.com",
+      "contactPhone": "+90 212 555 0501",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": null,
+      "licenseExpiryOffset": null,
+      "onboarding": {
+        "step": 7,
+        "stepStartedOffset": 864000000,
+        "stuck": false
+      },
+      "whatsapp": {
+        "displayNumber": "+90 212 555 0502",
+        "phoneNumberId": "778812345600500",
+        "connected": true,
+        "messagesLast24h": 6,
+        "errorsLast24h": 0,
+        "lastWebhookSuccessOffset": 14400000
+      },
+      "aiUsage": {
+        "monthlyQuota": 2000,
+        "usedThisMonth": 120,
+        "overagePolicy": "block"
+      },
+      "compliance": {
+        "licenseOnFile": false,
+        "complicationInsurance": false,
+        "complicationInsuranceExpiryOffset": null,
+        "verbisRegistered": false,
+        "foreignLanguageStaffRatio": 8,
+        "crossBorderNotified": false,
+        "crossBorderNotifiedOffset": null
+      },
+      "billing": {
+        "periodicity": "monthly",
+        "status": "trial",
+        "nextChargeOffset": -345600000
+      }
+    },
+    {
+      "key": "clinic-marmara-ivf",
+      "name": "Marmara Tüp Bebek",
+      "legalName": "Marmara Üreme Sağlığı Merkezi Ltd.",
+      "city": "İstanbul",
+      "branches": [
+        "ivf"
+      ],
+      "plan": "klinik",
+      "status": "active",
+      "userCount": 9,
+      "contactEmail": "iletisim@marmaraivf.com",
+      "contactPhone": "+90 216 555 0601",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": "USHT-2025-00389",
+      "licenseExpiryOffset": -19008000000,
+      "onboarding": {
+        "step": 7,
+        "stepStartedOffset": 12960000000,
+        "stuck": false
+      },
+      "whatsapp": {
+        "displayNumber": "+90 216 555 0602",
+        "phoneNumberId": "778812345600600",
+        "connected": true,
+        "messagesLast24h": 58,
+        "errorsLast24h": 0,
+        "lastWebhookSuccessOffset": 3600000
+      },
+      "aiUsage": {
+        "monthlyQuota": 2000,
+        "usedThisMonth": 610,
+        "overagePolicy": "block"
+      },
+      "compliance": {
+        "licenseOnFile": true,
+        "complicationInsurance": true,
+        "complicationInsuranceExpiryOffset": -17280000000,
+        "verbisRegistered": true,
+        "foreignLanguageStaffRatio": 22,
+        "crossBorderNotified": true,
+        "crossBorderNotifiedOffset": 12096000000
+      },
+      "billing": {
+        "periodicity": "annual",
+        "status": "current",
+        "nextChargeOffset": -18576000000
+      }
+    },
+    {
+      "key": "clinic-toros-ortopedi",
+      "name": "Toros Ortopedi",
+      "legalName": "Toros Ortopedi ve Travmatoloji A.Ş.",
+      "city": "Antalya",
+      "branches": [
+        "orthopedics"
+      ],
+      "plan": "solo",
+      "status": "onboarding",
+      "userCount": 2,
+      "contactEmail": "destek@torosortopedi.com",
+      "contactPhone": "+90 242 555 0701",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": null,
+      "licenseExpiryOffset": null,
+      "onboarding": {
+        "step": 3,
+        "stepStartedOffset": 777600000,
+        "stuck": true
+      },
+      "whatsapp": {
+        "displayNumber": "",
+        "phoneNumberId": "",
+        "connected": false,
+        "messagesLast24h": 0,
+        "errorsLast24h": 0,
+        "lastWebhookSuccessOffset": null
+      },
+      "aiUsage": {
+        "monthlyQuota": 300,
+        "usedThisMonth": 0,
+        "overagePolicy": "block"
+      },
+      "compliance": {
+        "licenseOnFile": false,
+        "complicationInsurance": false,
+        "complicationInsuranceExpiryOffset": null,
+        "verbisRegistered": false,
+        "foreignLanguageStaffRatio": 0,
+        "crossBorderNotified": false,
+        "crossBorderNotifiedOffset": null
+      },
+      "billing": {
+        "periodicity": "monthly",
+        "status": "trial",
+        "nextChargeOffset": -1814400000
+      }
+    },
+    {
+      "key": "clinic-anka-checkup",
+      "name": "Anka Check-up Merkezi",
+      "legalName": "Anka Sağlık Kontrol Hiz. Ltd.",
+      "city": "Ankara",
+      "branches": [
+        "checkup"
+      ],
+      "plan": "solo",
+      "status": "active",
+      "userCount": 4,
+      "contactEmail": "randevu@ankacheckup.com",
+      "contactPhone": "+90 312 555 0801",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": "USHT-2026-00276",
+      "licenseExpiryOffset": -28512000000,
+      "onboarding": {
+        "step": 7,
+        "stepStartedOffset": 3456000000,
+        "stuck": false
+      },
+      "whatsapp": {
+        "displayNumber": "+90 312 555 0802",
+        "phoneNumberId": "778812345600800",
+        "connected": true,
+        "messagesLast24h": 29,
+        "errorsLast24h": 0,
+        "lastWebhookSuccessOffset": 10800000
+      },
+      "aiUsage": {
+        "monthlyQuota": 300,
+        "usedThisMonth": 145,
+        "overagePolicy": "allow"
+      },
+      "compliance": {
+        "licenseOnFile": true,
+        "complicationInsurance": true,
+        "complicationInsuranceExpiryOffset": -28512000000,
+        "verbisRegistered": true,
+        "foreignLanguageStaffRatio": 20,
+        "crossBorderNotified": true,
+        "crossBorderNotifiedOffset": 3024000000
+      },
+      "billing": {
+        "periodicity": "monthly",
+        "status": "current",
+        "nextChargeOffset": -691200000
+      }
+    },
+    {
+      "key": "clinic-istanbul-onkoloji",
+      "name": "İstanbul Onkoloji Danışma",
+      "legalName": "İstanbul Onkoloji Danışmanlık A.Ş.",
+      "city": "İstanbul",
+      "branches": [
+        "oncology"
+      ],
+      "plan": "klinik",
+      "status": "suspended",
+      "userCount": 6,
+      "contactEmail": "iletisim@istonkoloji.com",
+      "contactPhone": "+90 212 555 0901",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": "USHT-2025-00033",
+      "licenseExpiryOffset": 432000000,
+      "onboarding": {
+        "step": 7,
+        "stepStartedOffset": 19008000000,
+        "stuck": false
+      },
+      "whatsapp": {
+        "displayNumber": "+90 212 555 0902",
+        "phoneNumberId": "778812345600900",
+        "connected": false,
+        "messagesLast24h": 0,
+        "errorsLast24h": 3,
+        "lastWebhookSuccessOffset": 1555200000
+      },
+      "aiUsage": {
+        "monthlyQuota": 2000,
+        "usedThisMonth": 30,
+        "overagePolicy": "block"
+      },
+      "compliance": {
+        "licenseOnFile": true,
+        "complicationInsurance": true,
+        "complicationInsuranceExpiryOffset": 1728000000,
+        "verbisRegistered": true,
+        "foreignLanguageStaffRatio": 12,
+        "crossBorderNotified": true,
+        "crossBorderNotifiedOffset": 17280000000
+      },
+      "billing": {
+        "periodicity": "annual",
+        "status": "overdue",
+        "nextChargeOffset": 1296000000
+      }
+    },
+    {
+      "key": "clinic-karadeniz-estetik",
+      "name": "Karadeniz Estetik ve Cerrahi",
+      "legalName": "Karadeniz Estetik Cerrahi Merkezi Ltd.",
+      "city": "İzmir",
+      "branches": [
+        "aesthetic_surgery",
+        "hair_transplant"
+      ],
+      "plan": "grup",
+      "status": "active",
+      "userCount": 17,
+      "contactEmail": "operasyon@karadenizestetik.com",
+      "contactPhone": "+90 232 555 1001",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": "USHT-2026-00087",
+      "licenseExpiryOffset": -22464000000,
+      "onboarding": {
+        "step": 7,
+        "stepStartedOffset": 7776000000,
+        "stuck": false
+      },
+      "whatsapp": {
+        "displayNumber": "+90 232 555 1002",
+        "phoneNumberId": "778812345601000",
+        "connected": true,
+        "messagesLast24h": 198,
+        "errorsLast24h": 2,
+        "lastWebhookSuccessOffset": 1080000
+      },
+      "aiUsage": {
+        "monthlyQuota": 10000,
+        "usedThisMonth": 9450,
+        "overagePolicy": "allow"
+      },
+      "compliance": {
+        "licenseOnFile": true,
+        "complicationInsurance": true,
+        "complicationInsuranceExpiryOffset": -5184000000,
+        "verbisRegistered": true,
+        "foreignLanguageStaffRatio": 19,
+        "crossBorderNotified": true,
+        "crossBorderNotifiedOffset": 7344000000
+      },
+      "billing": {
+        "periodicity": "annual",
+        "status": "current",
+        "nextChargeOffset": -23760000000
+      }
+    },
+    {
+      "key": "clinic-selcuk-dental",
+      "name": "Selçuk Diş Polikliniği",
+      "legalName": "Selçuk Ağız Diş Sağlığı Polikliniği",
+      "city": "Konya",
+      "branches": [
+        "dental"
+      ],
+      "plan": "solo",
+      "status": "onboarding",
+      "userCount": 1,
+      "contactEmail": "klinik@selcukdis.com",
+      "contactPhone": "+90 332 555 1101",
+      "timezone": "Europe/Istanbul",
+      "currency": "EUR",
+      "licenseNumber": null,
+      "licenseExpiryOffset": null,
+      "onboarding": {
+        "step": 1,
+        "stepStartedOffset": 86400000,
+        "stuck": false
+      },
+      "whatsapp": {
+        "displayNumber": "",
+        "phoneNumberId": "",
+        "connected": false,
+        "messagesLast24h": 0,
+        "errorsLast24h": 0,
+        "lastWebhookSuccessOffset": null
+      },
+      "aiUsage": {
+        "monthlyQuota": 300,
+        "usedThisMonth": 0,
+        "overagePolicy": "block"
+      },
+      "compliance": {
+        "licenseOnFile": false,
+        "complicationInsurance": false,
+        "complicationInsuranceExpiryOffset": null,
+        "verbisRegistered": false,
+        "foreignLanguageStaffRatio": 0,
+        "crossBorderNotified": false,
+        "crossBorderNotifiedOffset": null
+      },
+      "billing": {
+        "periodicity": "monthly",
+        "status": "trial",
+        "nextChargeOffset": -2505600000
+      }
+    }
+  ],
+  "clinicUsers": [
+    {
+      "name": "Emre Yıldız",
+      "email": "emre@novahairclinic.com",
+      "clinicKey": "clinic-nova-hair",
+      "role": "klinik_sahibi",
+      "lastLoginOffset": 3600000
+    },
+    {
+      "name": "Selin Kaya",
+      "email": "selin@novahairclinic.com",
+      "clinicKey": "clinic-nova-hair",
+      "role": "doktor",
+      "lastLoginOffset": 10800000
+    },
+    {
+      "name": "Ayşe Demir",
+      "email": "ayse@novahairclinic.com",
+      "clinicKey": "clinic-nova-hair",
+      "role": "hasta_danismani",
+      "lastLoginOffset": 1800000
+    },
+    {
+      "name": "Cem Aksu",
+      "email": "cem@egeestetik.com.tr",
+      "clinicKey": "clinic-ege-estetik",
+      "role": "operasyon_muduru",
+      "lastLoginOffset": 14400000
+    },
+    {
+      "name": "Merve Öz",
+      "email": "merve@anadoludental.com.tr",
+      "clinicKey": "clinic-anadolu-dental",
+      "role": "koordinator",
+      "lastLoginOffset": 7200000
+    },
+    {
+      "name": "Deniz Ak",
+      "email": "deniz@anadoludental.com.tr",
+      "clinicKey": "clinic-anadolu-dental",
+      "role": "muhasebe",
+      "lastLoginOffset": 86400000
+    },
+    {
+      "name": "Fatma Şen",
+      "email": "fatma@karadenizestetik.com",
+      "clinicKey": "clinic-karadeniz-estetik",
+      "role": "tercuman",
+      "lastLoginOffset": 18000000
+    }
+  ],
+  "demoRequests": [
+    {
+      "name": "Dr. Hakan Sezer",
+      "email": "hakan@sezerklinik.com",
+      "clinicName": "Sezer Saç Ekimi",
+      "city": "İstanbul",
+      "branchKey": "hair_transplant",
+      "phone": "+90 532 111 2233",
+      "status": "new",
+      "notes": null,
+      "createdOffset": 14400000
+    },
+    {
+      "name": "Elif Yalçın",
+      "email": "elif@yalcindent.com",
+      "clinicName": "Yalçın Diş Kliniği",
+      "city": "Bursa",
+      "branchKey": "dental",
+      "phone": "+90 533 222 3344",
+      "status": "contacted",
+      "notes": "Perşembe demo planlandı.",
+      "createdOffset": 86400000
+    },
+    {
+      "name": "Mert Aksoy",
+      "email": "mert@aksoyestetik.com",
+      "clinicName": "Aksoy Estetik",
+      "city": "İzmir",
+      "branchKey": "aesthetic_surgery",
+      "phone": "+90 535 333 4455",
+      "status": "demo_done",
+      "notes": "Fiyat konusunda tereddütlü, takip edilecek.",
+      "createdOffset": 259200000
+    },
+    {
+      "name": "Zeynep Kurt",
+      "email": "zeynep@kurtgoz.com",
+      "clinicName": "Kurt Göz Merkezi",
+      "city": "Antalya",
+      "branchKey": "eye_lasik",
+      "phone": "+90 536 444 5566",
+      "status": "won",
+      "notes": "Nova Hair Clinic olarak değil, ayrı yeni klinik — sözleşme imzalandı.",
+      "createdOffset": 604800000
+    },
+    {
+      "name": "Caner Bulut",
+      "email": "caner@bulutivf.com",
+      "clinicName": "Bulut Tüp Bebek",
+      "city": "Ankara",
+      "branchKey": "ivf",
+      "phone": "+90 537 555 6677",
+      "status": "lost",
+      "notes": "Bütçe uymadı.",
+      "createdOffset": 864000000
+    },
+    {
+      "name": "Aslı Demirtaş",
+      "email": "asli@demirtasortopedi.com",
+      "clinicName": "Demirtaş Ortopedi",
+      "city": "Antalya",
+      "branchKey": "orthopedics",
+      "phone": "+90 538 666 7788",
+      "status": "new",
+      "notes": null,
+      "createdOffset": 72000000
+    }
+  ],
+  "healthErrors": [
+    {
+      "clinicName": "İstanbul Onkoloji Danışma",
+      "message": "Webhook zaman aşımı (10s)",
+      "atOffset": 72000000
+    },
+    {
+      "clinicName": "Karadeniz Estetik ve Cerrahi",
+      "message": "AI yanıt formatı geçersiz, yeniden denendi",
+      "atOffset": 21600000
+    },
+    {
+      "clinicName": "Ege Estetik",
+      "message": "WhatsApp API 429 (rate limit)",
+      "atOffset": 32400000
+    }
+  ]
+}

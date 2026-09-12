@@ -1,6 +1,6 @@
 BEGIN;
 INSERT INTO tenants (name, slug, status, plan_tier, country, timezone, is_demo, active_branch_keys)
-VALUES ('CareNova Demo Klinik','carenova-demo','active','growth','TR','Europe/Istanbul',true, ARRAY['hair_transplant','dental','aesthetic_surgery','eye_lasik','ivf']::text[])
+VALUES ('CareNova Demo Klinik','carenova-demo','active','klinik','TR','Europe/Istanbul',true, ARRAY['hair_transplant','dental','aesthetic_surgery','eye_lasik','ivf']::text[])
 ON CONFLICT (slug) DO UPDATE SET is_demo=true, active_branch_keys=EXCLUDED.active_branch_keys, updated_at=now();
 CREATE TEMP TABLE _t AS SELECT id FROM tenants WHERE slug='carenova-demo';
 INSERT INTO users (tenant_id, role_id, email, password_hash, first_name, last_name, is_active) VALUES
@@ -28,7 +28,7 @@ DELETE FROM cases WHERE tenant_id=(SELECT id FROM _t);
 DELETE FROM leads WHERE tenant_id=(SELECT id FROM _t);
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Michael Brandt', '+900001000001', 'de', 'new', 'hair_transplant', true)
+  VALUES ((SELECT id FROM _t), 'Michael Brandt', '+900001000001', 'de', 'new', 'hair_transplant', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -48,7 +48,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Sara Al-Amin', '+900001000002', 'ar', 'new', 'dental', true)
+  VALUES ((SELECT id FROM _t), 'Sara Al-Amin', '+900001000002', 'ar', 'new', 'dental', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -68,7 +68,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Lukas Weber', '+900001000003', 'de', 'new', 'hair_transplant', true)
+  VALUES ((SELECT id FROM _t), 'Lukas Weber', '+900001000003', 'de', 'new', 'hair_transplant', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -88,7 +88,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Ahmed Al-Rashid', '+900001000004', 'ar', 'new', 'dental', true)
+  VALUES ((SELECT id FROM _t), 'Ahmed Al-Rashid', '+900001000004', 'ar', 'new', 'dental', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -108,7 +108,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Charlotte Bennett', '+900001000005', 'en', 'new', 'aesthetic_surgery', true)
+  VALUES ((SELECT id FROM _t), 'Charlotte Bennett', '+900001000005', 'en', 'new', 'aesthetic_surgery', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -128,7 +128,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Irina Sokolova', '+900001000006', 'ru', 'new', 'eye_lasik', true)
+  VALUES ((SELECT id FROM _t), 'Irina Sokolova', '+900001000006', 'ru', 'new', 'eye_lasik', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -148,7 +148,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Fatima Zohra', '+900001000007', 'ar', 'new', 'hair_transplant', true)
+  VALUES ((SELECT id FROM _t), 'Fatima Zohra', '+900001000007', 'ar', 'new', 'hair_transplant', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -168,7 +168,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'David Kim', '+900001000008', 'en', 'new', 'dental', true)
+  VALUES ((SELECT id FROM _t), 'David Kim', '+900001000008', 'en', 'new', 'dental', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -188,7 +188,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Hassan Baig', '+900001000009', 'en', 'new', 'hair_transplant', true)
+  VALUES ((SELECT id FROM _t), 'Hassan Baig', '+900001000009', 'en', 'new', 'hair_transplant', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -208,7 +208,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Marco Rossi', '+900001000010', 'en', 'new', 'aesthetic_surgery', true)
+  VALUES ((SELECT id FROM _t), 'Marco Rossi', '+900001000010', 'en', 'new', 'aesthetic_surgery', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -228,7 +228,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Sophie Martin', '+900001000011', 'en', 'new', 'dental', true)
+  VALUES ((SELECT id FROM _t), 'Sophie Martin', '+900001000011', 'en', 'new', 'dental', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -248,7 +248,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Klaus Richter', '+900001000012', 'de', 'new', 'hair_transplant', true)
+  VALUES ((SELECT id FROM _t), 'Klaus Richter', '+900001000012', 'de', 'new', 'hair_transplant', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -268,7 +268,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Rania Khoury', '+900001000013', 'ar', 'new', 'aesthetic_surgery', true)
+  VALUES ((SELECT id FROM _t), 'Rania Khoury', '+900001000013', 'ar', 'new', 'aesthetic_surgery', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -288,7 +288,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Tom Andersen', '+900001000014', 'en', 'new', 'hair_transplant', true)
+  VALUES ((SELECT id FROM _t), 'Tom Andersen', '+900001000014', 'en', 'new', 'hair_transplant', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -308,7 +308,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Aylin Yusupova', '+900001000015', 'ru', 'new', 'ivf', true)
+  VALUES ((SELECT id FROM _t), 'Aylin Yusupova', '+900001000015', 'ru', 'new', 'ivf', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -328,7 +328,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Isabella Conti', '+900001000016', 'en', 'new', 'aesthetic_surgery', true)
+  VALUES ((SELECT id FROM _t), 'Isabella Conti', '+900001000016', 'en', 'new', 'aesthetic_surgery', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -348,7 +348,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Emre Aydınoğlu', '+900001000017', 'tr', 'new', 'eye_lasik', true)
+  VALUES ((SELECT id FROM _t), 'Emre Aydınoğlu', '+900001000017', 'tr', 'new', 'eye_lasik', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
@@ -368,7 +368,7 @@ WITH l AS (
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
-  VALUES ((SELECT id FROM _t), 'Omar Haddad', '+900001000018', 'ar', 'new', 'dental', true)
+  VALUES ((SELECT id FROM _t), 'Omar Haddad', '+900001000018', 'ar', 'new', 'dental', false)
   RETURNING id
 ), cse AS (
   INSERT INTO cases (tenant_id, patient_id, case_number, branch_key, status, medical_eligibility, eligibility_note,
