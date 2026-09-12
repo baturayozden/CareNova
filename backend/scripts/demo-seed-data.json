@@ -1,0 +1,869 @@
+{
+  "generatedFrom": "frontend/src/data/caseData.ts",
+  "staff": {
+    "doctors": [
+      {
+        "id": "doc-1",
+        "name": "Dr. Emre Yıldız",
+        "branch": "hair_transplant",
+        "registrationNo": "TR-34-88213",
+        "languages": [
+          "tr",
+          "en",
+          "de"
+        ]
+      },
+      {
+        "id": "doc-2",
+        "name": "Dr. Selin Kaya",
+        "branch": "aesthetic_surgery",
+        "registrationNo": "TR-35-44120",
+        "languages": [
+          "tr",
+          "en"
+        ]
+      },
+      {
+        "id": "doc-3",
+        "name": "Dr. Mert Aydın",
+        "branch": "eye_lasik",
+        "registrationNo": "TR-06-91002",
+        "languages": [
+          "tr",
+          "en",
+          "ar"
+        ]
+      },
+      {
+        "id": "doc-4",
+        "name": "Dr. Ayla Çelik",
+        "branch": "dental",
+        "registrationNo": "TR-34-55671",
+        "languages": [
+          "tr",
+          "en",
+          "ru"
+        ]
+      },
+      {
+        "id": "doc-5",
+        "name": "Dr. Kerem Ateş",
+        "branch": "ivf",
+        "registrationNo": "TR-34-23890",
+        "languages": [
+          "tr",
+          "en"
+        ]
+      }
+    ],
+    "consultants": [
+      {
+        "id": "con-1",
+        "name": "Ayşe Demir",
+        "languages": [
+          "tr",
+          "en",
+          "de"
+        ]
+      },
+      {
+        "id": "con-2",
+        "name": "Jonas Fischer",
+        "languages": [
+          "en",
+          "de"
+        ]
+      },
+      {
+        "id": "con-3",
+        "name": "Layla Hassan",
+        "languages": [
+          "en",
+          "ar"
+        ]
+      },
+      {
+        "id": "con-4",
+        "name": "Olga Petrova",
+        "languages": [
+          "en",
+          "ru"
+        ]
+      }
+    ],
+    "coordinators": [
+      {
+        "id": "coord-1",
+        "name": "Kaan Şahin"
+      },
+      {
+        "id": "coord-2",
+        "name": "Elif Aksoy"
+      }
+    ],
+    "interpreters": [
+      {
+        "id": "int-1",
+        "name": "Reem Al-Sayed",
+        "languages": [
+          "ar"
+        ]
+      },
+      {
+        "id": "int-2",
+        "name": "Natasha Ivanova",
+        "languages": [
+          "ru"
+        ]
+      },
+      {
+        "id": "int-3",
+        "name": "Hans Weber",
+        "languages": [
+          "de"
+        ]
+      }
+    ]
+  },
+  "cases": [
+    {
+      "caseNumber": "CN-2026-0201",
+      "patientName": "Michael Brandt",
+      "patientCountry": "Germany",
+      "patientLanguage": "de",
+      "patientAge": 34,
+      "branchKey": "hair_transplant",
+      "status": "new",
+      "estimatedValueEur": 2600,
+      "lastActivityAt": "2026-09-07T07:42:00.000Z",
+      "assignedConsultant": "Ayşe Demir",
+      "assignedDoctor": null,
+      "assignedCoordinator": null,
+      "assignedInterpreter": null,
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "new",
+          "at": "2026-09-07T07:42:00.000Z"
+        }
+      ],
+      "preAssessment": [],
+      "doctorDecision": "pending",
+      "doctorNote": null,
+      "itinerary": [],
+      "patientCountryCode": "DE"
+    },
+    {
+      "caseNumber": "CN-2026-0187",
+      "patientName": "Sara Al-Amin",
+      "patientCountry": "Iraq",
+      "patientLanguage": "ar",
+      "patientAge": 29,
+      "branchKey": "dental",
+      "status": "qualified",
+      "estimatedValueEur": 3400,
+      "lastActivityAt": "2026-09-07T06:00:00.000Z",
+      "assignedConsultant": "Layla Hassan",
+      "assignedDoctor": null,
+      "assignedCoordinator": null,
+      "assignedInterpreter": "Reem Al-Sayed",
+      "companions": [
+        {
+          "name": "Youssef Al-Amin",
+          "relation": "Eş"
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "new",
+          "at": "2026-09-05T08:00:00.000Z"
+        },
+        {
+          "status": "qualified",
+          "at": "2026-09-07T06:00:00.000Z"
+        }
+      ],
+      "preAssessment": [
+        {
+          "q": "Eksik diş sayısı",
+          "a": "4"
+        }
+      ],
+      "doctorDecision": "pending",
+      "doctorNote": null,
+      "itinerary": [],
+      "patientCountryCode": "IQ"
+    },
+    {
+      "caseNumber": "CN-2026-0142",
+      "patientName": "Lukas Weber",
+      "patientCountry": "Germany",
+      "patientLanguage": "de",
+      "patientAge": 41,
+      "branchKey": "hair_transplant",
+      "status": "awaiting_doctor",
+      "estimatedValueEur": 2900,
+      "lastActivityAt": "2026-09-07T03:00:00.000Z",
+      "assignedConsultant": "Jonas Fischer",
+      "assignedDoctor": null,
+      "assignedCoordinator": null,
+      "assignedInterpreter": null,
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "new",
+          "at": "2026-09-04T08:00:00.000Z"
+        },
+        {
+          "status": "qualified",
+          "at": "2026-09-05T08:00:00.000Z"
+        },
+        {
+          "status": "pre_assessment",
+          "at": "2026-09-05T08:00:00.000Z"
+        },
+        {
+          "status": "awaiting_doctor",
+          "at": "2026-09-07T03:00:00.000Z"
+        }
+      ],
+      "preAssessment": [
+        {
+          "q": "Norwood evresi (fotoğraftan)",
+          "a": "4"
+        },
+        {
+          "q": "Kronik hastalık",
+          "a": "Yok"
+        }
+      ],
+      "doctorDecision": "pending",
+      "doctorNote": null,
+      "itinerary": [],
+      "patientCountryCode": "DE"
+    },
+    {
+      "caseNumber": "CN-2026-0198",
+      "patientName": "Ahmed Al-Rashid",
+      "patientCountry": "Iraq",
+      "patientLanguage": "ar",
+      "patientAge": 52,
+      "branchKey": "dental",
+      "status": "awaiting_doctor",
+      "estimatedValueEur": 3100,
+      "lastActivityAt": "2026-09-07T00:00:00.000Z",
+      "assignedConsultant": "Layla Hassan",
+      "assignedDoctor": "Dr. Ayla Çelik",
+      "assignedCoordinator": null,
+      "assignedInterpreter": "Reem Al-Sayed",
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "new",
+          "at": "2026-09-03T08:00:00.000Z"
+        },
+        {
+          "status": "qualified",
+          "at": "2026-09-04T08:00:00.000Z"
+        },
+        {
+          "status": "pre_assessment",
+          "at": "2026-09-05T08:00:00.000Z"
+        },
+        {
+          "status": "awaiting_doctor",
+          "at": "2026-09-07T00:00:00.000Z"
+        }
+      ],
+      "preAssessment": [
+        {
+          "q": "Eksik diş sayısı",
+          "a": "3"
+        }
+      ],
+      "doctorDecision": "pending",
+      "doctorNote": null,
+      "itinerary": [],
+      "patientCountryCode": "IQ"
+    },
+    {
+      "caseNumber": "CN-2026-0156",
+      "patientName": "Charlotte Bennett",
+      "patientCountry": "United Kingdom",
+      "patientLanguage": "en",
+      "patientAge": 38,
+      "branchKey": "aesthetic_surgery",
+      "status": "quoted",
+      "estimatedValueEur": 5200,
+      "lastActivityAt": "2026-09-06T20:00:00.000Z",
+      "assignedConsultant": "Jonas Fischer",
+      "assignedDoctor": "Dr. Selin Kaya",
+      "assignedCoordinator": null,
+      "assignedInterpreter": null,
+      "companions": [
+        {
+          "name": "James Bennett",
+          "relation": "Eş"
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "new",
+          "at": "2026-09-01T08:00:00.000Z"
+        },
+        {
+          "status": "qualified",
+          "at": "2026-09-02T08:00:00.000Z"
+        },
+        {
+          "status": "pre_assessment",
+          "at": "2026-09-03T08:00:00.000Z"
+        },
+        {
+          "status": "awaiting_doctor",
+          "at": "2026-09-05T08:00:00.000Z"
+        },
+        {
+          "status": "quoted",
+          "at": "2026-09-06T20:00:00.000Z"
+        }
+      ],
+      "preAssessment": [
+        {
+          "q": "İlgilenilen prosedür",
+          "a": "Rinoplasti"
+        }
+      ],
+      "doctorDecision": "eligible",
+      "doctorNote": "Uygun, standart rinoplasti planı.",
+      "itinerary": [],
+      "patientCountryCode": "GB"
+    },
+    {
+      "caseNumber": "CN-2026-0133",
+      "patientName": "Irina Sokolova",
+      "patientCountry": "Russia",
+      "patientLanguage": "ru",
+      "patientAge": 27,
+      "branchKey": "eye_lasik",
+      "status": "awaiting_deposit",
+      "estimatedValueEur": 2100,
+      "lastActivityAt": "2026-09-06T08:00:00.000Z",
+      "assignedConsultant": "Olga Petrova",
+      "assignedDoctor": "Dr. Mert Aydın",
+      "assignedCoordinator": "Kaan Şahin",
+      "assignedInterpreter": "Natasha Ivanova",
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "new",
+          "at": "2026-08-28T08:00:00.000Z"
+        },
+        {
+          "status": "quoted",
+          "at": "2026-09-04T08:00:00.000Z"
+        },
+        {
+          "status": "awaiting_deposit",
+          "at": "2026-09-06T08:00:00.000Z"
+        }
+      ],
+      "preAssessment": [],
+      "doctorDecision": "eligible",
+      "doctorNote": "Uygun.",
+      "itinerary": [],
+      "patientCountryCode": "RU"
+    },
+    {
+      "caseNumber": "CN-2026-0098",
+      "patientName": "Fatima Zohra",
+      "patientCountry": "Algeria",
+      "patientLanguage": "ar",
+      "patientAge": 31,
+      "branchKey": "hair_transplant",
+      "status": "reserved",
+      "estimatedValueEur": 3300,
+      "lastActivityAt": "2026-09-05T08:00:00.000Z",
+      "assignedConsultant": "Layla Hassan",
+      "assignedDoctor": "Dr. Emre Yıldız",
+      "assignedCoordinator": "Elif Aksoy",
+      "assignedInterpreter": "Reem Al-Sayed",
+      "companions": [
+        {
+          "name": "Amina Zohra",
+          "relation": "Kız kardeş"
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "new",
+          "at": "2026-08-18T08:00:00.000Z"
+        },
+        {
+          "status": "quoted",
+          "at": "2026-08-26T08:00:00.000Z"
+        },
+        {
+          "status": "awaiting_deposit",
+          "at": "2026-08-30T08:00:00.000Z"
+        },
+        {
+          "status": "reserved",
+          "at": "2026-09-05T08:00:00.000Z"
+        }
+      ],
+      "preAssessment": [],
+      "doctorDecision": "eligible",
+      "doctorNote": "Uygun.",
+      "itinerary": [],
+      "patientCountryCode": "DZ"
+    },
+    {
+      "caseNumber": "CN-2026-0077",
+      "patientName": "David Kim",
+      "patientCountry": "South Korea",
+      "patientLanguage": "en",
+      "patientAge": 45,
+      "branchKey": "dental",
+      "status": "travel_planned",
+      "estimatedValueEur": 4100,
+      "lastActivityAt": "2026-09-04T08:00:00.000Z",
+      "assignedConsultant": "Jonas Fischer",
+      "assignedDoctor": "Dr. Ayla Çelik",
+      "assignedCoordinator": "Kaan Şahin",
+      "assignedInterpreter": null,
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "reserved",
+          "at": "2026-08-28T08:00:00.000Z"
+        },
+        {
+          "status": "travel_planned",
+          "at": "2026-09-04T08:00:00.000Z"
+        }
+      ],
+      "preAssessment": [],
+      "doctorDecision": "eligible",
+      "doctorNote": "Uygun.",
+      "itinerary": [
+        {
+          "day": "Gün 1",
+          "plan": "Varış + konsültasyon"
+        },
+        {
+          "day": "Gün 2",
+          "plan": "Operasyon"
+        },
+        {
+          "day": "Gün 3-4",
+          "plan": "Dinlenme + kontrol"
+        },
+        {
+          "day": "Gün 5",
+          "plan": "Dönüş"
+        }
+      ],
+      "patientCountryCode": "KR"
+    },
+    {
+      "caseNumber": "CN-2026-0055",
+      "patientName": "Hassan Baig",
+      "patientCountry": "Pakistan",
+      "patientLanguage": "en",
+      "patientAge": 36,
+      "branchKey": "hair_transplant",
+      "status": "arrived",
+      "estimatedValueEur": 2800,
+      "lastActivityAt": "2026-09-07T02:00:00.000Z",
+      "assignedConsultant": "Ayşe Demir",
+      "assignedDoctor": "Dr. Emre Yıldız",
+      "assignedCoordinator": "Kaan Şahin",
+      "assignedInterpreter": null,
+      "companions": [
+        {
+          "name": "Amir Baig",
+          "relation": "Kardeş"
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "travel_planned",
+          "at": "2026-09-02T08:00:00.000Z"
+        },
+        {
+          "status": "arrived",
+          "at": "2026-09-07T02:00:00.000Z"
+        }
+      ],
+      "preAssessment": [],
+      "doctorDecision": "eligible",
+      "doctorNote": "Uygun.",
+      "itinerary": [
+        {
+          "day": "Gün 1",
+          "plan": "Varış — otelde"
+        }
+      ],
+      "patientCountryCode": "PK"
+    },
+    {
+      "caseNumber": "CN-2026-0031",
+      "patientName": "Marco Rossi",
+      "patientCountry": "Italy",
+      "patientLanguage": "en",
+      "patientAge": 48,
+      "branchKey": "aesthetic_surgery",
+      "status": "treated",
+      "estimatedValueEur": 6100,
+      "lastActivityAt": "2026-09-06T08:00:00.000Z",
+      "assignedConsultant": "Jonas Fischer",
+      "assignedDoctor": "Dr. Selin Kaya",
+      "assignedCoordinator": "Elif Aksoy",
+      "assignedInterpreter": null,
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "arrived",
+          "at": "2026-09-04T08:00:00.000Z"
+        },
+        {
+          "status": "treated",
+          "at": "2026-09-06T08:00:00.000Z"
+        }
+      ],
+      "preAssessment": [],
+      "doctorDecision": "eligible",
+      "doctorNote": "Operasyon başarılı.",
+      "itinerary": [
+        {
+          "day": "Gün 3",
+          "plan": "Operasyon tamamlandı, dinlenme"
+        }
+      ],
+      "patientCountryCode": "IT"
+    },
+    {
+      "caseNumber": "CN-2026-0012",
+      "patientName": "Sophie Martin",
+      "patientCountry": "France",
+      "patientLanguage": "en",
+      "patientAge": 33,
+      "branchKey": "dental",
+      "status": "returned",
+      "estimatedValueEur": 2950,
+      "lastActivityAt": "2026-09-03T08:00:00.000Z",
+      "assignedConsultant": "Ayşe Demir",
+      "assignedDoctor": "Dr. Ayla Çelik",
+      "assignedCoordinator": null,
+      "assignedInterpreter": null,
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "treated",
+          "at": "2026-09-01T08:00:00.000Z"
+        },
+        {
+          "status": "returned",
+          "at": "2026-09-03T08:00:00.000Z"
+        }
+      ],
+      "preAssessment": [],
+      "doctorDecision": "eligible",
+      "doctorNote": "Tamamlandı.",
+      "itinerary": [],
+      "patientCountryCode": "FR"
+    },
+    {
+      "caseNumber": "CN-2025-0891",
+      "patientName": "Klaus Richter",
+      "patientCountry": "Germany",
+      "patientLanguage": "de",
+      "patientAge": 39,
+      "branchKey": "hair_transplant",
+      "status": "in_aftercare",
+      "estimatedValueEur": 3050,
+      "lastActivityAt": "2026-08-31T08:00:00.000Z",
+      "assignedConsultant": "Jonas Fischer",
+      "assignedDoctor": "Dr. Emre Yıldız",
+      "assignedCoordinator": null,
+      "assignedInterpreter": null,
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "treated",
+          "at": "2026-08-06T08:00:00.000Z"
+        },
+        {
+          "status": "returned",
+          "at": "2026-08-08T08:00:00.000Z"
+        },
+        {
+          "status": "in_aftercare",
+          "at": "2026-08-08T08:00:00.000Z"
+        }
+      ],
+      "preAssessment": [],
+      "doctorDecision": "eligible",
+      "doctorNote": null,
+      "itinerary": [],
+      "patientCountryCode": "DE"
+    },
+    {
+      "caseNumber": "CN-2025-0654",
+      "patientName": "Rania Khoury",
+      "patientCountry": "Lebanon",
+      "patientLanguage": "ar",
+      "patientAge": 44,
+      "branchKey": "aesthetic_surgery",
+      "status": "completed",
+      "estimatedValueEur": 5500,
+      "lastActivityAt": "2026-06-09T08:00:00.000Z",
+      "assignedConsultant": "Layla Hassan",
+      "assignedDoctor": "Dr. Selin Kaya",
+      "assignedCoordinator": null,
+      "assignedInterpreter": "Reem Al-Sayed",
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "treated",
+          "at": "2026-03-06T08:00:00.000Z"
+        },
+        {
+          "status": "in_aftercare",
+          "at": "2026-03-11T08:00:00.000Z"
+        },
+        {
+          "status": "completed",
+          "at": "2026-06-09T08:00:00.000Z"
+        }
+      ],
+      "preAssessment": [],
+      "doctorDecision": "eligible",
+      "doctorNote": null,
+      "itinerary": [],
+      "patientCountryCode": "LB"
+    },
+    {
+      "caseNumber": "CN-2026-0177",
+      "patientName": "Tom Andersen",
+      "patientCountry": "Norway",
+      "patientLanguage": "en",
+      "patientAge": 42,
+      "branchKey": "hair_transplant",
+      "status": "lost",
+      "estimatedValueEur": 2400,
+      "lastActivityAt": "2026-08-23T08:00:00.000Z",
+      "assignedConsultant": "Ayşe Demir",
+      "assignedDoctor": null,
+      "assignedCoordinator": null,
+      "assignedInterpreter": null,
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "quoted",
+          "at": "2026-08-18T08:00:00.000Z"
+        },
+        {
+          "status": "lost",
+          "at": "2026-08-23T08:00:00.000Z"
+        }
+      ],
+      "preAssessment": [],
+      "doctorDecision": "eligible",
+      "doctorNote": null,
+      "itinerary": [],
+      "patientCountryCode": "NO"
+    },
+    {
+      "caseNumber": "CN-2026-0203",
+      "patientName": "Aylin Yusupova",
+      "patientCountry": "Kazakhstan",
+      "patientLanguage": "ru",
+      "patientAge": 30,
+      "branchKey": "ivf",
+      "status": "medically_ineligible",
+      "estimatedValueEur": 0,
+      "lastActivityAt": "2026-09-06T22:00:00.000Z",
+      "assignedConsultant": "Olga Petrova",
+      "assignedDoctor": "Dr. Kerem Ateş",
+      "assignedCoordinator": null,
+      "assignedInterpreter": "Natasha Ivanova",
+      "companions": [
+        {
+          "name": "Ruslan Yusupov",
+          "relation": "Eş"
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "pre_assessment",
+          "at": "2026-09-06T08:00:00.000Z"
+        },
+        {
+          "status": "medically_ineligible",
+          "at": "2026-09-06T22:00:00.000Z"
+        }
+      ],
+      "preAssessment": [
+        {
+          "q": "Donör gamet ihtiyacı",
+          "a": "Evet"
+        }
+      ],
+      "doctorDecision": "ineligible",
+      "doctorNote": "Donör gamet Türkiye'de yasal değil — branş şablonu kuralı gereği vaka kapatıldı.",
+      "itinerary": [],
+      "patientCountryCode": "KZ"
+    },
+    {
+      "caseNumber": "CN-2026-0211",
+      "patientName": "Isabella Conti",
+      "patientCountry": "Italy",
+      "patientLanguage": "en",
+      "patientAge": 35,
+      "branchKey": "aesthetic_surgery",
+      "status": "awaiting_doctor",
+      "estimatedValueEur": 4800,
+      "lastActivityAt": "2026-09-07T07:48:00.000Z",
+      "assignedConsultant": "Jonas Fischer",
+      "assignedDoctor": null,
+      "assignedCoordinator": null,
+      "assignedInterpreter": null,
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "new",
+          "at": "2026-09-06T08:00:00.000Z"
+        },
+        {
+          "status": "qualified",
+          "at": "2026-09-07T02:00:00.000Z"
+        },
+        {
+          "status": "pre_assessment",
+          "at": "2026-09-07T07:00:00.000Z"
+        },
+        {
+          "status": "awaiting_doctor",
+          "at": "2026-09-07T07:48:00.000Z"
+        }
+      ],
+      "preAssessment": [
+        {
+          "q": "İlgilenilen prosedür",
+          "a": "Karın germe + liposuction"
+        },
+        {
+          "q": "Önceki ameliyat",
+          "a": "Sezaryen (2021)"
+        }
+      ],
+      "doctorDecision": "pending",
+      "doctorNote": null,
+      "itinerary": [],
+      "patientCountryCode": "IT"
+    },
+    {
+      "caseNumber": "CN-2026-0058",
+      "patientName": "Emre Aydınoğlu",
+      "patientCountry": "Netherlands",
+      "patientLanguage": "tr",
+      "patientAge": 26,
+      "branchKey": "eye_lasik",
+      "status": "awaiting_doctor",
+      "estimatedValueEur": 2200,
+      "lastActivityAt": "2026-09-05T08:00:00.000Z",
+      "assignedConsultant": "Ayşe Demir",
+      "assignedDoctor": null,
+      "assignedCoordinator": null,
+      "assignedInterpreter": null,
+      "companions": [],
+      "statusHistory": [
+        {
+          "status": "new",
+          "at": "2026-09-02T08:00:00.000Z"
+        },
+        {
+          "status": "qualified",
+          "at": "2026-09-03T08:00:00.000Z"
+        },
+        {
+          "status": "pre_assessment",
+          "at": "2026-09-04T08:00:00.000Z"
+        },
+        {
+          "status": "awaiting_doctor",
+          "at": "2026-09-05T08:00:00.000Z"
+        }
+      ],
+      "preAssessment": [
+        {
+          "q": "Numara (sağ/sol)",
+          "a": "-4.5 / -4.0"
+        },
+        {
+          "q": "Kornea kalınlığı ölçümü",
+          "a": "Yapılmadı"
+        }
+      ],
+      "doctorDecision": "pending",
+      "doctorNote": null,
+      "itinerary": [],
+      "patientCountryCode": "NL"
+    },
+    {
+      "caseNumber": "CN-2026-0019",
+      "patientName": "Omar Haddad",
+      "patientCountry": "Jordan",
+      "patientLanguage": "ar",
+      "patientAge": 58,
+      "branchKey": "dental",
+      "status": "awaiting_doctor",
+      "estimatedValueEur": 5200,
+      "lastActivityAt": "2026-09-04T08:00:00.000Z",
+      "assignedConsultant": "Layla Hassan",
+      "assignedDoctor": null,
+      "assignedCoordinator": null,
+      "assignedInterpreter": "Reem Al-Sayed",
+      "companions": [
+        {
+          "name": "Layla Haddad",
+          "relation": "Eş"
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "new",
+          "at": "2026-08-30T08:00:00.000Z"
+        },
+        {
+          "status": "qualified",
+          "at": "2026-09-01T08:00:00.000Z"
+        },
+        {
+          "status": "pre_assessment",
+          "at": "2026-09-03T08:00:00.000Z"
+        },
+        {
+          "status": "awaiting_doctor",
+          "at": "2026-09-04T08:00:00.000Z"
+        }
+      ],
+      "preAssessment": [
+        {
+          "q": "Eksik diş sayısı",
+          "a": "8"
+        },
+        {
+          "q": "Kronik hastalık",
+          "a": "Tip 2 diyabet — kontrolsüz"
+        }
+      ],
+      "doctorDecision": "pending",
+      "doctorNote": null,
+      "itinerary": [],
+      "patientCountryCode": "JO"
+    }
+  ]
+}
