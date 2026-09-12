@@ -13,4 +13,4 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
-Sitemap: https://caredental.ai/sitemap.xml
+Sitemap: https://carenova.ai/sitemap.xml

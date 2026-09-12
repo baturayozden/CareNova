@@ -1,4 +1,4 @@
-# app.caredental.ai and admin.caredental.ai — the authenticated product.
+# app.carenova.ai and admin.carenova.ai — the authenticated product.
 # Nothing here belongs in a search index.
 User-agent: *
 Disallow: /
