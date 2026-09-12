@@ -25,7 +25,7 @@
   },
   "overview": {
     "title": "Overview",
-    "subtitle": "Platform-wide summary — demo data, {{count}} clinics.",
+    "subtitle": "{{real}} real, {{demo}} demo clinics.",
     "kpi": {
       "activeClinic": "Active Clinics",
       "activeClinicSub": "{{count}} total",
@@ -33,17 +33,22 @@
       "activeCases": "Active Cases",
       "activeWhatsapp": "Active WhatsApp Lines",
       "aiConversations": "AI Conversations This Month",
-      "mrr": "MRR (demo)"
+      "mrr": "MRR"
     },
     "avgFirstReplyLabel": "Average First Reply Time (platform-wide)",
     "avgFirstReplyValue": "{{value}}s",
-    "trendLabel": "Last 30 days — active case trend (sample data)",
-    "sparklineAriaLabel": "Last 30 days trend",
+    "trendLabel": "Active case trend (last 30 days)",
     "attentionNeeded": "Needs attention",
     "quotaWarning": "Approaching quota ({{count}})",
     "onboardingStuck": "Stuck in onboarding ({{count}})",
     "billingOverdue": "Overdue payment ({{count}})",
-    "empty": "None."
+    "empty": "None.",
+    "split": "demo {{demo}} · real {{real}}",
+    "splitEur": "demo {{demo}} · real {{real}}",
+    "avgFirstReplySample": "Last 7 days, {{count}} conversations",
+    "trendNotMeasured": "No daily case history is kept; no trend line is invented.",
+    "emptyTitle": "No clinics yet",
+    "emptyBody": "The platform summary builds up here once the first clinic signs up."
   },
   "clinics": {
     "title": "Clinics",
@@ -66,9 +71,9 @@
       "lastActivity": "Last Activity"
     },
     "emptyFiltered": "No clinics match the filters.",
-    "minutesAgo": "{{count}} min ago",
-    "hoursAgo": "{{count}}h ago",
-    "daysAgo": "{{count}}d ago"
+    "emptyTitle": "No clinics yet",
+    "emptyBody": "Registered clinics will be listed here.",
+    "sortLabel": "Sort"
   },
   "clinicDetail": {
     "notFound": "Clinic not found.",
@@ -80,13 +85,14 @@
       "changePlan": "Change plan",
       "addQuota": "Add quota",
       "viewingNow": "Currently viewing",
-      "viewAsClinic": "View as clinic"
+      "viewAsClinic": "View as clinic",
+      "notAvailable": "Read-only this round — write actions are not wired yet."
     },
     "impersonateForm": {
       "reasonLabel": "Reason for viewing (required)",
       "reasonPlaceholder": "e.g. Support ticket #4821 — investigating a WhatsApp connection issue",
       "start": "Start",
-      "note": "While active, all write actions become read-only and are logged to the audit trail."
+      "note": "Screen state only for now: the viewing session is not written to the audit log yet and requests do not run as the clinic (no server side)."
     },
     "tabs": {
       "general": "General",
@@ -106,26 +112,23 @@
       "contact": "Contact",
       "timezone": "Timezone",
       "currency": "Currency",
-      "onboardingStep": "Onboarding Step"
+      "onboardingStep": "Onboarding Step",
+      "status": "Status",
+      "activeCases": "Active Cases",
+      "createdAt": "Registered"
     },
-    "onboardingLive": "Live",
-    "usersTabPrefix": "{{count}} users. See ",
-    "usersTabSuffix": " for a detailed user list and role management.",
     "whatsappTab": {
       "displayNumber": "Display Number",
       "connectionStatus": "Connection Status",
-      "connected": "Connected",
-      "notConnected": "Not connected",
       "messages24h": "Messages (24h)",
-      "errors24h": "Errors (24h)"
+      "errors24h": "Errors (24h)",
+      "noLineBody": "The clinic has not connected a WhatsApp line yet."
     },
     "aiUsageTab": {
       "monthlyQuota": "Monthly Quota",
       "used": "Used",
       "overagePolicy": "Overage Policy",
-      "block": "Block",
-      "allow": "Allow",
-      "estimatedCost": "Estimated Cost (this month)"
+      "estimatedCost": "Cost (this month, USD)"
     },
     "billingTab": {
       "period": "Period",
@@ -143,24 +146,22 @@
       "complicationInsurance": "Complication Insurance",
       "verbis": "VERBIS Registration",
       "foreignLangRatio": "Foreign Language Staff Ratio",
-      "ek1Consents": "Ek-1 Consents (total / revoked)",
-      "unconsentedMedia": "Unconsented Media",
-      "crossBorder": "Cross-Border Transfer Notice",
-      "yes": "Yes",
-      "no": "No",
-      "done": "Done",
-      "notDone": "Not done"
+      "ek1Consents": "Annex-1 Consent",
+      "crossBorder": "Cross-Border Transfer Notice"
     },
     "auditTab": {
       "who": "Who",
       "what": "Action",
       "when": "When",
       "empty": "No records for this clinic."
+    },
+    "usersTab": {
+      "empty": "This clinic has no users."
     }
   },
   "demoRequests": {
     "title": "Demo Requests",
-    "subtitle": "{{count}} requests — from the landing page form.",
+    "subtitle": "{{count}} requests — from the landing form.",
     "exportCsv": "Export CSV",
     "columns": {
       "name": "Name",
@@ -171,21 +172,29 @@
       "date": "Date",
       "status": "Status",
       "note": "Note"
-    }
+    },
+    "emptyTitle": "No demo requests yet",
+    "emptyBody": "Requests from the landing page form are listed here."
   },
   "aiUsage": {
     "title": "AI Usage & Quota",
-    "subtitle": "Usage this month, by clinic.",
-    "totalCostLabel": "Total Platform Cost (this month, demo)",
+    "subtitle": "This month's usage per clinic — derived from message records.",
+    "totalCostLabel": "Total AI cost (this month)",
     "columns": {
       "clinic": "Clinic",
       "quota": "Quota",
       "usage": "Usage",
       "overagePolicy": "Overage Policy",
-      "estimatedCost": "Estimated Cost"
+      "estimatedCost": "Cost (USD)",
+      "tokens": "Tokens (input / output)"
     },
-    "block": "Block",
-    "allow": "Allow"
+    "policy": {
+      "block": "Block",
+      "notify": "Notify",
+      "allow": "Allow"
+    },
+    "tokensValue": "{{input}} / {{output}}",
+    "formula": "Cost = input tokens × ${{input}}/MTok + output tokens × ${{output}}/MTok ({{model}}). USD — the currency tokens are billed in; no exchange-rate conversion."
   },
   "audit": {
     "title": "Audit Log",
@@ -197,30 +206,38 @@
       "what": "Action",
       "clinic": "Clinic",
       "when": "When"
-    }
+    },
+    "emptyTitle": "No audit records yet",
+    "emptyBody": "Records appear here as they are written. They cannot be deleted or changed — blocked at the database level.",
+    "noActor": "Record not tied to a user (system action)",
+    "pageInfo": "Page {{page}} / {{pages}} — {{total}} records"
   },
   "billing": {
     "title": "Billing",
-    "subtitle": "Overdue accounts are listed first.",
-    "mrr": "MRR (demo)",
-    "arr": "ARR (demo)",
+    "subtitle": "From subscription records — overdue first.",
+    "mrr": "MRR",
+    "arr": "ARR",
     "columns": {
       "clinic": "Clinic",
       "period": "Period",
       "amount": "Amount",
       "status": "Status",
-      "nextCharge": "Next Charge"
+      "nextCharge": "Next Charge",
+      "plan": "Package"
     },
     "annual": "Annual",
     "monthly": "Monthly",
     "current": "Current",
     "overdue": "Overdue",
-    "trial": "Trial"
+    "trial": "Trial",
+    "perMonth": "{{amount}}/mo",
+    "noSubscription": "No subscription record",
+    "basisNote": "Amounts are derived from the package price list: Solo €{{solo}} / Clinic €{{klinik}} / Group €{{grup}} (monthly, billed annually). No payment provider is connected yet; status comes from the subscription record."
   },
   "branches": {
     "title": "Branch Templates",
-    "subtitleBefore": "System templates — the AI pricing authority matrix can be changed here, but cannot fall outside the",
-    "subtitleAfter": "enum (a dropdown, not free text).",
+    "subtitleBefore": "System templates — read-only this round. The AI pricing authority can never fall outside the",
+    "subtitleAfter": "enum (a closed list, not free text).",
     "readyTemplate": "Ready template",
     "configurable": "Configurable",
     "usageCount": "{{count}} clinics using",
@@ -230,7 +247,10 @@
     "requiredMediaLabel": "Required Media",
     "redFlagsLabel": "Red Flags",
     "branchObjectionsLabel": "Branch Objections",
-    "aftercareScheduleLabel": "Aftercare Schedule"
+    "aftercareScheduleLabel": "Aftercare Schedule",
+    "empty": "No branch templates found.",
+    "readOnly": "Editing is off this round (read-only).",
+    "usageCount_one": "{{count}} clinic using"
   },
   "compliance": {
     "title": "Compliance Panel",
@@ -243,29 +263,35 @@
       "insurance": "Insurance",
       "verbis": "VERBIS",
       "langStaff": "20% Language Staff",
-      "ek1Consent": "Ek-1 Consent",
+      "ek1Consent": "Annex-1 Consent",
       "crossBorder": "Cross-Border Transfer"
     },
-    "yes": "Yes",
-    "no": "No",
     "daysOverdue": "{{count}} days overdue",
     "daysLeft": "{{count}} days left",
-    "revokedSuffix": "revoked",
-    "unconsentedMedia": "Unconsented media",
-    "footerNote": "Complication insurance deadline is 31.12.2026 — approaching (≤60 days) deadlines are flagged in yellow. Clinics with expired or soon-to-expire licenses are highlighted the same way."
+    "footerNote": "Source: 2025 Health Tourism Regulation — authorisation certificate, complication insurance (deadline 31.12.2026; ≤60 days left shown in amber), 20% foreign-language staff. KVKK — VERBİS registration (no size exemption), standard contract and notification within 5 working days for cross-border transfer. \"Unknown\" means not assessed yet; it counts as neither compliant nor non-compliant. HealthTürkiye registration and the annual performance review are not tracked yet.",
+    "notAssessed": "Not assessed",
+    "recentEventsTitle": "Recent regulatory shield events",
+    "recentEventsEmpty": "No recorded events.",
+    "daysLeft_one": "{{count}} day left",
+    "daysOverdue_one": "{{count}} day overdue"
   },
   "health": {
     "title": "Platform Health",
-    "subtitle": "Demo data — the structure is ready to connect to real metrics.",
-    "webhookSuccessRate": "Webhook Success Rate",
-    "avgFirstReply": "Avg. First Reply Time",
+    "subtitle": "Derived from message records; values that cannot be derived are shown as \"not measured yet\".",
+    "avgFirstReply": "Avg. First Reply Time (7 days)",
     "avgFirstReplyValue": "{{value}}s",
-    "aiErrorRate": "AI Error Rate",
-    "recentErrors": "Recent errors"
+    "aiErrorRate": "AI Error Rate (24 h)",
+    "recentErrors": "Recent errors",
+    "deliverySuccessRate": "Delivery Success Rate (24 h)",
+    "sampleOutbound": "{{count}} outbound messages",
+    "sampleFirstReply": "{{count}} conversations",
+    "sampleAi": "{{count}} AI messages",
+    "definitions": "Delivery success rate: share of outbound messages in the last 24 hours that did not fail. This is not a true inbound-webhook success rate — a webhook request that fails before a record is written leaves no trace to count. AI error rate: share of AI-generated messages in the last 24 hours that could not be sent. First reply: average time between a conversation's first inbound message and the first AI reply, over the last 7 days.",
+    "noErrors": "No recent errors."
   },
   "onboarding": {
     "title": "Onboarding Tracker",
-    "subtitle": "Target: 45 min for clinics, 15 min for solo. {{live}} clinics live, {{inProgress}} in the funnel.",
+    "subtitle": "Target: clinic 45 min, solo 15 min. {{live}} clinics live, {{inProgress}} onboarding.",
     "columns": {
       "clinic": "Clinic",
       "step": "Step",
@@ -275,7 +301,9 @@
     "emptyFunnel": "No clinics waiting in the funnel — all are live.",
     "daysInStep": "{{count}} days",
     "stuck": "Stuck",
-    "inProgress": "In progress"
+    "inProgress": "In progress",
+    "stuckRule": "\"Stuck\": waiting on the same step for more than {{days}} days (derived on the server).",
+    "daysInStep_one": "{{count}} day"
   },
   "users": {
     "title": "Users, Roles & Impersonation",
@@ -297,7 +325,11 @@
     "viewing": "Viewing",
     "reasonPlaceholder": "Reason (required)",
     "start": "Start",
-    "view": "View"
+    "view": "View",
+    "emptyPlatform": "No platform users.",
+    "emptyClinic": "No clinic users yet.",
+    "clinicCount": "{{count}} users",
+    "clinicCount_one": "{{count}} user"
   },
   "whatsapp": {
     "title": "WhatsApp Lines",
@@ -306,16 +338,108 @@
       "clinic": "Clinic",
       "displayNumber": "Display Number",
       "status": "Status",
-      "lastWebhookSuccess": "Last Webhook Success",
       "messages24h": "Messages (24h)",
-      "errors24h": "Errors (24h)"
+      "errors24h": "Errors (24h)",
+      "lastDelivery": "Last Successful Delivery"
     },
     "connected": "Connected",
     "notConnected": "Not connected",
-    "testSuccess": "Test successful (demo)",
-    "testWebhook": "Test webhook",
+    "noLine": "No line",
+    "derivedNote": "Last successful delivery and 24-hour counts are derived from message records. No webhook test yet."
+  },
+  "demoToggle": {
+    "label": "Show demo data",
+    "hint": "When off, only real clinics are listed — the platform as it looks on day one."
+  },
+  "time": {
     "minutesAgo": "{{count}} min ago",
-    "hoursAgo": "{{count}}h ago",
-    "daysAgo": "{{count}}d ago"
+    "hoursAgo": "{{count}} h ago",
+    "daysAgo": "{{count}} days ago",
+    "minutesAgo_one": "{{count}} min ago",
+    "hoursAgo_one": "{{count}} h ago",
+    "daysAgo_one": "{{count}} day ago"
+  },
+  "state": {
+    "loading": "Loading…",
+    "slow": "The server may be waking up from sleep; the first request can take 30-50 seconds.",
+    "errorTitle": "Could not load data",
+    "error401": "Your session may have expired. Please sign in again.",
+    "error403": "You don't have access to this screen.",
+    "errorNetwork": "Could not reach the server. Check your connection and try again.",
+    "errorServer": "The server returned an error.",
+    "demoHiddenHint": "Demo data is hidden — tick \"Show demo data\" at the top to see the sample clinics.",
+    "notMeasured": "not measured yet"
+  },
+  "labels": {
+    "branches": {
+      "hair_transplant": "Hair Transplant",
+      "dental": "Dental",
+      "aesthetic_surgery": "Aesthetic Surgery",
+      "eye_lasik": "Eye (LASIK)",
+      "bariatric": "Bariatric",
+      "ivf": "IVF",
+      "orthopedics": "Orthopedics",
+      "cardiology": "Cardiology",
+      "oncology": "Oncology",
+      "checkup": "Check-up"
+    },
+    "plans": {
+      "solo": "Solo",
+      "klinik": "Clinic",
+      "grup": "Group"
+    },
+    "clinicStatus": {
+      "active": "Active",
+      "trial": "Trial",
+      "onboarding": "Onboarding",
+      "suspended": "Suspended"
+    },
+    "onboardingSteps": {
+      "0": "Clinic details",
+      "1": "Branch selection",
+      "2": "WhatsApp connection",
+      "3": "Doctor cards",
+      "4": "Knowledge base",
+      "5": "Pricing/authority approval",
+      "6": "KVKK texts",
+      "7": "Live"
+    },
+    "demoRequestStatus": {
+      "new": "New",
+      "contacted": "Contacted",
+      "demo_done": "Demo done",
+      "won": "Won",
+      "lost": "Lost"
+    },
+    "authority": {
+      "full": "Full",
+      "range_from_photo": "Range from photo",
+      "range_after_imaging": "Range after imaging",
+      "qualification_only": "Qualification only",
+      "logistics_only": "Logistics only"
+    }
+  },
+  "complianceStatus": {
+    "onFile": "On file",
+    "missing": "Missing",
+    "unknown": "Unknown",
+    "insurance": {
+      "unknown": "Unknown",
+      "missing": "Missing",
+      "active": "Active",
+      "expired": "Expired"
+    },
+    "verbis": {
+      "unknown": "Unknown",
+      "not_registered": "Not registered",
+      "registered": "Registered"
+    },
+    "crossBorder": {
+      "unknown": "Unknown",
+      "missing": "Missing",
+      "signed": "Signed"
+    },
+    "ek1NotMeasured": "Annex-1 consent records are not kept yet — no count is shown, none is invented.",
+    "ek1Counts": "{{total}} total / {{revoked}} revoked"
   }
 }

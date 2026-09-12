@@ -6,7 +6,7 @@ import { useTheme } from '../context/ThemeContext';
 import { isPlatformAdmin } from '../lib/roles';
 import { urlFor } from '../config/hosts';
 import AppMeta from '../components/AppMeta';
-import { DEMO_MODE } from '../lib/api';
+import { USES_DEMO_ADAPTER } from '../lib/api';
 import carenovaLogoDark from '../assets/carenova-logo-transparent-dark.svg';
 import carenovaLogoLight from '../assets/carenova-logo-transparent-light.svg';
 
@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
       <div className="bg-surface rounded-2xl p-10 w-full max-w-md shadow-2xl border border-line">
         <div className="text-center mb-8">
           <img src={logoSrc} alt="CareNova" className="w-full max-w-[240px] h-auto mx-auto block mb-1" />
-          {DEMO_MODE && (
+          {USES_DEMO_ADAPTER && (
             <span className="inline-flex items-center gap-1.5 mt-3 bg-accent/10 border border-accent/25 text-accent text-xs font-medium px-3 py-1 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-accent" /> {t('login.demoMode')}
             </span>

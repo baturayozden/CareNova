@@ -1,5 +1,4 @@
 import React, { createContext, useCallback, useContext, useState } from 'react';
-import { adminAuditEvents, AdminAuditEvent, adminClinics } from '../data/adminDemoData';
 
 // GECE-2-BRIEFI.md Bölüm C.10 🔴 güvenlik kuralları:
 //   - sadece super_admin başlatabilir (enforced by AdminProtectedRoute already
@@ -9,14 +8,15 @@ import { adminAuditEvents, AdminAuditEvent, adminClinics } from '../data/adminDe
 //   - denetim kaydına yazılır (kim, hangi klinik, ne zaman, gerekçe)
 //   - yazma işlemleri engellenir (salt okunur) — bu bir destek aracı
 //
-// Demo-mode scope: this tracks IN-MEMORY UI state (which clinic, since when,
-// why) and appends to the in-memory adminAuditEvents array so the Audit Log
-// page reflects it — there's no real backend to actually scope API writes to
-// read-only during impersonation (no real API calls happen anywhere in demo
-// mode). The read-only enforcement is therefore a UI-level contract for now
-// (see isImpersonating everywhere a demo "write" action — approve/suspend/
-// change plan/add quota — is offered): documented, not independently
-// testable against a live write path tonight.
+// Current scope: UI state only (which clinic, since when, why). Two of the
+// rules above are NOT met yet, and the screen says so instead of pretending:
+//   * Nothing is written to the audit log. The earlier demo version appended an
+//     invented event to an in-memory array; with the log now read from the
+//     database (append-only, migration 070), a screen-only event would be a
+//     record that does not exist. Writing it needs a server endpoint.
+//   * No request actually runs "as" the clinic, so there is nothing to make
+//     read-only yet. The server-side guard exists (middleware/auth.js,
+//     blockWritesDuringImpersonation) for when requests do.
 
 interface ImpersonationState {
   clinicId: string;
@@ -27,7 +27,7 @@ interface ImpersonationState {
 
 interface ImpersonationContextValue {
   session: ImpersonationState | null;
-  start: (clinicId: string, reason: string) => void;
+  start: (clinicId: string, clinicName: string, reason: string) => void;
   stop: () => void;
 }
 
@@ -36,38 +36,12 @@ const ImpersonationContext = createContext<ImpersonationContextValue | undefined
 export function ImpersonationProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<ImpersonationState | null>(null);
 
-  const start = useCallback((clinicId: string, reason: string) => {
-    const clinic = adminClinics.find(c => c.id === clinicId);
-    if (!clinic || !reason.trim()) return;
-    const startedAt = new Date().toISOString();
-    setSession({ clinicId, clinicName: clinic.name, reason, startedAt });
-    const event: AdminAuditEvent = {
-      id: `ae-imp-start-${Date.now()}`,
-      actor: 'Baturay Özden',
-      action: `Klinik olarak görüntüleme başlatıldı — gerekçe: "${reason}"`,
-      clinicId: clinic.id,
-      clinicName: clinic.name,
-      at: startedAt,
-    };
-    adminAuditEvents.unshift(event);
+  const start = useCallback((clinicId: string, clinicName: string, reason: string) => {
+    if (!clinicId || !reason.trim()) return;
+    setSession({ clinicId, clinicName, reason, startedAt: new Date().toISOString() });
   }, []);
 
-  const stop = useCallback(() => {
-    setSession(current => {
-      if (current) {
-        const event: AdminAuditEvent = {
-          id: `ae-imp-end-${Date.now()}`,
-          actor: 'Baturay Özden',
-          action: 'Klinik olarak görüntüleme sonlandırıldı',
-          clinicId: current.clinicId,
-          clinicName: current.clinicName,
-          at: new Date().toISOString(),
-        };
-        adminAuditEvents.unshift(event);
-      }
-      return null;
-    });
-  }, []);
+  const stop = useCallback(() => setSession(null), []);
 
   return (
     <ImpersonationContext.Provider value={{ session, start, stop }}>

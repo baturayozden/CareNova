@@ -84,12 +84,24 @@ const REPORT_PATH = path.join(__dirname, '..', '..', 'docs', 'i18n-leak-report.m
 // chrome vocabulary (sidebar labels, page headings, buttons) that must
 // flip with the language switch — a real regression guard for the exact
 // bugs GECE-3-BRIEFI.md Bölüm 2 found, without false positives on data.
+//
+// ASAMA-3A: the admin console no longer runs on the demo adapter — it reads
+// the real API, so it needs a real session. Set ADMIN_ACCESS_TOKEN (a
+// super_admin access token for the API at REACT_APP_API_URL) to include the
+// admin routes; without it they are skipped, and the report says so.
+const ADMIN_ACCESS_TOKEN = process.env.ADMIN_ACCESS_TOKEN || '';
 const APP_ADMIN_ROUTES = [
   { path: '/dashboard?host=app', label: 'clinic dashboard' },
   { path: '/cases?host=app', label: 'cases list' },
   { path: '/doctor-queue?host=app', label: 'doctor queue' },
-  { path: '/admin/overview?host=admin', label: 'admin overview' },
+  ...(ADMIN_ACCESS_TOKEN ? [
+    { path: '/admin/overview?host=admin', label: 'admin overview' },
+    { path: '/admin/clinics?host=admin', label: 'admin clinics' },
+    { path: '/admin/compliance?host=admin', label: 'admin compliance' },
+    { path: '/admin/demo-requests?host=admin', label: 'admin demo requests' },
+  ] : []),
 ];
+if (!ADMIN_ACCESS_TOKEN) console.warn('[i18n-leaks] ADMIN_ACCESS_TOKEN not set — admin routes skipped.');
 
 // English chrome that must NOT appear once the page is in TR mode.
 const APP_TR_MODE_LEAK_DENYLIST = [
@@ -116,6 +128,15 @@ const APP_TR_MODE_LEAK_DENYLIST = [
 // Turkish chrome that must NOT appear once the page is in EN mode (values
 // pulled from the tr/*.json files these keys resolve to — kept in sync by
 // hand; a rename on either side needs a matching edit here).
+// Admin-only: code labels that were hardcoded Turkish before ASAMA-3A (branch,
+// plan, status, onboarding step, demo-request status, compliance state) — now
+// admin.json labels.*. Admin routes only: the clinic panel shows some of these
+// words as always-Turkish demo DATA by design (see the note above).
+const ADMIN_EN_MODE_LEAK_DENYLIST = [
+  'Saç Ekimi', 'Estetik Cerrahi', 'Tüp Bebek', 'Askıda', 'Kurulumda', 'Deneme',
+  'Klinik bilgisi', 'İletişime geçildi', 'Demo yapıldı', 'Kazanıldı', 'Kaybedildi',
+  'Bilinmiyor', 'Kayıtlı', 'henüz ölçülmüyor',
+];
 const APP_EN_MODE_LEAK_DENYLIST = [
   // NOTE: bare 'Panel' is deliberately excluded — it's the Turkish word
   // for "Dashboard" AND a legitimate English word that appears inside
@@ -263,9 +284,10 @@ async function loadInLanguage(page, lang) {
 // language override since both are read from independent mechanisms
 // (localStorage vs. query string).
 async function loadRouteInLanguage(page, routePath, lang) {
-  await page.evaluateOnNewDocument((l) => {
+  await page.evaluateOnNewDocument((l, token) => {
     try { window.localStorage.setItem('carenova_language', l); } catch {}
-  }, lang);
+    try { if (token) window.localStorage.setItem('accessToken', token); } catch {}
+  }, lang, routePath.includes('host=admin') ? ADMIN_ACCESS_TOKEN : '');
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
   await page.goto(`${URL}${routePath}`, { waitUntil: 'networkidle0', timeout: 30000 });
   const actualLang = await page.evaluate(() => document.documentElement.lang);
@@ -284,7 +306,8 @@ async function checkAppAdminRoutes(page) {
     for (const v of checkDenylist(trText, APP_TR_MODE_LEAK_DENYLIST, `TR, ${route.label}`)) {
       trViolations.push({ ...v, reason: `[${route.path}] ${v.reason}` });
     }
-    for (const v of checkDenylist(enText, APP_EN_MODE_LEAK_DENYLIST, `EN, ${route.label}`)) {
+    const enDenylist = route.path.includes('host=admin') ? [...APP_EN_MODE_LEAK_DENYLIST, ...ADMIN_EN_MODE_LEAK_DENYLIST] : APP_EN_MODE_LEAK_DENYLIST;
+    for (const v of checkDenylist(enText, enDenylist, `EN, ${route.label}`)) {
       enViolations.push({ ...v, reason: `[${route.path}] ${v.reason}` });
     }
   }

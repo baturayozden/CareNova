@@ -1,39 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import DemoName, { useDemoNameText } from '../../components/DemoName';
-import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
-import { adminDemoRequests } from '../../data/adminDemoData';
-import { BRANCH_LABELS } from '../../data/adminDemoData';
+import { usePlatformQuery } from '../lib/usePlatformQuery';
+import { useAdminFormat, downloadText, csvRow } from '../lib/format';
+import { LoadingState, ErrorState, EmptyState } from '../components/QueryState';
+import type { DemoRequestRow } from '../types';
 
-const STATUS_LABEL: Record<string, string> = {
-  new: 'Yeni', contacted: 'İletişime geçildi', demo_done: 'Demo yapıldı', won: 'Kazanıldı', lost: 'Kaybedildi',
-};
-const STATUS_TONE: Record<string, 'success' | 'warning' | 'danger' | 'neutral' | 'accent'> = {
+const STATUS_TONE: Record<DemoRequestRow['status'], 'success' | 'warning' | 'danger' | 'neutral' | 'accent'> = {
   new: 'accent', contacted: 'warning', demo_done: 'neutral', won: 'success', lost: 'danger',
 };
-
-// `mark` prefixes fabricated names: an exported file leaves the screen — and its
-// banner — behind entirely, so each row has to identify itself as a sample.
-function toCsv(rows: typeof adminDemoRequests, mark: (name: string) => string): string {
-  const header = 'Ad,E-posta,Klinik,Şehir,Branş,Telefon,Tarih,Durum,Not';
-  const lines = rows.map(r => [mark(r.name), r.email, mark(r.clinic), r.city, BRANCH_LABELS[r.branch] || r.branch, r.phone, r.createdAt, STATUS_LABEL[r.status], r.note].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
-  return [header, ...lines].join('\n');
-}
+const th = 'px-4 py-2.5 font-medium text-ink-subtle';
 
 export default function AdminDemoRequestsPage() {
-  const { t } = useTranslation('admin');
+  const fmt = useAdminFormat();
+  const { t } = fmt;
   const demoNameText = useDemoNameText();
-  const [requests] = useState(adminDemoRequests);
+  const query = usePlatformQuery<{ requests: DemoRequestRow[] }>('/api/demo');
+  const requests = query.data?.requests ?? [];
 
+  // An exported file leaves the screen and its banner behind, so every demo
+  // row identifies itself inside the file.
   const exportCsv = () => {
-    const blob = new Blob([toCsv(requests, demoNameText)], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'demo-talepleri.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+    const header = csvRow([t('demoRequests.columns.name'), 'E-mail', t('demoRequests.columns.clinic'), t('demoRequests.columns.city'), t('demoRequests.columns.branch'), t('demoRequests.columns.phone'), t('demoRequests.columns.date'), t('demoRequests.columns.status'), t('demoRequests.columns.note')]);
+    const lines = requests.map(r => csvRow([
+      demoNameText(r.name, r.is_demo), r.email, demoNameText(r.clinic_name, r.is_demo), r.city, r.branch_key ? fmt.branch(r.branch_key) : '',
+      r.phone, r.created_at, t(`labels.demoRequestStatus.${r.status}`), r.notes,
+    ]));
+    downloadText('demo-requests.csv', [header, ...lines].join('\n'));
   };
 
   return (
@@ -42,46 +37,57 @@ export default function AdminDemoRequestsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-ink">{t('demoRequests.title')}</h1>
-          <p className="text-ink-muted text-sm mt-0.5">{t('demoRequests.subtitle', { count: requests.length })}</p>
+          {query.data && <p className="text-ink-muted text-sm mt-0.5">{t('demoRequests.subtitle', { count: requests.length })}</p>}
         </div>
-        <button onClick={exportCsv} className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-surface-sunken transition-colors">
+        <button
+          onClick={exportCsv}
+          disabled={requests.length === 0}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-surface-sunken transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           <Download size={14} strokeWidth={1.75} aria-hidden="true" /> {t('demoRequests.exportCsv')}
         </button>
       </div>
 
-      <div className="rounded-xl border border-line bg-surface overflow-x-auto">
-        <table className="w-full text-sm min-w-[860px]">
-          <thead>
-            <tr className="border-b border-line text-left">
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.name')}</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.clinic')}</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.city')}</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.branch')}</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.phone')}</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.date')}</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.status')}</th>
-              <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('demoRequests.columns.note')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((r, i) => (
-              <tr key={r.id} className={`border-b border-line last:border-0 ${i % 2 === 1 ? 'bg-surface-page/40' : ''}`}>
-                <td className="px-4 py-2.5">
-                  <p className="font-medium text-ink"><DemoName>{r.name}</DemoName></p>
-                  <p className="text-ink-subtle text-xs">{r.email}</p>
-                </td>
-                <td className="px-4 py-2.5 text-ink-muted"><DemoName>{r.clinic}</DemoName></td>
-                <td className="px-4 py-2.5 text-ink-muted">{r.city}</td>
-                <td className="px-4 py-2.5 text-ink-muted">{BRANCH_LABELS[r.branch] || r.branch}</td>
-                <td className="px-4 py-2.5 text-ink-muted">{r.phone}</td>
-                <td className="px-4 py-2.5 text-ink-subtle text-xs">{new Date(r.createdAt).toLocaleDateString('tr-TR')}</td>
-                <td className="px-4 py-2.5"><StatusBadge tone={STATUS_TONE[r.status]}>{STATUS_LABEL[r.status]}</StatusBadge></td>
-                <td className="px-4 py-2.5 text-ink-muted text-xs max-w-[160px] truncate" title={r.note ? demoNameText(r.note) : undefined}>{r.note ? <DemoName>{r.note}</DemoName> : '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {query.loading ? <LoadingState />
+        : query.error ? <ErrorState error={query.error} onRetry={query.reload} />
+          : requests.length === 0 ? <EmptyState title={t('demoRequests.emptyTitle')} body={t('demoRequests.emptyBody')} />
+            : (
+              <div className="rounded-xl border border-line bg-surface overflow-x-auto">
+                <table className="w-full text-sm min-w-[860px]">
+                  <thead>
+                    <tr className="border-b border-line text-left">
+                      <th scope="col" className={th}>{t('demoRequests.columns.name')}</th>
+                      <th scope="col" className={th}>{t('demoRequests.columns.clinic')}</th>
+                      <th scope="col" className={th}>{t('demoRequests.columns.city')}</th>
+                      <th scope="col" className={th}>{t('demoRequests.columns.branch')}</th>
+                      <th scope="col" className={th}>{t('demoRequests.columns.phone')}</th>
+                      <th scope="col" className={th}>{t('demoRequests.columns.date')}</th>
+                      <th scope="col" className={th}>{t('demoRequests.columns.status')}</th>
+                      <th scope="col" className={th}>{t('demoRequests.columns.note')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {requests.map((r, i) => (
+                      <tr key={r.id} className={`border-b border-line last:border-0 ${i % 2 === 1 ? 'bg-surface-page/40' : ''}`}>
+                        <td className="px-4 py-2.5">
+                          <p className="font-medium text-ink"><DemoName when={r.is_demo}>{r.name}</DemoName></p>
+                          <p className="text-ink-subtle text-xs">{r.email}</p>
+                        </td>
+                        <td className="px-4 py-2.5 text-ink-muted"><DemoName when={r.is_demo}>{r.clinic_name}</DemoName></td>
+                        <td className="px-4 py-2.5 text-ink-muted">{r.city ?? '—'}</td>
+                        <td className="px-4 py-2.5 text-ink-muted">{r.branch_key ? fmt.branch(r.branch_key) : '—'}</td>
+                        <td className="px-4 py-2.5 text-ink-muted">{r.phone ?? '—'}</td>
+                        <td className="px-4 py-2.5 text-ink-subtle text-xs">{fmt.date(r.created_at)}</td>
+                        <td className="px-4 py-2.5"><StatusBadge tone={STATUS_TONE[r.status] ?? 'neutral'}>{t(`labels.demoRequestStatus.${r.status}`, { defaultValue: r.status })}</StatusBadge></td>
+                        <td className="px-4 py-2.5 text-ink-muted text-xs max-w-[180px] truncate" title={r.notes ? demoNameText(r.notes, r.is_demo) : undefined}>
+                          {r.notes ? <DemoName when={r.is_demo}>{r.notes}</DemoName> : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
     </div>
   );
 }

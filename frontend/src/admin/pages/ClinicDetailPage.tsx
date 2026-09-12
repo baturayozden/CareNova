@@ -1,44 +1,51 @@
 import React, { useState } from 'react';
 import DemoName, { useDemoNameText } from '../../components/DemoName';
 import { useParams, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { Eye, CheckCircle2, PauseCircle, PlusCircle, ArrowLeftRight } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
-import { adminClinics, adminAuditEvents, BRANCH_LABELS, PLAN_LABELS, ONBOARDING_STEPS } from '../../data/adminDemoData';
 import { useImpersonation } from '../ImpersonationContext';
+import { usePlatformQuery } from '../lib/usePlatformQuery';
+import { useAdminFormat } from '../lib/format';
+import { LoadingState, ErrorState, EmptyState } from '../components/QueryState';
+import { LicenseBadge, InsuranceBadge, VerbisBadge, CrossBorderBadge, Ek1Cell, LanguageRatio } from '../components/ComplianceBadges';
+import type { AdminAuditEvent, AdminClinic, AdminClinicUser, DerivationBasis } from '../types';
 
-const TABS = ['Genel', 'Kullanıcılar', 'WhatsApp', 'AI Kullanım', 'Faturalama', 'Uyum', 'Denetim'] as const;
-const TAB_KEYS: Record<typeof TABS[number], string> = {
-  Genel: 'general',
-  Kullanıcılar: 'users',
-  WhatsApp: 'whatsapp',
-  'AI Kullanım': 'aiUsage',
-  Faturalama: 'billing',
-  Uyum: 'compliance',
-  Denetim: 'audit',
-};
+interface DetailResponse {
+  clinic: AdminClinic;
+  users: AdminClinicUser[];
+  auditEvents: AdminAuditEvent[];
+  basis: DerivationBasis;
+}
+
+const TABS = ['general', 'users', 'whatsapp', 'aiUsage', 'billing', 'compliance', 'audit'] as const;
+type Tab = typeof TABS[number];
+
+const th = 'px-4 py-2.5 font-medium text-ink-subtle';
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
       <p className="text-xs text-ink-subtle mb-0.5">{label}</p>
-      <p className="text-sm text-ink font-medium">{value}</p>
+      <div className="text-sm text-ink font-medium">{value}</div>
     </div>
   );
 }
 
 export default function ClinicDetailPage() {
-  const { t } = useTranslation('admin');
+  const fmt = useAdminFormat();
+  const { t } = fmt;
   const { id } = useParams();
-  const clinic = adminClinics.find(c => c.id === id);
-  const [tab, setTab] = useState<typeof TABS[number]>('Genel');
+  const query = usePlatformQuery<DetailResponse>(id ? `/api/admin/platform/clinics/${id}` : null);
+  const [tab, setTab] = useState<Tab>('general');
   const [impersonateReason, setImpersonateReason] = useState('');
   const [showImpersonateForm, setShowImpersonateForm] = useState(false);
   const demoNameText = useDemoNameText();
   const { session, start } = useImpersonation();
 
-  if (!clinic) {
+  const notFound = (query.error as { response?: { status?: number } })?.response?.status === 404;
+  if (query.loading) return <LoadingState />;
+  if (notFound || (!query.error && !query.data)) {
     return (
       <div className="text-center py-12">
         <p className="text-ink-muted text-sm">{t('clinicDetail.notFound')}</p>
@@ -46,31 +53,35 @@ export default function ClinicDetailPage() {
       </div>
     );
   }
+  if (query.error || !query.data) return <ErrorState error={query.error} onRetry={query.reload} />;
 
-  const auditForClinic = adminAuditEvents.filter(e => e.clinicId === clinic.id);
+  const { clinic, users, auditEvents, basis } = query.data;
   const isImpersonatingThis = session?.clinicId === clinic.id;
+  const quotaPct = clinic.aiUsage.monthlyQuota > 0 ? Math.round(clinic.aiUsage.usedThisMonth / clinic.aiUsage.monthlyQuota * 100) : null;
+  const disabledAction = 'inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink-subtle cursor-not-allowed';
 
   return (
     <div className="space-y-5">
-      <AppMeta title={`${demoNameText(clinic.name)} | CareNova Platform`} />
+      <AppMeta title={`${demoNameText(clinic.name, clinic.isDemo)} | CareNova Platform`} />
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Link to="/admin/clinics" className="text-xs text-ink-subtle hover:text-ink transition-colors">{t('clinicDetail.backLink')}</Link>
-          <h1 className="text-xl font-semibold text-ink mt-1"><DemoName>{clinic.name}</DemoName></h1>
-          <p className="text-ink-muted text-sm"><DemoName>{clinic.legalName}</DemoName></p>
+          <h1 className="text-xl font-semibold text-ink mt-1"><DemoName when={clinic.isDemo}>{clinic.name}</DemoName></h1>
+          {clinic.legalName && <p className="text-ink-muted text-sm"><DemoName when={clinic.isDemo}>{clinic.legalName}</DemoName></p>}
         </div>
         <div className="flex flex-wrap gap-2">
-          <button className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-surface-sunken transition-colors">
+          {/* Write actions are out of scope this round (read-only console); shown disabled, not faked. */}
+          <button disabled title={t('clinicDetail.actions.notAvailable')} className={disabledAction}>
             <CheckCircle2 size={14} strokeWidth={1.75} aria-hidden="true" /> {t('clinicDetail.actions.approve')}
           </button>
-          <button className="inline-flex items-center gap-1.5 rounded-lg border border-danger/30 px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger-soft transition-colors">
+          <button disabled title={t('clinicDetail.actions.notAvailable')} className={disabledAction}>
             <PauseCircle size={14} strokeWidth={1.75} aria-hidden="true" /> {t('clinicDetail.actions.suspend')}
           </button>
-          <button className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-surface-sunken transition-colors">
+          <button disabled title={t('clinicDetail.actions.notAvailable')} className={disabledAction}>
             <ArrowLeftRight size={14} strokeWidth={1.75} aria-hidden="true" /> {t('clinicDetail.actions.changePlan')}
           </button>
-          <button className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-surface-sunken transition-colors">
+          <button disabled title={t('clinicDetail.actions.notAvailable')} className={disabledAction}>
             <PlusCircle size={14} strokeWidth={1.75} aria-hidden="true" /> {t('clinicDetail.actions.addQuota')}
           </button>
           {isImpersonatingThis ? (
@@ -88,9 +99,10 @@ export default function ClinicDetailPage() {
 
       {showImpersonateForm && !isImpersonatingThis && (
         <div className="rounded-xl border border-accent/30 bg-accent-soft p-4">
-          <p className="text-sm font-medium text-ink mb-2">{t('clinicDetail.impersonateForm.reasonLabel')}</p>
+          <label htmlFor="impersonate-reason" className="block text-sm font-medium text-ink mb-2">{t('clinicDetail.impersonateForm.reasonLabel')}</label>
           <div className="flex flex-wrap gap-2">
             <input
+              id="impersonate-reason"
               value={impersonateReason}
               onChange={(e) => setImpersonateReason(e.target.value)}
               placeholder={t('clinicDetail.impersonateForm.reasonPlaceholder')}
@@ -98,7 +110,7 @@ export default function ClinicDetailPage() {
             />
             <button
               disabled={!impersonateReason.trim()}
-              onClick={() => { start(clinic.id, impersonateReason); setShowImpersonateForm(false); setImpersonateReason(''); }}
+              onClick={() => { start(clinic.id, clinic.name, impersonateReason); setShowImpersonateForm(false); setImpersonateReason(''); }}
               className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t('clinicDetail.impersonateForm.start')}
@@ -108,102 +120,140 @@ export default function ClinicDetailPage() {
         </div>
       )}
 
-      <div className="flex gap-1 border-b border-line overflow-x-auto">
-        {TABS.map(tabItem => (
+      <div className="flex gap-1 border-b border-line overflow-x-auto" role="tablist">
+        {TABS.map(tabKey => (
           <button
-            key={tabItem}
-            onClick={() => setTab(tabItem)}
+            key={tabKey}
+            role="tab"
+            aria-selected={tab === tabKey}
+            onClick={() => setTab(tabKey)}
             className={`px-3.5 py-2 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-colors ${
-              tab === tabItem ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
+              tab === tabKey ? 'border-accent text-accent' : 'border-transparent text-ink-muted hover:text-ink'
             }`}
           >
-            {t(`clinicDetail.tabs.${TAB_KEYS[tabItem]}`)}
+            {t(`clinicDetail.tabs.${tabKey}`)}
           </button>
         ))}
       </div>
 
-      {tab === 'Genel' && (
+      {tab === 'general' && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 rounded-xl border border-line bg-surface p-5">
-          <Field label={t('clinicDetail.fields.title')} value={<DemoName>{clinic.legalName}</DemoName>} />
+          <Field label={t('clinicDetail.fields.title')} value={clinic.legalName ? <DemoName when={clinic.isDemo}>{clinic.legalName}</DemoName> : '—'} />
           <Field label={t('clinicDetail.fields.licenseNumber')} value={clinic.licenseNumber || '—'} />
-          <Field label={t('clinicDetail.fields.city')} value={clinic.city} />
-          <Field label={t('clinicDetail.fields.branches')} value={clinic.branches.map(b => BRANCH_LABELS[b]).join(', ')} />
-          <Field label={t('clinicDetail.fields.plan')} value={PLAN_LABELS[clinic.plan]} />
-          <Field label={t('clinicDetail.fields.contact')} value={<>{clinic.contactEmail}<br />{clinic.contactPhone}</>} />
-          <Field label={t('clinicDetail.fields.timezone')} value={clinic.timezone} />
-          <Field label={t('clinicDetail.fields.currency')} value={clinic.currency} />
-          <Field label={t('clinicDetail.fields.onboardingStep')} value={`${clinic.onboarding.step}/7 — ${ONBOARDING_STEPS[Math.min(clinic.onboarding.step, 7) - 1] || t('clinicDetail.onboardingLive')}`} />
+          <Field label={t('clinicDetail.fields.city')} value={clinic.city ?? '—'} />
+          <Field label={t('clinicDetail.fields.branches')} value={fmt.branches(clinic.branches)} />
+          <Field label={t('clinicDetail.fields.plan')} value={fmt.plan(clinic.plan)} />
+          <Field label={t('clinicDetail.fields.status')} value={fmt.clinicStatus(clinic.status)} />
+          <Field label={t('clinicDetail.fields.contact')} value={<>{clinic.contactEmail ?? '—'}<br />{clinic.contactPhone ?? ''}</>} />
+          <Field label={t('clinicDetail.fields.timezone')} value={clinic.timezone ?? '—'} />
+          <Field label={t('clinicDetail.fields.currency')} value={clinic.currency ?? '—'} />
+          <Field label={t('clinicDetail.fields.onboardingStep')} value={`${clinic.onboarding.step}/7 — ${fmt.onboardingStep(clinic.onboarding.step)}`} />
+          <Field label={t('clinicDetail.fields.activeCases')} value={clinic.activeCases} />
+          <Field label={t('clinicDetail.fields.createdAt')} value={fmt.date(clinic.createdAt)} />
         </div>
       )}
 
-      {tab === 'Kullanıcılar' && (
-        <div className="rounded-xl border border-line bg-surface p-5">
-          <p className="text-sm text-ink-muted">{t('clinicDetail.usersTabPrefix', { count: clinic.userCount })}<Link to="/admin/users" className="text-accent hover:underline">{t('nav.users')}</Link>{t('clinicDetail.usersTabSuffix')}</p>
-        </div>
-      )}
-
-      {tab === 'WhatsApp' && (
-        <div className="grid sm:grid-cols-2 gap-4 rounded-xl border border-line bg-surface p-5">
-          <Field label={t('clinicDetail.whatsappTab.displayNumber')} value={clinic.whatsapp.displayNumber || '—'} />
-          <Field label={t('clinicDetail.whatsappTab.connectionStatus')} value={clinic.whatsapp.connected ? <StatusBadge tone="success">{t('clinicDetail.whatsappTab.connected')}</StatusBadge> : <StatusBadge tone="danger">{t('clinicDetail.whatsappTab.notConnected')}</StatusBadge>} />
-          <Field label={t('clinicDetail.whatsappTab.messages24h')} value={clinic.whatsapp.messagesLast24h} />
-          <Field label={t('clinicDetail.whatsappTab.errors24h')} value={clinic.whatsapp.errorsLast24h} />
-        </div>
-      )}
-
-      {tab === 'AI Kullanım' && (
-        <div className="grid sm:grid-cols-2 gap-4 rounded-xl border border-line bg-surface p-5">
-          <Field label={t('clinicDetail.aiUsageTab.monthlyQuota')} value={clinic.aiUsage.monthlyQuota.toLocaleString('tr-TR')} />
-          <Field label={t('clinicDetail.aiUsageTab.used')} value={`${clinic.aiUsage.usedThisMonth.toLocaleString('tr-TR')} (%${Math.round(clinic.aiUsage.usedThisMonth / clinic.aiUsage.monthlyQuota * 100)})`} />
-          <Field label={t('clinicDetail.aiUsageTab.overagePolicy')} value={clinic.aiUsage.overagePolicy === 'block' ? t('clinicDetail.aiUsageTab.block') : t('clinicDetail.aiUsageTab.allow')} />
-          <Field label={t('clinicDetail.aiUsageTab.estimatedCost')} value={`€${clinic.aiUsage.estimatedCostEur}`} />
-        </div>
-      )}
-
-      {tab === 'Faturalama' && (
-        <div className="grid sm:grid-cols-2 gap-4 rounded-xl border border-line bg-surface p-5">
-          <Field label={t('clinicDetail.billingTab.period')} value={clinic.billing.periodicity === 'annual' ? t('clinicDetail.billingTab.annual') : t('clinicDetail.billingTab.monthly')} />
-          <Field label={t('clinicDetail.billingTab.amount')} value={`€${clinic.billing.amountEur}`} />
-          <Field label={t('clinicDetail.billingTab.status')} value={clinic.billing.status === 'current' ? <StatusBadge tone="success">{t('clinicDetail.billingTab.current')}</StatusBadge> : clinic.billing.status === 'overdue' ? <StatusBadge tone="danger">{t('clinicDetail.billingTab.overdue')}</StatusBadge> : <StatusBadge tone="warning">{t('clinicDetail.billingTab.trial')}</StatusBadge>} />
-          <Field label={t('clinicDetail.billingTab.nextCharge')} value={new Date(clinic.billing.nextChargeAt).toLocaleDateString('tr-TR')} />
-        </div>
-      )}
-
-      {tab === 'Uyum' && (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 rounded-xl border border-line bg-surface p-5">
-          <Field label={t('clinicDetail.complianceTab.license')} value={clinic.compliance.licenseOnFile ? <StatusBadge tone="success">{t('clinicDetail.complianceTab.yes')}</StatusBadge> : <StatusBadge tone="danger">{t('clinicDetail.complianceTab.no')}</StatusBadge>} />
-          <Field label={t('clinicDetail.complianceTab.complicationInsurance')} value={clinic.compliance.complicationInsurance ? <StatusBadge tone="success">{t('clinicDetail.complianceTab.yes')}</StatusBadge> : <StatusBadge tone="danger">{t('clinicDetail.complianceTab.no')}</StatusBadge>} />
-          <Field label={t('clinicDetail.complianceTab.verbis')} value={clinic.compliance.verbisRegistered ? <StatusBadge tone="success">{t('clinicDetail.complianceTab.yes')}</StatusBadge> : <StatusBadge tone="danger">{t('clinicDetail.complianceTab.no')}</StatusBadge>} />
-          <Field label={t('clinicDetail.complianceTab.foreignLangRatio')} value={`%${clinic.compliance.foreignLanguageStaffRatio}`} />
-          <Field label={t('clinicDetail.complianceTab.ek1Consents')} value={`${clinic.compliance.ek1TotalConsents} / ${clinic.compliance.ek1RevokedConsents}`} />
-          <Field label={t('clinicDetail.complianceTab.unconsentedMedia')} value={clinic.compliance.ek1HasUnconsentedMedia ? <StatusBadge tone="danger">{t('clinicDetail.complianceTab.yes')}</StatusBadge> : <StatusBadge tone="success">{t('clinicDetail.complianceTab.no')}</StatusBadge>} />
-          <Field label={t('clinicDetail.complianceTab.crossBorder')} value={clinic.compliance.crossBorderNotified ? <StatusBadge tone="success">{t('clinicDetail.complianceTab.done')}</StatusBadge> : <StatusBadge tone="danger">{t('clinicDetail.complianceTab.notDone')}</StatusBadge>} />
-        </div>
-      )}
-
-      {tab === 'Denetim' && (
-        <div className="rounded-xl border border-line bg-surface overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-line text-left">
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('clinicDetail.auditTab.who')}</th>
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('clinicDetail.auditTab.what')}</th>
-                <th scope="col" className="px-4 py-2.5 font-medium text-ink-subtle">{t('clinicDetail.auditTab.when')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {auditForClinic.length === 0 ? (
-                <tr><td colSpan={3} className="px-4 py-6 text-center text-ink-muted text-sm">{t('clinicDetail.auditTab.empty')}</td></tr>
-              ) : auditForClinic.map(e => (
-                <tr key={e.id} className="border-b border-line last:border-0">
-                  <td className="px-4 py-2.5 text-ink">{e.actor}</td>
-                  <td className="px-4 py-2.5 text-ink-muted">{e.action}</td>
-                  <td className="px-4 py-2.5 text-ink-subtle text-xs">{new Date(e.at).toLocaleString('tr-TR')}</td>
+      {tab === 'users' && (
+        users.length === 0 ? <EmptyState title={t('clinicDetail.usersTab.empty')} /> : (
+          <div className="rounded-xl border border-line bg-surface overflow-x-auto">
+            <table className="w-full text-sm min-w-[600px]">
+              <thead>
+                <tr className="border-b border-line text-left">
+                  <th scope="col" className={th}>{t('users.columnsClinic.name')}</th>
+                  <th scope="col" className={th}>{t('users.columnsClinic.role')}</th>
+                  <th scope="col" className={th}>{t('users.columnsClinic.lastLogin')}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u.id} className="border-b border-line last:border-0">
+                    <td className="px-4 py-2.5">
+                      <p className="font-medium text-ink"><DemoName when={u.isDemo}>{u.name}</DemoName></p>
+                      <p className="text-ink-subtle text-xs">{u.email}</p>
+                    </td>
+                    <td className="px-4 py-2.5 text-ink-muted">{fmt.role(u.role)}</td>
+                    <td className="px-4 py-2.5 text-ink-subtle text-xs">{fmt.dateTime(u.lastLoginAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      )}
+
+      {tab === 'whatsapp' && (
+        clinic.whatsapp === null ? <EmptyState title={t('whatsapp.noLine')} body={t('clinicDetail.whatsappTab.noLineBody')} /> : (
+          <div className="grid sm:grid-cols-2 gap-4 rounded-xl border border-line bg-surface p-5">
+            <Field label={t('clinicDetail.whatsappTab.displayNumber')} value={clinic.whatsapp.displayNumber || '—'} />
+            <Field label={t('clinicDetail.whatsappTab.connectionStatus')} value={clinic.whatsapp.connected ? <StatusBadge tone="success">{t('whatsapp.connected')}</StatusBadge> : <StatusBadge tone="danger">{t('whatsapp.notConnected')}</StatusBadge>} />
+            <Field label={t('clinicDetail.whatsappTab.messages24h')} value={clinic.whatsapp.messagesLast24h} />
+            <Field label={t('clinicDetail.whatsappTab.errors24h')} value={clinic.whatsapp.errorsLast24h} />
+            <Field label={t('whatsapp.columns.lastDelivery')} value={fmt.timeAgo(clinic.whatsapp.lastWebhookSuccessAt)} />
+          </div>
+        )
+      )}
+
+      {tab === 'aiUsage' && (
+        <div className="space-y-2">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 rounded-xl border border-line bg-surface p-5">
+            <Field label={t('clinicDetail.aiUsageTab.monthlyQuota')} value={fmt.num(clinic.aiUsage.monthlyQuota)} />
+            <Field label={t('clinicDetail.aiUsageTab.used')} value={`${fmt.num(clinic.aiUsage.usedThisMonth)}${quotaPct === null ? '' : ` (${fmt.pct(quotaPct)})`}`} />
+            <Field label={t('clinicDetail.aiUsageTab.overagePolicy')} value={t(`aiUsage.policy.${clinic.aiUsage.overagePolicy}`)} />
+            <Field label={t('aiUsage.columns.tokens')} value={t('aiUsage.tokensValue', { input: fmt.num(clinic.aiUsage.promptTokensThisMonth), output: fmt.num(clinic.aiUsage.completionTokensThisMonth) })} />
+            <Field label={t('clinicDetail.aiUsageTab.estimatedCost')} value={fmt.usd(clinic.aiUsage.costUsdThisMonth)} />
+          </div>
+          <p className="text-xs text-ink-subtle">{t('aiUsage.formula', { model: basis.aiPricing.model, input: basis.aiPricing.inputUsdPerMTok, output: basis.aiPricing.outputUsdPerMTok })}</p>
         </div>
+      )}
+
+      {tab === 'billing' && (
+        clinic.billing === null ? <EmptyState title={t('billing.noSubscription')} /> : (
+          <div className="space-y-2">
+            <div className="grid sm:grid-cols-2 gap-4 rounded-xl border border-line bg-surface p-5">
+              <Field label={t('clinicDetail.billingTab.period')} value={t(`billing.${clinic.billing.periodicity}`)} />
+              <Field label={t('clinicDetail.billingTab.amount')} value={t('billing.perMonth', { amount: fmt.eur(clinic.billing.amountEur) })} />
+              <Field label={t('clinicDetail.billingTab.status')} value={<StatusBadge tone={clinic.billing.status === 'current' ? 'success' : clinic.billing.status === 'overdue' ? 'danger' : 'warning'}>{t(`billing.${clinic.billing.status}`)}</StatusBadge>} />
+              <Field label={t('clinicDetail.billingTab.nextCharge')} value={fmt.date(clinic.billing.nextChargeAt)} />
+            </div>
+            <p className="text-xs text-ink-subtle">{t('billing.basisNote', { solo: basis.planPriceEur.solo, klinik: basis.planPriceEur.klinik, grup: basis.planPriceEur.grup })}</p>
+          </div>
+        )
+      )}
+
+      {tab === 'compliance' && (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 rounded-xl border border-line bg-surface p-5">
+          <Field label={t('clinicDetail.complianceTab.license')} value={<LicenseBadge licenseNumber={clinic.licenseNumber} assessed={clinic.compliance.assessed} />} />
+          <Field label={t('clinicDetail.complianceTab.complicationInsurance')} value={<InsuranceBadge status={clinic.compliance.complicationInsurance} />} />
+          <Field label={t('clinicDetail.complianceTab.verbis')} value={<VerbisBadge status={clinic.compliance.verbis} />} />
+          <Field label={t('clinicDetail.complianceTab.foreignLangRatio')} value={<LanguageRatio ratio={clinic.compliance.foreignLanguageStaffRatio} />} />
+          <Field label={t('clinicDetail.complianceTab.ek1Consents')} value={<Ek1Cell compliance={clinic.compliance} />} />
+          <Field label={t('clinicDetail.complianceTab.crossBorder')} value={<CrossBorderBadge status={clinic.compliance.crossBorderContract} />} />
+        </div>
+      )}
+
+      {tab === 'audit' && (
+        auditEvents.length === 0 ? <EmptyState title={t('clinicDetail.auditTab.empty')} body={t('audit.emptyBody')} /> : (
+          <div className="rounded-xl border border-line bg-surface overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-line text-left">
+                  <th scope="col" className={th}>{t('clinicDetail.auditTab.who')}</th>
+                  <th scope="col" className={th}>{t('clinicDetail.auditTab.what')}</th>
+                  <th scope="col" className={th}>{t('clinicDetail.auditTab.when')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {auditEvents.map(e => (
+                  <tr key={e.id} className="border-b border-line last:border-0">
+                    <td className="px-4 py-2.5 text-ink" title={e.actor ? undefined : t('audit.noActor')}>{e.actor ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-ink-muted">{e.action}</td>
+                    <td className="px-4 py-2.5 text-ink-subtle text-xs">{fmt.dateTime(e.at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
       )}
     </div>
   );

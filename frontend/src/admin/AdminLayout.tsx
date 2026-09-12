@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { setDefaultTitle } from '../lib/setDefaultTitle';
 import { useImpersonation } from './ImpersonationContext';
+import { useDemoHidden } from '../lib/adminDemoVisibility';
 import carenovaLogoDark from '../assets/carenova-logo-transparent-dark.svg';
 import carenovaLogoLight from '../assets/carenova-logo-transparent-light.svg';
 
@@ -115,6 +116,7 @@ export default function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const current = NAV_ITEMS.find(item => location.pathname.startsWith(item.to));
   const { session, stop } = useImpersonation();
+  const [demoHidden, setDemoHidden] = useDemoHidden();
   // See lib/setDefaultTitle.ts for why this isn't a plain `document.title =`.
   useEffect(() => { setDefaultTitle('CareNova | Platform'); }, []);
 
@@ -164,6 +166,16 @@ export default function AdminLayout() {
               </>
             )}
           </nav>
+          {/* Shows the console as it looks with real tenants only (day-one empty state). */}
+          <label className="ml-auto inline-flex items-center gap-2 text-xs text-ink-muted cursor-pointer select-none" title={t('demoToggle.hint')}>
+            <input
+              type="checkbox"
+              checked={!demoHidden}
+              onChange={(e) => setDemoHidden(!e.target.checked)}
+              className="h-3.5 w-3.5 accent-accent"
+            />
+            {t('demoToggle.label')}
+          </label>
         </header>
         <main className="flex-1 p-4 md:p-6 min-w-0">
           <DemoDataBanner className="mb-4 md:mb-6" />
