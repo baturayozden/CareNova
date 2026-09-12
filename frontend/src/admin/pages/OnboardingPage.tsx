@@ -1,4 +1,5 @@
 import React from 'react';
+import DemoName from '../../components/DemoName';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AppMeta from '../../components/AppMeta';
@@ -58,7 +59,7 @@ export default function OnboardingPage() {
               const days = daysSince(c.onboarding.stepStartedAt);
               return (
                 <tr key={c.id} className="border-b border-line last:border-0">
-                  <td className="px-4 py-2.5"><Link to={`/admin/clinics/${c.id}`} className="font-medium text-ink hover:text-accent transition-colors">{c.name}</Link></td>
+                  <td className="px-4 py-2.5"><Link to={`/admin/clinics/${c.id}`} className="font-medium text-ink hover:text-accent transition-colors"><DemoName>{c.name}</DemoName></Link></td>
                   <td className="px-4 py-2.5 text-ink-muted">{ONBOARDING_STEPS[c.onboarding.step]}</td>
                   <td className="px-4 py-2.5 text-ink-muted">{t('onboarding.daysInStep', { count: days })}</td>
                   <td className="px-4 py-2.5">

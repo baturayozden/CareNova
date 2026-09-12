@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DemoName from '../../components/DemoName';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye } from 'lucide-react';
@@ -72,10 +73,10 @@ export default function UsersPage() {
               {adminClinicUsers.map((u, i) => (
                 <tr key={u.id} className={`border-b border-line last:border-0 ${i % 2 === 1 ? 'bg-surface-page/40' : ''}`}>
                   <td className="px-4 py-2.5">
-                    <p className="font-medium text-ink">{u.name}</p>
+                    <p className="font-medium text-ink"><DemoName>{u.name}</DemoName></p>
                     <p className="text-ink-subtle text-xs">{u.email}</p>
                   </td>
-                  <td className="px-4 py-2.5"><Link to={`/admin/clinics/${u.clinicId}`} className="text-ink-muted hover:text-accent transition-colors">{u.clinicName}</Link></td>
+                  <td className="px-4 py-2.5"><Link to={`/admin/clinics/${u.clinicId}`} className="text-ink-muted hover:text-accent transition-colors"><DemoName>{u.clinicName}</DemoName></Link></td>
                   <td className="px-4 py-2.5 text-ink-muted">{CLINIC_ROLE_LABELS[u.role]}</td>
                   <td className="px-4 py-2.5 text-ink-subtle text-xs">{new Date(u.lastLoginAt).toLocaleString('tr-TR')}</td>
                   <td className="px-4 py-2.5">

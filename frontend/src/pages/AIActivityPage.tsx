@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import DemoName from '../components/DemoName';
 import type { ChangeEvent } from "react";
 import { useTranslation } from 'react-i18next';
 import api from '../lib/api';
@@ -204,7 +205,7 @@ function ConversationCard({ conv, showClinic, onTakeOver }: CardProps) {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-white font-medium text-sm">{conv.patientName}</span>
+                <span className="text-white font-medium text-sm"><DemoName>{conv.patientName}</DemoName></span>
                 <span className="text-gray-500 text-xs">{LANG_FLAGS[conv.language] ?? '🌐'}</span>
                 {showClinic && <span className="text-gray-500 text-xs">{conv.clinic}</span>}
                 {conv.actionRequired && (
@@ -457,7 +458,7 @@ function ActionRequiredCard({ conv, onMarkCalled, onResolve }: ActionCardProps) 
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-white font-semibold text-base">
-            {conv.patientName}
+            <DemoName>{conv.patientName}</DemoName>
             <span className="text-gray-500 font-normal text-sm ml-2">· {LANG_FLAGS[conv.language] ?? '🌐'}</span>
           </p>
           <p className="text-gray-400 text-sm mt-0.5">

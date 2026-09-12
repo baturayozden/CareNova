@@ -5,6 +5,8 @@ import { ArrowLeft, Lock, Mic, Image as ImageIcon, Check } from 'lucide-react';
 import AppMeta from '../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
 import { cases, CaseStatus, CASE_STATUS_LABELS } from '../data/caseData';
+import DemoName, { useDemoNameText } from '../components/DemoName';
+import { isDemoName } from '../lib/demoProvenance';
 
 const STATUS_TONE: Record<CaseStatus, 'success' | 'warning' | 'danger' | 'neutral' | 'accent'> = {
   new: 'neutral', qualified: 'accent', pre_assessment: 'warning', awaiting_doctor: 'warning',
@@ -23,6 +25,7 @@ export default function CaseFileDetailPage() {
   const { t } = useTranslation('cases');
   const { id } = useParams<{ id: string }>();
   const [tab, setTab] = useState<TabKey>('summary');
+  const demoNameText = useDemoNameText();
   const item = cases.find(c => c.id === id);
 
   if (!item) {
@@ -50,7 +53,7 @@ export default function CaseFileDetailPage() {
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-5">
-        <AppMeta title={`${item.patientName} | ${t('listTitle')} | CareNova`} />
+        <AppMeta title={`${demoNameText(item.patientName)} | ${t('listTitle')} | CareNova`} />
         <div>
           <Link to="/cases" className="inline-flex items-center gap-1.5 text-sm text-ink-muted hover:text-accent mb-3">
             <ArrowLeft size={16} strokeWidth={1.75} aria-hidden="true" />{t('backToList')}
@@ -59,7 +62,7 @@ export default function CaseFileDetailPage() {
             <div className="flex items-center gap-2">
               <span className="text-2xl" aria-hidden="true">{item.patientCountryFlag}</span>
               <div>
-                <h1 className="text-xl font-semibold text-ink">{item.patientName}</h1>
+                <h1 className="text-xl font-semibold text-ink"><DemoName>{item.patientName}</DemoName></h1>
                 <p className="text-ink-subtle text-xs">{item.caseNumber} · {item.patientCountry}</p>
               </div>
             </div>
@@ -87,14 +90,14 @@ export default function CaseFileDetailPage() {
               <h2 className="text-sm font-semibold text-ink mb-3">{t('summary.patient')}</h2>
               <dl className="space-y-1.5 text-sm">
                 <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.estimatedValue')}</dt><dd className="text-ink font-medium">€{item.estimatedValueEur.toLocaleString('tr-TR')}</dd></div>
-                <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.companions')}</dt><dd className="text-ink">{item.companions.length ? item.companions.map(c => `${c.name} (${c.relation})`).join(', ') : t('summary.noCompanions')}</dd></div>
+                <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.companions')}</dt><dd className="text-ink">{item.companions.length ? item.companions.map((c, i) => (<React.Fragment key={c.name}>{i > 0 && ', '}<DemoName>{c.name}</DemoName> ({c.relation})</React.Fragment>)) : t('summary.noCompanions')}</dd></div>
               </dl>
               <h3 className="text-xs font-semibold text-ink-subtle uppercase tracking-wide mt-4 mb-2">{t('summary.assigned')}</h3>
               <dl className="space-y-1.5 text-sm">
-                <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.consultant')}</dt><dd className="text-ink">{item.assignedConsultant ?? t('notAssigned')}</dd></div>
-                <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.doctor')}</dt><dd className="text-ink">{item.assignedDoctor ?? t('notAssigned')}</dd></div>
-                <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.coordinator')}</dt><dd className="text-ink">{item.assignedCoordinator ?? t('notAssigned')}</dd></div>
-                <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.interpreter')}</dt><dd className="text-ink">{item.assignedInterpreter ?? t('notAssigned')}</dd></div>
+                <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.consultant')}</dt><dd className="text-ink">{item.assignedConsultant ? <DemoName>{item.assignedConsultant}</DemoName> : t('notAssigned')}</dd></div>
+                <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.doctor')}</dt><dd className="text-ink">{item.assignedDoctor ? <DemoName>{item.assignedDoctor}</DemoName> : t('notAssigned')}</dd></div>
+                <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.coordinator')}</dt><dd className="text-ink">{item.assignedCoordinator ? <DemoName>{item.assignedCoordinator}</DemoName> : t('notAssigned')}</dd></div>
+                <div className="flex justify-between"><dt className="text-ink-muted">{t('summary.interpreter')}</dt><dd className="text-ink">{item.assignedInterpreter ? <DemoName>{item.assignedInterpreter}</DemoName> : t('notAssigned')}</dd></div>
               </dl>
             </div>
             <div className="rounded-xl border border-line bg-surface p-4">
@@ -236,7 +239,7 @@ export default function CaseFileDetailPage() {
             {item.auditLog.length === 0 && <p className="text-ink-subtle text-sm p-4">{t('audit.empty')}</p>}
             {item.auditLog.map((e, i) => (
               <div key={i} className="p-4 flex items-center justify-between gap-3 text-sm">
-                <div><span className="text-ink font-medium">{e.actor}</span><span className="text-ink-muted"> — {e.action}</span></div>
+                <div><span className="text-ink font-medium">{isDemoName(e.actor) ? <DemoName>{e.actor}</DemoName> : e.actor}</span><span className="text-ink-muted"> — {e.action}</span></div>
                 <span className="text-ink-subtle text-xs shrink-0">{fmtDateTime(e.at)}</span>
               </div>
             ))}

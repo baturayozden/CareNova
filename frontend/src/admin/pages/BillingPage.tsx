@@ -1,4 +1,5 @@
 import React from 'react';
+import DemoName from '../../components/DemoName';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AppMeta from '../../components/AppMeta';
@@ -49,7 +50,7 @@ export default function BillingPage() {
           <tbody>
             {rows.map((c, i) => (
               <tr key={c.id} className={`border-b border-line last:border-0 ${i % 2 === 1 ? 'bg-surface-page/40' : ''}`}>
-                <td className="px-4 py-2.5"><Link to={`/admin/clinics/${c.id}`} className="font-medium text-ink hover:text-accent transition-colors">{c.name}</Link></td>
+                <td className="px-4 py-2.5"><Link to={`/admin/clinics/${c.id}`} className="font-medium text-ink hover:text-accent transition-colors"><DemoName>{c.name}</DemoName></Link></td>
                 <td className="px-4 py-2.5 text-ink-muted">{c.billing.periodicity === 'annual' ? t('billing.annual') : t('billing.monthly')}</td>
                 <td className="px-4 py-2.5 text-right text-ink">€{c.billing.amountEur}</td>
                 <td className="px-4 py-2.5">

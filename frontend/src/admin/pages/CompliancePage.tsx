@@ -1,4 +1,5 @@
 import React from 'react';
+import DemoName from '../../components/DemoName';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AppMeta from '../../components/AppMeta';
@@ -63,7 +64,7 @@ export default function CompliancePage() {
               return (
                 <tr key={c.id} className={`border-b border-line last:border-0 ${i % 2 === 1 ? 'bg-surface-page/40' : ''}`}>
                   <td className="px-4 py-2.5">
-                    <Link to={`/admin/clinics/${c.id}`} className="font-medium text-ink hover:text-accent transition-colors">{c.name}</Link>
+                    <Link to={`/admin/clinics/${c.id}`} className="font-medium text-ink hover:text-accent transition-colors"><DemoName>{c.name}</DemoName></Link>
                   </td>
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-1.5">

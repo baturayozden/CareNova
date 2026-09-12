@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import DemoName from '../../components/DemoName';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
@@ -101,7 +102,7 @@ export default function ClinicsPage() {
             {filtered.map((c, i) => (
               <tr key={c.id} className={`border-b border-line last:border-0 hover:bg-surface-sunken ${i % 2 === 1 ? 'bg-surface-page/40' : ''}`}>
                 <td className="px-4 py-2.5">
-                  <Link to={`/admin/clinics/${c.id}`} className="font-medium text-ink hover:text-accent transition-colors">{c.name}</Link>
+                  <Link to={`/admin/clinics/${c.id}`} className="font-medium text-ink hover:text-accent transition-colors"><DemoName>{c.name}</DemoName></Link>
                 </td>
                 <td className="px-4 py-2.5 text-ink-muted">{c.city}</td>
                 <td className="px-4 py-2.5 text-ink-muted">{c.branches.map(b => BRANCH_LABELS[b]).join(', ')}</td>

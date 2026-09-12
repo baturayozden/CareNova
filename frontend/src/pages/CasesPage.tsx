@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 import AppMeta from '../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
 import { cases, CaseStatus, CASE_STATUS_LABELS, DEMO_NOW_MS } from '../data/caseData';
+import DemoName from '../components/DemoName';
 
 // GECE-2-BRIEFI.md Bölüm D.2 — "CareNova'nın merkezi kavramı". Demo-only:
 // reads static caseData.ts, no API calls (mirrors the admin console's own
@@ -114,13 +115,13 @@ export default function CasesPage() {
                   <td className="px-4 py-3">
                     <Link to={`/cases/${c.id}`} className="flex items-center gap-2 font-medium text-ink hover:text-accent">
                       <span aria-hidden="true">{c.patientCountryFlag}</span>
-                      {c.patientName}
+                      <DemoName>{c.patientName}</DemoName>
                       <span className="text-ink-subtle font-normal text-xs">{c.caseNumber}</span>
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-ink-muted">{BRANCH_LABELS[c.branch] ?? c.branch}</td>
                   <td className="px-4 py-3"><StatusBadge tone={STATUS_TONE[c.status]}>{CASE_STATUS_LABELS[c.status]}</StatusBadge></td>
-                  <td className="px-4 py-3 text-ink-muted">{c.assignedConsultant ?? t('notAssigned')}</td>
+                  <td className="px-4 py-3 text-ink-muted">{c.assignedConsultant ? <DemoName>{c.assignedConsultant}</DemoName> : t('notAssigned')}</td>
                   <td className="px-4 py-3 text-ink-muted">€{c.estimatedValueEur.toLocaleString('tr-TR')}</td>
                   <td className="px-4 py-3 text-ink-subtle">{timeAgo(c.lastActivityAt)}</td>
                 </tr>

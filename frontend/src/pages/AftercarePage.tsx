@@ -7,6 +7,7 @@ import StatusBadge from '../components/StatusBadge';
 import { cases, DEMO_NOW_MS, CaseFile } from '../data/caseData';
 import { adminBranchTemplates } from '../data/adminBranchTemplates';
 import { BRANCH_LABELS } from '../lib/caseDisplay';
+import DemoName from '../components/DemoName';
 
 // APP-ADMIN-EKSIKLER-KOMUTU.md Görev 2 — one row per case that has reached
 // treatment (aftercare tracking only makes sense once there's something to
@@ -134,7 +135,7 @@ export default function AftercarePage() {
                   <td className="px-4 py-3">
                     <Link to={`/cases/${c.id}?tab=aftercare`} className="flex items-center gap-2 font-medium text-ink hover:text-accent">
                       <span aria-hidden="true">{c.patientCountryFlag}</span>
-                      {c.patientName}
+                      <DemoName>{c.patientName}</DemoName>
                       <span className="text-ink-subtle font-normal text-xs">{c.caseNumber}</span>
                     </Link>
                   </td>

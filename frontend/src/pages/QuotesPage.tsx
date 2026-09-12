@@ -6,6 +6,7 @@ import AppMeta from '../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
 import { cases, caseConsultants, DEMO_NOW_MS } from '../data/caseData';
 import { BRANCH_LABELS } from '../lib/caseDisplay';
+import DemoName, { useDemoNameText } from '../components/DemoName';
 
 // APP-ADMIN-EKSIKLER-KOMUTU.md Görev 2 — same pattern as CasesPage.tsx
 // (static caseData.ts, no API call, Klinik Beyazı design tokens). Every
@@ -44,6 +45,7 @@ function deriveStatus(locked: boolean, validUntil: string | null, caseStatus: st
 
 export default function QuotesPage() {
   const { t } = useTranslation('cases');
+  const demoNameText = useDemoNameText();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<QuoteStatus | 'all'>('all');
   const [branchFilter, setBranchFilter] = useState('all');
@@ -134,7 +136,7 @@ export default function QuotesPage() {
             <select value={consultantFilter} onChange={(e) => setConsultantFilter(e.target.value)}
               className="px-3 py-2 rounded-lg border border-line bg-surface text-sm text-ink focus:outline-none focus:border-accent">
               <option value="all">{t('quotesList.allConsultants')}</option>
-              {caseConsultants.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+              {caseConsultants.map(c => <option key={c.id} value={c.name}>{demoNameText(c.name)}</option>)}
             </select>
           </div>
         </div>
@@ -158,7 +160,7 @@ export default function QuotesPage() {
                   <td className="px-4 py-3">
                     <Link to={`/cases/${r.caseId}`} className="flex items-center gap-2 font-medium text-ink hover:text-accent">
                       <span aria-hidden="true">{r.patientCountryFlag}</span>
-                      {r.patientName}
+                      <DemoName>{r.patientName}</DemoName>
                       <span className="text-ink-subtle font-normal text-xs">{r.caseNumber}</span>
                     </Link>
                   </td>
@@ -174,7 +176,7 @@ export default function QuotesPage() {
                   <td className="px-4 py-3 text-ink-subtle">
                     {r.validUntil ? new Date(r.validUntil).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) : t('quotesList.noExpiry')}
                   </td>
-                  <td className="px-4 py-3 text-ink-muted">{r.consultant ?? t('notAssigned')}</td>
+                  <td className="px-4 py-3 text-ink-muted">{r.consultant ? <DemoName>{r.consultant}</DemoName> : t('notAssigned')}</td>
                 </tr>
               ))}
               {filtered.length === 0 && (

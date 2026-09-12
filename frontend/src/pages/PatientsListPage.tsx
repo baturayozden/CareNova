@@ -9,6 +9,7 @@ import AppMeta from '../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
 import { CaseStatus, CASE_STATUS_LABELS } from '../data/caseData';
 import { STATUS_TONE, BRANCH_LABELS } from '../lib/caseDisplay';
+import DemoName, { useDemoNameText } from '../components/DemoName';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 //
@@ -124,6 +125,7 @@ export default function PatientsListPage() {
   const navigate   = useNavigate();
   const { user }   = useAuth();
   const { t }      = useTranslation('patients');
+  const demoNameText = useDemoNameText();
 
   const [patients,   setPatients]   = useState<Patient[]>([]);
   const [search,     setSearch]     = useState('');
@@ -228,7 +230,7 @@ export default function PatientsListPage() {
           onChange={handleAssigned}
           options={[
             { id: '', label: t('filters.allStaff') },
-            ...staffList.map(s => ({ id: s.id, label: s.name })),
+            ...staffList.map(s => ({ id: s.id, label: demoNameText(s.name) })),
           ]}
         />
 
@@ -299,7 +301,7 @@ export default function PatientsListPage() {
                     {initials}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium text-sm truncate">{p.patientCountryFlag} {p.patientName}</p>
+                    <p className="text-white font-medium text-sm truncate">{p.patientCountryFlag} <DemoName>{p.patientName}</DemoName></p>
                     <p className="text-gray-500 text-xs mt-0.5 font-mono">{p.caseNumber}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -315,7 +317,7 @@ export default function PatientsListPage() {
                       {initials}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-white font-medium text-sm truncate">{p.patientCountryFlag} {p.patientName}</p>
+                      <p className="text-white font-medium text-sm truncate">{p.patientCountryFlag} <DemoName>{p.patientName}</DemoName></p>
                       <p className="text-gray-500 text-xs truncate font-mono">{p.caseNumber}</p>
                     </div>
                   </div>
@@ -324,7 +326,7 @@ export default function PatientsListPage() {
                     {p.staffName ? (
                       <div className="flex items-center gap-1.5">
                         <User size={11} className="text-gray-600 shrink-0" />
-                        <span className="text-gray-300 text-xs truncate">{p.staffName}</span>
+                        <span className="text-gray-300 text-xs truncate"><DemoName>{p.staffName}</DemoName></span>
                       </div>
                     ) : (
                       <span className="text-gray-600 text-xs">{t('notAssigned')}</span>

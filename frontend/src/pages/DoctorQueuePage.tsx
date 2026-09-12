@@ -5,6 +5,7 @@ import { AlertTriangle, Image as ImageIcon, ShieldAlert, X, CheckCircle2 } from 
 import AppMeta from '../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
 import { cases, CaseFile, DEMO_NOW_MS } from '../data/caseData';
+import DemoName from '../components/DemoName';
 
 // GECE-2-BRIEFI.md Bölüm D.3, derinleştirildi GECE-3-BRIEFI.md Bölüm D
 // (Bulgu 4): mobile-first, doctor role's default landing page. 🔴 AI's
@@ -124,7 +125,7 @@ function DoctorDecisionCard({ item }: { item: CaseFile }) {
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xl" aria-hidden="true">{item.patientCountryFlag}</span>
-            <Link to={`/cases/${item.id}`} className="font-medium text-ink hover:text-accent">{item.patientName}</Link>
+            <Link to={`/cases/${item.id}`} className="font-medium text-ink hover:text-accent"><DemoName>{item.patientName}</DemoName></Link>
           </div>
           <p className="text-ink-subtle text-xs mt-0.5">{item.patientCountry} · {item.patientAge} yaş · {BRANCH_LABELS[item.branch] ?? item.branch}</p>
         </div>

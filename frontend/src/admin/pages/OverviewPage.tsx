@@ -1,4 +1,5 @@
 import React from 'react';
+import DemoName from '../../components/DemoName';
 import { useTranslation } from 'react-i18next';
 import { Building2, Sparkles, MessageCircle, Wallet, Clock3, AlertTriangle } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
@@ -95,7 +96,7 @@ export default function OverviewPage() {
             ) : (
               <ul className="space-y-1">
                 {quotaWarnings.map(c => (
-                  <li key={c.id} className="text-xs text-ink">{c.name} — %{Math.round(c.aiUsage.usedThisMonth / c.aiUsage.monthlyQuota * 100)}</li>
+                  <li key={c.id} className="text-xs text-ink"><DemoName>{c.name}</DemoName> — %{Math.round(c.aiUsage.usedThisMonth / c.aiUsage.monthlyQuota * 100)}</li>
                 ))}
               </ul>
             )}
@@ -110,7 +111,7 @@ export default function OverviewPage() {
             ) : (
               <ul className="space-y-1">
                 {stuckOnboarding.map(c => (
-                  <li key={c.id} className="text-xs text-ink">{c.name} — {ONBOARDING_STEPS[c.onboarding.step]}</li>
+                  <li key={c.id} className="text-xs text-ink"><DemoName>{c.name}</DemoName> — {ONBOARDING_STEPS[c.onboarding.step]}</li>
                 ))}
               </ul>
             )}
@@ -125,7 +126,7 @@ export default function OverviewPage() {
             ) : (
               <ul className="space-y-1">
                 {overdueBilling.map(c => (
-                  <li key={c.id} className="text-xs text-ink">{c.name} — €{c.billing.amountEur}</li>
+                  <li key={c.id} className="text-xs text-ink"><DemoName>{c.name}</DemoName> — €{c.billing.amountEur}</li>
                 ))}
               </ul>
             )}

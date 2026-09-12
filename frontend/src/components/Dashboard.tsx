@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import AppMeta from './AppMeta';
 import { cases, CaseFile, DEMO_NOW_MS, todaysSchedule, ScheduleEntry } from '../data/caseData';
 import { averageFirstResponseMinutes } from '../lib/caseDisplay';
+import DemoName from './DemoName';
 
 // GECE-3-BRIEFI.md Bölüm C — replaces CareDental's inherited lead board
 // (Bulgu 3: "Total Leads 4" while /cases showed 15 cases — two screens
@@ -188,7 +189,7 @@ export default function Dashboard() {
         <div className="divide-y divide-line">
           {actionItems.map((item, i) => (
             <Link key={i} to={`/cases/${item.caseId}`} className="block px-4 py-3 hover:bg-surface-sunken transition-colors">
-              <p className="text-sm text-ink font-medium">{item.patientName}</p>
+              <p className="text-sm text-ink font-medium"><DemoName>{item.patientName}</DemoName></p>
               <p className="text-xs text-ink-muted">{item.reason}</p>
             </Link>
           ))}
@@ -210,7 +211,7 @@ export default function Dashboard() {
               <Link key={i} to={`/cases/${entry.caseId}`} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-sunken transition-colors">
                 <span className="text-xs text-ink-subtle w-12 shrink-0">{entry.time}</span>
                 <Icon size={15} strokeWidth={1.75} className="text-ink-subtle shrink-0" aria-hidden="true" />
-                <span className="text-sm text-ink truncate">{entry.patientName}</span>
+                <span className="text-sm text-ink truncate"><DemoName>{entry.patientName}</DemoName></span>
                 <span className="text-xs text-ink-subtle ml-auto shrink-0">{t(`dashboard.schedule.type.${entry.type}`)}</span>
               </Link>
             );
@@ -231,7 +232,7 @@ export default function Dashboard() {
             <Link key={i} to={`/cases/${item.caseId}`} className="block px-4 py-3 hover:bg-surface-sunken transition-colors">
               <div className="flex items-center gap-1.5 mb-1">
                 <span aria-hidden="true">{item.flag}</span>
-                <span className="text-sm font-medium text-ink">{item.patientName}</span>
+                <span className="text-sm font-medium text-ink"><DemoName>{item.patientName}</DemoName></span>
                 <span className="text-[11px] text-ink-subtle ml-auto">{fmtTime(item.at)}</span>
               </div>
               <p className="text-xs text-ink-muted truncate">{item.text}</p>

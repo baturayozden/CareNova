@@ -6,6 +6,7 @@ import AppMeta from '../components/AppMeta';
 import StatusBadge from '../components/StatusBadge';
 import { cases } from '../data/caseData';
 import { BRANCH_LABELS, timeAgo } from '../lib/caseDisplay';
+import DemoName from '../components/DemoName';
 
 // APP-ADMIN-EKSIKLER-KOMUTU.md Görev 2 — one row per case that has a travel
 // plan. Honest limitation, noted rather than papered over: caseData.ts's
@@ -84,7 +85,7 @@ export default function TravelPage() {
                   <td className="px-4 py-3">
                     <Link to={`/cases/${c.id}?tab=travel`} className="flex items-center gap-2 font-medium text-ink hover:text-accent">
                       <span aria-hidden="true">{c.patientCountryFlag}</span>
-                      {c.patientName}
+                      <DemoName>{c.patientName}</DemoName>
                       <span className="text-ink-subtle font-normal text-xs">{c.caseNumber}</span>
                     </Link>
                   </td>
@@ -94,7 +95,7 @@ export default function TravelPage() {
                   <td className="px-4 py-3 text-ink-muted">{c.travel!.hotel}</td>
                   <td className="px-4 py-3 text-ink-muted">{c.travel!.transfer}</td>
                   <td className="px-4 py-3 text-ink-muted">{c.companions.length}</td>
-                  <td className="px-4 py-3 text-ink-muted">{c.assignedCoordinator ?? t('notAssigned')}</td>
+                  <td className="px-4 py-3 text-ink-muted">{c.assignedCoordinator ? <DemoName>{c.assignedCoordinator}</DemoName> : t('notAssigned')}</td>
                   <td className="px-4 py-3 text-ink-subtle">{timeAgo(c.lastActivityAt)}</td>
                 </tr>
               ))}

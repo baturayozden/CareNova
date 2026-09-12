@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DemoName, { useDemoNameText } from '../../components/DemoName';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, CheckCircle2, PauseCircle, PlusCircle, ArrowLeftRight } from 'lucide-react';
@@ -34,6 +35,7 @@ export default function ClinicDetailPage() {
   const [tab, setTab] = useState<typeof TABS[number]>('Genel');
   const [impersonateReason, setImpersonateReason] = useState('');
   const [showImpersonateForm, setShowImpersonateForm] = useState(false);
+  const demoNameText = useDemoNameText();
   const { session, start } = useImpersonation();
 
   if (!clinic) {
@@ -50,13 +52,13 @@ export default function ClinicDetailPage() {
 
   return (
     <div className="space-y-5">
-      <AppMeta title={`${clinic.name} | CareNova Platform`} />
+      <AppMeta title={`${demoNameText(clinic.name)} | CareNova Platform`} />
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Link to="/admin/clinics" className="text-xs text-ink-subtle hover:text-ink transition-colors">{t('clinicDetail.backLink')}</Link>
-          <h1 className="text-xl font-semibold text-ink mt-1">{clinic.name}</h1>
-          <p className="text-ink-muted text-sm">{clinic.legalName}</p>
+          <h1 className="text-xl font-semibold text-ink mt-1"><DemoName>{clinic.name}</DemoName></h1>
+          <p className="text-ink-muted text-sm"><DemoName>{clinic.legalName}</DemoName></p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-surface-sunken transition-colors">
@@ -122,7 +124,7 @@ export default function ClinicDetailPage() {
 
       {tab === 'Genel' && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 rounded-xl border border-line bg-surface p-5">
-          <Field label={t('clinicDetail.fields.title')} value={clinic.legalName} />
+          <Field label={t('clinicDetail.fields.title')} value={<DemoName>{clinic.legalName}</DemoName>} />
           <Field label={t('clinicDetail.fields.licenseNumber')} value={clinic.licenseNumber || '—'} />
           <Field label={t('clinicDetail.fields.city')} value={clinic.city} />
           <Field label={t('clinicDetail.fields.branches')} value={clinic.branches.map(b => BRANCH_LABELS[b]).join(', ')} />

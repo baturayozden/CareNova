@@ -1,4 +1,5 @@
 import React from 'react';
+import DemoName from '../../components/DemoName';
 import { useTranslation } from 'react-i18next';
 import { Activity, Clock3, AlertOctagon } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
@@ -38,7 +39,7 @@ export default function HealthPage() {
           {adminHealth.recentErrors.map(err => (
             <div key={err.id} className="px-4 py-3 flex items-center justify-between gap-3">
               <div>
-                <p className="text-sm text-ink font-medium">{err.clinicName}</p>
+                <p className="text-sm text-ink font-medium"><DemoName>{err.clinicName}</DemoName></p>
                 <p className="text-xs text-ink-muted">{err.message}</p>
               </div>
               <span className="text-xs text-ink-subtle shrink-0">{new Date(err.at).toLocaleString('tr-TR')}</span>

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import AppMeta from '../components/AppMeta';
 import { cases, caseConsultants, CaseStatus, DEMO_NOW_MS } from '../data/caseData';
 import { BRANCH_LABELS, averageFirstResponseMinutes } from '../lib/caseDisplay';
+import DemoName from '../components/DemoName';
 
 // APP-ADMIN-EKSIKLER-KOMUTU.md Görev 2 — the weekly-summary report a
 // klinik_sahibi checks. Reuses averageFirstResponseMinutes (moved out of
@@ -184,7 +185,7 @@ export default function ReportsPage() {
             <tbody className="divide-y divide-line">
               {byConsultant.map(c => (
                 <tr key={c.name}>
-                  <td className="px-5 py-3 text-ink font-medium">{c.name}</td>
+                  <td className="px-5 py-3 text-ink font-medium"><DemoName>{c.name}</DemoName></td>
                   <td className="px-5 py-3 text-ink-muted">{c.count}</td>
                   <td className="px-5 py-3 text-ink-muted">€{c.value.toLocaleString('tr-TR')}</td>
                   <td className="px-5 py-3 text-ink-muted">{c.avgResponse != null ? `${c.avgResponse} dk` : '—'}</td>

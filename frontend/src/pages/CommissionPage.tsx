@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import DemoName from '../components/DemoName';
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
@@ -935,7 +936,7 @@ export default function CommissionPage() {
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               <span className={`text-[10px] text-gray-500 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>▶</span>
-                              <span className="text-white font-medium">{tc.name}</span>
+                              <span className="text-white font-medium"><DemoName>{tc.name}</DemoName></span>
                               {isNonQuota && (
                                 <span className="px-1.5 py-0.5 bg-slate-600 text-white rounded text-[10px] font-medium">
                                   {t('leaderboard.notInQuota')}
@@ -998,10 +999,10 @@ export default function CommissionPage() {
                                             onClick={e => e.stopPropagation()}
                                             className="text-accent/80 hover:text-accent hover:underline"
                                           >
-                                            {d.patient_name || '—'}
+                                            {d.patient_name ? <DemoName>{d.patient_name}</DemoName> : '—'}
                                           </a>
                                         ) : (
-                                          <span className="text-gray-400">{d.patient_name || '—'}</span>
+                                          <span className="text-gray-400">{d.patient_name ? <DemoName>{d.patient_name}</DemoName> : '—'}</span>
                                         )}
                                       </td>
                                       <td className="px-3 py-2.5 text-gray-300">
@@ -1098,7 +1099,7 @@ export default function CommissionPage() {
                       onClick={() => toggleRow(rec.id)}
                     >
                       <td className="px-4 py-3">
-                        <p className="text-white font-medium">{rec.first_name} {rec.last_name}</p>
+                        <p className="text-white font-medium"><DemoName>{rec.first_name} {rec.last_name}</DemoName></p>
                         <p className="text-gray-500 text-xs">{rec.email}</p>
                       </td>
                       <td className="px-4 py-3 text-right text-gray-300 tabular-nums">{formatEUR(rec.total_revenue)}</td>

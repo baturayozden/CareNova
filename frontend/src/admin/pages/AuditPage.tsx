@@ -1,18 +1,22 @@
 import React, { useMemo, useState } from 'react';
+import DemoName, { useDemoNameText } from '../../components/DemoName';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Download, Lock } from 'lucide-react';
 import AppMeta from '../../components/AppMeta';
 import { adminAuditEvents } from '../../data/adminDemoData';
 
-function toCsv(rows: typeof adminAuditEvents): string {
+// `mark` prefixes the fabricated clinic name. The actor column is the real
+// platform owner (see REAL_PEOPLE in lib/demoProvenance.ts) and stays as is.
+function toCsv(rows: typeof adminAuditEvents, mark: (name: string) => string): string {
   const header = 'Kim,Ne yaptı,Klinik,Ne zaman';
-  const lines = rows.map(r => [r.actor, r.action, r.clinicName || '—', r.at].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+  const lines = rows.map(r => [r.actor, r.action, r.clinicName ? mark(r.clinicName) : '—', r.at].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
   return [header, ...lines].join('\n');
 }
 
 export default function AuditPage() {
   const { t } = useTranslation('admin');
+  const demoNameText = useDemoNameText();
   const [clinicFilter, setClinicFilter] = useState('all');
   const clinics = useMemo(() => Array.from(new Set(adminAuditEvents.filter(e => e.clinicName).map(e => e.clinicName!))), []);
   const rows = useMemo(() => {
@@ -21,7 +25,7 @@ export default function AuditPage() {
   }, [clinicFilter]);
 
   const exportCsv = () => {
-    const blob = new Blob([toCsv(rows)], { type: 'text/csv;charset=utf-8' });
+    const blob = new Blob([toCsv(rows, demoNameText)], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = 'denetim-kaydi.csv';
@@ -47,7 +51,7 @@ export default function AuditPage() {
 
       <select value={clinicFilter} onChange={(e) => setClinicFilter(e.target.value)} className="rounded-lg border border-line bg-surface text-sm text-ink px-3 py-1.5">
         <option value="all">{t('audit.filterAllClinics')}</option>
-        {clinics.map(name => <option key={name} value={name}>{name}</option>)}
+        {clinics.map(name => <option key={name} value={name}>{demoNameText(name)}</option>)}
       </select>
 
       <div className="rounded-xl border border-line bg-surface overflow-x-auto">
@@ -66,7 +70,7 @@ export default function AuditPage() {
                 <td className="px-4 py-2.5 font-medium text-ink">{e.actor}</td>
                 <td className="px-4 py-2.5 text-ink-muted">{e.action}</td>
                 <td className="px-4 py-2.5">
-                  {e.clinicId ? <Link to={`/admin/clinics/${e.clinicId}`} className="text-accent hover:underline">{e.clinicName}</Link> : <span className="text-ink-subtle">—</span>}
+                  {e.clinicId ? <Link to={`/admin/clinics/${e.clinicId}`} className="text-accent hover:underline"><DemoName>{e.clinicName}</DemoName></Link> : <span className="text-ink-subtle">—</span>}
                 </td>
                 <td className="px-4 py-2.5 text-ink-subtle text-xs">{new Date(e.at).toLocaleString('tr-TR')}</td>
               </tr>
