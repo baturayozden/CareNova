@@ -43,9 +43,9 @@ export function enableDemoTracking(): void {
   tracking = true;
 }
 
-function report(source: string): void {
+function report(source: string, requestedPath?: string): void {
   if (!tracking) return;
-  const path = window.location.pathname;
+  const path = requestedPath ?? window.location.pathname;
   let sources = readsByPath.get(path);
   if (!sources) {
     sources = new Set();
@@ -81,6 +81,27 @@ export function demoSource<T extends object>(source: string, data: T): T {
       return Reflect.get(target, prop, receiver);
     },
   });
+}
+
+/**
+ * Mark a path as showing fabricated records from a source that is not an
+ * imported collection — an API response whose rows belong to a demo tenant
+ * (lib/apiDemoMarking.ts). `path` is the page that ASKED for the data, captured
+ * when the request was sent, so a response that lands after navigation is not
+ * pinned on the next page.
+ */
+export function reportDemoData(source: string, path: string): void {
+  report(source, path);
+}
+
+/**
+ * Forget every mark. Only for the admin shell's "hide demo data" switch: the
+ * screen refetches right after, and marks itself again if any demo row is
+ * still in what comes back. Never called to make a banner go away on its own.
+ */
+export function resetDemoProvenance(): void {
+  readsByPath.clear();
+  listeners.forEach(listener => listener());
 }
 
 export function subscribeDemoProvenance(listener: Listener): () => void {

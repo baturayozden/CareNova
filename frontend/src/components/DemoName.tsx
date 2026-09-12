@@ -12,8 +12,11 @@ import { useTranslation } from 'react-i18next';
  * Inline, not flex, so it inherits the surrounding line and any parent
  * `truncate` instead of forcing its own box into dense table cells.
  */
-export default function DemoName({ children }: { children: React.ReactNode }) {
+export default function DemoName({ children, when = true }: { children: React.ReactNode; when?: boolean }) {
   const { t } = useTranslation('common');
+  // `when` carries the row's own flag for mixed lists (API rows with isDemo):
+  // a real clinic next to a demo one gets no badge.
+  if (!when) return <>{children}</>;
   return (
     <span data-demo-name="">
       <span
@@ -35,7 +38,7 @@ export default function DemoName({ children }: { children: React.ReactNode }) {
  * Text-only form, for places that cannot hold markup — <option>, title and
  * aria-label attributes. Produces "[ÖRNEK] Name", which the audit accepts.
  */
-export function useDemoNameText(): (name: string | null | undefined) => string {
+export function useDemoNameText(): (name: string | null | undefined, when?: boolean) => string {
   const { t } = useTranslation('common');
-  return name => (name ? `[${t('demoData.nameBadge')}] ${name}` : '');
+  return (name, when = true) => (name ? (when ? `[${t('demoData.nameBadge')}] ${name}` : name) : '');
 }

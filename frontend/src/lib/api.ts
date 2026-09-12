@@ -1,7 +1,15 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import demoAdapter from './demoAdapter';
+import { hostMode } from '../config/hosts';
+import { markDemoResponse } from './apiDemoMarking';
+import { acceptsIncludeDemo, isDemoHidden } from './adminDemoVisibility';
 
 export const DEMO_MODE = process.env.REACT_APP_DEMO_MODE === 'true';
+
+// The admin console always talks to the real API, even in a demo-mode build:
+// its demo clinics are real is_demo rows now (ASAMA-3A), marked from the data
+// itself. The app host keeps the in-browser demo adapter.
+export const USES_DEMO_ADAPTER = DEMO_MODE && hostMode !== 'admin';
 
 // ── Token helpers ─────────────────────────────────────────────────────────────
 
@@ -26,18 +34,25 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3001',
   // withCredentials kept so same-origin cookie fallback still works during dev
   withCredentials: true,
-  // Demo mode never touches the network — no backend is deployed tonight.
+  // Demo mode on the app host never touches the network.
   // See src/lib/demoAdapter.ts and src/data/demoData.ts.
-  ...(DEMO_MODE ? { adapter: demoAdapter } : {}),
+  ...(USES_DEMO_ADAPTER ? { adapter: demoAdapter } : {}),
 });
 
 // ── Request interceptor — attach Bearer token ─────────────────────────────────
 
-api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+type TrackedConfig = InternalAxiosRequestConfig & { demoPath?: string };
+
+api.interceptors.request.use((config: TrackedConfig) => {
   const token = TokenStore.getAccess();
   if (token) {
     config.headers = config.headers ?? {};
     config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  // The page that asked — demo marks go to it even if the answer lands later.
+  config.demoPath = window.location.pathname;
+  if (hostMode === 'admin' && isDemoHidden() && acceptsIncludeDemo(config.url)) {
+    config.params = { ...(config.params ?? {}), includeDemo: 'false' };
   }
   return config;
 });
@@ -75,7 +90,11 @@ function flushQueue(token: string | null, err: unknown = null) {
 }
 
 api.interceptors.response.use(
-  res => res,
+  res => {
+    // Demo rows mark the screen that shows them — see lib/apiDemoMarking.ts.
+    markDemoResponse(res, (res.config as TrackedConfig).demoPath ?? window.location.pathname);
+    return res;
+  },
   async error => {
     const original = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
