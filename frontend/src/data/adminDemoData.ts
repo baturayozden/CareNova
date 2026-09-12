@@ -1,3 +1,4 @@
+import { demoSource, registerDemoNames } from '../lib/demoProvenance';
 // Platform-wide demo data for the admin console (admin.carenova.ai).
 // Realistic Turkish health-tourism clinics, generic-but-plausible names
 // ("Nova Hair Clinic", "Ege Estetik") — never a real clinic's name or brand.
@@ -81,7 +82,7 @@ export const ONBOARDING_STEPS = [
   'Bilgi bankası', 'Fiyat/yetki onayı', 'KVKK metinleri', 'Test → canlı',
 ] as const;
 
-export const adminClinics: AdminClinic[] = [
+export const adminClinics: AdminClinic[] = demoSource('adminDemoData.adminClinics', [
   {
     id: 'clinic-nova-hair', name: 'Nova Hair Clinic', legalName: 'Nova Saç Ekimi Sağlık Hiz. A.Ş.',
     city: 'İstanbul', branches: ['hair_transplant'], plan: 'klinik', status: 'active',
@@ -225,7 +226,7 @@ export const adminClinics: AdminClinic[] = [
     compliance: { licenseOnFile: false, complicationInsurance: false, complicationInsuranceExpiry: null, verbisRegistered: false, foreignLanguageStaffRatio: 0, ek1TotalConsents: 0, ek1RevokedConsents: 0, ek1HasUnconsentedMedia: false, crossBorderNotified: false, crossBorderNotifiedAt: null },
     billing: { periodicity: 'monthly', amountEur: 0, status: 'trial', nextChargeAt: daysFromNow(29) },
   },
-];
+]);
 
 export const BRANCH_LABELS: Record<string, string> = {
   hair_transplant: 'Saç Ekimi', dental: 'Diş', aesthetic_surgery: 'Estetik Cerrahi',
@@ -242,20 +243,20 @@ export interface AdminDemoRequest {
   status: 'new' | 'contacted' | 'demo_done' | 'won' | 'lost';
   note: string;
 }
-export const adminDemoRequests: AdminDemoRequest[] = [
+export const adminDemoRequests: AdminDemoRequest[] = demoSource('adminDemoData.adminDemoRequests', [
   { id: 'dr-1', name: 'Dr. Hakan Sezer', email: 'hakan@sezerklinik.com', clinic: 'Sezer Saç Ekimi', city: 'İstanbul', branch: 'hair_transplant', phone: '+90 532 111 2233', createdAt: hoursAgo(4), status: 'new', note: '' },
   { id: 'dr-2', name: 'Elif Yalçın', email: 'elif@yalcindent.com', clinic: 'Yalçın Diş Kliniği', city: 'Bursa', branch: 'dental', phone: '+90 533 222 3344', createdAt: daysAgo(1), status: 'contacted', note: 'Perşembe demo planlandı.' },
   { id: 'dr-3', name: 'Mert Aksoy', email: 'mert@aksoyestetik.com', clinic: 'Aksoy Estetik', city: 'İzmir', branch: 'aesthetic_surgery', phone: '+90 535 333 4455', createdAt: daysAgo(3), status: 'demo_done', note: 'Fiyat konusunda tereddütlü, takip edilecek.' },
   { id: 'dr-4', name: 'Zeynep Kurt', email: 'zeynep@kurtgoz.com', clinic: 'Kurt Göz Merkezi', city: 'Antalya', branch: 'eye_lasik', phone: '+90 536 444 5566', createdAt: daysAgo(7), status: 'won', note: 'Nova Hair Clinic olarak değil, ayrı yeni klinik — sözleşme imzalandı.' },
   { id: 'dr-5', name: 'Caner Bulut', email: 'caner@bulutivf.com', clinic: 'Bulut Tüp Bebek', city: 'Ankara', branch: 'ivf', phone: '+90 537 555 6677', createdAt: daysAgo(10), status: 'lost', note: 'Bütçe uymadı.' },
   { id: 'dr-6', name: 'Aslı Demirtaş', email: 'asli@demirtasortopedi.com', clinic: 'Demirtaş Ortopedi', city: 'Antalya', branch: 'orthopedics', phone: '+90 538 666 7788', createdAt: hoursAgo(20), status: 'new', note: '' },
-];
+]);
 
 // ── Denetim kaydı (C.11) ─────────────────────────────────────────────────
 export interface AdminAuditEvent {
   id: string; actor: string; action: string; clinicId: string | null; clinicName: string | null; at: string;
 }
-export const adminAuditEvents: AdminAuditEvent[] = [
+export const adminAuditEvents: AdminAuditEvent[] = demoSource('adminDemoData.adminAuditEvents', [
   { id: 'ae-1', actor: 'Baturay Özden', action: 'Klinik onaylandı', clinicId: 'clinic-marmara-ivf', clinicName: 'Marmara Tüp Bebek', at: daysAgo(150) },
   { id: 'ae-2', actor: 'Baturay Özden', action: 'Plan değiştirildi: Solo → Klinik', clinicId: 'clinic-ege-estetik', clinicName: 'Ege Estetik', at: daysAgo(60) },
   { id: 'ae-3', actor: 'Baturay Özden', action: 'Klinik askıya alındı (ödeme gecikmesi)', clinicId: 'clinic-istanbul-onkoloji', clinicName: 'İstanbul Onkoloji Danışma', at: daysAgo(15) },
@@ -263,7 +264,7 @@ export const adminAuditEvents: AdminAuditEvent[] = [
   { id: 'ae-5', actor: 'Baturay Özden', action: 'Kota eklendi: +5000 AI konuşma', clinicId: 'clinic-karadeniz-estetik', clinicName: 'Karadeniz Estetik ve Cerrahi', at: hoursAgo(40) },
   { id: 'ae-6', actor: 'Baturay Özden', action: 'Klinik olarak görüntüleme başlatıldı', clinicId: 'clinic-nova-hair', clinicName: 'Nova Hair Clinic', at: hoursAgo(2) },
   { id: 'ae-7', actor: 'Baturay Özden', action: 'Klinik olarak görüntüleme sonlandırıldı', clinicId: 'clinic-nova-hair', clinicName: 'Nova Hair Clinic', at: hoursAgo(1.9) },
-];
+]);
 
 // ── Kullanıcılar (C.10) ──────────────────────────────────────────────────
 export interface AdminPlatformUser {
@@ -282,7 +283,7 @@ export const CLINIC_ROLE_LABELS: Record<AdminClinicUser['role'], string> = {
   klinik_sahibi: 'Klinik Sahibi', operasyon_muduru: 'Operasyon Müdürü', hasta_danismani: 'Hasta Danışmanı',
   doktor: 'Doktor', koordinator: 'Koordinatör', tercuman: 'Tercüman', muhasebe: 'Muhasebe',
 };
-export const adminClinicUsers: AdminClinicUser[] = [
+export const adminClinicUsers: AdminClinicUser[] = demoSource('adminDemoData.adminClinicUsers', [
   { id: 'cu-1', name: 'Emre Yıldız', email: 'emre@novahairclinic.com', clinicId: 'clinic-nova-hair', clinicName: 'Nova Hair Clinic', role: 'klinik_sahibi', lastLoginAt: hoursAgo(1) },
   { id: 'cu-2', name: 'Selin Kaya', email: 'selin@novahairclinic.com', clinicId: 'clinic-nova-hair', clinicName: 'Nova Hair Clinic', role: 'doktor', lastLoginAt: hoursAgo(3) },
   { id: 'cu-3', name: 'Ayşe Demir', email: 'ayse@novahairclinic.com', clinicId: 'clinic-nova-hair', clinicName: 'Nova Hair Clinic', role: 'hasta_danismani', lastLoginAt: hoursAgo(0.5) },
@@ -290,10 +291,10 @@ export const adminClinicUsers: AdminClinicUser[] = [
   { id: 'cu-5', name: 'Merve Öz', email: 'merve@anadoludental.com.tr', clinicId: 'clinic-anadolu-dental', clinicName: 'Anadolu Dental', role: 'koordinator', lastLoginAt: hoursAgo(2) },
   { id: 'cu-6', name: 'Deniz Ak', email: 'deniz@anadoludental.com.tr', clinicId: 'clinic-anadolu-dental', clinicName: 'Anadolu Dental', role: 'muhasebe', lastLoginAt: daysAgo(1) },
   { id: 'cu-7', name: 'Fatma Şen', email: 'fatma@karadenizestetik.com', clinicId: 'clinic-karadeniz-estetik', clinicName: 'Karadeniz Estetik ve Cerrahi', role: 'tercuman', lastLoginAt: hoursAgo(5) },
-];
+]);
 
 // ── Platform sağlığı (C.12) ──────────────────────────────────────────────
-export const adminHealth = {
+export const adminHealth = demoSource('adminDemoData.adminHealth', {
   webhookSuccessRate: 97.4,
   avgFirstReplySeconds: 4.2,
   aiErrorRate: 0.6,
@@ -302,4 +303,18 @@ export const adminHealth = {
     { id: 'err-2', clinicName: 'Karadeniz Estetik ve Cerrahi', message: 'AI yanıt formatı geçersiz, yeniden denendi', at: hoursAgo(6) },
     { id: 'err-3', clinicName: 'Ege Estetik', message: 'WhatsApp API 429 (rate limit)', at: hoursAgo(9) },
   ],
-};
+});
+
+// ── Demo provenance ─────────────────────────────────────────────────────────
+// Fabricated clinic, legal-entity and person names. NOT the audit-log actor or
+// adminPlatformUsers: both are the real platform owner (see REAL_PEOPLE in
+// lib/demoProvenance.ts) — the events are invented, he is not.
+registerDemoNames([
+  ...adminClinics.map(c => c.name),
+  ...adminClinics.map(c => c.legalName),
+  ...adminDemoRequests.map(r => r.name),
+  ...adminDemoRequests.map(r => r.clinic),
+  ...adminAuditEvents.map(e => e.clinicName),
+  ...adminClinicUsers.map(u => u.name),
+  ...adminClinicUsers.map(u => u.clinicName),
+]);

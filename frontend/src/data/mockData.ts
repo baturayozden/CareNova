@@ -1,10 +1,11 @@
+import { demoSource, registerDemoNames } from '../lib/demoProvenance';
 import { Lead, ActivityEvent } from '../types';
 
 const now = new Date();
 const minsAgo = (m: number) => new Date(now.getTime() - m * 60 * 1000).toISOString();
 const daysAgo = (d: number) => new Date(now.getTime() - d * 24 * 60 * 60 * 1000).toISOString();
 
-export const leads: Lead[] = [
+export const leads: Lead[] = demoSource('mockData.leads', [
   {
     id: '1',
     name: 'James Thornton',
@@ -93,9 +94,9 @@ export const leads: Lead[] = [
     lastContact: minsAgo(95),
     aiMessages: 3, email: null, aiFollowUpEnabled: true, gdprConsentGiven: true, notes: null, treatment: null, treatmentValue: null, leadScore: null, scoreLabel: null, scoreTags: [], scoreReasoning: null, assignedTo: null, createdAt: daysAgo(7),
   },
-];
+]);
 
-export const activityEvents: ActivityEvent[] = [
+export const activityEvents: ActivityEvent[] = demoSource('mockData.activityEvents', [
   {
     id: 'e1',
     leadName: 'James Thornton',
@@ -176,4 +177,9 @@ export const activityEvents: ActivityEvent[] = [
     timestamp: minsAgo(180),
     clinic: 'Dent Klinik İstanbul',
   },
-];
+]);
+
+// ── Demo provenance ─────────────────────────────────────────────────────────
+// Not imported by any screen today; branded anyway so that the first screen
+// that does import it is marked without anyone having to remember.
+registerDemoNames(leads.map(l => l.name));

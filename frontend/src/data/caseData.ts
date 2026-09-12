@@ -1,3 +1,4 @@
+import { demoSource, registerDemoNames } from '../lib/demoProvenance';
 // Case File demo data (GECE-2-BRIEFI.md Bölüm D.2/D.5) — CareNova's central
 // concept for health tourism (patient + companions + medical file + quotes +
 // travel + payments + aftercare), matching backend/src/migrations/057's
@@ -65,31 +66,31 @@ const daysAgo = (n: number) => new Date(now.getTime() - n * 86400000).toISOStrin
 const daysFromNow = (n: number) => new Date(now.getTime() + n * 86400000).toISOString();
 const hoursAgo = (n: number) => new Date(now.getTime() - n * 3600000).toISOString();
 
-export const caseDoctors = [
+export const caseDoctors = demoSource('caseData.caseDoctors', [
   { id: 'doc-1', name: 'Dr. Emre Yıldız', branch: 'hair_transplant', registrationNo: 'TR-34-88213', languages: ['tr', 'en', 'de'] },
   { id: 'doc-2', name: 'Dr. Selin Kaya', branch: 'aesthetic_surgery', registrationNo: 'TR-35-44120', languages: ['tr', 'en'] },
   { id: 'doc-3', name: 'Dr. Mert Aydın', branch: 'eye_lasik', registrationNo: 'TR-06-91002', languages: ['tr', 'en', 'ar'] },
   { id: 'doc-4', name: 'Dr. Ayla Çelik', branch: 'dental', registrationNo: 'TR-34-55671', languages: ['tr', 'en', 'ru'] },
   { id: 'doc-5', name: 'Dr. Kerem Ateş', branch: 'ivf', registrationNo: 'TR-34-23890', languages: ['tr', 'en'] },
-];
-export const caseConsultants = [
+]);
+export const caseConsultants = demoSource('caseData.caseConsultants', [
   { id: 'con-1', name: 'Ayşe Demir', languages: ['tr', 'en', 'de'] },
   { id: 'con-2', name: 'Jonas Fischer', languages: ['en', 'de'] },
   { id: 'con-3', name: 'Layla Hassan', languages: ['en', 'ar'] },
   { id: 'con-4', name: 'Olga Petrova', languages: ['en', 'ru'] },
-];
-export const caseCoordinators = [
+]);
+export const caseCoordinators = demoSource('caseData.caseCoordinators', [
   { id: 'coord-1', name: 'Kaan Şahin' },
   { id: 'coord-2', name: 'Elif Aksoy' },
-];
-export const caseInterpreters = [
+]);
+export const caseInterpreters = demoSource('caseData.caseInterpreters', [
   { id: 'int-1', name: 'Reem Al-Sayed', languages: ['ar'] },
   { id: 'int-2', name: 'Natasha Ivanova', languages: ['ru'] },
   { id: 'int-3', name: 'Hans Weber', languages: ['de'] },
-];
+]);
 
 // One case per status value at minimum (brief: "farklı durumlarda 12-15 vaka").
-export const cases: CaseFile[] = [
+export const cases: CaseFile[] = demoSource('caseData.cases', [
   {
     id: 'case-1', caseNumber: 'CN-2026-0201', patientName: 'Michael Brandt', patientCountryFlag: '🇩🇪', patientCountry: 'Germany', patientLanguage: 'de', patientAge: 34,
     companions: [], branch: 'hair_transplant', status: 'new',
@@ -343,7 +344,7 @@ export const cases: CaseFile[] = [
     quotes: [], travel: null, aftercare: [],
     auditLog: [{ actor: 'AI', action: 'Ön-değerlendirme tamamlandı, kronik hastalık beyanı işaretlendi', at: daysAgo(3) }],
   },
-];
+]);
 
 // "Bugünün programı" (GECE-3-BRIEFI.md Bölüm C) — demo-only, hand-picked
 // same-day schedule. The real backend models this per-case as
@@ -359,9 +360,28 @@ export type ScheduleEntry = {
   patientName: string;
   type: 'arrival' | 'consultation' | 'procedure' | 'checkup' | 'departure';
 };
-export const todaysSchedule: ScheduleEntry[] = [
+export const todaysSchedule: ScheduleEntry[] = demoSource('caseData.todaysSchedule', [
   { time: '09:00', caseId: 'case-9', patientName: 'Hassan Baig', type: 'consultation' },
   { time: '11:30', caseId: 'case-10', patientName: 'Marco Rossi', type: 'checkup' },
   { time: '14:00', caseId: 'case-8', patientName: 'David Kim', type: 'arrival' },
   { time: '16:00', caseId: 'case-7', patientName: 'Fatima Zohra', type: 'procedure' },
-];
+]);
+
+// ── Demo provenance ─────────────────────────────────────────────────────────
+// Every person name invented in this file, for the record-level marker audit
+// (lib/demoNameAudit.ts). Clinic staff, patients and companions are fictional.
+// Audit-log actors are registered only when they are PEOPLE: "Sistem" and "AI"
+// are the labels for automated actions, not invented individuals — and
+// "Sistem" is also ordinary UI copy elsewhere (e.g. the Branches page's system
+// template label), where registering it would flag a word as a fake person.
+const NON_PERSON_ACTORS = ['Sistem', 'System', 'AI'];
+registerDemoNames([
+  ...cases.map(c => c.patientName),
+  ...cases.flatMap(c => c.companions.map(p => p.name)),
+  ...cases.flatMap(c => c.auditLog.map(a => a.actor)).filter(a => NON_PERSON_ACTORS.indexOf(a) === -1),
+  ...caseDoctors.map(d => d.name),
+  ...caseConsultants.map(d => d.name),
+  ...caseCoordinators.map(d => d.name),
+  ...caseInterpreters.map(d => d.name),
+  ...todaysSchedule.map(s => s.patientName),
+]);

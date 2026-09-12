@@ -49,5 +49,11 @@
     "receptionist": "Coordinator",
     "sales": "Patient Consultant",
     "nurse": "Nurse"
+  },
+  "demoData": {
+    "bannerTitle": "DEMO DATA",
+    "bannerBody": "The patient and clinic records on this screen are examples for illustration and are not real.",
+    "nameBadge": "SAMPLE",
+    "nameBadgeLabel": "Sample record — not a real person or clinic"
   }
 }

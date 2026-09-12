@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import './i18n';
 import App from './App';
+import { enableDemoTracking } from './lib/demoProvenance';
 import reportWebVitals from './reportWebVitals';
 
 const container = document.getElementById('root') as HTMLElement;
@@ -18,6 +19,12 @@ const container = document.getElementById('root') as HTMLElement;
 // its captured mid-animation opacity:0 forever, since no React/JS ever
 // touches it again.
 container.innerHTML = '';
+
+// Only reads that happen from here on count toward the demo-data banner. Every
+// import above has already run, including modules that derive data from the
+// fabricated collections at load time (commissionDemoData, via demoAdapter) —
+// those reads belong to no page and must not mark the first one opened.
+enableDemoTracking();
 
 const root = ReactDOM.createRoot(container);
 root.render(

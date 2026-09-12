@@ -1,3 +1,4 @@
+import { demoSource, registerDemoNames } from '../lib/demoProvenance';
 import { ApiLead, Message, ConversationSummary, DashboardStats, ApiActivity } from '../types';
 
 // Realistic Turkish health-tourism demo data (PAKET 5 / REACT_APP_DEMO_MODE).
@@ -45,7 +46,7 @@ export const DEMO_SUPER_ADMIN = {
   financeEnabled: true,
 };
 
-export const demoLeads: ApiLead[] = [
+export const demoLeads: ApiLead[] = demoSource('demoData.demoLeads', [
   {
     id: 'lead-1', tenantId: DEMO_TENANT_ID, tenantName: DEMO_TENANT_NAME,
     phone: '+49 151 2345 6789', firstName: 'Lukas', lastName: 'Weber',
@@ -93,9 +94,9 @@ export const demoLeads: ApiLead[] = [
     scoreReasoning: 'Tedavi tamamlandı, bakım hattı takibi sürüyor.',
     assignedTo: 'Dr. Mert Aydın', createdAt: daysAgo(34), updatedAt: daysAgo(1),
   },
-];
+]);
 
-export const demoMessages: Record<string, Message[]> = {
+export const demoMessages: Record<string, Message[]> = demoSource('demoData.demoMessages', {
   'lead-1': [
     { id: 'm1-1', leadId: 'lead-1', direction: 'inbound', aiGenerated: false, status: 'read', createdAt: daysAgo(6),
       content: 'Hallo! Ich interessiere mich für eine Haartransplantation. Können Sie mir einen Preis nennen?' },
@@ -126,9 +127,9 @@ export const demoMessages: Record<string, Message[]> = {
     { id: 'm4-2', leadId: 'lead-4', direction: 'inbound', aiGenerated: false, status: 'read', createdAt: daysAgo(1),
       content: '[фото отправлено] Всё отлично, спасибо!' },
   ],
-};
+});
 
-export const demoConversations: ConversationSummary[] = demoLeads.map(l => {
+export const demoConversations: ConversationSummary[] = demoSource('demoData.demoConversations', demoLeads.map(l => {
   const msgs = demoMessages[l.id] || [];
   const lastOut = [...msgs].reverse().find(m => m.direction === 'outbound');
   const lastIn = [...msgs].reverse().find(m => m.direction === 'inbound');
@@ -145,30 +146,41 @@ export const demoConversations: ConversationSummary[] = demoLeads.map(l => {
     actionRequired: l.status === 'qualified' || l.status === 'booked',
     aiFollowUpEnabled: l.aiFollowUpEnabled, leadCreatedAt: l.createdAt,
   };
-});
+}));
 
-export const demoActivityEvents: ApiActivity[] = demoLeads.flatMap(l => {
+export const demoActivityEvents: ApiActivity[] = demoSource('demoData.demoActivityEvents', demoLeads.flatMap(l => {
   const msgs = demoMessages[l.id] || [];
   return msgs.slice(-1).map(m => ({
     id: `evt-${m.id}`, leadName: `${l.firstName} ${l.lastName}`,
     type: (m.direction === 'outbound' ? 'message_sent' : 'response_received') as 'message_sent' | 'response_received',
     content: m.content, timestamp: m.createdAt, clinic: DEMO_TENANT_NAME, aiGenerated: m.aiGenerated,
   }));
-});
+}));
 
-export const demoStats: DashboardStats = {
+export const demoStats: DashboardStats = demoSource('demoData.demoStats', {
   total: demoLeads.length, booked: demoLeads.filter(l => l.status === 'booked' || l.status === 'attended').length,
   aiMessages: Object.values(demoMessages).flat().filter(m => m.aiGenerated).length,
   recoveryRate: 68,
-};
+});
 
-export const demoDoctors = [
+export const demoDoctors = demoSource('demoData.demoDoctors', [
   { id: 'dr-1', name: 'Dr. Emre Yıldız', title: 'Saç Ekimi Uzmanı', branch: 'Saç Ekimi', languages: ['tr', 'en', 'de'], registrationNo: 'TR-34-88213' },
   { id: 'dr-2', name: 'Dr. Selin Kaya', title: 'Plastik ve Rekonstrüktif Cerrahi', branch: 'Estetik Cerrahi', languages: ['tr', 'en'], registrationNo: 'TR-34-77410' },
   { id: 'dr-3', name: 'Dr. Mert Aydın', title: 'Göz Hastalıkları Uzmanı', branch: 'Göz', languages: ['tr', 'en', 'ru'], registrationNo: 'TR-06-55219' },
-];
+]);
 
-export const demoConsultants = [
+export const demoConsultants = demoSource('demoData.demoConsultants', [
   { id: 'pc-1', name: 'Ayşe Demir', role: 'Hasta Danışmanı', languages: ['tr', 'ar', 'en'] },
   { id: 'pc-2', name: 'Jonas Fischer', role: 'Hasta Danışmanı', languages: ['de', 'en', 'tr'] },
-];
+]);
+
+// ── Demo provenance ─────────────────────────────────────────────────────────
+// Fabricated leads and clinic staff. DEMO_USER / DEMO_SUPER_ADMIN are left
+// unbranded on purpose: they are the signed-in session identity shown in the
+// sidebar on EVERY page, not records a screen presents as data — branding them
+// would put the banner on Settings and the login redirect too.
+registerDemoNames([
+  ...demoLeads.map(l => `${l.firstName} ${l.lastName}`.trim()),
+  ...demoDoctors.map(d => d.name),
+  ...demoConsultants.map(c => c.name),
+]);

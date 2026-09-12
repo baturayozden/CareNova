@@ -49,5 +49,11 @@
     "receptionist": "Koordinatör",
     "sales": "Hasta Danışmanı",
     "nurse": "Hemşire"
+  },
+  "demoData": {
+    "bannerTitle": "DEMO VERİ",
+    "bannerBody": "Bu ekrandaki hasta ve klinik kayıtları örnek amaçlıdır, gerçek değildir.",
+    "nameBadge": "ÖRNEK",
+    "nameBadgeLabel": "Örnek kayıt — gerçek bir kişi ya da klinik değil"
   }
 }

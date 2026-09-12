@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import DemoDataBanner from '../components/DemoDataBanner';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard, Building2, ListChecks, MessageCircle, Cpu, Layers,
@@ -165,6 +166,7 @@ export default function AdminLayout() {
           </nav>
         </header>
         <main className="flex-1 p-4 md:p-6 min-w-0">
+          <DemoDataBanner className="mb-4 md:mb-6" />
           <Outlet />
         </main>
       </div>

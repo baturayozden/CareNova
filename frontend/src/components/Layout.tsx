@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Sidebar from './Sidebar';
 import RouteErrorBoundary from './RouteErrorBoundary';
+import DemoDataBanner from './DemoDataBanner';
 
 export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -40,6 +41,9 @@ export default function Layout() {
 
       {/* ── Main content — top padding on mobile for fixed top-bar ────────── */}
       <main className="flex-1 overflow-y-auto bg-surface-page pt-14 md:pt-0">
+        {/* Shows itself only on screens that read fabricated records — see
+            DemoDataBanner. Lives here, not in pages, so no page can omit it. */}
+        <DemoDataBanner className="mx-4 mt-4 md:mx-6 md:mt-6" />
         <RouteErrorBoundary>
           <Outlet />
         </RouteErrorBoundary>

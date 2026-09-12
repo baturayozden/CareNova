@@ -9,6 +9,7 @@
 // Fischer, Layla Hassan, Olga Petrova are the same 4 people /cases shows
 // in its own DANIŞMAN column.
 import { cases, caseConsultants, CaseStatus } from './caseData';
+import { demoSource } from '../lib/demoProvenance';
 import { DEMO_TENANT_NAME } from './demoData';
 
 function dealStatusFor(status: CaseStatus): string {
@@ -38,7 +39,7 @@ const consultantByName = new Map(caseConsultants.map(c => [c.name, c]));
 // Only cases with a locked quote represent an actual agreed deal — a case
 // still in qualification/pre-assessment (no quotes[]) has no revenue to
 // attribute yet, same rule CaseFileDetailPage's own Quote tab already uses.
-export const demoCommissionDeals = cases
+export const demoCommissionDeals = demoSource('commissionDemoData.deals', cases
   .filter(c => c.quotes.length > 0 && c.assignedConsultant)
   .map(c => {
     const consultant = consultantByName.get(c.assignedConsultant as string)!;
@@ -62,7 +63,7 @@ export const demoCommissionDeals = cases
       patient_name: c.patientName,
       verification_status: 'verified',
     };
-  });
+  }));
 
 function computeRecords() {
   const byStaff = new Map<string, { staffId: string; total: number; count: number }>();
@@ -106,13 +107,13 @@ function computeRecords() {
     .sort((a, b) => Number(b.total_commission) - Number(a.total_commission));
 }
 
-export const demoCommissionRecords = computeRecords();
+export const demoCommissionRecords = demoSource('commissionDemoData.records', computeRecords());
 
 const quotaTotal = demoCommissionDeals
   .filter(d => d.status !== 'cancelled')
   .reduce((s, d) => s + Number(d.agreed_amount), 0);
 
-export const demoCommissionPeriod = {
+export const demoCommissionPeriod = demoSource('commissionDemoData.period', {
   id: 'period-2026-09',
   period_label: 'Eylül 2026',
   period_start: '2026-09-01',
@@ -127,12 +128,12 @@ export const demoCommissionPeriod = {
   created_at: '2026-09-01T00:00:00.000Z',
   locked_by_first: null as string | null,
   locked_by_last: null as string | null,
-};
+});
 
 // Reused by both Commission's Deals tab AND /patients' "Assigned to" filter
 // (both call GET /api/clinics/:id/sales-users) — a single, real staff list
 // instead of each screen deriving its own ad-hoc one.
-export const demoSalesStaff = caseConsultants.map(c => {
+export const demoSalesStaff = demoSource('commissionDemoData.salesStaff', caseConsultants.map(c => {
   const [firstName, ...rest] = c.name.split(' ');
   return { id: c.id, firstName, lastName: rest.join(' '), email: `${firstName.toLowerCase()}@carenova.ai` };
-});
+}));
