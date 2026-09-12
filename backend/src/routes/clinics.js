@@ -181,7 +181,7 @@ router.get('/', async (req, res) => {
 // POST /api/clinics  — create new clinic (super admin only)
 // ---------------------------------------------------------------------------
 router.post('/', requireSuperAdmin, async (req, res) => {
-  const { name, address, phone, email, website, planTier = 'starter' } = req.body;
+  const { name, address, phone, email, website, planTier = 'solo' } = req.body; // CareNova packages: solo | klinik | grup (migration 067)
   if (!name?.trim()) return res.status(400).json({ error: 'Clinic name is required' });
 
   const DEFAULT_PASSWORD = 'CareNova2026!';
