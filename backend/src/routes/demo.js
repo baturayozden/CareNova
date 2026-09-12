@@ -12,6 +12,7 @@ const { Resend } = require('resend');
 const { authenticate, requireRole } = require('../middleware/auth');
 
 const FROM          = 'CareNova AI <noreply@carenova.ai>';
+const DEMO_REQUEST_STATUSES = ['new', 'contacted', 'demo_done', 'won', 'lost'];
 const NOTIFY_EMAIL  = 'baturay@carenova.ai';
 const ADMIN_URL     = process.env.ADMIN_URL || 'http://localhost:3001';
 
@@ -200,10 +201,14 @@ router.post('/', async (req, res) => {
 });
 
 // GET /api/demo  (super_admin only)
-router.get('/', ...requireRole('super_admin'), async (_req, res) => {
+// `?includeDemo=false` hides seeded example requests (is_demo, migration 068),
+// the same switch the admin platform endpoints take.
+router.get('/', ...requireRole('super_admin'), async (req, res) => {
   try {
+    const includeDemo = !(req.query.includeDemo === 'false' || req.query.includeDemo === '0');
     const { rows } = await pool.query(
-      `SELECT * FROM demo_requests ORDER BY created_at DESC`,
+      `SELECT * FROM demo_requests WHERE ($1::boolean OR is_demo = false) ORDER BY created_at DESC`,
+      [includeDemo],
     );
     return res.json({ requests: rows });
   } catch (err) {
@@ -222,8 +227,9 @@ router.patch('/:id/status', ...requireRole('super_admin'), async (req, res) => {
     return res.status(400).json({ error: 'Provide at least one of: status, notes.' });
   }
 
-  if (status !== undefined && !['pending', 'contacted', 'converted'].includes(status)) {
-    return res.status(400).json({ error: 'Invalid status. Must be pending | contacted | converted.' });
+  // CareNova sales funnel (migration 068), replacing CareDental's pending/contacted/converted.
+  if (status !== undefined && !DEMO_REQUEST_STATUSES.includes(status)) {
+    return res.status(400).json({ error: `Invalid status. Must be ${DEMO_REQUEST_STATUSES.join(' | ')}.` });
   }
 
   const fields = [];

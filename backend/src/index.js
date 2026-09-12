@@ -54,11 +54,18 @@ app.use(cors({
     }
   },
   credentials: true,
+  // Readable by the browser cross-origin; the frontend uses it to mark demo
+  // tenant data (middleware/tenantDemoHeader.js).
+  exposedHeaders: ['X-Tenant-Demo'],
 }));
 app.use(express.json({
   verify: (req, _res, buf) => { req.rawBody = buf; },
 }));
 app.use(cookieParser());
+
+// X-Tenant-Demo on every response for an authenticated tenant user — see the
+// middleware's header for why a header and not a body field.
+app.use(require('./middleware/tenantDemoHeader').tenantDemoHeader);
 
 // GECE-3-BRIEFI.md Bölüm F: impersonation sessions may never write, only
 // read — enforced globally (harmless no-op for every request that doesn't
@@ -114,6 +121,12 @@ app.use('/api/whatsapp', authenticate, require('./routes/whatsappApi'));
 app.use('/api/activity', authenticate, require('./routes/activity'));
 app.use('/api/insights', authenticate, require('./routes/insights'));
 
+// Super Admin Console read endpoints (platform-only; requireRole inside the
+// router already includes authenticate). Mounted BEFORE /api/admin: that
+// router gates every path under it to super_admin, so mounted after it, an
+// `admin`-role user could never reach these super_admin+admin endpoints.
+app.use('/api/admin/platform', require('./routes/adminPlatform'));
+
 // Super-admin management
 app.use('/api/admin', require('./routes/admin'));
 
@@ -142,10 +155,6 @@ app.use('/api/case-files', authenticate, require('./routes/caseFiles'));
 // Branch templates (pre-assessment questions, AI pricing authority, IVF
 // donor-gamete rule, etc. — CARENOVA-STRATEJI.md Bölüm 7/M2)
 app.use('/api/branch-templates', authenticate, require('./routes/branchTemplates'));
-
-// Super Admin Console read endpoints (platform-only; requireRole inside the
-// router already includes authenticate — mirrors routes/admin.js's own mount)
-app.use('/api/admin/platform', require('./routes/adminPlatform'));
 
 // Billing entities (legal entity list per tenant)
 app.use('/api/billing-entities', authenticate, require('./routes/billingEntities'));

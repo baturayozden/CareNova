@@ -40,6 +40,7 @@ function safeUser(row) {
     isActive:  row.is_active,
     tenantId:  row.tenant_id ?? null,
     createdAt: row.created_at,
+    lastLoginAt: row.last_login_at ?? null,
   };
 }
 
