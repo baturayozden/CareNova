@@ -116,7 +116,11 @@ async function insertMessages(client, rows) {
   );
 }
 
-async function seedPlatform(client, { now = new Date() } = {}) {
+async function seedPlatform(client) {
+  // Every timestamp is an offset from the DATABASE's now() — not this machine's
+  // clock, not a fixed date. A re-seed is one command; a forgotten one still
+  // leaves a coherent timeline. (now() is fixed for the whole transaction.)
+  const { rows: [{ now }] } = await client.query('SELECT now() AS now');
   const purged = await purgePlatform(client);
   const stats = { tenants: 0, users: 0, messages: 0, demoRequests: 0 };
   const { rows: [{ month_start: monthStart }] } = await client.query(`SELECT date_trunc('month', $1::timestamptz) AS month_start`, [now]);

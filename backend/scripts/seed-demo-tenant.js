@@ -28,6 +28,8 @@
 //     the demo tenant's id. It refuses to touch a tenant with is_demo = false.
 //   * The login password is never taken from argv (shell history) -- it comes
 //     from a no-echo prompt, or SEED_USER_PASSWORD for non-interactive use.
+//     `--keep-login` re-seeds without touching the existing password.
+//   * Timestamps are relative to the database's now() (see CASE_DATA_NOW_MS).
 //     Same reasoning as scripts/set-admin-password.js.
 
 require('dotenv').config({ override: true });
@@ -43,6 +45,14 @@ const TENANT_NAME = 'CareNova Demo Klinik';
 const TENANT_PLAN_TIER = 'klinik';
 const BCRYPT_ROUNDS = 12;
 const MIN_LENGTH = 8;
+
+// caseData.ts builds every date relative to its own fixed "now"
+// (frontend/src/data/caseData.ts:59). Seeded rows keep the same DISTANCE from
+// the database's now() instead of the absolute date: a re-seed is one command,
+// and a forgotten re-seed still reads as a coherent timeline ("3 days ago"
+// and "5 days ago" stay 2 days apart) rather than a date frozen in September.
+const CASE_DATA_NOW_MS = Date.parse('2026-09-07T08:00:00Z');
+const agoMs = iso => Math.max(0, CASE_DATA_NOW_MS - Date.parse(iso));
 
 // Clinic role ids (roles table, migration 059).
 const ROLE = {
@@ -177,15 +187,18 @@ async function seed(client, loginEmail, loginPassword) {
   console.log(`Personel: ${staffByName.size} kullanici (doktor/danisman/koordinator/tercuman)`);
 
   // ── login user ────────────────────────────────────────────────────────────
-  const loginHash = await bcrypt.hash(loginPassword, BCRYPT_ROUNDS);
+  // loginPassword === null (--keep-login): the existing password is left as it
+  // is; a new user gets an unusable hash (set it later with set-admin-password.js).
+  const loginHash = loginPassword === null ? await unusableHash() : await bcrypt.hash(loginPassword, BCRYPT_ROUNDS);
   const { rows: [loginUser] } = await client.query(
     `INSERT INTO users (tenant_id, role_id, email, password_hash, first_name, last_name, is_active)
      VALUES ($1,$2,$3,$4,'Demo','Kullanici',true)
      ON CONFLICT (tenant_id, email) DO UPDATE SET
        role_id = EXCLUDED.role_id,
-       password_hash = EXCLUDED.password_hash, is_active = true, updated_at = now()
+       password_hash = CASE WHEN $5 THEN users.password_hash ELSE EXCLUDED.password_hash END,
+       is_active = true, updated_at = now()
      RETURNING id`,
-    [tenantId, ROLE.operasyon_muduru, loginEmail, loginHash],
+    [tenantId, ROLE.operasyon_muduru, loginEmail, loginHash, loginPassword === null],
   );
   await client.query(
     `INSERT INTO user_tenants (user_id, tenant_id, role_id) VALUES ($1,$2,$3)
@@ -213,7 +226,8 @@ async function seed(client, loginEmail, loginPassword) {
          eligibility_note, patient_country, patient_language, currency, estimated_value,
          assigned_consultant_id, assigned_doctor_id, assigned_coordinator_id, assigned_interpreter_id,
          created_at, updated_at
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'EUR',$10,$11,$12,$13,$14,$15,$15)
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'EUR',$10,$11,$12,$13,$14,
+                 now() - ($15::bigint * interval '1 millisecond'), now() - ($15::bigint * interval '1 millisecond'))
        RETURNING id`,
       [tenantId, lead.id, c.caseNumber, c.branchKey, c.status,
         c.doctorDecision || 'pending', c.doctorNote || null,
@@ -222,7 +236,7 @@ async function seed(client, loginEmail, loginPassword) {
         staffByName.get(c.assignedDoctor) || null,
         staffByName.get(c.assignedCoordinator) || null,
         staffByName.get(c.assignedInterpreter) || null,
-        c.lastActivityAt || new Date().toISOString()],
+        c.lastActivityAt ? agoMs(c.lastActivityAt) : 0],
     );
 
     for (const comp of c.companions) {
@@ -238,8 +252,8 @@ async function seed(client, loginEmail, loginPassword) {
     for (const h of c.statusHistory) {
       await client.query(
         `INSERT INTO case_events (case_id, event_type, payload, created_at)
-         VALUES ($1,'status_change',$2,$3)`,
-        [row.id, JSON.stringify({ status: h.status }), h.at],
+         VALUES ($1,'status_change',$2, now() - ($3::bigint * interval '1 millisecond'))`,
+        [row.id, JSON.stringify({ status: h.status }), agoMs(h.at)],
       );
       events++;
     }
@@ -281,10 +295,13 @@ async function seed(client, loginEmail, loginPassword) {
       console.log('Demo platform silindi ->', JSON.stringify(platform));
     } else {
       const loginEmail = process.env.SEED_USER_EMAIL || 'demo@carenova.ai';
-      let pw = process.env.SEED_USER_PASSWORD;
-      if (!pw) pw = await readSecret(`Demo klinik kullanicisi (${loginEmail}) icin sifre (girdi gorunmez): `);
-      if (!pw || pw.length < MIN_LENGTH) {
-        throw new Error(`Sifre en az ${MIN_LENGTH} karakter olmali.`);
+      let pw = null;
+      if (!process.argv.includes('--keep-login')) {
+        pw = process.env.SEED_USER_PASSWORD;
+        if (!pw) pw = await readSecret(`Demo klinik kullanicisi (${loginEmail}) icin sifre (girdi gorunmez): `);
+        if (!pw || pw.length < MIN_LENGTH) {
+          throw new Error(`Sifre en az ${MIN_LENGTH} karakter olmali.`);
+        }
       }
       await seed(client, loginEmail, pw);
     }

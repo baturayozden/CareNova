@@ -41,10 +41,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-09-07T07:42:00.000Z'::timestamptz, '2026-09-07T07:42:00.000Z'::timestamptz
+         (now() - interval '1080000 milliseconds'), (now() - interval '1080000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"new"}'::jsonb,'2026-09-07T07:42:00.000Z')) AS v(p,at) RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"new"}'::jsonb,(now() - interval '1080000 milliseconds'))) AS v(p,at) RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -61,10 +61,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='reem.al.sayed@demo.carenova.ai'),
-         '2026-09-07T06:00:00.000Z'::timestamptz, '2026-09-07T06:00:00.000Z'::timestamptz
+         (now() - interval '7200000 milliseconds'), (now() - interval '7200000 milliseconds')
   FROM l RETURNING id
 )
-, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('Youssef Al-Amin','Eş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"new"}'::jsonb,'2026-09-05T08:00:00.000Z'),('{"status":"qualified"}'::jsonb,'2026-09-07T06:00:00.000Z')) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'dental', '[{"q":"Eksik diş sayısı","a":"4"}]'::jsonb, now() FROM cse RETURNING 1)
+, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('Youssef Al-Amin','Eş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"new"}'::jsonb,(now() - interval '172800000 milliseconds')),('{"status":"qualified"}'::jsonb,(now() - interval '7200000 milliseconds'))) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'dental', '[{"q":"Eksik diş sayısı","a":"4"}]'::jsonb, now() FROM cse RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -81,10 +81,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-09-07T03:00:00.000Z'::timestamptz, '2026-09-07T03:00:00.000Z'::timestamptz
+         (now() - interval '18000000 milliseconds'), (now() - interval '18000000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"new"}'::jsonb,'2026-09-04T08:00:00.000Z'),('{"status":"qualified"}'::jsonb,'2026-09-05T08:00:00.000Z'),('{"status":"pre_assessment"}'::jsonb,'2026-09-05T08:00:00.000Z'),('{"status":"awaiting_doctor"}'::jsonb,'2026-09-07T03:00:00.000Z')) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'hair_transplant', '[{"q":"Norwood evresi (fotoğraftan)","a":"4"},{"q":"Kronik hastalık","a":"Yok"}]'::jsonb, now() FROM cse RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"new"}'::jsonb,(now() - interval '259200000 milliseconds')),('{"status":"qualified"}'::jsonb,(now() - interval '172800000 milliseconds')),('{"status":"pre_assessment"}'::jsonb,(now() - interval '172800000 milliseconds')),('{"status":"awaiting_doctor"}'::jsonb,(now() - interval '18000000 milliseconds'))) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'hair_transplant', '[{"q":"Norwood evresi (fotoğraftan)","a":"4"},{"q":"Kronik hastalık","a":"Yok"}]'::jsonb, now() FROM cse RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -101,10 +101,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='ayla.celik@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='reem.al.sayed@demo.carenova.ai'),
-         '2026-09-07T00:00:00.000Z'::timestamptz, '2026-09-07T00:00:00.000Z'::timestamptz
+         (now() - interval '28800000 milliseconds'), (now() - interval '28800000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"new"}'::jsonb,'2026-09-03T08:00:00.000Z'),('{"status":"qualified"}'::jsonb,'2026-09-04T08:00:00.000Z'),('{"status":"pre_assessment"}'::jsonb,'2026-09-05T08:00:00.000Z'),('{"status":"awaiting_doctor"}'::jsonb,'2026-09-07T00:00:00.000Z')) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'dental', '[{"q":"Eksik diş sayısı","a":"3"}]'::jsonb, now() FROM cse RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"new"}'::jsonb,(now() - interval '345600000 milliseconds')),('{"status":"qualified"}'::jsonb,(now() - interval '259200000 milliseconds')),('{"status":"pre_assessment"}'::jsonb,(now() - interval '172800000 milliseconds')),('{"status":"awaiting_doctor"}'::jsonb,(now() - interval '28800000 milliseconds'))) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'dental', '[{"q":"Eksik diş sayısı","a":"3"}]'::jsonb, now() FROM cse RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -121,10 +121,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='selin.kaya@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-09-06T20:00:00.000Z'::timestamptz, '2026-09-06T20:00:00.000Z'::timestamptz
+         (now() - interval '43200000 milliseconds'), (now() - interval '43200000 milliseconds')
   FROM l RETURNING id
 )
-, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('James Bennett','Eş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"new"}'::jsonb,'2026-09-01T08:00:00.000Z'),('{"status":"qualified"}'::jsonb,'2026-09-02T08:00:00.000Z'),('{"status":"pre_assessment"}'::jsonb,'2026-09-03T08:00:00.000Z'),('{"status":"awaiting_doctor"}'::jsonb,'2026-09-05T08:00:00.000Z'),('{"status":"quoted"}'::jsonb,'2026-09-06T20:00:00.000Z')) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'aesthetic_surgery', '[{"q":"İlgilenilen prosedür","a":"Rinoplasti"}]'::jsonb, now() FROM cse RETURNING 1)
+, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('James Bennett','Eş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"new"}'::jsonb,(now() - interval '518400000 milliseconds')),('{"status":"qualified"}'::jsonb,(now() - interval '432000000 milliseconds')),('{"status":"pre_assessment"}'::jsonb,(now() - interval '345600000 milliseconds')),('{"status":"awaiting_doctor"}'::jsonb,(now() - interval '172800000 milliseconds')),('{"status":"quoted"}'::jsonb,(now() - interval '43200000 milliseconds'))) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'aesthetic_surgery', '[{"q":"İlgilenilen prosedür","a":"Rinoplasti"}]'::jsonb, now() FROM cse RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -141,10 +141,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='mert.aydin@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='kaan.sahin@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='natasha.ivanova@demo.carenova.ai'),
-         '2026-09-06T08:00:00.000Z'::timestamptz, '2026-09-06T08:00:00.000Z'::timestamptz
+         (now() - interval '86400000 milliseconds'), (now() - interval '86400000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"new"}'::jsonb,'2026-08-28T08:00:00.000Z'),('{"status":"quoted"}'::jsonb,'2026-09-04T08:00:00.000Z'),('{"status":"awaiting_deposit"}'::jsonb,'2026-09-06T08:00:00.000Z')) AS v(p,at) RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"new"}'::jsonb,(now() - interval '864000000 milliseconds')),('{"status":"quoted"}'::jsonb,(now() - interval '259200000 milliseconds')),('{"status":"awaiting_deposit"}'::jsonb,(now() - interval '86400000 milliseconds'))) AS v(p,at) RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -161,10 +161,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='emre.yildiz@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='elif.aksoy@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='reem.al.sayed@demo.carenova.ai'),
-         '2026-09-05T08:00:00.000Z'::timestamptz, '2026-09-05T08:00:00.000Z'::timestamptz
+         (now() - interval '172800000 milliseconds'), (now() - interval '172800000 milliseconds')
   FROM l RETURNING id
 )
-, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('Amina Zohra','Kız kardeş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"new"}'::jsonb,'2026-08-18T08:00:00.000Z'),('{"status":"quoted"}'::jsonb,'2026-08-26T08:00:00.000Z'),('{"status":"awaiting_deposit"}'::jsonb,'2026-08-30T08:00:00.000Z'),('{"status":"reserved"}'::jsonb,'2026-09-05T08:00:00.000Z')) AS v(p,at) RETURNING 1)
+, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('Amina Zohra','Kız kardeş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"new"}'::jsonb,(now() - interval '1728000000 milliseconds')),('{"status":"quoted"}'::jsonb,(now() - interval '1036800000 milliseconds')),('{"status":"awaiting_deposit"}'::jsonb,(now() - interval '691200000 milliseconds')),('{"status":"reserved"}'::jsonb,(now() - interval '172800000 milliseconds'))) AS v(p,at) RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -181,10 +181,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='ayla.celik@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='kaan.sahin@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-09-04T08:00:00.000Z'::timestamptz, '2026-09-04T08:00:00.000Z'::timestamptz
+         (now() - interval '259200000 milliseconds'), (now() - interval '259200000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"reserved"}'::jsonb,'2026-08-28T08:00:00.000Z'),('{"status":"travel_planned"}'::jsonb,'2026-09-04T08:00:00.000Z')) AS v(p,at) RETURNING 1), itn AS (INSERT INTO case_timeline (case_id, day_offset, title, type) SELECT cse.id, v.d, v.t, 'consultation' FROM cse, (VALUES (0,'{"tr":"Varış + konsültasyon","label":"Gün 1"}'::jsonb),(1,'{"tr":"Operasyon","label":"Gün 2"}'::jsonb),(2,'{"tr":"Dinlenme + kontrol","label":"Gün 3-4"}'::jsonb),(3,'{"tr":"Dönüş","label":"Gün 5"}'::jsonb)) AS v(d,t) RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"reserved"}'::jsonb,(now() - interval '864000000 milliseconds')),('{"status":"travel_planned"}'::jsonb,(now() - interval '259200000 milliseconds'))) AS v(p,at) RETURNING 1), itn AS (INSERT INTO case_timeline (case_id, day_offset, title, type) SELECT cse.id, v.d, v.t, 'consultation' FROM cse, (VALUES (0,'{"tr":"Varış + konsültasyon","label":"Gün 1"}'::jsonb),(1,'{"tr":"Operasyon","label":"Gün 2"}'::jsonb),(2,'{"tr":"Dinlenme + kontrol","label":"Gün 3-4"}'::jsonb),(3,'{"tr":"Dönüş","label":"Gün 5"}'::jsonb)) AS v(d,t) RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -201,10 +201,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='emre.yildiz@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='kaan.sahin@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-09-07T02:00:00.000Z'::timestamptz, '2026-09-07T02:00:00.000Z'::timestamptz
+         (now() - interval '21600000 milliseconds'), (now() - interval '21600000 milliseconds')
   FROM l RETURNING id
 )
-, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('Amir Baig','Kardeş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"travel_planned"}'::jsonb,'2026-09-02T08:00:00.000Z'),('{"status":"arrived"}'::jsonb,'2026-09-07T02:00:00.000Z')) AS v(p,at) RETURNING 1), itn AS (INSERT INTO case_timeline (case_id, day_offset, title, type) SELECT cse.id, v.d, v.t, 'consultation' FROM cse, (VALUES (0,'{"tr":"Varış — otelde","label":"Gün 1"}'::jsonb)) AS v(d,t) RETURNING 1)
+, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('Amir Baig','Kardeş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"travel_planned"}'::jsonb,(now() - interval '432000000 milliseconds')),('{"status":"arrived"}'::jsonb,(now() - interval '21600000 milliseconds'))) AS v(p,at) RETURNING 1), itn AS (INSERT INTO case_timeline (case_id, day_offset, title, type) SELECT cse.id, v.d, v.t, 'consultation' FROM cse, (VALUES (0,'{"tr":"Varış — otelde","label":"Gün 1"}'::jsonb)) AS v(d,t) RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -221,10 +221,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='selin.kaya@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='elif.aksoy@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-09-06T08:00:00.000Z'::timestamptz, '2026-09-06T08:00:00.000Z'::timestamptz
+         (now() - interval '86400000 milliseconds'), (now() - interval '86400000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"arrived"}'::jsonb,'2026-09-04T08:00:00.000Z'),('{"status":"treated"}'::jsonb,'2026-09-06T08:00:00.000Z')) AS v(p,at) RETURNING 1), itn AS (INSERT INTO case_timeline (case_id, day_offset, title, type) SELECT cse.id, v.d, v.t, 'consultation' FROM cse, (VALUES (0,'{"tr":"Operasyon tamamlandı, dinlenme","label":"Gün 3"}'::jsonb)) AS v(d,t) RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"arrived"}'::jsonb,(now() - interval '259200000 milliseconds')),('{"status":"treated"}'::jsonb,(now() - interval '86400000 milliseconds'))) AS v(p,at) RETURNING 1), itn AS (INSERT INTO case_timeline (case_id, day_offset, title, type) SELECT cse.id, v.d, v.t, 'consultation' FROM cse, (VALUES (0,'{"tr":"Operasyon tamamlandı, dinlenme","label":"Gün 3"}'::jsonb)) AS v(d,t) RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -241,10 +241,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='ayla.celik@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-09-03T08:00:00.000Z'::timestamptz, '2026-09-03T08:00:00.000Z'::timestamptz
+         (now() - interval '345600000 milliseconds'), (now() - interval '345600000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"treated"}'::jsonb,'2026-09-01T08:00:00.000Z'),('{"status":"returned"}'::jsonb,'2026-09-03T08:00:00.000Z')) AS v(p,at) RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"treated"}'::jsonb,(now() - interval '518400000 milliseconds')),('{"status":"returned"}'::jsonb,(now() - interval '345600000 milliseconds'))) AS v(p,at) RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -261,10 +261,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='emre.yildiz@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-08-31T08:00:00.000Z'::timestamptz, '2026-08-31T08:00:00.000Z'::timestamptz
+         (now() - interval '604800000 milliseconds'), (now() - interval '604800000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"treated"}'::jsonb,'2026-08-06T08:00:00.000Z'),('{"status":"returned"}'::jsonb,'2026-08-08T08:00:00.000Z'),('{"status":"in_aftercare"}'::jsonb,'2026-08-08T08:00:00.000Z')) AS v(p,at) RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"treated"}'::jsonb,(now() - interval '2764800000 milliseconds')),('{"status":"returned"}'::jsonb,(now() - interval '2592000000 milliseconds')),('{"status":"in_aftercare"}'::jsonb,(now() - interval '2592000000 milliseconds'))) AS v(p,at) RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -281,10 +281,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='selin.kaya@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='reem.al.sayed@demo.carenova.ai'),
-         '2026-06-09T08:00:00.000Z'::timestamptz, '2026-06-09T08:00:00.000Z'::timestamptz
+         (now() - interval '7776000000 milliseconds'), (now() - interval '7776000000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"treated"}'::jsonb,'2026-03-06T08:00:00.000Z'),('{"status":"in_aftercare"}'::jsonb,'2026-03-11T08:00:00.000Z'),('{"status":"completed"}'::jsonb,'2026-06-09T08:00:00.000Z')) AS v(p,at) RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"treated"}'::jsonb,(now() - interval '15984000000 milliseconds')),('{"status":"in_aftercare"}'::jsonb,(now() - interval '15552000000 milliseconds')),('{"status":"completed"}'::jsonb,(now() - interval '7776000000 milliseconds'))) AS v(p,at) RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -301,10 +301,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-08-23T08:00:00.000Z'::timestamptz, '2026-08-23T08:00:00.000Z'::timestamptz
+         (now() - interval '1296000000 milliseconds'), (now() - interval '1296000000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"quoted"}'::jsonb,'2026-08-18T08:00:00.000Z'),('{"status":"lost"}'::jsonb,'2026-08-23T08:00:00.000Z')) AS v(p,at) RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"quoted"}'::jsonb,(now() - interval '1728000000 milliseconds')),('{"status":"lost"}'::jsonb,(now() - interval '1296000000 milliseconds'))) AS v(p,at) RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -321,10 +321,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='kerem.ates@demo.carenova.ai'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='natasha.ivanova@demo.carenova.ai'),
-         '2026-09-06T22:00:00.000Z'::timestamptz, '2026-09-06T22:00:00.000Z'::timestamptz
+         (now() - interval '36000000 milliseconds'), (now() - interval '36000000 milliseconds')
   FROM l RETURNING id
 )
-, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('Ruslan Yusupov','Eş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"pre_assessment"}'::jsonb,'2026-09-06T08:00:00.000Z'),('{"status":"medically_ineligible"}'::jsonb,'2026-09-06T22:00:00.000Z')) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'ivf', '[{"q":"Donör gamet ihtiyacı","a":"Evet"}]'::jsonb, now() FROM cse RETURNING 1)
+, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('Ruslan Yusupov','Eş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"pre_assessment"}'::jsonb,(now() - interval '86400000 milliseconds')),('{"status":"medically_ineligible"}'::jsonb,(now() - interval '36000000 milliseconds'))) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'ivf', '[{"q":"Donör gamet ihtiyacı","a":"Evet"}]'::jsonb, now() FROM cse RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -341,10 +341,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-09-07T07:48:00.000Z'::timestamptz, '2026-09-07T07:48:00.000Z'::timestamptz
+         (now() - interval '720000 milliseconds'), (now() - interval '720000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"new"}'::jsonb,'2026-09-06T08:00:00.000Z'),('{"status":"qualified"}'::jsonb,'2026-09-07T02:00:00.000Z'),('{"status":"pre_assessment"}'::jsonb,'2026-09-07T07:00:00.000Z'),('{"status":"awaiting_doctor"}'::jsonb,'2026-09-07T07:48:00.000Z')) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'aesthetic_surgery', '[{"q":"İlgilenilen prosedür","a":"Karın germe + liposuction"},{"q":"Önceki ameliyat","a":"Sezaryen (2021)"}]'::jsonb, now() FROM cse RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"new"}'::jsonb,(now() - interval '86400000 milliseconds')),('{"status":"qualified"}'::jsonb,(now() - interval '21600000 milliseconds')),('{"status":"pre_assessment"}'::jsonb,(now() - interval '3600000 milliseconds')),('{"status":"awaiting_doctor"}'::jsonb,(now() - interval '720000 milliseconds'))) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'aesthetic_surgery', '[{"q":"İlgilenilen prosedür","a":"Karın germe + liposuction"},{"q":"Önceki ameliyat","a":"Sezaryen (2021)"}]'::jsonb, now() FROM cse RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -361,10 +361,10 @@ WITH l AS (
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
-         '2026-09-05T08:00:00.000Z'::timestamptz, '2026-09-05T08:00:00.000Z'::timestamptz
+         (now() - interval '172800000 milliseconds'), (now() - interval '172800000 milliseconds')
   FROM l RETURNING id
 )
-, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"new"}'::jsonb,'2026-09-02T08:00:00.000Z'),('{"status":"qualified"}'::jsonb,'2026-09-03T08:00:00.000Z'),('{"status":"pre_assessment"}'::jsonb,'2026-09-04T08:00:00.000Z'),('{"status":"awaiting_doctor"}'::jsonb,'2026-09-05T08:00:00.000Z')) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'eye_lasik', '[{"q":"Numara (sağ/sol)","a":"-4.5 / -4.0"},{"q":"Kornea kalınlığı ölçümü","a":"Yapılmadı"}]'::jsonb, now() FROM cse RETURNING 1)
+, ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"new"}'::jsonb,(now() - interval '432000000 milliseconds')),('{"status":"qualified"}'::jsonb,(now() - interval '345600000 milliseconds')),('{"status":"pre_assessment"}'::jsonb,(now() - interval '259200000 milliseconds')),('{"status":"awaiting_doctor"}'::jsonb,(now() - interval '172800000 milliseconds'))) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'eye_lasik', '[{"q":"Numara (sağ/sol)","a":"-4.5 / -4.0"},{"q":"Kornea kalınlığı ölçümü","a":"Yapılmadı"}]'::jsonb, now() FROM cse RETURNING 1)
 SELECT 1;
 WITH l AS (
   INSERT INTO leads (tenant_id, first_name, phone, language, status, treatment_interest, gdpr_consent_given)
@@ -381,9 +381,9 @@ WITH l AS (
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='x@x'),
          (SELECT id FROM users WHERE email='reem.al.sayed@demo.carenova.ai'),
-         '2026-09-04T08:00:00.000Z'::timestamptz, '2026-09-04T08:00:00.000Z'::timestamptz
+         (now() - interval '259200000 milliseconds'), (now() - interval '259200000 milliseconds')
   FROM l RETURNING id
 )
-, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('Layla Haddad','Eş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ('{"status":"new"}'::jsonb,'2026-08-30T08:00:00.000Z'),('{"status":"qualified"}'::jsonb,'2026-09-01T08:00:00.000Z'),('{"status":"pre_assessment"}'::jsonb,'2026-09-03T08:00:00.000Z'),('{"status":"awaiting_doctor"}'::jsonb,'2026-09-04T08:00:00.000Z')) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'dental', '[{"q":"Eksik diş sayısı","a":"8"},{"q":"Kronik hastalık","a":"Tip 2 diyabet — kontrolsüz"}]'::jsonb, now() FROM cse RETURNING 1)
+, comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ('Layla Haddad','Eş')) AS v(name,rel) RETURNING 1), ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ('{"status":"new"}'::jsonb,(now() - interval '691200000 milliseconds')),('{"status":"qualified"}'::jsonb,(now() - interval '518400000 milliseconds')),('{"status":"pre_assessment"}'::jsonb,(now() - interval '345600000 milliseconds')),('{"status":"awaiting_doctor"}'::jsonb,(now() - interval '259200000 milliseconds'))) AS v(p,at) RETURNING 1), asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, 'dental', '[{"q":"Eksik diş sayısı","a":"8"},{"q":"Kronik hastalık","a":"Tip 2 diyabet — kontrolsüz"}]'::jsonb, now() FROM cse RETURNING 1)
 SELECT 1;
 COMMIT;

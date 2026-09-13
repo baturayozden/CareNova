@@ -5,6 +5,9 @@ const j=v=>"'"+JSON.stringify(v).replace(/'/g,"''")+"'::jsonb";
 const ROLE={doctors:12,consultants:11,coordinators:13,interpreters:14};
 const tr={'ç':'c','ğ':'g','ı':'i','ö':'o','ş':'s','ü':'u','Ç':'c','Ğ':'g','İ':'i','Ö':'o','Ş':'s','Ü':'u'};
 const email=n=>n.replace(/^Dr\.?\s*/,'').split('').map(c=>tr[c]||c).join('').toLowerCase().replace(/[^a-z0-9]+/g,'.').replace(/^\.|\.$/g,'')+'@demo.carenova.ai';
+// Dates are written relative to now() — see CASE_DATA_NOW_MS in seed-demo-tenant.js.
+const CASE_DATA_NOW_MS=Date.parse('2026-09-07T08:00:00Z');
+const ago=iso=>`(now() - interval '${Math.max(0,CASE_DATA_NOW_MS-Date.parse(iso))} milliseconds')`;
 const L=[];
 L.push('BEGIN;');
 const branches=[...new Set(D.cases.map(c=>c.branchKey))];
@@ -50,12 +53,12 @@ for(const c of D.cases){
          (SELECT id FROM users WHERE email=${q(c.assignedDoctor?email(c.assignedDoctor):'x@x')}),
          (SELECT id FROM users WHERE email=${q(c.assignedCoordinator?email(c.assignedCoordinator):'x@x')}),
          (SELECT id FROM users WHERE email=${q(c.assignedInterpreter?email(c.assignedInterpreter):'x@x')}),
-         ${q(c.lastActivityAt)}::timestamptz, ${q(c.lastActivityAt)}::timestamptz
+         ${ago(c.lastActivityAt)}, ${ago(c.lastActivityAt)}
   FROM l RETURNING id
 )`);
   const parts=[];
   if(c.companions.length) parts.push(`comp AS (INSERT INTO case_companions (case_id, name, relationship) SELECT cse.id, v.name, v.rel FROM cse, (VALUES ${c.companions.map(x=>`(${q(x.name)},${q(x.relation||null)})`).join(',')}) AS v(name,rel) RETURNING 1)`);
-  if(c.statusHistory.length) parts.push(`ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at::timestamptz FROM cse, (VALUES ${c.statusHistory.map(h=>`(${j({status:h.status})},${q(h.at)})`).join(',')}) AS v(p,at) RETURNING 1)`);
+  if(c.statusHistory.length) parts.push(`ev AS (INSERT INTO case_events (case_id, event_type, payload, created_at) SELECT cse.id,'status_change',v.p,v.at FROM cse, (VALUES ${c.statusHistory.map(h=>`(${j({status:h.status})},${ago(h.at)})`).join(',')}) AS v(p,at) RETURNING 1)`);
   if(c.preAssessment&&c.preAssessment.length) parts.push(`asm AS (INSERT INTO case_assessments (case_id, template_key, answers, completed_at) SELECT cse.id, ${q(c.branchKey)}, ${j(c.preAssessment)}, now() FROM cse RETURNING 1)`);
   if(c.itinerary&&c.itinerary.length) parts.push(`itn AS (INSERT INTO case_timeline (case_id, day_offset, title, type) SELECT cse.id, v.d, v.t, 'consultation' FROM cse, (VALUES ${c.itinerary.map((s,i)=>`(${i},${j({tr:s.plan,label:s.day})})`).join(',')}) AS v(d,t) RETURNING 1)`);
   if(parts.length){ L.push(', '+parts.join(', ')); L.push(`SELECT 1;`); }
