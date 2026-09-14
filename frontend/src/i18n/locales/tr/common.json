@@ -1,6 +1,7 @@
 {
   "appName": "CareNova",
   "loading": "Yükleniyor…",
+  "wakingServer": "Sunucu uyku modundan uyanıyor olabilir; ilk açılış 30-50 saniye sürebilir.",
   "save": "Kaydet",
   "cancel": "Vazgeç",
   "delete": "Sil",

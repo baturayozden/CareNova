@@ -3,6 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth, User } from '../context/AuthContext';
 import { PLATFORM_ROLES } from '../lib/roles';
 import { hostUrls } from '../config/hosts';
+import AppLoadingScreen from './AppLoadingScreen';
 
 interface ProtectedRouteProps {
   roles?: string[];
@@ -25,11 +26,9 @@ export default function ProtectedRoute({ roles }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-surface-page">
-        <div className="w-10 h-10 border-4 border-line border-t-accent rounded-full animate-spin" />
-      </div>
-    );
+    // /auth/me is what this waits on, and on a sleeping free Render instance
+    // that is 30-50 s. AppLoadingScreen says so rather than spinning silently.
+    return <AppLoadingScreen />;
   }
 
   if (!user) {

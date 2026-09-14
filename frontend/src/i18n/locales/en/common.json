@@ -1,6 +1,7 @@
 {
   "appName": "CareNova",
   "loading": "Loading…",
+  "wakingServer": "The server may be waking up from sleep; the first load can take 30-50 seconds.",
   "save": "Save",
   "cancel": "Cancel",
   "delete": "Delete",

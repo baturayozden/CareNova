@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AppLoadingScreen from './components/AppLoadingScreen';
 import ScrollToTop  from './components/ScrollToTop';
 import ScrollToHash from './components/ScrollToHash';
 import ConsentBanner from './components/ConsentBanner';
@@ -62,11 +63,7 @@ import {
 const AdminApp = React.lazy(() => import('./admin/AdminApp'));
 
 function AdminLoadingFallback() {
-  return (
-    <div className="flex h-screen items-center justify-center bg-surface-page">
-      <div className="w-10 h-10 border-4 border-line border-t-accent rounded-full animate-spin" />
-    </div>
-  );
+  return <AppLoadingScreen />;
 }
 
 // ── Marketing host (carenova.ai) ────────────────────────────────────────────

@@ -81,6 +81,41 @@
       });
     </script>
     <meta charset="utf-8" />
+    <!-- API wake-up ping. The API runs on a free Render instance that sleeps
+         after ~15 min idle; the first request then takes 30-50 s. The admin
+         console blocks on /auth/me before it can paint anything, so that whole
+         cost lands on the first screen a visitor sees. Firing a credential-less
+         GET /health HERE — while the JS bundle is still being downloaded and
+         parsed — starts the wake several seconds earlier, so the two waits
+         overlap instead of stacking.
+
+         Who gets the ping mirrors src/lib/api.ts exactly (USES_DEMO_ADAPTER):
+         the admin host always talks to the real API, the app host only when
+         demo mode is OFF (in demo mode its /auth/me is answered in-browser by
+         demoAdapter, so there is no cold start to hide), and marketing never —
+         it carries most of the traffic and has no reason to wake a backend.
+
+         Both REACT_APP_ placeholders below are substituted at build time by
+         CRA (InterpolateHtmlPlugin, env.raw); the charAt('%') check is what
+         makes an unset var a no-op instead of a bad request. -->
+    <script>
+      (function () {
+        try {
+          var base = '%REACT_APP_API_URL%';
+          if (!base || base.charAt(0) === '%') return;
+          var demo = '%REACT_APP_DEMO_MODE%' === 'true';
+          var h = location.hostname;
+          var isAdmin = h.indexOf('admin.') === 0;
+          var isApp = h.indexOf('app.') === 0;
+          if (!(isAdmin || (isApp && !demo))) return;
+          /* no-cors: the response is opaque and unused — the point is only to
+             make the instance start. Nothing here can fail loudly. */
+          fetch(base.replace(/\/+$/, '') + '/health', { mode: 'no-cors', cache: 'no-store' })
+            .catch(function () {});
+        } catch (e) {}
+      })();
+    </script>
+
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1B6FEA" />
