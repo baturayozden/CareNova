@@ -406,14 +406,67 @@ $seed$;
 -- CareNova Demo Klinik is the tenant the CLINIC panel (app host) signs into. It
 -- had 18 cases and 18 leads and ZERO messages: a clinic with patients and no
 -- conversations, and the product's most distinctive screen — the AI WhatsApp
--- thread — empty.
+-- thread — empty. It also had no WhatsApp line at all, so the WhatsApp Hatları
+-- screen read "Hat yok" next to its traffic; and its leads all carried the seed
+-- moment as created_at, which put a patient's first message three months AFTER
+-- the case she supposedly opened.
 --
--- The script is a real consultation arc (first contact -> treatment question ->
--- photos -> medical assessment -> written quote -> travel) in the language each
--- lead actually speaks. Nothing in it promises an outcome, quotes a price
+-- The script below is a real consultation arc (first contact -> treatment
+-- question -> photos -> medical assessment -> written quote -> travel) in the
+-- language each lead actually speaks. Nothing in it promises an outcome, quotes
 -- before assessment, or gives medical advice: this is demo data for a health
--- product, so it models what the AI is ALLOWED to say. The Uyum Paneli's
--- blocked phrases (section 5) are the counter-example, and they are separate.
+-- product, so it models what the AI is ALLOWED to say. The blocked phrases in
+-- section 5 are the counter-example and they are deliberately separate.
+
+-- 7a. A clinic with messages needs a line for them to have arrived on.
+-- Credentials are the same literal placeholders the other demo rows use;
+-- nothing token-shaped is ever written to this table.
+INSERT INTO whatsapp_configs (tenant_id, display_name, phone_number_id, business_account_id,
+                              access_token, webhook_verify_token, is_active,
+                              daily_message_limit, display_phone_number)
+SELECT t.id, t.name, '778812345600100', 'demo-waba',
+       'demo-not-a-token', 'demo-not-a-token', true, 1000, '+90 212 555 0100'
+FROM tenants t
+WHERE t.slug = 'carenova-demo'
+  AND NOT EXISTS (SELECT 1 FROM whatsapp_configs w WHERE w.tenant_id = t.id);
+
+-- 7b. The clinic opened in a live demo was also the emptiest detail page and
+-- the only row in the Uyum Paneli reading "Bilinmiyor" throughout. Give it the
+-- profile of a clinic that has done everything right: it is the reference the
+-- others are compared against.
+UPDATE tenants
+   SET legal_name = COALESCE(legal_name, 'CareNova Demo Sağlık Hizmetleri A.Ş.'),
+       email      = COALESCE(email, 'info@demo.carenova.ai'),
+       phone      = COALESCE(phone, '+90 212 555 0100')
+ WHERE slug = 'carenova-demo';
+
+INSERT INTO tenant_compliance (tenant_id, license_number, license_expires_at,
+                               complication_insurance_status, complication_insurance_expires_at,
+                               verbis_status, verbis_registered_at,
+                               cross_border_contract_status, cross_border_notified_at,
+                               foreign_language_staff_ratio)
+SELECT t.id, 'SB-34-2024-0100', (now() + interval '14 months')::date,
+       'active', (now() + interval '9 months')::date,
+       'registered', (now() - interval '8 months')::date,
+       'signed', (now() - interval '7 months')::date,
+       33   -- 5 of 15 staff work in a foreign language; the floor is 20%
+FROM tenants t
+WHERE t.slug = 'carenova-demo'
+  AND NOT EXISTS (SELECT 1 FROM tenant_compliance tc WHERE tc.tenant_id = t.id);
+
+-- 7c. The lead has to exist before the case it opened.
+UPDATE leads l
+   SET created_at        = c.created_at - ((1 + (abs(hashtext('lead' || l.id::text)::bigint) % 3)) * interval '1 day'),
+       status_changed_at = c.created_at,
+       status = CASE
+         WHEN c.status IN ('lost','medically_ineligible')                             THEN 'lost'
+         WHEN c.status IN ('arrived','treated','returned','in_aftercare','completed')  THEN 'attended'
+         WHEN c.status IN ('reserved','travel_planned')                                THEN 'booked'
+         WHEN c.status = 'new'                                                         THEN 'responded'
+         ELSE 'qualified' END
+  FROM cases c
+ WHERE c.patient_id = l.id
+   AND l.tenant_id = (SELECT id FROM tenants WHERE slug = 'carenova-demo');
 
 DELETE FROM messages WHERE tenant_id = (SELECT id FROM tenants WHERE slug = 'carenova-demo');
 
@@ -485,14 +538,26 @@ SELECT * FROM (VALUES
  ('ar',12,'outbound','العرض يشمل الإقامة والنقل من المطار، أما تذكرة الطيران فغير مشمولة. يمكن لمنسّقنا إعداد خيارات حسب تواريخك.')
 ) AS s(lang, turn, direction, text);
 
--- Turn count per lead: a lost lead never reaches the quote, a treated one goes
--- the whole way. The thread stops where the conversation actually got to.
+-- The window each thread occupies: from the lead's first contact to when the
+-- conversation actually stopped. A closed case stopped talking when it closed;
+-- an open one is still recent. Clamped to three hours ago at the latest —
+-- demo.roll_clock (071) takes its hand from the newest activity row, so a
+-- thread ending at now() would be pushed into the future by the first roll.
 CREATE TEMP TABLE _threads ON COMMIT DROP AS
-SELECT l.id AS lead_id, l.tenant_id, l.created_at, l.language,
+SELECT l.id AS lead_id, l.tenant_id, l.language,
+       l.created_at AS starts,
+       LEAST(
+         CASE WHEN c.status IN ('completed','lost','medically_ineligible')
+              THEN c.updated_at + interval '2 days'
+              ELSE now() - ((2 + (abs(hashtext('end' || l.id::text)::bigint) % 40)) * interval '1 hour')
+         END,
+         now() - interval '3 hours'
+       ) AS ends,
        CASE WHEN l.status = 'lost'     THEN 4 + (abs(hashtext('n' || l.id::text)::bigint) % 4)
             WHEN l.status = 'attended' THEN 12
             ELSE 6 + (abs(hashtext('n' || l.id::text)::bigint) % 7) END AS turns
 FROM leads l
+JOIN cases c   ON c.patient_id = l.id
 JOIN tenants t ON t.id = l.tenant_id AND t.slug = 'carenova-demo';
 
 INSERT INTO messages (tenant_id, lead_id, direction, content, message_type, status,
@@ -504,8 +569,7 @@ SELECT th.tenant_id, th.lead_id, s.direction, s.text, 'text',
        CASE WHEN s.direction = 'outbound'
              AND abs(hashtext('f' || th.lead_id::text || s.turn::text)::bigint) % 100 < 3
             THEN 'failed' ELSE 'read' END,
-       at.ts,
-       s.direction = 'outbound',
+       at.ts, s.direction = 'outbound',
        CASE WHEN s.direction = 'outbound' THEN 'claude-sonnet-4-5' END,
        CASE WHEN s.direction = 'outbound'
             THEN 900 + (abs(hashtext('pt' || th.lead_id::text || s.turn::text)::bigint) % 700) END,
@@ -515,20 +579,34 @@ SELECT th.tenant_id, th.lead_id, s.direction, s.text, 'text',
 FROM _threads th
 JOIN _script s ON s.lang = th.language AND s.turn <= th.turns
 CROSS JOIN LATERAL (
-  -- Spread the turns PROPORTIONALLY between first contact and two hours ago.
-  -- A fixed step (the first version used 9 hours) runs a recent lead's thread
-  -- past now(): 157 messages ended up future-dated, and since demo.roll_clock
-  -- takes its hand from the newest activity row, that would have made the
-  -- computed delta negative and stopped the clock permanently.
-  SELECT th.created_at + (now() - interval '2 hours' - th.created_at)
-                         * (s.turn::double precision / th.turns) AS ts
+  SELECT th.starts + (GREATEST(th.ends, th.starts + interval '3 hours') - th.starts)
+                     * (s.turn::double precision / th.turns) AS ts
 ) at;
 
--- Counters and lead status derived from the thread, never asserted.
+-- The AI does not take hours to answer, and the platform overview reports
+-- exactly that: average first reply. Laying every turn out evenly put the AI's
+-- response hours after the patient's message and the overview read 1 989,8 s —
+-- 33 minutes — for a product whose whole claim is an instant answer. The
+-- patient takes hours or days to write back; the AI answers in seconds.
+WITH seq AS (
+  SELECT m.id, m.direction,
+         lag(m.created_at) OVER (PARTITION BY m.lead_id ORDER BY m.created_at) AS prev_at,
+         lag(m.direction)  OVER (PARTITION BY m.lead_id ORDER BY m.created_at) AS prev_dir
+  FROM messages m
+  WHERE m.tenant_id = (SELECT id FROM tenants WHERE slug = 'carenova-demo')
+),
+fixed AS (
+  -- 18-180 s: fast, but not so uniform that it reads as generated.
+  SELECT id, prev_at + ((18 + (abs(hashtext('d' || id::text)::bigint) % 163)) * interval '1 second') AS ts
+  FROM seq WHERE direction = 'outbound' AND prev_dir = 'inbound' AND prev_at IS NOT NULL
+)
+UPDATE messages m SET created_at = f.ts, sent_at = f.ts, status_updated_at = f.ts
+  FROM fixed f WHERE m.id = f.id;
+
+-- Counters derived from the thread, never asserted.
 UPDATE leads l
    SET last_ai_message_at = s.last_ai,
-       ai_follow_up_count = s.ai_n,
-       status = CASE WHEN l.status = 'new' THEN 'responded' ELSE l.status END
+       ai_follow_up_count = s.ai_n
   FROM (SELECT lead_id,
                max(created_at) FILTER (WHERE ai_generated) AS last_ai,
                count(*) FILTER (WHERE ai_generated AND direction = 'outbound')::int AS ai_n
