@@ -485,6 +485,65 @@ AI, sıcak lead'e doktorla 10 dakikalık görüntülü görüşme önerir; dokto
 
 **Neden bu kadar önemli:** Şikayetvar ve Trustpilot şikayetlerinin en yoğun kümesi burada. Kliniğe satarken argüman şu: *"Bu rozet, sizi rakiplerinizin şikayet ettiği şeyden ayırıyor — ve dönüşümü artırıyor."*
 
+#### Ticari kararlar — 14 Eylül 2026
+
+Bu bölüm M4'ün yukarıdaki tanımını **bağlayıcı hâle getiren** dört kararı kayda
+geçirir. Dördü de ticari karardır, teknik değil: kodu yazmadan önce verilmesi
+gerekiyordu çünkü veri modeli bunlara göre şekilleniyor.
+
+**1. Garanti sınırı: mutlak kilit + imzalı ek belge.**
+Teklifte yazan kalemler hiçbir koşulda artmaz. Klinik ek bir işlem gerekli
+görürse doktor imzalı ayrı bir **ek belge** çıkarır; hasta bunu **tedaviden
+önce** kabul eder. Hasta reddederse orijinal teklif aynen geçerli kalır ve
+tedavi orijinal kapsamla yapılır. Bant yok, istisna listesi yok.
+
+*Neden bu:* "Garanti, şu şartlarla" bir garanti değildir. ±%10 bant ise
+şikâyetlerin çoğunun zaten çıktığı büyüklük — bandı tanımak vaadi anlamsız
+kılar. Ek belge yolu ise gerçek tıbbi bulguyu inkâr etmeden vaadi koruyor:
+fiyat artmıyor, **kapsam** hastanın onayıyla değişiyor.
+
+**2. Kilit yetkisi: klinik kendi eşiğini belirler, varsayılan her teklif onay ister.**
+Hasta danışmanı teklifi hazırlar. Tutar kliniğin belirlediği eşiğin altındaysa
+tek başına kilitler; üstündeyse klinik sahibi veya operasyon müdürü onaylar.
+Varsayılan eşik sıfır — yani yeni klinik kurulumdan çıktığında **her** teklif
+ikinci bir onay ister; klinik eşiği bilinçli olarak yükseltir. Solo pakette
+eşik sınırsıza çekilir.
+
+*Neden bu:* Fiyatı belirleyen ve değiştiren aynı kişi olursa "kilitli teklif"in
+denetim değeri kalmaz. Ama tek kullanıcılı Solo pakette onaylayacak ikinci kişi
+yok; sabit iki-kişi kuralı o planı uygulanamaz hâle getirirdi.
+
+**3. Depozito: kliniğin kendi hesabı. Para CareNova'ya hiç uğramaz.**
+CareNova yalnızca ödeme **linki** üretir; klinik kendi Stripe/İyzico/banka
+hesabını bağlar.
+
+*Neden bu:* §9 saf abonelik modelini (Model A) seçerek aracı kuruluş yetki
+belgesi tartışmasından kaçınıyor. Hasta parasını tutmak ya da aktarmak o soruyu
+geri getirir — üstüne ödeme aracılığı mevzuatını da ekler.
+
+**⚠️ Bunun doğrudan sonucu:** CareNova depozitonun ödendiğini **göremez**.
+Dolayısıyla "teklif kabul edildi" durumu ödemeden türetilemez; ürün içinde
+hastanın açık bir kabul eylemi (ya da kliniğin "depozito alındı" işaretlemesi)
+olmak zorunda. Vaka durumunun `awaiting_deposit → reserved` geçişi de bu
+eyleme bağlanacak, ödeme webhook'una değil.
+
+**4. Para birimi: EUR bağlayıcı, hastanın para biriminde bilgi amaçlı çeviri.**
+Teklifteki tek bağlayıcı tutar EUR. Yanında "bugünkü kurla ~£X" bilgi notu ve
+**kurun hangi tarih/saatte alındığı** yazar. Kur riski hastada kalır ama
+görünür.
+
+*Neden bu:* Hastanın para biriminde kilitlemek hasta için en güçlü vaat, ama kur
+riskini tamamen kliniğe yükler — 21 günde %5 oynayan bir kurda klinik marjını
+yer ve klinikler buna direnir. Hiç göstermemek ise dönüşümde sürtünme yaratır.
+
+**Hâlâ açık, hukuk görüşü gerektiren tek soru:**
+"Fiyat Garantisi Rozeti" kimin garantisi? Öneri: rozet **kaydı** garanti eder,
+fiyatı değil — "bu klinik CareNova üzerinde kilitli teklif düzenler ve her
+versiyonu değişmez şekilde kaydedilir". CareNova taraflar arasında hakem
+olmaz, tazmin etmez. Aksi hâlde platform hasta-klinik ilişkisine taraf olmaya
+başlar ve §9'un kaçındığı yere geri döner.
+
+
 ---
 
 ### M5 — Seyahat ve Lojistik Konsiyerj [YENİ]
